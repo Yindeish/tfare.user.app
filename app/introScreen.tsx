@@ -1,6 +1,8 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React from 'react'
 import Swiper from 'react-native-swiper'
+import { useSession } from '@/contexts/userSignedInContext';
+import { Link } from 'expo-router';
 
 const { container, page, slide1, slide2, slide3, text, wrapper, activeDotStyle } = StyleSheet.create({
     container: {
@@ -43,9 +45,13 @@ const { container, page, slide1, slide2, slide3, text, wrapper, activeDotStyle }
 });
 
 export default function introScreen() {
+
+    const { signIn } = useSession();
+
     return (
         <View style={container}>
             <Swiper
+                loop={false}
                 style={wrapper}
                 showsButtons={false}
                 dotColor='white'
@@ -54,6 +60,8 @@ export default function introScreen() {
             >
                 <View style={slide1}>
                     <Text style={text}>Hello Swiper</Text>
+                    <Pressable onPress={signIn}><Text>Signin</Text></Pressable>
+                    <Link href={'/(app)/'}>Home</Link>
                 </View>
                 <View style={slide2}>
                     <Text style={text}>Beautiful</Text>
