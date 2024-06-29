@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import { Redirect } from 'expo-router';
 import { useSession } from '@/contexts/userTokenContext';
 
-export default function index() {
+export default function Index() {
     const { session, isLoading } = useSession();
 
     const { width, height } = Dimensions.get('window');
@@ -13,8 +13,7 @@ export default function index() {
     }, [session])
 
     if (isLoading) {
-        // return <View style={{ width, height, backgroundColor: '#D8D8D8' }} />;
-        return <View style={{ width, height, backgroundColor: 'red' }} />;
+        return <View style={{ width, height, backgroundColor: '#D7D7D7' }} />;
     }
 
     if (!session) {
@@ -24,10 +23,4 @@ export default function index() {
     else {
         return <Redirect href="/(auth)/signin" />;
     }
-
-    // return (
-    //     <View>
-    //         <Text>index</Text>
-    //     </View>
-    // )
 }

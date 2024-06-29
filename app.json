@@ -13,7 +13,8 @@
       "backgroundColor": "#5D5FEF"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "y"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,7 +31,8 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "expo-font"    ],
+      "expo-font"
+    ],
     "experiments": {
       "typedRoutes": true
     },

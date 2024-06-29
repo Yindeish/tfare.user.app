@@ -1,7 +1,16 @@
-import { Redirect, Stack } from 'expo-router';
-import { Dimensions, View } from 'react-native';
+import { Redirect, Stack, Tabs } from 'expo-router';
+import { Dimensions, View, Image } from 'react-native';
 import { useSession } from '../../contexts/userSignedInContext';
 import { useEffect } from 'react';
+import { pages } from '@/constants/pages';
+import { FontAwesome } from '@expo/vector-icons';
+import { tabs } from '@/constants/tabs';
+import { colors } from '@/constants/Colors';
+// import HomeSVG from '@/components/svg/home';
+// import HomeSVG from '@/components/svg/home.svg';
+import TabBartTitle from '@/components/tab/tabTitle';
+import { images } from '@/constants/images';
+
 
 export default function AppLayout() {
   const { session, isLoading } = useSession();
@@ -20,6 +29,43 @@ export default function AppLayout() {
     return <Redirect href="/(auth)/signin" />;
   }
 
-  return <Stack />;
+  else return <Tabs screenOptions={{ tabBarActiveTintColor: 'blue', headerShown: false }}>
+    <Tabs.Screen
+      name={tabs.home}
+      options={{
+        tabBarStyle: {
+          backgroundColor: colors.white,
+        },
+        tabBarLabel: ({ color }) => <TabBartTitle title='Home' color={color} />,
+        // tabBarIcon: ({ color }) => <HomeSVG width={20} height={20} />,
+        // tabBarIcon: ({ color }) => <HomeSVG color={color} />,
+        tabBarIcon: ({ color, focused }) => <Image style={{ width: 18, height: 19.72 }} source={focused ? images.activeHomeImage : images.homeImage} />,
+        tabBarActiveBackgroundColor: colors.white
+      }}
+    />
+    <Tabs.Screen
+      name={tabs.trip}
+      options={{
+        tabBarLabel: ({ color }) => <TabBartTitle title='Trip' color={color} />,
+        tabBarIcon: ({ color, focused }) => <Image style={{ width: 22, height: 19 }} source={focused ? images.activeTripImage : images.tripImage} />,
+      }}
+    />
+    <Tabs.Screen
+      name={tabs.offer}
+      options={{
+        tabBarLabel: ({ color }) => <TabBartTitle title='Offers' color={color} />,
+        tabBarIcon: ({ color, focused }) => <Image style={{ width: 20.12, height: 19.43 }} source={focused ? images.activeOffersImage : images.offersImage} />,
+      }}
+    />
+    <Tabs.Screen
+      name={tabs.account}
+      options={{
+        tabBarLabel: ({ color }) => <TabBartTitle title='Account' color={color} />,
+        tabBarIcon: ({ color, focused }) => <Image style={{ width: 14, height: 18 }} source={focused ? images.activeAccountImage : images.accountImage} />,
+      }}
+    />
+  </Tabs>
 }
+
+
 

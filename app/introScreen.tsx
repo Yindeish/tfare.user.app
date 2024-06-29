@@ -7,6 +7,8 @@ import { Link } from 'expo-router';
 import { images } from '@/constants/images';
 import Colors from '@/constants/Colors';
 import { fonts } from '@/constants/fonts';
+import SafeScreen from '@/components/safeScreen';
+import PaddedScreen from '@/components/paddedScreen';
 
 const { container, containerWrapper, skipLink, skipText, slide, slideImage, slideText, text, wrapper, activeDotStyle, ctaBtn, ctaText } = StyleSheet.create({
     containerWrapper: {
@@ -82,74 +84,78 @@ const { container, containerWrapper, skipLink, skipText, slide, slideImage, slid
     }
 });
 
-export default function introScreen() {
+export default function IntroScreen() {
 
     const { signIn } = useSession();
     let [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
     return (
-        <View style={containerWrapper}>
+        <SafeScreen>
+            <PaddedScreen>
+                <View style={containerWrapper}>
 
-            <Link
-                href={'/(auth)/signin'}
-                style={skipLink}
-            >
-                <Text style={skipText}>Skip</Text>
-            </Link>
+                    <Link
+                        href={'/(auth)/signin'}
+                        style={skipLink}
+                    >
+                        <Text style={skipText}>Skip</Text>
+                    </Link>
 
-            <View style={container}>
-                <Swiper
-                    loop={false}
-                    style={wrapper}
-                    showsButtons={false}
-                    dotColor='white'
-                    activeDotColor='#EF5DA8'
-                    activeDotStyle={activeDotStyle}
-                    onIndexChanged={(index) => {
-                        setCurrentSlideIndex(index);
-                    }}
-                >
-                    <View style={slide}>
-                        <Image style={slideImage} source={images.introScreenImage1} />
+                    <View style={container}>
+                        <Swiper
+                            loop={false}
+                            style={wrapper}
+                            showsButtons={false}
+                            dotColor='white'
+                            activeDotColor='#EF5DA8'
+                            activeDotStyle={activeDotStyle}
+                            onIndexChanged={(index) => {
+                                setCurrentSlideIndex(index);
+                            }}
+                        >
+                            <View style={slide}>
+                                <Image style={slideImage} source={images.introScreenImage1} />
 
-                        <Text style={slideText}>
-                            Unlock a new way to travel with loved ones through our Family Ride feature.
-                        </Text>
+                                <Text style={slideText}>
+                                    Unlock a new way to travel with loved ones through our Family Ride feature.
+                                </Text>
+                            </View>
+                            <View style={slide}>
+                                <Image style={slideImage} source={images.introScreenImage2} />
+
+                                <Text style={slideText}>
+                                    Experience the freedom of safe travels.
+                                </Text>
+                            </View>
+                            <View style={slide}>
+                                <Image style={slideImage} source={images.introScreenImage3} />
+
+                                <Text style={slideText}>
+                                    Discover the joy of shared experiences with our Co-Passenger rides.
+                                </Text>
+                            </View>
+                        </Swiper>
                     </View>
-                    <View style={slide}>
-                        <Image style={slideImage} source={images.introScreenImage2} />
 
-                        <Text style={slideText}>
-                            Experience the freedom of safe travels.
-                        </Text>
-                    </View>
-                    <View style={slide}>
-                        <Image style={slideImage} source={images.introScreenImage3} />
+                    <View style={{
+                        opacity: currentSlideIndex === 2 ? 1 : 0, width: '90%', marginLeft: 'auto', marginRight: 'auto', display: 'flex', flexDirection: 'column', gap: 16
+                    }}>
+                        <Link href={'/(auth)/signup'}>
+                            <TouchableRipple rippleColor={Colors.light.tabIconDefault} style={ctaBtn}>
+                                <Text style={ctaText}>Get Started</Text>
+                            </TouchableRipple>
+                        </Link>
 
-                        <Text style={slideText}>
-                            Discover the joy of shared experiences with our Co-Passenger rides.
-                        </Text>
-                    </View>
-                </Swiper>
-            </View>
-
-            <View style={{
-                opacity: currentSlideIndex === 2 ? 1 : 0, width: '90%', marginLeft: 'auto', marginRight: 'auto', display: 'flex', flexDirection: 'column', gap: 16
-            }}>
-                <Link href={'/(auth)/signup'}>
-                    <TouchableRipple rippleColor={Colors.light.tabIconDefault} style={ctaBtn}>
-                        <Text style={ctaText}>Get Started</Text>
-                    </TouchableRipple>
-                </Link>
-
-                <Link style={{ width: '100%', height: '100%' }} href={'/(auth)/signin'}>
-                    <TouchableRipple rippleColor={Colors.light.tabIconDefault} style={[ctaBtn, { backgroundColor: MD2Colors.transparent, borderWidth: 1, borderColor: MD2Colors.white }]}>
-                        {/* <Link style={{ width: '100%', height: '100%' }} href={'/(auth)/signin'}>
+                        <Link style={{ width: '100%', height: '100%' }} href={'/(auth)/signin'}>
+                            <TouchableRipple rippleColor={Colors.light.tabIconDefault} style={[ctaBtn, { backgroundColor: MD2Colors.transparent, borderWidth: 1, borderColor: MD2Colors.white }]}>
+                                {/* <Link style={{ width: '100%', height: '100%' }} href={'/(auth)/signin'}>
                         </Link> */}
-                        <Text style={ctaText}>Sign in</Text>
-                    </TouchableRipple>
-                </Link>
-            </View>
-        </View>
+                                <Text style={ctaText}>Sign in</Text>
+                            </TouchableRipple>
+                        </Link>
+                    </View>
+                </View>
+            </PaddedScreen>
+        </SafeScreen>
     )
 }

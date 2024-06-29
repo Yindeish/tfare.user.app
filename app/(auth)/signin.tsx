@@ -1,13 +1,14 @@
 import { View, Pressable, StyleSheet, TextInput } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Link, router } from 'expo-router'
-import { useSession } from '@/contexts/userSignedInContext';
-import { useSession as useTokenSession } from '@/contexts/userTokenContext';
-import SafeScreen from '@/components/safeScreen';
+import { useSession } from '../../contexts/userSignedInContext';
+import { useSession as useTokenSession } from '../../contexts/userTokenContext';
+import SafeScreen from '../../components/safeScreen';
 import { MD2Colors, Text } from 'react-native-paper';
-import { fonts } from '@/constants/fonts';
-import { flex, flexCenter, flexCol, flexYCenter, itemsCenter, justifyBetween, justifyEnd, mLAuto, mXAuto, pAuto, pLAuto, wFull, wHFull } from '@/utils/styles';
-import Colors, { colors } from '@/constants/Colors';
+import { fonts } from '../../constants/fonts';
+import { flex, flexCenter, flexCol, flexYCenter, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, mLAuto, mXAuto, pAuto, pLAuto, wFull, wHFull } from '../../utils/styles';
+import Colors, { colors } from '../../constants/Colors';
+import PaddedScreen from '@/components/paddedScreen';
 
 const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noAccount, signupLink, invalidEntryText } = StyleSheet.create({
     signInTitle: {
@@ -94,52 +95,54 @@ export default function signin() {
 
     return (
         <SafeScreen>
-            <View style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', gap: 40 }}>
-                <View style={[flexCol, { gap: 2 }]}>
-                    <Text style={signInTitle}>Sign in</Text>
-                    <Text style={signInTitle}>to continue</Text>
-                </View>
-
-                <View style={[form, flexYCenter, { gap: 16 }]}>
-                    <TextInput
-                        style={[textInput, invalidEntry && { borderColor: Colors.light.error }]}
-                        placeholder='Email Address'
-                        underlineColorAndroid={colors.transparent}
-                        placeholderTextColor={'#747474'}
-                        value={email}
-                        autoFocus
-                        cursorColor={'#747474'}
-                        onChangeText={(text) => onChange('email', text)}
-                    />
-
-                    <TextInput
-                        style={[textInput, invalidEntry && { borderColor: Colors.light.error }]}
-                        placeholder="Password"
-                        underlineColorAndroid={colors.transparent}
-                        placeholderTextColor={'#747474'}
-                        value={password}
-                        secureTextEntry={secureTextEntry}
-                        onChangeText={(text) => onChange('password', text)}
-                    />
-
-                    <View style={[wFull, flex, itemsCenter, invalidEntry ? justifyBetween : justifyEnd]}>
-                        {invalidEntry && (<Text style={invalidEntryText}>Incorrect email or password</Text>)}
-
-                        <Text style={[forgotPassword]}>Forgot Password?</Text>
+            <PaddedScreen>
+                <View style={[wHFull, flexCol, itemsStart, justifyCenter, { gap: 40 }]}>
+                    <View style={[flexCol, { gap: 2 }]}>
+                        <Text style={signInTitle}>Sign in</Text>
+                        <Text style={signInTitle}>to continue</Text>
                     </View>
+
+                    <View style={[form, flexYCenter, { gap: 16 }]}>
+                        <TextInput
+                            style={[textInput, invalidEntry && { borderColor: Colors.light.error }]}
+                            placeholder='Email Address'
+                            underlineColorAndroid={colors.transparent}
+                            placeholderTextColor={'#747474'}
+                            value={email}
+                            autoFocus
+                            cursorColor={'#747474'}
+                            onChangeText={(text) => onChange('email', text)}
+                        />
+
+                        <TextInput
+                            style={[textInput, invalidEntry && { borderColor: Colors.light.error }]}
+                            placeholder="Password"
+                            underlineColorAndroid={colors.transparent}
+                            placeholderTextColor={'#747474'}
+                            value={password}
+                            secureTextEntry={secureTextEntry}
+                            onChangeText={(text) => onChange('password', text)}
+                        />
+
+                        <View style={[wFull, flex, itemsCenter, invalidEntry ? justifyBetween : justifyEnd]}>
+                            {invalidEntry && (<Text style={invalidEntryText}>Incorrect email or password</Text>)}
+
+                            <Text style={[forgotPassword]}>Forgot Password?</Text>
+                        </View>
+                    </View>
+
+                    <Pressable style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]} onPress={() => { signIn(); signInwithToken(); router.push('/(app)/') }}>
+                        <Text style={[flex, itemsCenter, justifyCenter, signInText,]}>Sign In</Text>
+                    </Pressable>
+
+                    <Text style={[noAccount, mXAuto]}>
+                        Don't have an account?
+                        <Link href={'/signup'}>
+                            <Text style={signupLink}>Sign Up</Text>
+                        </Link>
+                    </Text>
                 </View>
-
-                <Pressable style={[wFull, signInBtn]}>
-                    <Text style={[wHFull, pAuto, flexCenter, signInText]}>Sign In</Text>
-                </Pressable>
-
-                <Text style={[noAccount, mXAuto]}>
-                    Don't have an account?
-                    <Link href={'/signup'}>
-                        <Text style={signupLink}>Sign Up</Text>
-                    </Link>
-                </Text>
-            </View>
+            </PaddedScreen>
         </SafeScreen>
     )
 }
