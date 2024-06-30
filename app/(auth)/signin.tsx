@@ -95,7 +95,7 @@ export default function signin() {
 
     return (
         <SafeScreen>
-            <PaddedScreen>
+            <PaddedScreen styles={wHFull}>
                 <View style={[wHFull, flexCol, itemsStart, justifyCenter, { gap: 40 }]}>
                     <View style={[flexCol, { gap: 2 }]}>
                         <Text style={signInTitle}>Sign in</Text>

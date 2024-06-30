@@ -15,6 +15,8 @@ import notificationImage from '../assets/images/icons/notification-image.png';
 import topupImage from '../assets/images/icons/topup-image.png';
 import headPhoneImage from '../assets/images/icons/head-phone-image.png';
 import walletImage from '../assets/images/icons/wallet-image.png';
+import bannerImage from '../assets/images/homeSreen/banner-image.png';
+import whiteTripImage from '../assets/images/homeSreen/white-trip-image.png';
 
 const images = {
     introScreenImage1,
@@ -33,7 +35,9 @@ const images = {
     notificationImage,
     topupImage,
     headPhoneImage,
-    walletImage
+    walletImage,
+    bannerImage,
+    whiteTripImage
 }
 
 export { images }

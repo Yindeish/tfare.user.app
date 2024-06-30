@@ -1,6 +1,6 @@
-import { ViewStyle } from "react-native";
+import { TextStyle, ViewStyle } from "react-native";
 
-const utilStyles: Record<string, ViewStyle> = {
+const utilStyles: Record<string, ViewStyle | TextStyle> = {
     flexCenter: {
         display: 'flex',
         flexDirection: 'row',
@@ -101,7 +101,8 @@ const utilStyles: Record<string, ViewStyle> = {
     },
     mLAuto: {
         marginLeft: 'auto'
-    }
+    },
 }
+
 
 export const { flexCenter, flexXCenter, flexYCenter, flex, flexCol, itemsCenter, itemsStart, itemsEnd, justifyBetween, justifyCenter, justifyStart, justifyEnd, wFull, hFull, wHFull, pAuto, pXAuto, pYAuto, pTAuto, pBAuto, pRAuto, pLAuto, mAuto, mXAuto, mYAuto, mTAuto, mBAuto, mRAuto, mLAuto } = utilStyles;

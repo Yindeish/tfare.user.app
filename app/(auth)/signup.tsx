@@ -116,7 +116,7 @@ export default function signup() {
 
     return (
         <SafeScreen>
-            <PaddedScreen>
+            <PaddedScreen styles={wHFull}>
                 <View style={[wFull, hFull, flex, flexCol, itemsStart, justifyEnd, { gap: 40, height: 'auto' }]}>
                     <View style={[flexCol, { gap: 2 }]}>
                         <Text style={signUpTitle}>Create a</Text>

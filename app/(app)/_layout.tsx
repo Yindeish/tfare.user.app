@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { pages } from '@/constants/pages';
 import { FontAwesome } from '@expo/vector-icons';
 import { tabs } from '@/constants/tabs';
-import { colors } from '@/constants/Colors';
+import Colors, { colors } from '@/constants/Colors';
 // import HomeSVG from '@/components/svg/home';
 // import HomeSVG from '@/components/svg/home.svg';
 import TabBartTitle from '@/components/tab/tabTitle';
@@ -29,7 +29,7 @@ export default function AppLayout() {
     return <Redirect href="/(auth)/signin" />;
   }
 
-  else return <Tabs screenOptions={{ tabBarActiveTintColor: 'blue', headerShown: false }}>
+  else return <Tabs screenOptions={{ tabBarActiveTintColor: Colors.light.background, headerShown: false }}>
     <Tabs.Screen
       name={tabs.home}
       options={{
@@ -61,7 +61,7 @@ export default function AppLayout() {
       name={tabs.account}
       options={{
         tabBarLabel: ({ color }) => <TabBartTitle title='Account' color={color} />,
-        tabBarIcon: ({ color, focused }) => <Image style={{ width: 14, height: 18 }} source={focused ? images.activeAccountImage : images.accountImage} />,
+        tabBarIcon: ({ color, focused }) => <Image style={{ width: 15, height: 18 }} source={focused ? images.activeAccountImage : images.accountImage} />,
       }}
     />
   </Tabs>

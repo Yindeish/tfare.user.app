@@ -1,23 +1,53 @@
-import { Text, View } from 'react-native';
-
+import { Text, TouchableOpacity, View, Image, StyleSheet, ScrollView } from 'react-native';
 import { useSession } from '../../contexts/userSignedInContext';
 import { useSession as useTokenSession } from '../../contexts/userTokenContext';
 import React from 'react';
 import SafeScreen from '@/components/safeScreen';
-import { flexCol, wHFull } from '@/utils/styles';
-import { colors } from '@/constants/Colors';
+import { flex, flexCol, itemsCenter, justifyCenter, wFull, wHFull } from '@/utils/styles';
+import Colors, { colors } from '@/constants/Colors';
 import UserBlock from '@/components/tab/home/userBlock';
 import BannerBlock from '@/components/tab/home/bannerBlock';
+import PaddedScreen from '@/components/paddedScreen';
+import { images } from '@/constants/images';
+import { fonts } from '@/constants/fonts';
+import TripHistory from '@/components/tab/home/TripHistory';
+import { colorBlack, colorWhite, fs12, fw500, neurialGrotesk } from '@/utils/fontStyles';
+
+const { orderRideBtn, orderRideText } = StyleSheet.create({
+    orderRideBtn: {
+        backgroundColor: Colors.light.background,
+        height: 50,
+        borderRadius: 10,
+        gap: 10
+    },
+    orderRideText: {
+        fontFamily: fonts.neurialGrotesk,
+        fontWeight: '500',
+        fontSize: 12,
+        color: colors.white
+    }
+});
 
 export default function Index() {
     const { signOut } = useSession();
     const { signOut: signOutToken } = useTokenSession();
     return (
         <SafeScreen>
-            <View style={[wHFull, flexCol, { overflow: 'scroll' }]}>
+            <ScrollView style={[wHFull, flexCol,]}>
                 <UserBlock />
+
                 <BannerBlock />
-            </View>
+
+                <PaddedScreen styles={{ backgroundColor: colors.white, marginVertical: 20 }}>
+                    <TouchableOpacity style={[orderRideBtn, wFull, flex, itemsCenter, justifyCenter]}>
+                        <Image style={{ width: 20, height: 17.27 }} source={images.whiteTripImage} />
+
+                        <Text style={[neurialGrotesk, fw500, fs12, colorWhite]}>Order Ride</Text>
+                    </TouchableOpacity>
+                </PaddedScreen>
+
+                <TripHistory />
+            </ScrollView>
         </SafeScreen>
     );
 }

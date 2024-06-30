@@ -17,7 +17,7 @@ function UserBlock() {
             height: 205,
             gap: 32,
             marginTop: 40,
-            marginBottom: 0
+            marginBottom: 20
         },
         greyText: {
             color: '#747474',
@@ -56,8 +56,9 @@ function UserBlock() {
         },
         topupText: {
             fontFamily: fonts.neurialGrotesk,
-            fontSize: 10,
+            fontSize: 12,
             fontWeight: '500',
+            color: colors.black
         }
     });
 
@@ -97,7 +98,7 @@ function UserBlock() {
                 <View style={[walletBlock, wFull, flex, justifyBetween, itemsCenter,]}>
                     <View style={[{ width: 126, height: 60, gap: 16 }, flexCol]}>
                         <View style={[flex, { gap: 16 }]}>
-                            <Image style={[{ width: 18, height: 19 }]} source={images.walletImage} />
+                            <Image style={[{ width: 19, height: 18 }]} source={images.walletImage} />
 
                             <Text style={[{ fontFamily: fonts.neurialGrotesk, fontSize: 12, color: '#747474', fontWeight: '400' }]}>wallet balance</Text>
                         </View>
@@ -106,7 +107,9 @@ function UserBlock() {
 
                     <TouchableOpacity>
                         <View style={[topUpBlock, flex, itemsCenter, justifyBetween]}>
-                            {/* <Topup /> */}
+
+                            <Image style={[{ width: 19, height: 19 }]} source={images.topupImage} />
+
                             <Text style={[topupText]}>Top Up</Text>
                         </View>
                     </TouchableOpacity>

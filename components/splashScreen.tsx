@@ -1,20 +1,31 @@
 import { useEffect, useState } from 'react';
 import { Dimensions, Text, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
+import { useFonts } from 'expo-font';
 
 
 SplashScreen.preventAutoHideAsync();
 
 
 export default function App() {
+    const [fontsLoaded] = useFonts({
+        'Neurial-Grotesk': require('./assets/fonts/Neurial-Grotesk.ttf'),
+    });
+
     const [isReady, setReady] = useState(false);
 
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         SplashScreen.hideAsync();
+    //         setReady(true);
+    //     }, 1000);
+    // }, [isReady]);
     useEffect(() => {
-        setTimeout(() => {
+        if (fontsLoaded) {
             SplashScreen.hideAsync();
             setReady(true);
-        }, 1000);
-    }, [isReady]);
+        }
+    }, [fontsLoaded]);
 
 
     const width = Dimensions.get('window').width;
