@@ -27,6 +27,9 @@ export const fontStyles: Record<string, TextStyle> = {
     fs16: {
         fontSize: 16
     },
+    fs18: {
+        fontSize: 16
+    },
     colorBlack: {
         color: colors.black,
     },
@@ -44,4 +47,4 @@ export const fontStyles: Record<string, TextStyle> = {
     }
 }
 
-export const { neurialGrotesk, fw400, fw500, fw700, fs10, fs12, fs14, fs16, colorBlack, colorWhite, colorBorderGrey, colorTextGrey, colorBlueBg } = fontStyles;
+export const { neurialGrotesk, fw400, fw500, fw700, fs10, fs12, fs14, fs16, fs18, colorBlack, colorWhite, colorBorderGrey, colorTextGrey, colorBlueBg } = fontStyles;

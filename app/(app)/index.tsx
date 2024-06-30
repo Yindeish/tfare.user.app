@@ -12,6 +12,9 @@ import { images } from '@/constants/images';
 import { fonts } from '@/constants/fonts';
 import TripHistory from '@/components/tab/home/TripHistory';
 import { colorBlack, colorWhite, fs12, fw500, neurialGrotesk } from '@/utils/fontStyles';
+import { router } from 'expo-router';
+import { pages } from '@/constants/pages';
+import { tabs } from '@/constants/tabs';
 
 const { orderRideBtn, orderRideText } = StyleSheet.create({
     orderRideBtn: {
@@ -39,7 +42,7 @@ export default function Index() {
                 <BannerBlock />
 
                 <PaddedScreen styles={{ backgroundColor: colors.white, marginVertical: 20 }}>
-                    <TouchableOpacity style={[orderRideBtn, wFull, flex, itemsCenter, justifyCenter]}>
+                    <TouchableOpacity onPress={() => router.push(tabs.trip)} style={[orderRideBtn, wFull, flex, itemsCenter, justifyCenter]}>
                         <Image style={{ width: 20, height: 17.27 }} source={images.whiteTripImage} />
 
                         <Text style={[neurialGrotesk, fw500, fs12, colorWhite]}>Order Ride</Text>

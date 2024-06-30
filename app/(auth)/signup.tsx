@@ -12,6 +12,7 @@ import { Entypo } from '@expo/vector-icons';
 import Checkbox from 'expo-checkbox';
 import { genders } from '@/constants/gender';
 import PaddedScreen from '@/components/paddedScreen';
+import { pages } from '@/constants/pages';
 
 
 const { signUpTitle, textInput, genderSelectText, genderMenuDropdown, menuItem, form, signUpBtn, signUpText, noAccount, signupLink, invalidEntryText, checkbox } = StyleSheet.create({
@@ -222,7 +223,7 @@ export default function signup() {
                         </Text>
                     </View>
 
-                    <Pressable style={[wFull, signUpBtn, flex, itemsCenter, justifyCenter]}>
+                    <Pressable onPress={() => router.push(pages.securityQuestion)} style={[wFull, signUpBtn, flex, itemsCenter, justifyCenter]}>
                         <Text style={[flexCenter, signUpText]}>Create</Text>
                     </Pressable>
 

@@ -3,51 +3,43 @@ import { Text, Button, TouchableRipple, MD2Colors } from 'react-native-paper';
 import React, { useState } from 'react'
 import Swiper from 'react-native-swiper'
 import { useSession } from '@/contexts/userSignedInContext';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { images } from '@/constants/images';
-import Colors from '@/constants/Colors';
+import Colors, { colors } from '@/constants/Colors';
 import { fonts } from '@/constants/fonts';
 import SafeScreen from '@/components/safeScreen';
 import PaddedScreen from '@/components/paddedScreen';
+import { flex, flexCol, itemsCenter, justifyCenter, wFull, wHFull } from '@/utils/styles';
+import { colorWhite, fs14, fs18, fw400, fw700, neurialGrotesk } from '@/utils/fontStyles';
+import { pages } from '@/constants/pages';
 
 const { container, containerWrapper, skipLink, skipText, slide, slideImage, slideText, text, wrapper, activeDotStyle, ctaBtn, ctaText } = StyleSheet.create({
     containerWrapper: {
-        backgroundColor: '#5D5FEF',
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
+        backgroundColor: Colors.light.background,
     },
     skipLink: {
         marginLeft: 'auto',
-        marginRight: '5%'
+        marginRight: 20,
+        marginTop: 102
     },
     skipText: {
-        color: 'white',
-        fontSize: 14,
-        fontWeight: 400,
         lineHeight: 17,
     },
     container: {
-        width: '90%',
+        width: '100%',
+        paddingHorizontal: 20,
         height: '60%',
-        backgroundColor: 'transparent',
+        backgroundColor: colors.transparent,
         marginBottom: 30
     },
     wrapper: {
     },
     slide: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'transparent',
+        backgroundColor: colors.transparent,
         gap: 15
     },
     slideImage: {
-        width: '100%', height: '55%', objectFit: 'cover'
+        height: '55%', objectFit: 'cover'
     },
     slideText: {
         fontSize: 22,
@@ -67,20 +59,12 @@ const { container, containerWrapper, skipLink, skipText, slide, slideImage, slid
         borderRadius: 10
     },
     ctaBtn: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
         borderRadius: 10,
         backgroundColor: Colors.light.tabIconDefault,
         height: 50
     },
     ctaText: {
-        fontSize: 18,
-        fontWeight: '700',
-        lineHeight: 23.76,
-        color: MD2Colors.white,
-        fontFamily: fonts.neurialGrotesk
+
     }
 });
 
@@ -91,71 +75,64 @@ export default function IntroScreen() {
 
     return (
         <SafeScreen>
-            <PaddedScreen>
-                <View style={containerWrapper}>
+            <View style={[wHFull, flexCol, itemsCenter, containerWrapper]}>
 
-                    <Link
-                        href={'/(auth)/signin'}
-                        style={skipLink}
+                <Link
+                    href={'/(auth)/signin'}
+                    style={skipLink}
+                >
+                    <Text style={[skipText, colorWhite, fw400, fs14]}>Skip</Text>
+                </Link>
+
+                <View style={container}>
+                    <Swiper
+                        loop={false}
+                        style={wrapper}
+                        showsButtons={false}
+                        dotColor='white'
+                        activeDotColor='#EF5DA8'
+                        activeDotStyle={activeDotStyle}
+                        onIndexChanged={(index) => {
+                            setCurrentSlideIndex(index);
+                        }}
                     >
-                        <Text style={skipText}>Skip</Text>
-                    </Link>
+                        <View style={[slide, wHFull, itemsCenter, justifyCenter]}>
+                            <Image style={[slideImage as any, wFull]} source={images.introScreenImage1} />
 
-                    <View style={container}>
-                        <Swiper
-                            loop={false}
-                            style={wrapper}
-                            showsButtons={false}
-                            dotColor='white'
-                            activeDotColor='#EF5DA8'
-                            activeDotStyle={activeDotStyle}
-                            onIndexChanged={(index) => {
-                                setCurrentSlideIndex(index);
-                            }}
-                        >
-                            <View style={slide}>
-                                <Image style={slideImage} source={images.introScreenImage1} />
+                            <Text style={slideText}>
+                                Unlock a new way to travel with loved ones through our Family Ride feature.
+                            </Text>
+                        </View>
+                        <View style={[slide, wHFull, itemsCenter, justifyCenter]}>
+                            <Image style={[slideImage as any, wFull]} source={images.introScreenImage2} />
 
-                                <Text style={slideText}>
-                                    Unlock a new way to travel with loved ones through our Family Ride feature.
-                                </Text>
-                            </View>
-                            <View style={slide}>
-                                <Image style={slideImage} source={images.introScreenImage2} />
+                            <Text style={slideText}>
+                                Experience the freedom of safe travels.
+                            </Text>
+                        </View>
+                        <View style={[slide, wHFull, itemsCenter, justifyCenter]}>
+                            <Image style={[slideImage as any, wFull]} source={images.introScreenImage3} />
 
-                                <Text style={slideText}>
-                                    Experience the freedom of safe travels.
-                                </Text>
-                            </View>
-                            <View style={slide}>
-                                <Image style={slideImage} source={images.introScreenImage3} />
-
-                                <Text style={slideText}>
-                                    Discover the joy of shared experiences with our Co-Passenger rides.
-                                </Text>
-                            </View>
-                        </Swiper>
-                    </View>
-
-                    <View style={{
-                        opacity: currentSlideIndex === 2 ? 1 : 0, width: '90%', marginLeft: 'auto', marginRight: 'auto', display: 'flex', flexDirection: 'column', gap: 16
-                    }}>
-                        <Link href={'/(auth)/signup'}>
-                            <TouchableRipple rippleColor={Colors.light.tabIconDefault} style={ctaBtn}>
-                                <Text style={ctaText}>Get Started</Text>
-                            </TouchableRipple>
-                        </Link>
-
-                        <Link style={{ width: '100%', height: '100%' }} href={'/(auth)/signin'}>
-                            <TouchableRipple rippleColor={Colors.light.tabIconDefault} style={[ctaBtn, { backgroundColor: MD2Colors.transparent, borderWidth: 1, borderColor: MD2Colors.white }]}>
-                                {/* <Link style={{ width: '100%', height: '100%' }} href={'/(auth)/signin'}>
-                        </Link> */}
-                                <Text style={ctaText}>Sign in</Text>
-                            </TouchableRipple>
-                        </Link>
-                    </View>
+                            <Text style={slideText}>
+                                Discover the joy of shared experiences with our Co-Passenger rides.
+                            </Text>
+                        </View>
+                    </Swiper>
                 </View>
-            </PaddedScreen>
+
+                <View style={[flexCol, wFull, {
+                    opacity: currentSlideIndex === 2 ? 1 : 0, gap: 16, paddingHorizontal: 20
+                }]}>
+                    <TouchableRipple onPress={() => router.replace(pages.signup)} rippleColor={Colors.light.tabIconDefault} style={[ctaBtn, flexCol, wFull, itemsCenter, justifyCenter]}>
+                        <Text style={[fw700, fs18, colorWhite, neurialGrotesk,]}>Get Started</Text>
+                    </TouchableRipple>
+
+                    <TouchableRipple
+                        onPress={() => router.replace(pages.signin)} rippleColor={colors.white} style={[ctaBtn, flexCol, wFull, itemsCenter, justifyCenter, { backgroundColor: MD2Colors.transparent, borderWidth: 1, borderColor: MD2Colors.white }]}>
+                        <Text style={[fw700, fs18, colorWhite, neurialGrotesk,]}>Sign in</Text>
+                    </TouchableRipple>
+                </View>
+            </View>
         </SafeScreen>
     )
 }

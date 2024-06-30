@@ -175,14 +175,14 @@ export default function SecurityQuestion() {
                         />
                     </View>
 
-                    <Pressable style={[wFull, signUpBtn]}
+                    <Pressable style={[wFull, flex, itemsCenter, justifyCenter, signUpBtn]}
                         onPress={() => (refRBSheet?.current as any)?.open()}>
-                        <Text style={[wHFull, pAuto, flexCenter, signUpText]}>Confirm</Text>
+                        <Text style={[signUpText]}>Confirm</Text>
                     </Pressable>
 
                     <RBSheet
                         ref={refRBSheet as any}
-                        useNativeDriver={true}
+                        // useNativeDriver={true}
                         draggable
                         closeOnPressBack
                         height={637}
@@ -193,7 +193,7 @@ export default function SecurityQuestion() {
                             draggableIcon: {
                                 backgroundColor: '#D7D7D7',
                                 width: 140,
-                                height: 4,
+                                // height: 4,
                                 borderRadius: 100,
                                 marginTop: 10
                             },
@@ -204,11 +204,15 @@ export default function SecurityQuestion() {
                         }}
                         customAvoidingViewProps={{
                             enabled: false,
-                        }}>
-                        <View style={[wFull, hFull, flexCol, { gap: 38, paddingHorizontal: 20, paddingTop: 45 }]}>
+                        }}
+                    >
+                        <View style={[wFull, hFull, flexCol, { gap: 38, paddingHorizontal: 20, paddingTop: 45, }]}>
                             <Image
                                 source={images.robotassistanterror}
-                                style={[mXAuto, { width: 81, height: 117 }]}
+                                style={[mXAuto as any, {
+                                    width: 81,
+                                    height: 117
+                                }]}
                             />
 
                             <View style={[flexCol, { gap: 2 }]}>
@@ -264,9 +268,10 @@ export default function SecurityQuestion() {
                                 />
                             </View>
 
-                            <Pressable style={[wFull, signUpBtn]}
+
+                            <Pressable style={[wFull, flex, itemsCenter, justifyCenter, signUpBtn]}
                                 onPress={() => (refRBSheet?.current as any)?.open()}>
-                                <Text style={[wHFull, pAuto, flexCenter, signUpText]}>Confirm</Text>
+                                <Text style={[signUpText]}>Confirm</Text>
                             </Pressable>
                         </View>
                     </RBSheet>
