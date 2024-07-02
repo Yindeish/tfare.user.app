@@ -3,7 +3,8 @@ const pages = {
     signup: 'signup',
     securityQuestion: 'securityQuestion',
     home: 'home',
-    ride: 'ride'
+    orderRide: 'orderRide',
+    bookRide: 'bookRide',
 }
 
 export { pages }

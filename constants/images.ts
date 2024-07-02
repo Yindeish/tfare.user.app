@@ -23,6 +23,15 @@ import dropOffImage from '../assets/images/icons/drop-off-image.png';
 import proceedCheckImage from '../assets/images/icons/proceed-check-image.png';
 import recentImage from '../assets/images/icons/recent-image.png';
 import saveLocationImage from '../assets/images/icons/save-location-image.png';
+import carImage from '../assets/images/icons/car-image.png';
+import passengersImage from '../assets/images/icons/passengers-image.png';
+import rideOfferImage from '../assets/images/icons/ride-offer-image.png';
+import cautionImage from '../assets/images/icons/caution-image.png';
+import yellowTripImage from '../assets/images/icons/yellow-trip-image.png';
+import searchingRideImage from '../assets/images/icons/searching-ride-image.png';
+import cancelImage from '../assets/images/icons/cancel-image.png';
+import yellowLocationImage from '../assets/images/icons/yellow-location-image.png';
+import blueLocationImage from '../assets/images/icons/blue-location-image.png';
 
 const images = {
     introScreenImage1,
@@ -49,7 +58,16 @@ const images = {
     dropOffImage,
     proceedCheckImage,
     recentImage,
-    saveLocationImage
+    saveLocationImage,
+    carImage,
+    passengersImage,
+    rideOfferImage,
+    cautionImage,
+    yellowTripImage,
+    searchingRideImage,
+    cancelImage,
+    yellowLocationImage,
+    blueLocationImage,
 }
 
 export { images }

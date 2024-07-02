@@ -5,6 +5,8 @@ import { PaperProvider } from 'react-native-paper';
 import { useFonts } from 'expo-font';
 import { fonts } from '../constants/fonts';
 import React from 'react';
+import { Provider } from 'react-redux'
+import { store } from '@/state/store';
 
 export default function Root() {
 
@@ -13,12 +15,14 @@ export default function Root() {
   });
 
   return (
-    <PaperProvider>
-      <TokenSessionProvider>
-        <SessionProvider>
-          <Slot />
-        </SessionProvider>
-      </TokenSessionProvider>
-    </PaperProvider>
+    <Provider store={store}>
+      <PaperProvider>
+        <TokenSessionProvider>
+          <SessionProvider>
+            <Slot />
+          </SessionProvider>
+        </TokenSessionProvider>
+      </PaperProvider>
+    </Provider>
   );
 }

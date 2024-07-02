@@ -1,8 +1,26 @@
 import { colors } from '@/constants/Colors';
+import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
+import LayoutSelectors from '@/state/selectors/layout';
+import { openBottomSheet, resetBottomSheetState } from '@/state/slices/layout';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import { Text } from 'react-native-paper';
+import { router } from 'expo-router';
 
 
-function BottomSheet({ children, controller, currentHeight }: { children: React.ReactNode, controller: any, currentHeight: number }) {
+function BottomSheet({ children, controller }: { children: React.ReactNode, controller: any }) {
+    const dispatch = useAppDispatch();
+    const { bottomSheet } = LayoutSelectors();
+
+    useEffect(() => console.log({ bottomSheet }, [bottomSheet]))
+
+    useEffect(() => {
+        if (bottomSheet.visible) (controller?.current as any)?.open();
+        if (!bottomSheet.visible) {
+            dispatch(resetBottomSheetState());
+            (controller?.current as any)?.close();
+        }
+    }, [bottomSheet.visible])
 
     return (
         <RBSheet
@@ -10,8 +28,15 @@ function BottomSheet({ children, controller, currentHeight }: { children: React.
             ref={controller}
             // useNativeDriver={true}
             draggable
+            dragOnContent
+            onOpen={() => {
+
+            }}
+            onClose={() => {
+                // dispatch(resetBottomSheetState());
+            }}
             closeOnPressBack
-            height={currentHeight}
+            height={bottomSheet.height}
             customStyles={{
                 wrapper: {
                     backgroundColor: colors.transparent,
