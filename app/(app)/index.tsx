@@ -42,7 +42,7 @@ export default function Index() {
                 <BannerBlock />
 
                 <PaddedScreen styles={{ backgroundColor: colors.white, marginVertical: 20 }}>
-                    <TouchableOpacity onPress={() => router.push(tabs.trip)} style={[orderRideBtn, wFull, flex, itemsCenter, justifyCenter]}>
+                    <TouchableOpacity onPress={() => router.push(pages.ride)} style={[orderRideBtn, wFull, flex, itemsCenter, justifyCenter]}>
                         <Image style={{ width: 20, height: 17.27 }} source={images.whiteTripImage} />
 
                         <Text style={[neurialGrotesk, fw500, fs12, colorWhite]}>Order Ride</Text>

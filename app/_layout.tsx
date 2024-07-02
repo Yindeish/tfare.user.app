@@ -1,4 +1,4 @@
-import { Slot } from 'expo-router';
+import { Slot, Stack } from 'expo-router';
 import { SessionProvider } from '@/contexts/userSignedInContext';
 import { SessionProvider as TokenSessionProvider } from '@/contexts/userTokenContext';
 import { PaperProvider } from 'react-native-paper';

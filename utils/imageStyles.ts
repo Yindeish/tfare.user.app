@@ -1,140 +1,29 @@
-import { ViewStyle } from "react-native";
+import { ImageStyle } from "react-native";
 
-type ViewStyleProp = Record<string, ViewStyle>;
+type ImageStyleProp = Record<string, ImageStyle>;
 
-const utilStyles: ViewStyleProp = {
-    flexCenter: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    flexXCenter: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center'
-    },
-    flexYCenter: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-    },
-    flex: {
-        display: 'flex',
-        flexDirection: 'row',
-    },
-    flexCol: {
-        display: 'flex',
-        flexDirection: 'column',
-    },
-    itemsCenter: {
-        alignItems: 'center'
-    },
-    itemsStart: {
-        alignItems: 'flex-start'
-    },
-    itemsEnd: {
-        alignItems: 'flex-end'
-    },
-    justifyCenter: {
-        justifyContent: 'center'
-    },
-    justifyBetween: {
-        justifyContent: 'space-between',
-    },
-    justifyStart: {
-        justifyContent: 'flex-start',
-    },
-    justifyEnd: {
-        justifyContent: 'flex-end',
-    },
-    wFull: {
-        width: '100%'
-    },
-    hFull: {
-        height: '100%'
-    },
+export const { wHFull, mXAuto, }: ImageStyleProp = {
     wHFull: {
         width: '100%',
         height: '100%'
     },
-    pAuto: {
-        paddingTop: 'auto',
-        paddingBottom: 'auto',
-        paddingRight: 'auto',
-        paddingLeft: 'auto'
-    },
-    pXAuto: {
-        marginLeft: 'auto',
-        marginRight: 'auto'
-    },
-    pYAuto: {
-        marginTop: 'auto',
-        marginBottom: 'auto'
-    },
-    pTAuto: {
-        paddingTop: 'auto',
-    },
-    pBAuto: {
-        paddingBottom: 'auto',
-    },
-    pRAuto: {
-        paddingRight: 'auto',
-    },
-    pLAuto: {
-        paddingLeft: 'auto'
-    },
     mXAuto: {
         marginLeft: 'auto',
-        marginRight: 'auto'
+        marginRight: 'auto',
     },
     mYAuto: {
         marginTop: 'auto',
         marginBottom: 'auto'
-    },
-    mTAuto: {
-        marginTop: 'auto',
-    },
-    mBAuto: {
-        marginBottom: 'auto',
-    },
-    mRAuto: {
-        marginRight: 'auto',
-    },
-    mLAuto: {
-        marginLeft: 'auto'
-    },
-    relative: {
-        position: 'relative'
-    },
-    absolute: {
-        position: 'absolute'
-    },
-    top0: {
-        top: 0
-    },
-    left0: {
-        left: 0
-    },
-    right0: {
-        right: 0
-    },
-    bottom0: {
-        bottom: 0
-    },
-
+    }
 }
-
-
-export const { flexCenter, flexXCenter, flexYCenter, flex, flexCol, itemsCenter, itemsStart, itemsEnd, justifyBetween, justifyCenter, justifyStart, justifyEnd, wFull, hFull, wHFull, pAuto, pXAuto, pYAuto, pTAuto, pBAuto, pRAuto, pLAuto, mAuto, mXAuto, mYAuto, mTAuto, mBAuto, mRAuto, mLAuto, relative, absolute, top0, left0, right0, bottom0 } = utilStyles;
 
 // FS -> Functional Styles
 // VFS -> View FS
 // VFS -> Text FS
-type VFS = <T extends number | string >(val: T) => ViewStyle;
+type VFS = <T extends number | string >(val: T) => ImageStyle;
 type VFSProp = { w: VFS, h: VFS, t: VFS, l: VFS, r: VFS, b: VFS, bg: VFS, zIndex: VFS, gap: VFS, m: VFS, mx: VFS, my: VFS, mt: VFS, mb: VFS, ml: VFS, mr: VFS, p: VFS, px: VFS, py: VFS, pt: VFS, pb: VFS, pl: VFS, pr: VFS, rounded: VFS };
 
-export const { w, h, t, l, r, b, bg, zIndex, gap, m, mx, my, mt, mb, ml, mr, p, px, py, pt, pb, pl, pr, rounded }: VFSProp = {
+export const image: VFSProp = {
     w: (val) => {
         return {
             width: val as number

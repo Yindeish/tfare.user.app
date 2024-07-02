@@ -48,3 +48,16 @@ export const fontStyles: Record<string, TextStyle> = {
 }
 
 export const { neurialGrotesk, fw400, fw500, fw700, fs10, fs12, fs14, fs16, fs18, colorBlack, colorWhite, colorBorderGrey, colorTextGrey, colorBlueBg } = fontStyles;
+
+
+type TFS = <T extends string>(val: T) => TextStyle;
+type TFSProp = { c: TFS };
+
+export const { c }: TFSProp = {
+    c: (val) => {
+        return {
+            color: val
+        }
+    },
+
+};

@@ -17,6 +17,12 @@ import headPhoneImage from '../assets/images/icons/head-phone-image.png';
 import walletImage from '../assets/images/icons/wallet-image.png';
 import bannerImage from '../assets/images/homeSreen/banner-image.png';
 import whiteTripImage from '../assets/images/homeSreen/white-trip-image.png';
+import locationImage from '../assets/images/icons/location-image.png';
+import pickUpImage from '../assets/images/icons/pick-up-image.png';
+import dropOffImage from '../assets/images/icons/drop-off-image.png';
+import proceedCheckImage from '../assets/images/icons/proceed-check-image.png';
+import recentImage from '../assets/images/icons/recent-image.png';
+import saveLocationImage from '../assets/images/icons/save-location-image.png';
 
 const images = {
     introScreenImage1,
@@ -37,7 +43,13 @@ const images = {
     headPhoneImage,
     walletImage,
     bannerImage,
-    whiteTripImage
+    whiteTripImage,
+    locationImage,
+    pickUpImage,
+    dropOffImage,
+    proceedCheckImage,
+    recentImage,
+    saveLocationImage
 }
 
 export { images }
