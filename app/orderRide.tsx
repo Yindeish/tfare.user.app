@@ -84,7 +84,7 @@ function Ride() {
                 </View>}
 
 
-                {<View style={[w('90%'), h('70%'), bg(colors.transparent), absolute, t(200), l(20), zIndex(100), py(8), { overflow: 'hidden' }]}>
+                {/* {<View style={[w('90%'), h('70%'), bg(colors.transparent), absolute, t(200), l(20), zIndex(100), py(8), { overflow: 'hidden' }]}>
 
                     <ScrollView style={[wFull, bg(colors.transparent), flexCol, gap(32)]}>
                         {['', '', '', '', '', '', ''].map((item, index) => (
@@ -110,7 +110,7 @@ function Ride() {
                         ))}
                     </ScrollView>
 
-                </View>}
+                </View>} */}
 
                 <MapView
                     style={[mapView, wHFull]}

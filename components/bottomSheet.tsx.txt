@@ -8,7 +8,7 @@ import { Text } from 'react-native-paper';
 import { router } from 'expo-router';
 
 
-function BottomSheet({ children, controller }: { children: React.ReactNode, controller: any }) {
+function BottomSheet({ children, controller }: { children: React.ReactNode, controller: RBSheet }) {
     const dispatch = useAppDispatch();
     const { bottomSheet } = LayoutSelectors();
 

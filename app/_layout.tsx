@@ -7,6 +7,7 @@ import { fonts } from '../constants/fonts';
 import React from 'react';
 import { Provider } from 'react-redux'
 import { store } from '@/state/store';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function Root() {
 
@@ -16,13 +17,15 @@ export default function Root() {
 
   return (
     <Provider store={store}>
-      <PaperProvider>
-        <TokenSessionProvider>
-          <SessionProvider>
-            <Slot />
-          </SessionProvider>
-        </TokenSessionProvider>
-      </PaperProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <PaperProvider>
+          <TokenSessionProvider>
+            <SessionProvider>
+              <Slot />
+            </SessionProvider>
+          </TokenSessionProvider>
+        </PaperProvider>
+      </GestureHandlerRootView>
     </Provider>
   );
 }
