@@ -17,6 +17,7 @@ import { EBottomSheetStatus } from '@/state/enums/layout';
 import { images } from '@/constants/images';
 import { image } from '@/utils/imageStyles';
 import { pages } from '@/constants/pages';
+import PageFloatingTitle from '@/components/page/pageFloatingTitle';
 
 const { mapView } = StyleSheet.create({
     mapView: {
@@ -61,19 +62,12 @@ function Ride() {
         <SafeScreen>
             <View style={[wHFull, bg(colors.transparent), relative]}>
 
-                <View style={[w(132), h(20), bg(colors.transparent), flex, justifyStart, gap(16), absolute, t(77), l(20), zIndex(10)]}>
-                    <TouchableOpacity onPress={() => {
-                        router.back();
-                        dispatch(resetBottomSheetState());
-                        dispatch(closeBottomSheet());
-                    }}>
-                        <Ionicons name="chevron-back" size={20} color={colors.white} />
-                    </TouchableOpacity>
+                <PageFloatingTitle onPress={() => {
+                    dispatch(resetBottomSheetState());
+                    dispatch(closeBottomSheet());
+                }} title='Order a Ride' />
 
-                    <Text style={[colorWhite, fs16, fw700, neurialGrotesk,]}>Order a Ride</Text>
-                </View>
-
-                {(EBottomSheetStatus.routeRideDetails || EBottomSheetStatus.searchingRide) && <View style={[w('90%'), h(104), bg(colors.white), flexCol, justifyStart, gap(16), absolute, t(77), l(20), zIndex(100), rounded(10), py(16), px(24)]}>
+                {(bottomSheet.type === EBottomSheetStatus.routeRideDetails || bottomSheet.type === EBottomSheetStatus.searchingRide) && <View style={[w('90%'), h(104), bg(colors.white), flexCol, justifyStart, gap(16), absolute, t(77), l(20), zIndex(100), rounded(10), py(16), px(24)]}>
                     <View style={[flex, itemsCenter, gap(16), justifyStart]}>
                         <Image style={[image.w(15), image.h(20)]} source={images.yellowLocationImage} />
 
@@ -94,7 +88,7 @@ function Ride() {
 
                     <ScrollView style={[wFull, bg(colors.transparent), flexCol, gap(32)]}>
                         {['', '', '', '', '', '', ''].map((item, index) => (
-                            <TouchableOpacity onPress={() => router.push(`/${pages.bookRide}`)} style={[wFull, h(170), bg(colors.white), rounded(10), flexCol, gap(32), p(12), mb(20)]}>
+                            <TouchableOpacity onPress={() => router.push(`/${pages.bookRide}`)} style={[wFull, h(170), bg(colors.white), rounded(10), flexCol, gap(32), p(12), mb(20)]} key={index}>
 
                                 <View style={[wFull, flex, justifyBetween, itemsCenter]}>
                                     <View style={[flexCol, gap(20)]}>

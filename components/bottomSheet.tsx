@@ -1,65 +1,12 @@
-import { colors } from '@/constants/Colors';
-import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
-import LayoutSelectors from '@/state/selectors/layout';
-import { openBottomSheet, resetBottomSheetState } from '@/state/slices/layout';
-import { useEffect, useLayoutEffect, useState } from 'react';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import { Text } from 'react-native-paper';
-import { router } from 'expo-router';
+import { View, Text } from 'react-native'
+import React from 'react'
 
-
-function BottomSheet({ children, controller }: { children: React.ReactNode, controller: any }) {
-    const dispatch = useAppDispatch();
-    const { bottomSheet } = LayoutSelectors();
-
-    useEffect(() => console.log({ bottomSheet }, [bottomSheet]))
-
-    useEffect(() => {
-        if (bottomSheet.visible) (controller?.current as any)?.open();
-        if (!bottomSheet.visible) {
-            dispatch(resetBottomSheetState());
-            (controller?.current as any)?.close();
-        }
-    }, [bottomSheet.visible])
-
+const bottomSheet = () => {
     return (
-        <RBSheet
-            // ref={refRBSheet as any}
-            ref={controller}
-            // useNativeDriver={true}
-            draggable
-            dragOnContent
-            onOpen={() => {
-
-            }}
-            onClose={() => {
-                // dispatch(resetBottomSheetState());
-            }}
-            closeOnPressBack
-            height={bottomSheet.height}
-            customStyles={{
-                wrapper: {
-                    backgroundColor: colors.transparent,
-                },
-                draggableIcon: {
-                    backgroundColor: '#D7D7D7',
-                    width: 140,
-                    // height: 4,
-                    borderRadius: 100,
-                    marginTop: 10
-                },
-            }}
-            customModalProps={{
-                animationType: 'slide',
-                statusBarTranslucent: true,
-            }}
-            customAvoidingViewProps={{
-                enabled: false,
-            }}
-        >
-            {children}
-        </RBSheet>
+        <View>
+            <Text>bottomSheet</Text>
+        </View>
     )
 }
 
-export default BottomSheet;
+export default bottomSheet

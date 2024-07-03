@@ -32,6 +32,7 @@ import searchingRideImage from '../assets/images/icons/searching-ride-image.png'
 import cancelImage from '../assets/images/icons/cancel-image.png';
 import yellowLocationImage from '../assets/images/icons/yellow-location-image.png';
 import blueLocationImage from '../assets/images/icons/blue-location-image.png';
+import blueBackgroundOfferImage from '../assets/images/icons/blue-background-offer-image.png';
 
 const images = {
     introScreenImage1,
@@ -68,6 +69,7 @@ const images = {
     cancelImage,
     yellowLocationImage,
     blueLocationImage,
+    blueBackgroundOfferImage,
 }
 
 export { images }
