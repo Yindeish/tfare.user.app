@@ -5,19 +5,18 @@ import { View, StyleSheet, Alert, Text, TouchableOpacity, Button, Dimensions, Sc
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import Colors, { colors } from '@/constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
 import { colorBlack, colorWhite, fs14, fs16, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles';
 import { router } from 'expo-router';
-import BottomSheet from '@/components/bottomSheet';
-import OrderRideBottomSheet from '@/components/page/orderRideBottomSheet';
+import { FilledForm, RecentDropoffLocations, RecentLocationsSnippet, RecentPickupLocations, RideRouteDetails, SearchingRide } from '@/components/page/orderRideBottomSheet';
 import LayoutSelectors from '@/state/selectors/layout';
-import { closeBottomSheet, openBottomSheet, resetBottomSheetState, setBottomSheetHeight, setBottomSheetType } from '@/state/slices/layout';
+import { closeBottomSheet, openBottomSheet, resetBottomSheetState, } from '@/state/slices/layout';
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
 import { EBottomSheetStatus } from '@/state/enums/layout';
 import { images } from '@/constants/images';
 import { image } from '@/utils/imageStyles';
-import { pages } from '@/constants/pages';
 import PageFloatingTitle from '@/components/page/pageFloatingTitle';
+import BottomSheet from '@/components/bottomSheet';
+import { pages } from '@/constants/pages';
 
 const { mapView } = StyleSheet.create({
     mapView: {
@@ -51,13 +50,6 @@ function Ride() {
     const [initialRegion, setInitialRegion] = useState<Region | null>(initialRegionObject);
     const [markerCoordinate, setMarkerCoordinate] = useState<{ latitude: number, longitude: number } | null>(markerCoordinateObject);
 
-    // Bottom Sheet
-    const refRBSheet = useRef();
-
-    useEffect(() => {
-        dispatch(openBottomSheet())
-    }, [router])
-
     return (
         <SafeScreen>
             <View style={[wHFull, bg(colors.transparent), relative]}>
@@ -67,7 +59,7 @@ function Ride() {
                     dispatch(closeBottomSheet());
                 }} title='Order a Ride' />
 
-                {(bottomSheet.type === EBottomSheetStatus.routeRideDetails || bottomSheet.type === EBottomSheetStatus.searchingRide) && <View style={[w('90%'), h(104), bg(colors.white), flexCol, justifyStart, gap(16), absolute, t(77), l(20), zIndex(100), rounded(10), py(16), px(24)]}>
+                {(bottomSheet.type === EBottomSheetStatus.routeRideDetails || bottomSheet.type === EBottomSheetStatus.searchingRides) && <View style={[w('90%'), h(104), bg(colors.white), flexCol, justifyStart, gap(16), absolute, t(77), l(20), zIndex(100), rounded(10), py(16), px(24)]}>
                     <View style={[flex, itemsCenter, gap(16), justifyStart]}>
                         <Image style={[image.w(15), image.h(20)]} source={images.yellowLocationImage} />
 
@@ -84,7 +76,7 @@ function Ride() {
                 </View>}
 
 
-                {/* {<View style={[w('90%'), h('70%'), bg(colors.transparent), absolute, t(200), l(20), zIndex(100), py(8), { overflow: 'hidden' }]}>
+                {bottomSheet.type === EBottomSheetStatus.searchingRides && <View style={[w('90%'), h('70%'), bg(colors.transparent), absolute, t(200), l(20), zIndex(100), py(8), { overflow: 'hidden' }]}>
 
                     <ScrollView style={[wFull, bg(colors.transparent), flexCol, gap(32)]}>
                         {['', '', '', '', '', '', ''].map((item, index) => (
@@ -110,7 +102,7 @@ function Ride() {
                         ))}
                     </ScrollView>
 
-                </View>} */}
+                </View>}
 
                 <MapView
                     style={[mapView, wHFull]}
@@ -144,10 +136,18 @@ function Ride() {
                     )}
                 </MapView>
 
-                <BottomSheet controller={refRBSheet}>
-                    <ScrollView>
-                        <OrderRideBottomSheet />
-                    </ScrollView>
+                <BottomSheet>
+                    {bottomSheet.type === EBottomSheetStatus.recentLocationsSnippet && <RecentLocationsSnippet />}
+
+                    {bottomSheet.type === EBottomSheetStatus.recentPickupLocations && <RecentPickupLocations />}
+
+                    {bottomSheet.type === EBottomSheetStatus.recentDropoffLocations && <RecentDropoffLocations />}
+
+                    {bottomSheet.type === EBottomSheetStatus.filledForm && <FilledForm />}
+
+                    {bottomSheet.type === EBottomSheetStatus.routeRideDetails && <RideRouteDetails />}
+
+                    {bottomSheet.type === EBottomSheetStatus.searchingRides && <SearchingRide />}
                 </BottomSheet>
             </View>
         </SafeScreen>

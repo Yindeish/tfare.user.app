@@ -1,12 +1,11 @@
 import { PayloadAction, SliceCaseReducers, ValidateSliceCaseReducers, createSlice } from "@reduxjs/toolkit";
 import { ESlicesNames } from "../enums/slicesNames";
-import { ILayoutReducers, ILayoutState, TBottomSheetHeight, TBottomSheetType } from "../types/layout";
+import { ILayoutReducers, ILayoutState, TBottomSheetSnapPoint, TBottomSheetType } from "../types/layout";
 import { EBottomSheetStatus } from "../enums/layout";
 
 const initialState: ILayoutState = {
     bottomSheet: {
-        // height: 637,
-        height: 508,
+        snapPoint: 0,
         props: null,
         type: EBottomSheetStatus.recentLocationsSnippet,
         visible: true
@@ -47,8 +46,11 @@ const layoutSlice = createSlice({
         closeBottomSheet: (state) => {
             state.bottomSheet.visible = false;
         },
-        setBottomSheetHeight: (state, action: PayloadAction<TBottomSheetHeight>) => {
-            state.bottomSheet.height = action.payload;
+        setBottomSheetSnapPoint: (state, action: PayloadAction<TBottomSheetSnapPoint>) => {
+            const { payload } = action;
+            if (payload >= 0 || payload > 4) {
+                state.bottomSheet.snapPoint = action.payload;
+            } else return;
         },
         setBottomSheetProps: (state, action: PayloadAction<any>) => {
             state.bottomSheet.props = action.payload;
@@ -60,7 +62,7 @@ const layoutSlice = createSlice({
             state.bottomSheet.visible = false;
             state.bottomSheet.props = null;
             state.bottomSheet.type = 'recentLocationsSnippet';
-            state.bottomSheet.height = 637;
+            state.bottomSheet.snapPoint = 0;
         },
     }
 })
@@ -74,7 +76,7 @@ export const {
     resetModalState,
     // BottomSheet
     setBottomSheetType,
-    setBottomSheetHeight,
+    setBottomSheetSnapPoint,
     setBottomSheetProps,
     openBottomSheet,
     resetBottomSheetState,

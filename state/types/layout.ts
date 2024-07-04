@@ -1,7 +1,8 @@
 type TVoidFn = () => void;
 type TVoidFnWithVal = <T>(val: T) => void;
-type TBottomSheetHeight = 637 | 508 | 490 | 436 | 477 | 444;
-type TBottomSheetType = 'recentLocationsSnippet' | 'recentPickupLocations' | 'recentDropoffLocations' | 'routeRideDetails' | 'filledForm' | 'searchingRide';
+// type TBottomSheetHeight = 601 | 508 | 436 | 477 | 400 | number;
+type TBottomSheetSnapPoint = number;
+type TBottomSheetType = 'recentLocationsSnippet' | 'recentPickupLocations' | 'recentDropoffLocations' | 'routeRideDetails' | 'filledForm' | 'searchingRides' | 'loadedRides';
 
 interface IModal {
     type: string,
@@ -10,7 +11,7 @@ interface IModal {
 }
 
 interface IBottomSheet extends IModal {
-    height: TBottomSheetHeight,
+    snapPoint: TBottomSheetSnapPoint,
     type: TBottomSheetType
 }
 
@@ -31,10 +32,10 @@ interface ILayoutReducers {
     openBottomSheet: TVoidFn;
     closeBottomSheet: TVoidFn;
     toggleBottomSheet: TVoidFn;
-    setBottomSheetHeight: TVoidFnWithVal;
+    setBottomSheetIndex: TVoidFnWithVal;
     setBottomSheetType: TVoidFnWithVal;
     setBottomSheetProps: TVoidFnWithVal;
     resetBottomSheetState: TVoidFn;
 }
 
-export type { IBottomSheet, ILayoutReducers, ILayoutState, IModal, TVoidFn, TVoidFnWithVal, TBottomSheetHeight, TBottomSheetType }
+export type { IBottomSheet, ILayoutReducers, ILayoutState, IModal, TVoidFn, TVoidFnWithVal, TBottomSheetSnapPoint, TBottomSheetType }

@@ -4,7 +4,8 @@ enum EBottomSheetStatus {
     recentDropoffLocations = 'recentDropoffLocations',
     routeRideDetails = 'routeRideDetails',
     filledForm = 'filledForm',
-    searchingRide = 'searchingRide',
+    searchingRides = 'searchingRides',
+    loadedRides = 'loadedRides',
 }
 
 export { EBottomSheetStatus }

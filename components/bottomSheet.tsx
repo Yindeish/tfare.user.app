@@ -1,37 +1,77 @@
 import { View, Text, StyleSheet } from 'react-native'
-import React, { useCallback, useMemo, useRef } from 'react';
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
+import { useSharedValue } from 'react-native-reanimated';
+import { bg, h, w, wFull, wHFull } from '@/utils/styles';
+import { colors } from '@/constants/Colors';
+import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
+import { resetBottomSheetState, setBottomSheetSnapPoint } from '@/state/slices/layout';
+import LayoutSelectors from '@/state/selectors/layout';
+
 
 const bottomSheet = ({ children }: { children: React.ReactNode }) => {
-    const bottomSheetRef = useRef<BottomSheet>(null);
+    const dispatch = useAppDispatch();
+    const { bottomSheet } = LayoutSelectors()
 
-    // const snapPoints = useMemo(() => [], [])
-    const snapPoints = ['25%', '50%', '75%', '85%'];
+    const bottomSheetRef = useRef<BottomSheet>(null);
+    const animatedIndex = useSharedValue(0);
+    const animatedPosition = useSharedValue(0);
+    const snapPoints = useMemo(() => [601, 508, 436, 477, 400, '95%'], []);
 
     const handleSheetChanges = useCallback((index: number) => {
-        console.log('handleSheetChanges', index);
     }, []);
 
-    const { container, contentContainer } = StyleSheet.create({
-        container: {
-            flex: 1,
-            padding: 24,
-            backgroundColor: 'grey',
-        },
-        contentContainer: {
-            flex: 1,
-            alignItems: 'center',
+    useEffect(() => {
+        bottomSheetRef.current?.snapToIndex(bottomSheet.snapPoint)
+    }, [bottomSheet.snapPoint])
+
+    useEffect(() => {
+        if (!bottomSheet.visible) bottomSheetRef.current?.close();
+    }, [bottomSheet.visible])
+
+    const { draggableIcon } = StyleSheet.create({
+        draggableIcon: {
+            backgroundColor: '#D7D7D7',
+            width: 140,
+            height: 4,
+            borderRadius: 100,
+            marginTop: 10
         },
     });
+
+    const renderBackdrop = useCallback(
+        // (props) => (
+        () => (
+            <BottomSheetBackdrop
+                // {...props}
+                disappearsOnIndex={-1}
+                appearsOnIndex={0}
+                animatedIndex={animatedIndex}
+                animatedPosition={animatedPosition}
+                style={[bg(colors.transparent)]}
+                pressBehavior={'close'}
+                opacity={0.4}
+                onPress={() => dispatch(resetBottomSheetState())}
+            />
+        ),
+        [animatedIndex, animatedPosition, dispatch]
+    );
 
     return (
         <BottomSheet
             ref={bottomSheetRef}
             onChange={handleSheetChanges}
+            onClose={() => dispatch(setBottomSheetSnapPoint(0))}
             snapPoints={snapPoints}
             enableHandlePanningGesture
+            animateOnMount
+            animatedIndex={animatedIndex}
+            backdropComponent={renderBackdrop}
+            backgroundStyle={[{ borderRadius: 0, }]}
+            enablePanDownToClose
+            handleIndicatorStyle={draggableIcon}
         >
-            <BottomSheetView style={contentContainer}>
+            <BottomSheetView>
                 {children}
             </BottomSheetView>
         </BottomSheet>
