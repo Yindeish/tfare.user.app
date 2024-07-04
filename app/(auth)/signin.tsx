@@ -3,12 +3,12 @@ import React, { useEffect, useState } from 'react'
 import { Link, router } from 'expo-router'
 import { useSession } from '../../contexts/userSignedInContext';
 import { useSession as useTokenSession } from '../../contexts/userTokenContext';
-import SafeScreen from '../../components/safeScreen';
+import SafeScreen from '../../components/shared/safeScreen';
 import { MD2Colors, Text } from 'react-native-paper';
 import { fonts } from '../../constants/fonts';
 import { bg, flex, flexCenter, flexCol, flexYCenter, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, mLAuto, mXAuto, pAuto, pLAuto, wFull, wHFull } from '../../utils/styles';
 import Colors, { colors } from '../../constants/Colors';
-import PaddedScreen from '@/components/paddedScreen';
+import PaddedScreen from '@/components/shared/paddedScreen';
 
 const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noAccount, signupLink, invalidEntryText } = StyleSheet.create({
     signInTitle: {

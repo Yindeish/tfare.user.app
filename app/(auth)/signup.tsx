@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, router } from 'expo-router'
 import { useSession } from '../../contexts/userSignedInContext';
 import { useSession as useTokenSession } from '../../contexts/userTokenContext';
-import SafeScreen from '../../components/safeScreen';
+import SafeScreen from '../../components/shared/safeScreen';
 import { Divider, MD2Colors, Menu, Text, Button } from 'react-native-paper';
 import { fonts } from '../../constants/fonts';
 import { flex, flexCenter, flexCol, flexYCenter, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, justifyStart, mLAuto, mRAuto, mXAuto, pAuto, pLAuto, wFull, wHFull } from '../../utils/styles';
@@ -11,7 +11,7 @@ import Colors, { colors } from '../../constants/Colors';
 import { Entypo } from '@expo/vector-icons';
 import Checkbox from 'expo-checkbox';
 import { genders } from '@/constants/gender';
-import PaddedScreen from '@/components/paddedScreen';
+import PaddedScreen from '@/components/shared/paddedScreen';
 import { pages } from '@/constants/pages';
 
 

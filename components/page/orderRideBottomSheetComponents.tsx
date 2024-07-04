@@ -1,5 +1,5 @@
 import { View, Image, TextInput, TouchableOpacity, ScrollView, FlatList, Pressable, Button, Dimensions } from "react-native";
-import PaddedScreen from "../paddedScreen";
+import PaddedScreen from "../shared/paddedScreen";
 import { absolute, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsEnd, itemsStart, justifyBetween, justifyCenter, justifyStart, left0, mLAuto, mRAuto, mXAuto, ml, mt, p, pLAuto, pXAuto, pb, pl, px, py, relative, right0, rounded, t, top0, w, wFull, wHFull, zIndex } from "@/utils/styles";
 import { Text, Portal, Dialog, Paragraph } from "react-native-paper";
 import { c, colorBlack, colorBlueBg, colorBorderGrey, colorWhite, fs12, fs14, fs16, fs18, fw400, fw500, fw700, neurialGrotesk } from "@/utils/fontStyles";
@@ -9,13 +9,13 @@ import Colors, { colors } from "@/constants/Colors";
 import { useEffect, useState } from "react";
 import LayoutSelectors from "@/state/selectors/layout";
 import { useDispatch } from "react-redux";
-import { closeBottomSheet, openBottomSheet, resetBottomSheetState, setBottomSheetSnapPoint, setBottomSheetType } from "@/state/slices/layout";
+import { closeBottomSheet, openBottomSheet, openModal, resetBottomSheetState, setBottomSheetSnapPoint, setBottomSheetType } from "@/state/slices/layout";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
 import RideSelectors from "@/state/selectors/ride";
-import { setDropoffBusstopInput, setPickupBusstopInput, setUserProposedAmount } from "@/state/slices/ride";
+import { setCurrentRideView, setDropoffBusstopInput, setPickupBusstopInput, setUserProposedAmount } from "@/state/slices/ride";
 import { router } from "expo-router";
 import BottomSheet, { BottomSheetFlatList, BottomSheetView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
-import BottomSheetTitle from "../bottomSheetTitle";
+import BottomSheetTitle from "../shared/bottomSheetTitle";
 
 const RecentLocationsSnippet = () => {
     const dispatch = useDispatch();
@@ -217,16 +217,6 @@ const RecentPickupLocations = () => {
                             <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
                         </TouchableOpacity>
 
-                        {/* <TextInput
-                            onFocus={() => setInputtingPickupBusstop(true)}
-                            onBlur={() => setInputtingPickupBusstop(false)}
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: '#747474', borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
-                            placeholderTextColor={'#747474'}
-                            cursorColor={'#747474'}
-                            placeholder="Enter Location"
-                            value={pickupBusstopInput}
-                            onChangeText={(text) => dispatch(setPickupBusstopInput(text))}
-                        /> */}
                         <BottomSheetTextInput
                             onFocus={() => setInputtingPickupBusstop(true)}
                             onBlur={() => setInputtingPickupBusstop(false)}
@@ -518,9 +508,6 @@ const FilledForm = () => {
         <PaddedScreen>
             <View style={[flexCol, gap(56), mt(20),]}>
                 <View style={[flexCol, gap(20),]}>
-                    {/* <View style={[wFull, flex, itemsCenter, justifyBetween]}>
-                        <Text style={[neurialGrotesk, fw700, fs16, colorBlack]}>Pick up bus stop</Text>
-                    </View> */}
                     <BottomSheetTitle title="Pick up bus stop" onPressFn={() => { dispatch(setBottomSheetType('recentLocationsSnippet')); dispatch(setBottomSheetSnapPoint(0)) }} />
 
                     <View style={[wFull, h(52), rounded(10), py(16), px(24), bg('#F9F7F8'), flex, gap(10), itemsCenter, justifyCenter]}>
@@ -648,7 +635,13 @@ const RideRouteDetails = () => {
                     </View>
                 </View>
 
-                <TouchableOpacity onPress={() => { dispatch(setBottomSheetType('searchingRides')); dispatch(setBottomSheetSnapPoint(4)) }}>
+                <TouchableOpacity onPress={() => {
+                    dispatch(setBottomSheetType('searchingRides'));
+                    dispatch(setCurrentRideView('availableRides'));
+                    dispatch(openModal());
+                    dispatch(setBottomSheetSnapPoint(4));
+                    dispatch(closeBottomSheet());
+                }}>
                     <View style={[wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.background)]}>
                         <Text style={[neurialGrotesk, fw700, fs18, colorWhite]}>Find Available Rides</Text>
 
@@ -680,8 +673,8 @@ const SearchingRide = () => {
 
                 <TouchableOpacity
                     onPress={() => {
+                        dispatch(closeBottomSheet());
                         router.push(`/(app)/`);
-                        dispatch(closeBottomSheet()); dispatch(resetBottomSheetState())
                     }} style={[bg('#F9F7F8'), wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
                     <Text style={[c('#747474'), neurialGrotesk, fw700, fs16]}>Cancel</Text>
 

@@ -1,6 +1,7 @@
 type TBusStop = 'pickupBusstop' | 'dropoffBusstop';
 type TLoadingStatus = 'idle' | 'succeeded' | 'failed';
 type TLoadingType = string;
+type TCurrentrideView = 'orderRide' | 'availableRides';
 
 interface IBusStop {
     type: TBusStop;
@@ -25,6 +26,7 @@ interface IRideState {
     pickupBusstopInput: string,
     dropoffBusstopInput: string,
     userProposedAmount: number | string,
+    currentRideView: TCurrentrideView
 }
 
-export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType }
+export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView }

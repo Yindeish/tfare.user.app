@@ -1,5 +1,5 @@
 import React from 'react';
-import SafeScreen from '../../components/safeScreen';
+import SafeScreen from '../../components/shared/safeScreen';
 import Colors, { colors } from '../../constants/Colors';
 import { fonts } from '../../constants/fonts';
 import { images } from '../../constants/images';
@@ -10,7 +10,7 @@ import { useRef, useState } from 'react';
 import { View, StyleSheet, TextInput, TouchableOpacity, Pressable, Button, Image } from 'react-native'
 import { Menu, Text } from 'react-native-paper'
 import RBSheet from 'react-native-raw-bottom-sheet';
-import PaddedScreen from '@/components/paddedScreen';
+import PaddedScreen from '@/components/shared/paddedScreen';
 // import { Image, ImageStyle } from 'expo-image';
 
 const { securityQuestionTitle, textInput, questionSelectText, questionMenuDropdown, menuItem, form, signUpBtn, signUpText, bottomSheetImage, bottomSheetMessage } = StyleSheet.create({

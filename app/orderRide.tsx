@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import SafeScreen from "@/components/safeScreen";
+import SafeScreen from "@/components/shared/safeScreen";
 import { absolute, bg, flex, flexCol, gap, h, itemsCenter, justifyBetween, justifyStart, l, left0, mXAuto, mb, p, px, py, relative, rounded, t, top0, w, wFull, wHFull, zIndex } from "@/utils/styles";
 import { View, StyleSheet, Alert, Text, TouchableOpacity, Button, Dimensions, ScrollView, Image, FlatList } from "react-native";
 import MapView, { Marker } from 'react-native-maps';
@@ -7,7 +7,7 @@ import * as Location from 'expo-location';
 import Colors, { colors } from '@/constants/Colors';
 import { colorBlack, colorWhite, fs14, fs16, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles';
 import { router } from 'expo-router';
-import { FilledForm, RecentDropoffLocations, RecentLocationsSnippet, RecentPickupLocations, RideRouteDetails, SearchingRide } from '@/components/page/orderRideBottomSheet';
+import { FilledForm, RecentDropoffLocations, RecentLocationsSnippet, RecentPickupLocations, RideRouteDetails, SearchingRide } from '@/components/page/orderRideBottomSheetComponents';
 import LayoutSelectors from '@/state/selectors/layout';
 import { closeBottomSheet, openBottomSheet, resetBottomSheetState, } from '@/state/slices/layout';
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
@@ -15,8 +15,12 @@ import { EBottomSheetStatus } from '@/state/enums/layout';
 import { images } from '@/constants/images';
 import { image } from '@/utils/imageStyles';
 import PageFloatingTitle from '@/components/page/pageFloatingTitle';
-import BottomSheet from '@/components/bottomSheet';
+import BottomSheet from '@/components/shared/bottomSheet';
 import { pages } from '@/constants/pages';
+import RideSelectors from '@/state/selectors/ride';
+import { indices } from '@/constants/zIndices';
+import { setCurrentRideView } from '@/state/slices/ride';
+import BottomSheetModal from '@/components/shared/bottomSheetModal';
 
 const { mapView } = StyleSheet.create({
     mapView: {
@@ -33,6 +37,7 @@ type Region = {
 function Ride() {
     const dispatch = useAppDispatch()
     const { bottomSheet, modal } = LayoutSelectors();
+    const { pickupBusstopInput, dropoffBusstopInput, currentRideView } = RideSelectors()
 
     const [locationError, setLocationError] = useState<string | null>(null);
     const initialRegionObject = {
@@ -54,16 +59,26 @@ function Ride() {
         <SafeScreen>
             <View style={[wHFull, bg(colors.transparent), relative]}>
 
-                <PageFloatingTitle onPress={() => {
-                    dispatch(resetBottomSheetState());
-                    dispatch(closeBottomSheet());
-                }} title='Order a Ride' />
+                {/* Page Title */}
 
-                {(bottomSheet.type === EBottomSheetStatus.routeRideDetails || bottomSheet.type === EBottomSheetStatus.searchingRides) && <View style={[w('90%'), h(104), bg(colors.white), flexCol, justifyStart, gap(16), absolute, t(77), l(20), zIndex(100), rounded(10), py(16), px(24)]}>
+                {currentRideView === 'orderRide' ?
+                    (<PageFloatingTitle view={false} onPress={() => {
+                        dispatch(closeBottomSheet());
+                    }} title='Order a Ride' />) :
+                    (<PageFloatingTitle view onPress={() => {
+                        dispatch(closeBottomSheet());
+                    }} title='Available Rides' />)}
+
+                {/* Page Title */}
+
+                {/* Pick and drop off inputs block */}
+
+                {(bottomSheet.type === EBottomSheetStatus.routeRideDetails || bottomSheet.type === EBottomSheetStatus.searchingRides) && (pickupBusstopInput !== '' && dropoffBusstopInput !== '') && <View style={[w('90%'), h(104), bg(colors.white), flexCol, justifyStart, gap(16), absolute, t(77), l(20), zIndex(indices.high), rounded(10), py(16), px(24)]}>
+
                     <View style={[flex, itemsCenter, gap(16), justifyStart]}>
                         <Image style={[image.w(15), image.h(20)]} source={images.yellowLocationImage} />
 
-                        <Text style={[neurialGrotesk, fw500, fs14, colorBlack]}>Sangotedo Bus stop</Text>
+                        <Text style={[neurialGrotesk, fw500, fs14, colorBlack]}>{pickupBusstopInput}</Text>
                     </View>
 
                     <View style={[w(289), h(0.7), mXAuto, bg(Colors.light.border)]} />
@@ -71,16 +86,21 @@ function Ride() {
                     <View style={[flex, itemsCenter, gap(16), justifyStart]}>
                         <Image style={[image.w(15), image.h(20)]} source={images.blueLocationImage} />
 
-                        <Text style={[neurialGrotesk, fw500, fs14, colorBlack]}>Ojodu Bus stop</Text>
+                        <Text style={[neurialGrotesk, fw500, fs14, colorBlack]}>{dropoffBusstopInput}</Text>
                     </View>
                 </View>}
 
+                {/* Pick and drop off inputs block */}
 
-                {bottomSheet.type === EBottomSheetStatus.searchingRides && <View style={[w('90%'), h('70%'), bg(colors.transparent), absolute, t(200), l(20), zIndex(100), py(8), { overflow: 'hidden' }]}>
+                {/* Loaded Rides */}
+
+                {currentRideView === 'availableRides' && bottomSheet.type === EBottomSheetStatus.searchingRides && <View style={[w('90%'), h('70%'), bg(colors.transparent), absolute, t(200), l(20), zIndex(indices.high), py(8), { overflow: 'hidden' }]}>
 
                     <ScrollView style={[wFull, bg(colors.transparent), flexCol, gap(32)]}>
                         {['', '', '', '', '', '', ''].map((item, index) => (
-                            <TouchableOpacity onPress={() => router.push(`/${pages.bookRide}`)} style={[wFull, h(170), bg(colors.white), rounded(10), flexCol, gap(32), p(12), mb(20)]} key={index}>
+                            <TouchableOpacity
+                                onPress={() => dispatch(setCurrentRideView('availableRides'))}
+                                style={[wFull, h(170), bg(colors.white), rounded(10), flexCol, gap(32), p(12), mb(20)]} key={index}>
 
                                 <View style={[wFull, flex, justifyBetween, itemsCenter]}>
                                     <View style={[flexCol, gap(20)]}>
@@ -103,6 +123,10 @@ function Ride() {
                     </ScrollView>
 
                 </View>}
+
+                {/* Loaded Rides */}
+
+                {/* MapView */}
 
                 <MapView
                     style={[mapView, wHFull]}
@@ -136,6 +160,10 @@ function Ride() {
                     )}
                 </MapView>
 
+                {/* MapView */}
+
+                {/* BottomSheet */}
+
                 <BottomSheet>
                     {bottomSheet.type === EBottomSheetStatus.recentLocationsSnippet && <RecentLocationsSnippet />}
 
@@ -147,8 +175,14 @@ function Ride() {
 
                     {bottomSheet.type === EBottomSheetStatus.routeRideDetails && <RideRouteDetails />}
 
-                    {bottomSheet.type === EBottomSheetStatus.searchingRides && <SearchingRide />}
+                    {/* {bottomSheet.type === EBottomSheetStatus.searchingRides && <SearchingRide />} */}
                 </BottomSheet>
+
+                <BottomSheetModal>
+                    {bottomSheet.type === EBottomSheetStatus.searchingRides && <SearchingRide />}
+                </BottomSheetModal>
+
+                {/* BottomSheet */}
             </View>
         </SafeScreen>
     );

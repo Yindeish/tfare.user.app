@@ -48,7 +48,7 @@ const layoutSlice = createSlice({
         },
         setBottomSheetSnapPoint: (state, action: PayloadAction<TBottomSheetSnapPoint>) => {
             const { payload } = action;
-            if (payload >= 0 || payload > 4) {
+            if (payload >= 0 || payload < 6) {
                 state.bottomSheet.snapPoint = action.payload;
             } else return;
         },
@@ -59,17 +59,17 @@ const layoutSlice = createSlice({
             state.bottomSheet.type = action.payload;
         },
         resetBottomSheetState: (state) => {
-            state.bottomSheet.visible = false;
+            state.bottomSheet.visible = true;
             state.bottomSheet.props = null;
             state.bottomSheet.type = 'recentLocationsSnippet';
-            state.bottomSheet.snapPoint = 0;
+            // state.bottomSheet.snapPoint = 0;
         },
     }
 })
 
 export const {
     // Modal
-    closeBottomSheet,
+    closeModal,
     setModalProps,
     setModalType,
     openModal,
@@ -79,6 +79,7 @@ export const {
     setBottomSheetSnapPoint,
     setBottomSheetProps,
     openBottomSheet,
+    closeBottomSheet,
     resetBottomSheetState,
 } = layoutSlice.actions;
 

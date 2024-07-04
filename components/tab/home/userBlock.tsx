@@ -1,4 +1,4 @@
-import PaddedScreen from "@/components/paddedScreen";
+import PaddedScreen from "@/components/shared/paddedScreen";
 // import Topup from "@/components/svg/topup";
 // import Wallet from "@/components/svg/wallet";
 import { colors } from "@/constants/Colors";

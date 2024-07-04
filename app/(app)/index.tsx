@@ -2,12 +2,12 @@ import { Text, TouchableOpacity, View, Image, StyleSheet, ScrollView } from 'rea
 import { useSession } from '../../contexts/userSignedInContext';
 import { useSession as useTokenSession } from '../../contexts/userTokenContext';
 import React from 'react';
-import SafeScreen from '@/components/safeScreen';
+import SafeScreen from '@/components/shared/safeScreen';
 import { flex, flexCol, itemsCenter, justifyCenter, wFull, wHFull } from '@/utils/styles';
 import Colors, { colors } from '@/constants/Colors';
 import UserBlock from '@/components/tab/home/userBlock';
 import BannerBlock from '@/components/tab/home/bannerBlock';
-import PaddedScreen from '@/components/paddedScreen';
+import PaddedScreen from '@/components/shared/paddedScreen';
 import { images } from '@/constants/images';
 import { fonts } from '@/constants/fonts';
 import TripHistory from '@/components/tab/home/TripHistory';

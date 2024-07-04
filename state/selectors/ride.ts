@@ -3,9 +3,9 @@ import { RootState } from "../store";
 
 
 function RideSelectors() {
-    const { dropoffBusstopInput, loading, pickupBusstopInput, userProposedAmount } = useAppSelector((state: RootState) => state.ride);
+    const { dropoffBusstopInput, loading, pickupBusstopInput, userProposedAmount, currentRideView } = useAppSelector((state: RootState) => state.ride);
 
-    return { dropoffBusstopInput, pickupBusstopInput, loading, userProposedAmount };
+    return { dropoffBusstopInput, pickupBusstopInput, loading, userProposedAmount, currentRideView };
 }
 
 export default RideSelectors;

@@ -1,4 +1,5 @@
 import { colors } from "@/constants/Colors";
+import { indices } from "@/constants/zIndices";
 import { c, colorWhite, fs16, fw700, neurialGrotesk } from "@/utils/fontStyles";
 import { absolute, bg, flex, gap, h, itemsCenter, justifyStart, l, t, w, zIndex } from "@/utils/styles";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,13 +9,13 @@ import { Text } from "react-native-paper";
 
 type TColor = { icon: string, text: string };
 
-function PageFloatingTitle({ onPress, title, color }: { onPress: Function, title: string, color?: TColor }) {
+function PageFloatingTitle({ onPress, title, color, view }: { onPress: Function, title: string, color?: TColor, view?: boolean }) {
 
 
     return (
-        <View style={[w(132), h(20), bg(colors.transparent), flex, justifyStart, itemsCenter, gap(10), absolute, t(47), l(20), zIndex(10)]}>
+        <View style={[w(132), h(20), bg(colors.transparent), flex, justifyStart, itemsCenter, gap(10), absolute, t(47), l(20), zIndex(indices.high)]}>
             <TouchableOpacity onPress={() => {
-                router.back();
+                !view && router.back();
                 onPress();
             }}>
                 <Ionicons name="chevron-back" size={20} color={color?.icon || colors.white} />

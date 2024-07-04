@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ESlicesNames } from "../enums/slicesNames";
-import { ILoading, IRideState } from "../types/ride";
+import { ILoading, IRideState, TCurrentrideView } from "../types/ride";
 
 
 const initialState: IRideState = {
@@ -10,7 +10,8 @@ const initialState: IRideState = {
         type: ''
     },
     pickupBusstopInput: '',
-    userProposedAmount: ''
+    userProposedAmount: '',
+    currentRideView: 'orderRide'
 }
 
 const RideSlice = createSlice({
@@ -28,10 +29,13 @@ const RideSlice = createSlice({
         },
         setUserProposedAmount: (state, action: PayloadAction<number | string>) => {
             state.userProposedAmount = action.payload;
+        },
+        setCurrentRideView: (state, action: PayloadAction<TCurrentrideView>) => {
+            state.currentRideView = action.payload;
         }
     }
 })
 
-export const { setDropoffBusstopInput, setLoading, setPickupBusstopInput, setUserProposedAmount } = RideSlice.actions;
+export const { setDropoffBusstopInput, setLoading, setPickupBusstopInput, setUserProposedAmount, setCurrentRideView } = RideSlice.actions;
 
 export default RideSlice.reducer;

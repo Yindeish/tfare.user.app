@@ -1,33 +1,38 @@
-import { View, Text, StyleSheet } from 'react-native'
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
+import { View, Text, StyleSheet, Button } from 'react-native';
+import {
+    BottomSheetModal,
+    BottomSheetView,
+    BottomSheetModalProvider,
+    BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
+import LayoutSelectors from '@/state/selectors/layout';
 import { useSharedValue } from 'react-native-reanimated';
-import { bg, h, w, wFull, wHFull } from '@/utils/styles';
+import { bg } from '@/utils/styles';
 import { colors } from '@/constants/Colors';
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
-import { resetBottomSheetState, setBottomSheetSnapPoint } from '@/state/slices/layout';
-import LayoutSelectors from '@/state/selectors/layout';
+import { closeModal } from '@/state/slices/layout';
 
 
-const bottomSheet = ({ children }: { children: React.ReactNode }) => {
-    const dispatch = useAppDispatch();
-    const { bottomSheet } = LayoutSelectors()
 
-    const bottomSheetRef = useRef<BottomSheet>(null);
+function bottomSheetModal({ children }: { children: React.ReactNode }) {
+    const dispatch = useAppDispatch()
+    const { modal } = LayoutSelectors();
+
+    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const animatedIndex = useSharedValue(0);
     const animatedPosition = useSharedValue(0);
-    const snapPoints = useMemo(() => [601, 508, 436, 477, 400, '95%'], []);
+    const snapPoints = useMemo(() => [300, 400], []);
+
+    useEffect(() => {
+        if (modal.visible) {
+            bottomSheetModalRef.current?.present();
+            bottomSheetModalRef.current?.snapToIndex(1);
+        }
+    }, [modal.visible]);
 
     const handleSheetChanges = useCallback((index: number) => {
     }, []);
-
-    useEffect(() => {
-        bottomSheetRef.current?.snapToIndex(bottomSheet.snapPoint)
-    }, [bottomSheet.snapPoint])
-
-    useEffect(() => {
-        if (!bottomSheet.visible) bottomSheetRef.current?.close();
-    }, [bottomSheet.visible])
 
     const { draggableIcon } = StyleSheet.create({
         draggableIcon: {
@@ -51,31 +56,29 @@ const bottomSheet = ({ children }: { children: React.ReactNode }) => {
                 style={[bg(colors.transparent)]}
                 pressBehavior={'close'}
                 opacity={0.4}
-                onPress={() => dispatch(resetBottomSheetState())}
+                onPress={() => dispatch(closeModal())}
             />
         ),
         [animatedIndex, animatedPosition, dispatch]
     );
 
     return (
-        <BottomSheet
-            ref={bottomSheetRef}
-            onChange={handleSheetChanges}
-            onClose={() => dispatch(setBottomSheetSnapPoint(0))}
+
+        <BottomSheetModal
+            ref={bottomSheetModalRef}
+            // index={1}
+            index={modal.visible ? 0 : -1}
             snapPoints={snapPoints}
-            enableHandlePanningGesture
-            animateOnMount
+            onChange={handleSheetChanges}
             animatedIndex={animatedIndex}
             backdropComponent={renderBackdrop}
             backgroundStyle={[{ borderRadius: 0, }]}
             enablePanDownToClose
             handleIndicatorStyle={draggableIcon}
         >
-            <BottomSheetView>
-                {children}
-            </BottomSheetView>
-        </BottomSheet>
+            {children}
+        </BottomSheetModal>
     )
 }
 
-export default bottomSheet
+export default bottomSheetModal;
