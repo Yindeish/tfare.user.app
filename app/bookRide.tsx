@@ -17,6 +17,12 @@ import RideBlock from '@/components/page/rideBlock'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { FlatList } from 'react-native-gesture-handler'
 import RideSelectors from '@/state/selectors/ride'
+import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
+import { setAddAnother, setTicketAsTicket1, setUserRides } from '@/state/slices/ride'
+import Checkbox from 'expo-checkbox'
+import BottomSheetModal from '@/components/shared/bottomSheetModal'
+import { closeModal, openModal } from '@/state/slices/layout'
+import { IRide } from '@/state/types/ride'
 
 const { sharedStyle, availableSeatStyle, selectedSeatStyle, unavailableSeatStyle } = StyleSheet.create({
     sharedStyle: {
@@ -35,35 +41,14 @@ const { sharedStyle, availableSeatStyle, selectedSeatStyle, unavailableSeatStyle
 });
 
 export default function BookRide() {
-    const { pickupBusstopInput, dropoffBusstopInput } = RideSelectors()
+    const dispatch = useAppDispatch();
+    const { addAnotherTicket, userRides, ticketAsTicket1, pickupBusstopInput, dropoffBusstopInput } = RideSelectors()
 
-    const DATA = [{
-        id: 0,
-        name: ''
-    }, {
-        id: 1,
-        name: ''
-    }, {
-        id: 2,
-        name: ''
-    }, {
-        id: 3,
-        name: ''
-    },
-        //     {
-        //     id: 4,
-        //     name: ''
-        // }, {
-        //     id: 5,
-        //     name: ''
-        // }, {
-        //     id: 6,
-        //     name: ''
-        // }, {
-        //     id: 7,
-        //     name: ''
-        //     }
-    ]
+    const selectSeat = (seatNo: number) => {
+        const seat = userRides[0].seats?.find(seat => seat.no === seatNo);
+        const newList = [...userRides, seat];
+        // dispatch(setUserRides(newList));
+    }
 
     return (
         <SafeScreen>
@@ -82,6 +67,7 @@ export default function BookRide() {
                     <View style={[wHFull, mt(120), flexCol, gap(32), mb(32)]}>
 
                         <RideBlock
+                            ride={userRides[0]}
                             bgColor='#FFF7E6'
                             ctaType='trackRide'
                             touchable
@@ -98,23 +84,31 @@ export default function BookRide() {
                                 </View>
 
                                 <FlatList
-                                    data={DATA}
+                                    data={userRides[0].seats}
                                     horizontal
-                                    renderItem={({ item: { id } }) => (
-                                        <TouchableOpacity style={[sharedStyle, id === 2 ? selectedSeatStyle : id === 4 ? unavailableSeatStyle : availableSeatStyle]} key={id}>
-                                            <Text style={[neurialGrotesk, fw400, fs14, { color: `${id === 2 ? colors.white : colors.black}` }]}>{id + 1}</Text>
-                                        </TouchableOpacity>
+                                    renderItem={({ item: { no, selected, available } }) => (
+                                        <>
+                                            {available ? (<TouchableOpacity
+                                                onPress={() => selectSeat(no)}
+                                                style={[sharedStyle, selected ? selectedSeatStyle : availableSeatStyle]} key={no}>
+                                                <Text style={[neurialGrotesk, fw400, fs14, { color: `${selected ? colors.white : colors.black}` }]}>{no}</Text>
+                                            </TouchableOpacity>)
+                                                :
+                                                <View style={[sharedStyle, unavailableSeatStyle]} key={no}>
+                                                    <Text style={[neurialGrotesk, fw400, fs14, { color: `${selected ? colors.white : colors.black}` }]}>{no}</Text>
+                                                </View>}
+                                        </>
                                     )}
                                     ItemSeparatorComponent={() => (<View style={[w(24)]} />)}
-                                    keyExtractor={({ id }) => id.toString()}
+                                    keyExtractor={({ no }) => no.toString()}
                                 />
                             </View>
 
                             <FlatList
-                                data={['', '']}
+                                data={userRides}
                                 renderItem={({ item, index }) => (
                                     <View style={[wFull, flexCol, gap(32), mt(32)]}>
-                                        <Text style={[colorBlack, neurialGrotesk, fw700, fs14]}>Ticket {index}</Text>
+                                        <Text style={[colorBlack, neurialGrotesk, fw700, fs14]}>Ticket {index + 1}</Text>
 
                                         {/* Pick up block */}
 
@@ -162,14 +156,136 @@ export default function BookRide() {
                                 )}
                             />
 
-                            <TouchableOpacity onPress={() => { }}>
+                            {/* Add another ticket btn */}
+
+                            {!addAnotherTicket && <TouchableOpacity onPress={() => dispatch(setAddAnother(true))}>
                                 <View style={[w('50%'), h(50), mt(32), rounded(100), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.background)]}>
                                     <Image style={[image.w(20), image.h(20)]} source={images.waitChairImage} />
 
                                     <Text style={[neurialGrotesk, fw500, fs12, colorWhite]}>Add another ticket</Text>
                                 </View>
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
 
+                            {/* Add another ticket btn */}
+
+                            {/* New ticket Block */}
+
+                            {addAnotherTicket && <View style={[wFull, flexCol, gap(32), itemsStart, mt(40)]}>
+
+                                <View style={[flex, itemsCenter, gap(4)]}>
+                                    <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}>{`Ticket ${userRides.length + 1}`}</Text>
+
+                                    <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>(You have selected more than 1 seat)</Text>
+                                </View>
+
+                                <View style={[flex, gap(12), itemsCenter]}>
+
+                                    <Checkbox
+                                        value={ticketAsTicket1 ? true : false}
+                                        onValueChange={() => dispatch(!ticketAsTicket1 ? setTicketAsTicket1({
+                                            id: '1'
+                                        })
+                                            :
+                                            setTicketAsTicket1(null))
+                                        }
+                                        color={ticketAsTicket1 ? '#27AE65' : colors.grey500}
+                                    />
+
+                                    <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Same pickup and dropoff as Ticket 1?</Text>
+                                </View>
+
+                                {!ticketAsTicket1 && <TouchableOpacity onPress={() => dispatch(openModal())}>
+                                    <View style={[w('auto'), h(50), p(16), rounded(100), flex, itemsCenter, justifyCenter, gap(10), bg(colors.white), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
+                                        <Image style={[image.w(20), image.h(20)]} source={images.blackBgWaitChairImage} />
+
+                                        <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>Select Ticket Details</Text>
+                                    </View>
+                                </TouchableOpacity>}
+
+                                {ticketAsTicket1 && <>
+                                    {/* Pick up block */}
+
+                                    <View style={[wFull, flexCol, gap(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
+                                        <View style={[flexCol, gap(15)]}>
+                                            <View style={[flex, gap(12), itemsCenter]}>
+                                                <Image source={images.greenBgCoasterImage} style={[image.w(20), image.h(20)]} />
+
+                                                <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Pick up Bus Stop</Text>
+                                            </View>
+
+                                            <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{pickupBusstopInput}</Text>
+                                        </View>
+                                    </View>
+
+                                    {/* Pick up block */}
+                                    {/* Drop off block */}
+
+                                    <View style={[wFull, flex, justifyBetween, pr(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
+                                        <View style={[flexCol, gap(15)]}>
+                                            <View style={[flex, gap(12), itemsCenter]}>
+                                                <Image source={images.redBgCoasterImage} style={[image.w(20), image.h(20)]} />
+
+                                                <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Pick up Bus Stop</Text>
+                                            </View>
+
+                                            <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{pickupBusstopInput}</Text>
+                                        </View>
+
+                                        <View style={[flexCol, gap(16), justifyStart]}>
+                                            <View style={[flex, itemsCenter, gap(8)]}>
+                                                <Image style={[image.w(14), image.h(11)]} source={images.rideOfferImage} />
+                                                <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12]}>Ticket fee</Text>
+                                            </View>
+
+                                            <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}> ₦ 550.00</Text>
+                                        </View>
+                                    </View>
+                                    {/* Drop off block */}
+
+                                    {/* Add another ticket btn */}
+
+                                    <TouchableOpacity onPress={() => {
+                                        dispatch(setUserRides((userRides as IRide[]).concat([{
+                                            pickupBusstop: {
+                                                type: 'pickupBusstop'
+                                            },
+                                            dropoffBusstop: {
+                                                type: 'dropoffBusstop'
+                                            },
+                                            saved: false,
+                                            status: 'idle'
+                                        } as IRide])))
+
+                                        dispatch(setAddAnother(true));
+                                    }}>
+                                        <View style={[w('auto'), p(16), mt(32), rounded(100), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.background)]}>
+                                            <Image style={[image.w(20), image.h(20)]} source={images.waitChairImage} />
+
+                                            <Text style={[neurialGrotesk, fw500, fs12, colorWhite]}>Add another ticket</Text>
+                                        </View>
+                                    </TouchableOpacity>
+
+                                    {/* Add another ticket btn */}
+                                </>}
+
+                            </View>}
+
+                            {/* New ticket Block */}
+
+                            {/* BottomSheet */}
+
+                            <BottomSheetModal onDismiss={() => {
+                                // dispatch(setBottomSheetSnapPoint(-1));
+                                // router.push(`/${pages.availableRides}`)
+                                dispatch(closeModal())
+                            }}>
+                                <View>
+                                    <Text>hijk jhjasdkk</Text>
+                                    <Text>hijk jhjasdkk</Text>
+                                </View>
+                            </BottomSheetModal>
+
+                            {/* BottomSheet */}
                         </PaddedScreen>
                     </View>
                 </ScrollView>

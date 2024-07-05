@@ -19,10 +19,11 @@ import BottomSheet from '@/components/shared/bottomSheet';
 import { pages } from '@/constants/pages';
 import RideSelectors from '@/state/selectors/ride';
 import { indices } from '@/constants/zIndices';
-import { setCurrentRideView } from '@/state/slices/ride';
+import { setCurrentRideView, setUserRides } from '@/state/slices/ride';
 import BottomSheetModal from '@/components/shared/bottomSheetModal';
 import { FontAwesome6 } from '@expo/vector-icons';
 import RideBlock from '@/components/page/rideBlock';
+import { IRide } from '@/state/types/ride';
 
 const { mapView } = StyleSheet.create({
     mapView: {
@@ -39,7 +40,7 @@ type Region = {
 function Ride() {
     const dispatch = useAppDispatch()
     const { bottomSheet, modal } = LayoutSelectors();
-    const { pickupBusstopInput, dropoffBusstopInput, currentRideView } = RideSelectors()
+    const { pickupBusstopInput, dropoffBusstopInput, currentRideView, availableRides, userRides } = RideSelectors()
 
     const [locationError, setLocationError] = useState<string | null>(null);
     const initialRegionObject = {
@@ -99,12 +100,30 @@ function Ride() {
                 {currentRideView === 'availableRides' && bottomSheet.type === EBottomSheetStatus.searchingRides && <View style={[w('90%'), h('70%'), bg(colors.transparent), absolute, t(200), l(20), zIndex(indices.high), py(8), { overflow: 'hidden' }]}>
 
                     <ScrollView style={[wFull, bg(colors.transparent), flexCol, gap(32)]}>
-                        {['', '', '', '', '', '', ''].map((item, index) => (
+                        {availableRides.map((ride, index) => (
                             <RideBlock
+                                ride={ride}
                                 bgColor='#F9F7F8'
                                 ctaType='bookRide'
+                                touchable
                                 roundedCorners
-                                key={index} />
+                                onPress={() => {
+                                    dispatch(setUserRides((userRides as IRide[]).concat([{
+                                        pickupBusstop: {
+                                            type: 'pickupBusstop',
+                                        },
+                                        dropoffBusstop: {
+                                            type: 'dropoffBusstop'
+                                        },
+                                        saved: false,
+                                        status: 'idle',
+                                        seats: ride.seats
+                                    } as IRide])))
+
+                                    router.push(`/${pages.bookRide}`)
+                                }}
+                                key={index}
+                            />
                         ))}
                     </ScrollView>
 

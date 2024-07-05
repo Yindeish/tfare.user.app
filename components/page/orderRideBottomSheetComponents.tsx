@@ -92,7 +92,7 @@ const RecentLocationsSnippet = () => {
                         horizontal
                         data={DATA}
                         renderItem={({ item }) => (
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => dispatch(setPickupBusstopInput(item.name))}>
                                 <View style={[w(98), hFull, rounded(100), py(16), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
                                     <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item.name}</Text>
                                 </View>
@@ -130,12 +130,12 @@ const RecentLocationsSnippet = () => {
                         <Image style={[image.w(22), image.h(24)]} source={images.dropOffImage} />
                     </View>
 
-                    <BottomSheetFlatList
+                    <FlatList
                         style={[wFull, h(46), flex, gap(16),]}
                         horizontal
                         data={DATA}
                         renderItem={({ item }) => (
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => dispatch(setDropoffBusstopInput(item.name))}>
                                 <View style={[w(98), hFull, rounded(100), py(16), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
                                     <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item.name}</Text>
                                 </View>

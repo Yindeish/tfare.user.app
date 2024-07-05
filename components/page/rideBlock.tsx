@@ -14,13 +14,13 @@ const RideBlock = ({ bgColor, ctaType, roundedCorners, ride, onPress, touchable 
 
         <View style={[wFull, h(45), flex, itemsCenter, justifyBetween, gap(14)]}>
             <View style={[flexCol, gap(12), itemsStart]}>
-                <Text style={[colorBlack, neurialGrotesk, fw700, fs14]}>Rider #124HAE</Text>
+                <Text style={[colorBlack, neurialGrotesk, fw700, fs14]}>Rider {ride?.id}</Text>
                 <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Honda Accord</Text>
             </View>
 
             <View style={[w('auto'), h(45), rounded(100), flex, itemsCenter, gap(16), bg(colors.white), p(16), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
                 <Image style={[image.w(18), image.h(14.73)]} source={images.passengersImage} />
-                <Text style={[fs12, fw500, neurialGrotesk, colorBlack]}>3 seats Available</Text>
+                <Text style={[fs12, fw500, neurialGrotesk, colorBlack]}>{ride?.availableSeats?.length} seats Available</Text>
             </View>
         </View>
 
@@ -33,7 +33,7 @@ const RideBlock = ({ bgColor, ctaType, roundedCorners, ride, onPress, touchable 
 
                 <View style={[hFull, flex, itemsCenter, gap(12)]}>
                     <View style={[image.w(5), image.h(5), rounded(5), bg(colors.black)]} />
-                    <Text style={[colorBlack, neurialGrotesk, fw500, fs14]}>3-5 mins</Text>
+                    <Text style={[colorBlack, neurialGrotesk, fw500, fs14]}>{ride?.duration}</Text>
                 </View>
             </View>
 

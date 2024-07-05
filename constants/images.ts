@@ -38,6 +38,7 @@ import ticketImage from '../assets/images/icons/ticket-image.png';
 import greenBgCoasterImage from '../assets/images/icons/green-bg-coaster-image.png';
 import redBgCoasterImage from '../assets/images/icons/red-bg-coaster-image.png';
 import waitChairImage from '../assets/images/icons/wait-chair-image.png';
+import blackBgWaitChairImage from '../assets/images/icons/black-bg-wait-chair-image.png';
 
 const images = {
     introScreenImage1,
@@ -80,6 +81,7 @@ const images = {
     greenBgCoasterImage,
     redBgCoasterImage,
     waitChairImage,
+    blackBgWaitChairImage,
 }
 
 export { images }

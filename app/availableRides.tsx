@@ -7,10 +7,16 @@ import PageFloatingTitle from '@/components/page/pageFloatingTitle'
 import { router } from 'expo-router'
 import Colors, { colors } from '@/constants/Colors'
 import { pages } from '@/constants/pages'
-import { setCurrentRideView } from '@/state/slices/ride'
+import { setCurrentRideView, setUserRides } from '@/state/slices/ride'
 import RideBlock from '@/components/page/rideBlock'
+import RideSelectors from '@/state/selectors/ride'
+import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
+import { IRide } from '@/state/types/ride'
 
 export default function AvailableRide() {
+    const dispatch = useAppDispatch()
+    const { availableRides, userRides } = RideSelectors()
+
     return (
         <SafeScreen>
             <View style={[wHFull, relative, { overflow: 'scroll' }]}>
@@ -23,13 +29,28 @@ export default function AvailableRide() {
                 <PaddedScreen>
                     <View style={[wFull, h('70%'), mt(130), { overflow: 'scroll', }]}>
                         <ScrollView style={[wFull, h('auto'), flexCol, gap(26),]}>
-                            {['', '', '', '', '', '',].map((ride, index) => (
+                            {availableRides.map((ride, index) => (
                                 <RideBlock
                                     bgColor='#F9F7F8'
                                     ctaType='bookRide'
+                                    ride={ride}
                                     touchable
                                     roundedCorners
-                                    onPress={() => router.push(`/${pages.bookRide}`)}
+                                    onPress={() => {
+                                        dispatch(setUserRides((userRides as IRide[]).concat([{
+                                            pickupBusstop: {
+                                                type: 'pickupBusstop',
+                                            },
+                                            dropoffBusstop: {
+                                                type: 'dropoffBusstop'
+                                            },
+                                            saved: false,
+                                            status: 'idle',
+                                            seats: ride.seats
+                                        } as IRide])))
+
+                                        router.push(`/${pages.bookRide}`)
+                                    }}
                                     key={index}
                                 />
                             ))}
