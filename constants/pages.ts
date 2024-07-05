@@ -4,6 +4,8 @@ const pages = {
     securityQuestion: 'securityQuestion',
     home: 'home',
     orderRide: 'orderRide',
+    bookRide: 'bookRide',
+    availableRides: 'availableRides',
 }
 
 export { pages }

@@ -107,10 +107,10 @@ export default function signin() {
                             style={[textInput, invalidEntry && { borderColor: Colors.light.error }]}
                             placeholder='Email Address'
                             underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={'#747474'}
+                            placeholderTextColor={Colors.light.textGrey}
                             value={email}
                             autoFocus
-                            cursorColor={'#747474'}
+                            cursorColor={Colors.light.textGrey}
                             onChangeText={(text) => onChange('email', text)}
                         />
 
@@ -118,7 +118,7 @@ export default function signin() {
                             style={[textInput, invalidEntry && { borderColor: Colors.light.error }]}
                             placeholder="Password"
                             underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={'#747474'}
+                            placeholderTextColor={Colors.light.textGrey}
                             value={password}
                             secureTextEntry={secureTextEntry}
                             onChangeText={(text) => onChange('password', text)}

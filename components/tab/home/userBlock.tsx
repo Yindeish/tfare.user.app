@@ -1,7 +1,7 @@
 import PaddedScreen from "@/components/shared/paddedScreen";
 // import Topup from "@/components/svg/topup";
 // import Wallet from "@/components/svg/wallet";
-import { colors } from "@/constants/Colors";
+import Colors, { colors } from "@/constants/Colors";
 import { fonts } from "@/constants/fonts";
 import { images } from "@/constants/images";
 import { flex, flexCol, hFull, itemsCenter, justifyBetween, justifyCenter, wFull } from "@/utils/styles";
@@ -20,7 +20,7 @@ function UserBlock() {
             marginBottom: 20
         },
         greyText: {
-            color: '#747474',
+            color: Colors.light.textGrey,
             fontFamily: fonts.neurialGrotesk,
             fontWeight: '400',
             fontSize: 12,
@@ -100,7 +100,7 @@ function UserBlock() {
                         <View style={[flex, { gap: 16 }]}>
                             <Image style={[{ width: 19, height: 18 }]} source={images.walletImage} />
 
-                            <Text style={[{ fontFamily: fonts.neurialGrotesk, fontSize: 12, color: '#747474', fontWeight: '400' }]}>wallet balance</Text>
+                            <Text style={[{ fontFamily: fonts.neurialGrotesk, fontSize: 12, color: Colors.light.textGrey, fontWeight: '400' }]}>wallet balance</Text>
                         </View>
                         <Text style={[userNameText, { fontSize: 22 }]}> ₦{'0000.00'}</Text>
                     </View>

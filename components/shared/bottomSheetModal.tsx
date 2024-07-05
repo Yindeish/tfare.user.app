@@ -13,9 +13,9 @@ import { colors } from '@/constants/Colors';
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
 import { closeModal } from '@/state/slices/layout';
 
+type TOnDismiss = () => void;
 
-
-function bottomSheetModal({ children }: { children: React.ReactNode }) {
+function bottomSheetModal({ children, onDismiss }: { children: React.ReactNode, onDismiss?: TOnDismiss }) {
     const dispatch = useAppDispatch()
     const { modal } = LayoutSelectors();
 
@@ -75,6 +75,7 @@ function bottomSheetModal({ children }: { children: React.ReactNode }) {
             backgroundStyle={[{ borderRadius: 0, }]}
             enablePanDownToClose
             handleIndicatorStyle={draggableIcon}
+            onDismiss={onDismiss}
         >
             {children}
         </BottomSheetModal>

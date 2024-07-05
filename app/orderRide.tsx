@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import SafeScreen from "@/components/shared/safeScreen";
-import { absolute, bg, flex, flexCol, gap, h, itemsCenter, justifyBetween, justifyStart, l, left0, mXAuto, mb, p, px, py, relative, rounded, t, top0, w, wFull, wHFull, zIndex } from "@/utils/styles";
+import { absolute, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyStart, l, left0, mXAuto, mb, p, px, py, relative, rounded, t, top0, w, wFull, wHFull, zIndex } from "@/utils/styles";
 import { View, StyleSheet, Alert, Text, TouchableOpacity, Button, Dimensions, ScrollView, Image, FlatList } from "react-native";
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import Colors, { colors } from '@/constants/Colors';
-import { colorBlack, colorWhite, fs14, fs16, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles';
+import { c, colorBlack, colorWhite, fs12, fs14, fs16, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles';
 import { router } from 'expo-router';
 import { FilledForm, RecentDropoffLocations, RecentLocationsSnippet, RecentPickupLocations, RideRouteDetails, SearchingRide } from '@/components/page/orderRideBottomSheetComponents';
 import LayoutSelectors from '@/state/selectors/layout';
-import { closeBottomSheet, openBottomSheet, resetBottomSheetState, } from '@/state/slices/layout';
+import { closeBottomSheet, openBottomSheet, resetBottomSheetState, setBottomSheetSnapPoint, } from '@/state/slices/layout';
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
 import { EBottomSheetStatus } from '@/state/enums/layout';
 import { images } from '@/constants/images';
@@ -21,6 +21,8 @@ import RideSelectors from '@/state/selectors/ride';
 import { indices } from '@/constants/zIndices';
 import { setCurrentRideView } from '@/state/slices/ride';
 import BottomSheetModal from '@/components/shared/bottomSheetModal';
+import { FontAwesome6 } from '@expo/vector-icons';
+import RideBlock from '@/components/page/rideBlock';
 
 const { mapView } = StyleSheet.create({
     mapView: {
@@ -98,27 +100,11 @@ function Ride() {
 
                     <ScrollView style={[wFull, bg(colors.transparent), flexCol, gap(32)]}>
                         {['', '', '', '', '', '', ''].map((item, index) => (
-                            <TouchableOpacity
-                                onPress={() => dispatch(setCurrentRideView('availableRides'))}
-                                style={[wFull, h(170), bg(colors.white), rounded(10), flexCol, gap(32), p(12), mb(20)]} key={index}>
-
-                                <View style={[wFull, flex, justifyBetween, itemsCenter]}>
-                                    <View style={[flexCol, gap(20)]}>
-                                        <Text>Rider #234HYI</Text>
-                                        <Text>Honda 240</Text>
-                                    </View>
-
-                                    <View style={[w('auto'), rounded(12), p(10)]}>
-                                        <Image style={[image.w(20), image.h(23)]} source={images.passengersImage} />
-
-                                        <Text>3 seats available</Text>
-                                    </View>
-                                </View>
-
-                                <View>
-
-                                </View>
-                            </TouchableOpacity>
+                            <RideBlock
+                                bgColor='#F9F7F8'
+                                ctaType='bookRide'
+                                roundedCorners
+                                key={index} />
                         ))}
                     </ScrollView>
 
@@ -178,11 +164,18 @@ function Ride() {
                     {/* {bottomSheet.type === EBottomSheetStatus.searchingRides && <SearchingRide />} */}
                 </BottomSheet>
 
-                <BottomSheetModal>
+                <BottomSheetModal onDismiss={() => {
+                    dispatch(setBottomSheetSnapPoint(-1));
+                    router.push(`/${pages.availableRides}`)
+                }}>
                     {bottomSheet.type === EBottomSheetStatus.searchingRides && <SearchingRide />}
                 </BottomSheetModal>
 
                 {/* BottomSheet */}
+
+                {/* Overlay -> BackDrop */}
+                {/* <View style={[wHFull, bg(colors.grey900), absolute, top0, left0, zIndex(indices.low)]} /> */}
+                {/* Overlay -> BackDrop */}
             </View>
         </SafeScreen>
     );

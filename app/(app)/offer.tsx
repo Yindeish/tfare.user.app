@@ -22,7 +22,7 @@ export default function Offer() {
                 <PaddedScreen>
                     <PageFloatingTitle onPress={() => {
 
-                    }} title='Offers' color={{ icon: '#747474', text: colors.black }} />
+                    }} title='Offers' color={{ icon: Colors.light.textGrey, text: colors.black }} />
 
                     <View style={[mt(104), wFull, bg(colors.white), rounded(10), p(10), flexCol, gap(28), py(34), px(25), { borderWidth: 0.7, borderColor: Colors.light.border, shadowColor: colors.black, shadowRadius: 12.2, }]}>
 
@@ -37,10 +37,10 @@ export default function Offer() {
                             <View style={[wFull, h(50), rounded(10), p(16), flex, itemsCenter, gap(10), bg('#F9F7F8')]}>
 
                                 <TextInput
-                                    style={[fs14, fw500, neurialGrotesk, h(20), { color: false ? '#747474' : Colors.light.error, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                                    style={[fs14, fw500, neurialGrotesk, h(20), { color: false ? Colors.light.textGrey : Colors.light.error, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                                     keyboardType="number-pad"
-                                    placeholderTextColor={'#747474'}
-                                    cursorColor={'#747474'}
+                                    placeholderTextColor={Colors.light.textGrey}
+                                    cursorColor={Colors.light.textGrey}
                                     placeholder="Input Code"
                                 //     value={userProposedAmount?.toString()}
                                 //     onChangeText={(text) => {
@@ -70,7 +70,7 @@ export default function Offer() {
 
                                 <View style={[flexCol, gap(12)]}>
                                     <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>Happy Eid Fitri</Text>
-                                    <Text style={[neurialGrotesk, fw400, fs12, c('#747474')]}>20% off your rides</Text>
+                                    <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>20% off your rides</Text>
                                 </View>
                             </View>
 
@@ -86,7 +86,7 @@ export default function Offer() {
 
                                 <View style={[flexCol, gap(12)]}>
                                     <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>Happy Eid Fitri</Text>
-                                    <Text style={[neurialGrotesk, fw400, fs12, c('#747474')]}>20% off your rides</Text>
+                                    <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>20% off your rides</Text>
                                 </View>
                             </View>
 

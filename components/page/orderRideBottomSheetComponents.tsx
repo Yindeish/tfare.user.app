@@ -72,9 +72,9 @@ const RecentLocationsSnippet = () => {
                         </TouchableOpacity>
 
                         <TextInput
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: '#747474', borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
-                            placeholderTextColor={'#747474'}
-                            cursorColor={'#747474'}
+                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            placeholderTextColor={Colors.light.textGrey}
+                            cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
                             value={pickupBusstopInput}
                             onChangeText={(text) => {
@@ -117,9 +117,9 @@ const RecentLocationsSnippet = () => {
                         <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
 
                         <BottomSheetTextInput
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: '#747474', borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
-                            placeholderTextColor={'#747474'}
-                            cursorColor={'#747474'}
+                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            placeholderTextColor={Colors.light.textGrey}
+                            cursorColor={Colors.light.textGrey}
                             placeholder="Enter Destination"
                             value={dropoffBusstopInput}
                             onChangeText={(text) => {
@@ -220,9 +220,9 @@ const RecentPickupLocations = () => {
                         <BottomSheetTextInput
                             onFocus={() => setInputtingPickupBusstop(true)}
                             onBlur={() => setInputtingPickupBusstop(false)}
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: '#747474', borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
-                            placeholderTextColor={'#747474'}
-                            cursorColor={'#747474'}
+                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            placeholderTextColor={Colors.light.textGrey}
+                            cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
                             value={pickupBusstopInput}
                             onChangeText={(text) => dispatch(setPickupBusstopInput(text))}
@@ -256,7 +256,7 @@ const RecentPickupLocations = () => {
                                         <View style={[flexCol, itemsStart, gap(12)]}>
                                             <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{item.name}</Text>
 
-                                            <Text style={[neurialGrotesk, fw400, fs12, c('#747474')]}>{`${item.name} ${item.name} ${item.name} ${item.name}`}</Text>
+                                            <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>{`${item.name} ${item.name} ${item.name} ${item.name}`}</Text>
                                         </View>
 
                                         <View style={[w('auto'), h(18.06), gap(32), flex, itemsCenter,]}>
@@ -297,9 +297,9 @@ const RecentPickupLocations = () => {
                             <View style={[wFull, flexCol, gap(10)]}>
                                 <View style={[wFull, flex, gap(10), py(16), px(24)]}>
                                     <TextInput
-                                        style={[fs14, fw500, neurialGrotesk, h(20), { color: '#747474', borderColor: colors.transparent, borderWidth: 0, flex: 1 }]}
-                                        placeholderTextColor={'#747474'}
-                                        cursorColor={'#747474'}
+                                        style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 1 }]}
+                                        placeholderTextColor={Colors.light.textGrey}
+                                        cursorColor={Colors.light.textGrey}
                                         placeholder="Enter Location"
                                         value=""
                                     />
@@ -311,7 +311,7 @@ const RecentPickupLocations = () => {
                                         <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
                                     </TouchableOpacity>
 
-                                    <Text style={[fs14, fw500, neurialGrotesk, c('#747474'), { borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}>Obafemi Awolowo Uni..</Text>
+                                    <Text style={[fs14, fw500, neurialGrotesk, c(Colors.light.textGrey), { borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}>Obafemi Awolowo Uni..</Text>
                                 </View>
                             </View>
                         </Dialog.Content >
@@ -386,9 +386,9 @@ const RecentDropoffLocations = () => {
                         <BottomSheetTextInput
                             onFocus={() => setInputtingDropoffBuststop(true)}
                             onBlur={() => setInputtingDropoffBuststop(false)}
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: '#747474', borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
-                            placeholderTextColor={'#747474'}
-                            cursorColor={'#747474'}
+                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            placeholderTextColor={Colors.light.textGrey}
+                            cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
                             value={dropoffBusstopInput}
                             onChangeText={(text) => dispatch(setDropoffBusstopInput(text))}
@@ -422,7 +422,7 @@ const RecentDropoffLocations = () => {
                                         <View style={[flexCol, itemsStart, gap(12)]}>
                                             <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{item.name}</Text>
 
-                                            <Text style={[neurialGrotesk, fw400, fs12, c('#747474')]}>{`${item.name} ${item.name} ${item.name} ${item.name}`}</Text>
+                                            <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>{`${item.name} ${item.name} ${item.name} ${item.name}`}</Text>
                                         </View>
 
                                         <View style={[w('auto'), h(18.06), gap(32), flex, itemsCenter,]}>
@@ -462,9 +462,9 @@ const RecentDropoffLocations = () => {
                             <View style={[wFull, flexCol, gap(10)]}>
                                 <View style={[wFull, flex, gap(10), py(16), px(24)]}>
                                     <TextInput
-                                        style={[fs14, fw500, neurialGrotesk, h(20), { color: '#747474', borderColor: colors.transparent, borderWidth: 0, flex: 1 }]}
-                                        placeholderTextColor={'#747474'}
-                                        cursorColor={'#747474'}
+                                        style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 1 }]}
+                                        placeholderTextColor={Colors.light.textGrey}
+                                        cursorColor={Colors.light.textGrey}
                                         placeholder="Enter Location"
                                         value=""
                                     />
@@ -476,7 +476,7 @@ const RecentDropoffLocations = () => {
                                         <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
                                     </TouchableOpacity>
 
-                                    <Text style={[fs14, fw500, neurialGrotesk, c('#747474'), { borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}>Obafemi Awolowo Uni..</Text>
+                                    <Text style={[fs14, fw500, neurialGrotesk, c(Colors.light.textGrey), { borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}>Obafemi Awolowo Uni..</Text>
                                 </View>
                             </View>
                         </Dialog.Content >
@@ -516,9 +516,9 @@ const FilledForm = () => {
                         </TouchableOpacity>
 
                         <TextInput
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: '#747474', borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
-                            placeholderTextColor={'#747474'}
-                            cursorColor={'#747474'}
+                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            placeholderTextColor={Colors.light.textGrey}
+                            cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
                             onFocus={() => onChange('pickupBusstop', true)}
                             onBlur={() => onChange('pickupBusstop', false)}
@@ -548,9 +548,9 @@ const FilledForm = () => {
                         </TouchableOpacity>
 
                         <BottomSheetTextInput
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: '#747474', borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
-                            placeholderTextColor={'#747474'}
-                            cursorColor={'#747474'}
+                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            placeholderTextColor={Colors.light.textGrey}
+                            cursorColor={Colors.light.textGrey}
                             placeholder="Enter Destination"
                             onFocus={() => onChange('pickupBusstop', true)}
                             onBlur={() => onChange('pickupBusstop', false)}
@@ -613,10 +613,10 @@ const RideRouteDetails = () => {
                             <Image style={[image.w(14), image.h(10)]} source={images.rideOfferImage} />
 
                             <BottomSheetTextInput
-                                style={[fs14, fw500, neurialGrotesk, h(20), { color: false ? '#747474' : Colors.light.error, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                                style={[fs14, fw500, neurialGrotesk, h(20), { color: false ? Colors.light.textGrey : Colors.light.error, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                                 keyboardType="number-pad"
-                                placeholderTextColor={'#747474'}
-                                cursorColor={'#747474'}
+                                placeholderTextColor={Colors.light.textGrey}
+                                cursorColor={Colors.light.textGrey}
                                 placeholder="Input your offer"
                                 value={userProposedAmount?.toString()}
                                 onChangeText={(text) => {
@@ -666,7 +666,7 @@ const SearchingRide = () => {
                         <Text style={[neurialGrotesk, fw700, colorBlack, { fontSize: 22 }]}>Searching for Rides</Text>
                     </View>
 
-                    <Text style={[c('#747474'), neurialGrotesk, fw400, fs12]}>Searching for nearby available rides</Text>
+                    <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12]}>Searching for nearby available rides</Text>
                 </View>
 
                 <Image style={[image.w(120), image.h(120)]} source={images.searchingRideImage} />
@@ -676,7 +676,7 @@ const SearchingRide = () => {
                         dispatch(closeBottomSheet());
                         router.push(`/(app)/`);
                     }} style={[bg('#F9F7F8'), wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
-                    <Text style={[c('#747474'), neurialGrotesk, fw700, fs16]}>Cancel</Text>
+                    <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw700, fs16]}>Cancel</Text>
 
                     <Image style={[image.w(20), image.h(20),]} source={images.cancelImage} />
                 </TouchableOpacity>

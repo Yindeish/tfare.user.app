@@ -45,7 +45,7 @@ const { signUpTitle, textInput, genderSelectText, genderMenuDropdown, menuItem, 
         paddingBottom: 'auto',
         backgroundColor: '#F9F7F8',
         fontFamily: fonts.neurialGrotesk,
-        color: '#747474'
+        color: Colors.light.textGrey
     },
     genderMenuDropdown: {
         width: '90%',
@@ -129,10 +129,10 @@ export default function signup() {
                             style={[textInput]}
                             placeholder='Profile name'
                             underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={'#747474'}
+                            placeholderTextColor={Colors.light.textGrey}
                             value={profileName}
                             autoFocus
-                            cursorColor={'#747474'}
+                            cursorColor={Colors.light.textGrey}
                             onChangeText={(text) => onChange('profileName', text)}
                         />
 
@@ -140,9 +140,9 @@ export default function signup() {
                             style={[textInput]}
                             placeholder='Email'
                             underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={'#747474'}
+                            placeholderTextColor={Colors.light.textGrey}
                             value={email}
-                            cursorColor={'#747474'}
+                            cursorColor={Colors.light.textGrey}
                             onChangeText={(text) => onChange('email', text)}
                         />
 
@@ -150,10 +150,10 @@ export default function signup() {
                             style={[textInput]}
                             placeholder='Phone number'
                             underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={'#747474'}
+                            placeholderTextColor={Colors.light.textGrey}
                             value={phoneNumber}
                             keyboardType='numeric'
-                            cursorColor={'#747474'}
+                            cursorColor={Colors.light.textGrey}
                             onChangeText={(text) => onChange('phoneNumber', text)}
                         />
 
@@ -172,7 +172,7 @@ export default function signup() {
                                                 {gender !== '' ? gender : 'Select Gender'}
                                             </Text>
 
-                                            <Entypo name="chevron-small-down" size={35} color="#747474" />
+                                            <Entypo name="chevron-small-down" size={35} color={Colors.light.textGrey} />
                                         </View>
                                     </TouchableOpacity>
                                 }>
@@ -189,7 +189,7 @@ export default function signup() {
                             style={[textInput, invalidEntry && { borderColor: Colors.light.error }]}
                             placeholder="Password"
                             underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={'#747474'}
+                            placeholderTextColor={Colors.light.textGrey}
                             value={password}
                             secureTextEntry={secureTextEntry}
                             onChangeText={(text) => onChange('password', text)}
@@ -199,7 +199,7 @@ export default function signup() {
                             style={[textInput, invalidEntry && { borderColor: Colors.light.error }]}
                             placeholder="Confirm Password"
                             underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={'#747474'}
+                            placeholderTextColor={Colors.light.textGrey}
                             value={confirmedPassword}
                             secureTextEntry={secureTextEntry}
                             onChangeText={(text) => onChange('confirmedPassword', text)}

@@ -70,7 +70,7 @@ const bottomSheet = ({ children }: { children: React.ReactNode }) => {
         <BottomSheet
             ref={bottomSheetRef}
             onChange={handleSheetChanges}
-            // onClose={() => dispatch(setBottomSheetSnapPoint(-1))}
+            onClose={() => dispatch(setBottomSheetSnapPoint(-1))}
             snapPoints={snapPoints}
             enableHandlePanningGesture
             animateOnMount

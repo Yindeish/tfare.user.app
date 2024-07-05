@@ -33,6 +33,11 @@ import cancelImage from '../assets/images/icons/cancel-image.png';
 import yellowLocationImage from '../assets/images/icons/yellow-location-image.png';
 import blueLocationImage from '../assets/images/icons/blue-location-image.png';
 import blueBackgroundOfferImage from '../assets/images/icons/blue-background-offer-image.png';
+import blueBgPickupImage from '../assets/images/icons/blue-bg-pickup-image.png';
+import ticketImage from '../assets/images/icons/ticket-image.png';
+import greenBgCoasterImage from '../assets/images/icons/green-bg-coaster-image.png';
+import redBgCoasterImage from '../assets/images/icons/red-bg-coaster-image.png';
+import waitChairImage from '../assets/images/icons/wait-chair-image.png';
 
 const images = {
     introScreenImage1,
@@ -70,6 +75,11 @@ const images = {
     yellowLocationImage,
     blueLocationImage,
     blueBackgroundOfferImage,
+    blueBgPickupImage,
+    ticketImage,
+    greenBgCoasterImage,
+    redBgCoasterImage,
+    waitChairImage,
 }
 
 export { images }
