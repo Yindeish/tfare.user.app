@@ -6,6 +6,13 @@ const pages = {
     orderRide: 'orderRide',
     bookRide: 'bookRide',
     availableRides: 'availableRides',
+    emergencyContacts: 'emergencyContacts',
+    savedAddresses: 'savedAddresses',
+    paymentInfo: 'paymentInfo',
+    accountSecurity: 'accountSecurity',
+    notifications: 'notifications',
+    contactSupport: 'contactSupport',
+    deactivateAccount: 'deactivateAccount',
 }
 
 export { pages }

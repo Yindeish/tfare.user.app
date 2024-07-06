@@ -1,20 +1,22 @@
-import { Image, View, } from 'react-native'
-import { Text } from 'react-native-paper'
+import { Image, View, TouchableOpacity, ScrollView, Pressable } from 'react-native'
+import { Button, Text } from 'react-native-paper'
 import React from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import { image, wHFull } from '@/utils/imageStyles'
 import PageFloatingTitle from '@/components/page/pageFloatingTitle'
-import { flex, flexCenter, flexCol, gap, itemsCenter, justifyBetween, mr, relative, rounded, wFull } from '@/utils/styles'
+import { bg, flex, flexCenter, flexCol, gap, h, itemsCenter, justifyBetween, mr, mt, pb, px, py, relative, rounded, w, wFull } from '@/utils/styles'
 import Colors, { colors } from '@/constants/Colors'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { images } from '@/constants/images'
-import { c, colorBlack, fs12, fs14, fw400, fw700, neurialGrotesk } from '@/utils/fontStyles'
+import { c, colorBlack, fs12, fs14, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles'
 import { Ionicons } from '@expo/vector-icons'
+import PageNavigator from '@/components/tab/account/pageNavigator'
+import { pages } from '@/constants/pages'
 
 export default function Account() {
     return (
         <SafeScreen>
-            <View style={[wHFull, relative]}>
+            <ScrollView style={[wHFull, relative]}>
 
                 <PageFloatingTitle
                     title='Account'
@@ -22,7 +24,7 @@ export default function Account() {
                     onPress={() => { }} />
 
                 <PaddedScreen>
-                    <View style={[wFull, flexCenter, gap(32),]}>
+                    <View style={[wFull, flexCol, gap(32), mt(120)]}>
 
                         <View style={[wFull, flex, itemsCenter, justifyBetween]}>
                             <View style={[flex, gap(14), itemsCenter, { flex: 0.8 }]}>
@@ -34,11 +36,77 @@ export default function Account() {
                                 </View>
                             </View>
 
-                            <Ionicons style={[mr(16)]} name="chevron-back" size={20} color={Colors.light.textGrey} />
+                            <Ionicons style={[mr(16)]} name="chevron-forward" size={20} color={Colors.light.textGrey} />
+                        </View>
+
+                        <View style={[wFull, flex, gap(10), justifyBetween, itemsCenter, bg('#EDEDFD'), rounded(10), h(94), py(17), px(9), {}]}>
+                            <View style={[flexCol, gap(16), w(126), h(60)]}>
+
+                                <View style={[flex, itemsCenter, { gap: 16 }]}>
+
+                                    <Image style={[image.w(19), image.h(18)]} source={images.walletImage} />
+
+                                    <Text style={[neurialGrotesk, fs12, c(Colors.light.textGrey), fw400,]}>wallet balance</Text>
+
+                                </View>
+
+                                <Text style={[neurialGrotesk, fw700, { fontSize: 22 }]}> ₦{'0000.00'}</Text>
+                            </View>
+
+                            <TouchableOpacity>
+                                <View style={[flex, itemsCenter, justifyBetween, w(124), h(45), px(16), rounded(100), bg(colors.white), {
+                                    borderWidth: 0.7, borderColor: '#D7D7D7',
+                                }]}>
+
+                                    <Image style={[image.w(19), image.h(19)]} source={images.topupImage} />
+                                    <Text style={[neurialGrotesk, fs12, fw500, colorBlack]}>Top Up</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={[wFull, flexCol, gap(16), bg(colors.white), pb(80)]}>
+
+                            <PageNavigator
+                                title='Emergency Contacts'
+                                navigate
+                                page={pages.emergencyContacts}
+                                source={images.emergencyContactsImage} imageStyle={[image.w(18), image.h(16.36)]} />
+
+                            <PageNavigator
+                                navigate
+                                page={pages.savedAddresses}
+                                title='Saved Addresses' source={images.locationImage} imageStyle={[image.w(15), image.h(20)]} />
+
+                            <PageNavigator
+                                navigate
+                                page={pages.paymentInfo}
+                                title='Payment Infomation' source={images.paymentCardImage} imageStyle={[image.w(18), image.h(14)]} />
+
+                            <PageNavigator
+                                navigate
+                                page={pages.accountSecurity}
+                                title='Account Security' source={images.securityImage} imageStyle={[image.w(18), image.h(22)]} />
+
+                            <PageNavigator
+                                navigate
+                                page={pages.notifications}
+                                title='Notifications' source={images.notificationImage} imageStyle={[image.w(18), image.h(19)]} />
+
+                            <PageNavigator
+                                navigate
+                                page={pages.contactSupport}
+                                title='Contact Support' source={images.headPhoneImage} imageStyle={[image.w(18), image.h(14.73)]} />
+
+                            <PageNavigator navigate={false} title='Rate Us' source={images.rateStarImage} imageStyle={[image.w(18), image.h(17.13)]} />
+
+                            <Button
+                                labelStyle={[neurialGrotesk, fs14, fw500]}
+                                textColor={Colors.light.error}>Logout</Button>
                         </View>
                     </View>
                 </PaddedScreen>
-            </View>
+            </ScrollView>
         </SafeScreen>
     )
 }
+

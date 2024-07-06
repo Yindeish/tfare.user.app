@@ -39,6 +39,10 @@ import greenBgCoasterImage from '../assets/images/icons/green-bg-coaster-image.p
 import redBgCoasterImage from '../assets/images/icons/red-bg-coaster-image.png';
 import waitChairImage from '../assets/images/icons/wait-chair-image.png';
 import blackBgWaitChairImage from '../assets/images/icons/black-bg-wait-chair-image.png';
+import emergencyContactsImage from '../assets/images/icons/emergency-contacts-image.png';
+import paymentCardImage from '../assets/images/icons/payment-card-image.png';
+import securityImage from '../assets/images/icons/security-image.png';
+import rateStarImage from '../assets/images/icons/rate-star-image.png';
 
 const images = {
     introScreenImage1,
@@ -82,6 +86,10 @@ const images = {
     redBgCoasterImage,
     waitChairImage,
     blackBgWaitChairImage,
+    emergencyContactsImage,
+    paymentCardImage,
+    securityImage,
+    rateStarImage,
 }
 
 export { images }
