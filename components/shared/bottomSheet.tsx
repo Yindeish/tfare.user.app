@@ -23,17 +23,11 @@ const bottomSheet = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     useEffect(() => {
-        console.log({ bottomSheetSnapPoint: bottomSheet.snapPoint })
         bottomSheetRef.current?.snapToIndex(bottomSheet.snapPoint)
     }, [bottomSheet.snapPoint])
 
     useEffect(() => {
-        console.log({ bottomSheetVisible: bottomSheet.visible })
-    }, [])
-
-    useEffect(() => {
         if (!bottomSheet.visible) {
-            console.log({ bottomSheetVisible: bottomSheet.visible })
             bottomSheetRef.current?.close();
         }
     }, [bottomSheet.visible])

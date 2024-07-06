@@ -120,6 +120,7 @@ function Ride() {
                                         saved: false,
                                         status: 'idle',
                                         seats: ride.seats,
+                                        tickets: []
                                     }))
 
                                     router.push(`/${pages.bookRide}`)

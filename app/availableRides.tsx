@@ -49,6 +49,7 @@ export default function AvailableRide() {
                                             saved: false,
                                             status: 'idle',
                                             seats: ride.seats,
+                                            tickets: []
                                         }))
 
                                         router.push(`/${pages.bookRide}`)

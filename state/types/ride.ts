@@ -2,7 +2,8 @@ type TBusStop = 'pickupBusstop' | 'dropoffBusstop';
 type TLoadingStatus = 'idle' | 'succeeded' | 'failed';
 type TLoadingType = string;
 type TCurrentrideView = 'orderRide' | 'availableRides';
-type TTicketAsTicket1 = Pick<ITicket, 'id'>;
+type TTicketAsTicket1 = Pick<ITicket, 'id' | 'seat'>;
+type TAddTicketStatus = 'idle' | 'btnVisible' | 'newTicketBlock';
 
 interface IRoute {
     routeName: string;
@@ -12,6 +13,7 @@ interface IRoute {
 
 interface IBusStop extends Partial<IRoute> {
     type: TBusStop;
+    saved?: boolean;
 }
 
 interface ILoading {
@@ -22,7 +24,9 @@ interface ILoading {
 interface ITicket {
     id?: string,
     seat: ISeat | null,
-    owner?: {}
+    owner?: {},
+    pickupBusstop?: IBusStop | null,
+    dropoffBusstop?: IBusStop | null,
 }
 
 interface IDriverDetails {
@@ -58,12 +62,13 @@ interface IRideState {
     pickupBusstopInput: string,
     dropoffBusstopInput: string,
     currentRideView: TCurrentrideView,
-    addAnotherTicket: boolean,
+    addTicketStatus: TAddTicketStatus,
     userRide: IRide | null,
     userCounterFare: number | null,
     availableRides: IRide[] | [],
     userSelectedSeats: ISeat[] | [],
     ticketAsTicket1: TTicketAsTicket1 | null,
+    currentSeat: ISeat | null,
 }
 
-export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, TTicketAsTicket1, ISeat, ITicket, IRoute }
+export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, TTicketAsTicket1, ISeat, ITicket, IRoute, TAddTicketStatus }
