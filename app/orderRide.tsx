@@ -19,7 +19,7 @@ import BottomSheet from '@/components/shared/bottomSheet';
 import { pages } from '@/constants/pages';
 import RideSelectors from '@/state/selectors/ride';
 import { indices } from '@/constants/zIndices';
-import { setCurrentRideView, setUserRides } from '@/state/slices/ride';
+import { setCurrentRideView, setUserRide } from '@/state/slices/ride';
 import BottomSheetModal from '@/components/shared/bottomSheetModal';
 import { FontAwesome6 } from '@expo/vector-icons';
 import RideBlock from '@/components/page/rideBlock';
@@ -40,7 +40,7 @@ type Region = {
 function Ride() {
     const dispatch = useAppDispatch()
     const { bottomSheet, modal } = LayoutSelectors();
-    const { pickupBusstopInput, dropoffBusstopInput, currentRideView, availableRides, userRides } = RideSelectors()
+    const { pickupBusstopInput, dropoffBusstopInput, currentRideView, availableRides, } = RideSelectors()
 
     const [locationError, setLocationError] = useState<string | null>(null);
     const initialRegionObject = {
@@ -108,17 +108,19 @@ function Ride() {
                                 touchable
                                 roundedCorners
                                 onPress={() => {
-                                    dispatch(setUserRides((userRides as IRide[]).concat([{
+                                    dispatch(setUserRide({
                                         pickupBusstop: {
                                             type: 'pickupBusstop',
+                                            routeName: pickupBusstopInput
                                         },
                                         dropoffBusstop: {
-                                            type: 'dropoffBusstop'
+                                            type: 'dropoffBusstop',
+                                            routeName: dropoffBusstopInput
                                         },
                                         saved: false,
                                         status: 'idle',
-                                        seats: ride.seats
-                                    } as IRide])))
+                                        seats: ride.seats,
+                                    }))
 
                                     router.push(`/${pages.bookRide}`)
                                 }}

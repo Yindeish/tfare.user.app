@@ -7,7 +7,7 @@ import PageFloatingTitle from '@/components/page/pageFloatingTitle'
 import { router } from 'expo-router'
 import Colors, { colors } from '@/constants/Colors'
 import { pages } from '@/constants/pages'
-import { setCurrentRideView, setUserRides } from '@/state/slices/ride'
+import { setCurrentRideView, setUserRide } from '@/state/slices/ride'
 import RideBlock from '@/components/page/rideBlock'
 import RideSelectors from '@/state/selectors/ride'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
@@ -15,7 +15,7 @@ import { IRide } from '@/state/types/ride'
 
 export default function AvailableRide() {
     const dispatch = useAppDispatch()
-    const { availableRides, userRides } = RideSelectors()
+    const { availableRides, pickupBusstopInput, dropoffBusstopInput } = RideSelectors()
 
     return (
         <SafeScreen>
@@ -37,17 +37,19 @@ export default function AvailableRide() {
                                     touchable
                                     roundedCorners
                                     onPress={() => {
-                                        dispatch(setUserRides((userRides as IRide[]).concat([{
+                                        dispatch(setUserRide({
                                             pickupBusstop: {
                                                 type: 'pickupBusstop',
+                                                routeName: pickupBusstopInput
                                             },
                                             dropoffBusstop: {
-                                                type: 'dropoffBusstop'
+                                                type: 'dropoffBusstop',
+                                                routeName: dropoffBusstopInput
                                             },
                                             saved: false,
                                             status: 'idle',
-                                            seats: ride.seats
-                                        } as IRide])))
+                                            seats: ride.seats,
+                                        }))
 
                                         router.push(`/${pages.bookRide}`)
                                     }}

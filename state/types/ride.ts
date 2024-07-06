@@ -22,7 +22,7 @@ interface ILoading {
 interface ITicket {
     id?: string,
     seat: ISeat | null,
-    owner: {}
+    owner?: {}
 }
 
 interface IDriverDetails {
@@ -31,10 +31,10 @@ interface IDriverDetails {
 }
 
 interface ISeat {
-    id?: number,
+    id?: string,
     no: number,
-    available: boolean,
-    selected: boolean
+    available?: boolean,
+    selected?: boolean
 }
 
 interface IRide {
@@ -42,8 +42,8 @@ interface IRide {
     pickupBusstop: IBusStop,
     dropoffBusstop: IBusStop,
     saved: boolean,
-    ticket?: ITicket | null,
-    status: 'idle' | 'canceled',
+    tickets?: ITicket[] | [],
+    status: 'idle' | 'canceled' | 'accepted' | 'started',
     userCounterFare?: number | null,
     duration?: string,
     availableSeats?: ISeat[] | [],
@@ -57,15 +57,13 @@ interface IRideState {
     searchMatchBusstops: IBusStop[] | [],
     pickupBusstopInput: string,
     dropoffBusstopInput: string,
-    userProposedAmount: number | string, // rename this to userCounterFare
     currentRideView: TCurrentrideView,
     addAnotherTicket: boolean,
-    userRides: IRide[] | [],
-    // userCounterFare: number | null,
+    userRide: IRide | null,
+    userCounterFare: number | null,
     availableRides: IRide[] | [],
     userSelectedSeats: ISeat[] | [],
     ticketAsTicket1: TTicketAsTicket1 | null,
-    // seats: ISeat[] | [],
 }
 
-export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, TTicketAsTicket1, ISeat, }
+export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, TTicketAsTicket1, ISeat, ITicket, IRoute }

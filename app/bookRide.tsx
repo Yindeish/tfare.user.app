@@ -18,11 +18,11 @@ import PaddedScreen from '@/components/shared/paddedScreen'
 import { FlatList } from 'react-native-gesture-handler'
 import RideSelectors from '@/state/selectors/ride'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
-import { setAddAnother, setTicketAsTicket1, setUserRides } from '@/state/slices/ride'
+import { setAddAnother, setTicketAsTicket1, setUserRide } from '@/state/slices/ride'
 import Checkbox from 'expo-checkbox'
 import BottomSheetModal from '@/components/shared/bottomSheetModal'
 import { closeModal, openModal } from '@/state/slices/layout'
-import { IRide } from '@/state/types/ride'
+import { IRide, ISeat, ITicket } from '@/state/types/ride'
 
 const { sharedStyle, availableSeatStyle, selectedSeatStyle, unavailableSeatStyle } = StyleSheet.create({
     sharedStyle: {
@@ -42,12 +42,43 @@ const { sharedStyle, availableSeatStyle, selectedSeatStyle, unavailableSeatStyle
 
 export default function BookRide() {
     const dispatch = useAppDispatch();
-    const { addAnotherTicket, userRides, ticketAsTicket1, pickupBusstopInput, dropoffBusstopInput } = RideSelectors()
+    const { addAnotherTicket, userRide, ticketAsTicket1, pickupBusstopInput, dropoffBusstopInput } = RideSelectors()
 
     const selectSeat = (seatNo: number) => {
-        const seat = userRides[0].seats?.find(seat => seat.no === seatNo);
-        const newList = [...userRides, seat];
-        // dispatch(setUserRides(newList));
+        // create ticket for seat
+        if (userRide?.tickets) {
+            const ticketExist = (userRide?.tickets as ITicket[]).find(ticket => ticket?.seat?.no === seatNo && ticket?.seat?.selected);
+
+            if (!ticketExist) {
+                dispatch(setUserRide({
+                    ...userRide as IRide,
+                    tickets: [...userRide?.tickets as ITicket[], {
+                        seat: {
+                            no: seatNo,
+                            selected: true,
+                            available: false
+                        },
+                        owner: {}
+                    }]
+                }))
+            }
+            else return;
+        }
+
+        else {
+            dispatch(setUserRide({
+                ...userRide as IRide,
+                tickets: [{
+                    seat: {
+                        no: seatNo,
+                        selected: true,
+                        available: false
+                    },
+                    owner: {}
+                }]
+            }))
+        }
+
     }
 
     return (
@@ -67,7 +98,7 @@ export default function BookRide() {
                     <View style={[wHFull, mt(120), flexCol, gap(32), mb(32)]}>
 
                         <RideBlock
-                            ride={userRides[0]}
+                            ride={userRide as IRide}
                             bgColor='#FFF7E6'
                             ctaType='trackRide'
                             touchable
@@ -84,7 +115,7 @@ export default function BookRide() {
                                 </View>
 
                                 <FlatList
-                                    data={userRides[0].seats}
+                                    data={userRide?.seats}
                                     horizontal
                                     renderItem={({ item: { no, selected, available } }) => (
                                         <>
@@ -104,57 +135,49 @@ export default function BookRide() {
                                 />
                             </View>
 
-                            <FlatList
-                                data={userRides}
-                                renderItem={({ item, index }) => (
-                                    <View style={[wFull, flexCol, gap(32), mt(32)]}>
-                                        <Text style={[colorBlack, neurialGrotesk, fw700, fs14]}>Ticket {index + 1}</Text>
+                            <View style={[wFull, flexCol, gap(32), mt(32)]}>
+                                <Text style={[colorBlack, neurialGrotesk, fw700, fs14]}>Ticket 1</Text>
 
-                                        {/* Pick up block */}
+                                {/* Pick up block */}
 
-                                        <View style={[wFull, flexCol, gap(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
-                                            <View style={[flexCol, gap(15)]}>
-                                                <View style={[flex, gap(12), itemsCenter]}>
-                                                    <Image source={images.greenBgCoasterImage} style={[image.w(20), image.h(20)]} />
+                                <View style={[wFull, flexCol, gap(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
+                                    <View style={[flexCol, gap(15)]}>
+                                        <View style={[flex, gap(12), itemsCenter]}>
+                                            <Image source={images.greenBgCoasterImage} style={[image.w(20), image.h(20)]} />
 
-                                                    <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Pick up Bus Stop</Text>
-                                                </View>
-
-                                                <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{pickupBusstopInput}</Text>
-                                            </View>
+                                            <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Pick up Bus Stop</Text>
                                         </View>
 
-                                        {/* Pick up block */}
-                                        {/* Drop off block */}
-
-                                        <View style={[wFull, flex, justifyBetween, pr(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
-                                            <View style={[flexCol, gap(15)]}>
-                                                <View style={[flex, gap(12), itemsCenter]}>
-                                                    <Image source={images.redBgCoasterImage} style={[image.w(20), image.h(20)]} />
-
-                                                    <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Pick up Bus Stop</Text>
-                                                </View>
-
-                                                <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{pickupBusstopInput}</Text>
-                                            </View>
-
-                                            <View style={[flexCol, gap(16), justifyStart]}>
-                                                <View style={[flex, itemsCenter, gap(8)]}>
-                                                    <Image style={[image.w(14), image.h(11)]} source={images.rideOfferImage} />
-                                                    <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12]}>Ticket fee</Text>
-                                                </View>
-
-                                                <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}> ₦ 550.00</Text>
-                                            </View>
-                                        </View>
-                                        {/* Drop off block */}
-
+                                        <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{pickupBusstopInput}</Text>
                                     </View>
-                                )}
-                                ItemSeparatorComponent={() => (
-                                    <View style={[wFull, h(32)]} />
-                                )}
-                            />
+                                </View>
+
+                                {/* Pick up block */}
+                                {/* Drop off block */}
+
+                                <View style={[wFull, flex, justifyBetween, pr(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
+                                    <View style={[flexCol, gap(15)]}>
+                                        <View style={[flex, gap(12), itemsCenter]}>
+                                            <Image source={images.redBgCoasterImage} style={[image.w(20), image.h(20)]} />
+
+                                            <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Pick up Bus Stop</Text>
+                                        </View>
+
+                                        <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{pickupBusstopInput}</Text>
+                                    </View>
+
+                                    <View style={[flexCol, gap(16), justifyStart]}>
+                                        <View style={[flex, itemsCenter, gap(8)]}>
+                                            <Image style={[image.w(14), image.h(11)]} source={images.rideOfferImage} />
+                                            <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12]}>Ticket fee</Text>
+                                        </View>
+
+                                        <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}> ₦ 550.00</Text>
+                                    </View>
+                                </View>
+                                {/* Drop off block */}
+
+                            </View>
 
                             {/* Add another ticket btn */}
 
@@ -173,7 +196,7 @@ export default function BookRide() {
                             {addAnotherTicket && <View style={[wFull, flexCol, gap(32), itemsStart, mt(40)]}>
 
                                 <View style={[flex, itemsCenter, gap(4)]}>
-                                    <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}>{`Ticket ${userRides.length + 1}`}</Text>
+                                    <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}>{`Ticket 2`}</Text>
 
                                     <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>(You have selected more than 1 seat)</Text>
                                 </View>
@@ -245,7 +268,7 @@ export default function BookRide() {
                                     {/* Add another ticket btn */}
 
                                     <TouchableOpacity onPress={() => {
-                                        dispatch(setUserRides((userRides as IRide[]).concat([{
+                                        dispatch(setUserRide({
                                             pickupBusstop: {
                                                 type: 'pickupBusstop'
                                             },
@@ -254,7 +277,7 @@ export default function BookRide() {
                                             },
                                             saved: false,
                                             status: 'idle'
-                                        } as IRide])))
+                                        }))
 
                                         dispatch(setAddAnother(true));
                                     }}>

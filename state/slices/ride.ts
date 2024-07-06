@@ -11,7 +11,7 @@ const initialState: IRideState = {
     },
     searchMatchBusstops: [],
     pickupBusstopInput: '',
-    userProposedAmount: '',
+    userCounterFare: null,
     currentRideView: 'orderRide',
     addAnotherTicket: false,
     availableRides: [
@@ -81,10 +81,9 @@ const initialState: IRideState = {
             saved: false
         },
     ],
-    userRides: [],
     userSelectedSeats: [],
     ticketAsTicket1: null,
-    // seats: []
+    userRide: null,
 }
 
 const RideSlice = createSlice({
@@ -103,8 +102,8 @@ const RideSlice = createSlice({
         setLoading: (state, action: PayloadAction<ILoading>) => {
             state.loading = action.payload;
         },
-        setUserProposedAmount: (state, action: PayloadAction<number | string>) => {
-            state.userProposedAmount = action.payload;
+        setUserCounterFare: (state, action: PayloadAction<number | null>) => {
+            state.userCounterFare = action.payload;
         },
         setCurrentRideView: (state, action: PayloadAction<TCurrentrideView>) => {
             state.currentRideView = action.payload;
@@ -115,8 +114,8 @@ const RideSlice = createSlice({
         setAvailableRides: (state, action) => {
             state.availableRides = action.payload;
         },
-        setUserRides: (state, action: PayloadAction<IRide[] | []>) => {
-            state.userRides = action.payload;
+        setUserRide: (state, action: PayloadAction<IRide | null>) => {
+            state.userRide = action.payload;
         },
         setUserSelectedSeats: (state, action: PayloadAction<ISeat[] | []>) => {
             state.userSelectedSeats = action.payload;
@@ -130,6 +129,6 @@ const RideSlice = createSlice({
     }
 })
 
-export const { setDropoffBusstopInput, setLoading, setPickupBusstopInput, setUserProposedAmount, setCurrentRideView, setAddAnother, setAvailableRides, setUserRides, setUserSelectedSeats, setTicketAsTicket1, setSearchMatchBusstops, setSeats } = RideSlice.actions;
+export const { setDropoffBusstopInput, setLoading, setPickupBusstopInput, setUserCounterFare, setCurrentRideView, setAddAnother, setAvailableRides, setUserRide, setUserSelectedSeats, setTicketAsTicket1, setSearchMatchBusstops, setSeats } = RideSlice.actions;
 
 export default RideSlice.reducer;
