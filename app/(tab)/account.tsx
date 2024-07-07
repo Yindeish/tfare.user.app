@@ -12,6 +12,7 @@ import { c, colorBlack, fs12, fs14, fw400, fw500, fw700, neurialGrotesk } from '
 import { Ionicons } from '@expo/vector-icons'
 import PageNavigator from '@/components/tab/account/pageNavigator'
 import { pages } from '@/constants/pages'
+import { router } from 'expo-router'
 
 export default function Account() {
     return (
@@ -26,7 +27,7 @@ export default function Account() {
                 <PaddedScreen>
                     <View style={[wFull, flexCol, gap(32), mt(120)]}>
 
-                        <View style={[wFull, flex, itemsCenter, justifyBetween]}>
+                        <TouchableOpacity onPress={() => router.push(`/(account)/${pages.profileInfo}`)} style={[wFull, flex, itemsCenter, justifyBetween]}>
                             <View style={[flex, gap(14), itemsCenter, { flex: 0.8 }]}>
                                 <Image source={images.userProfileImage} style={[image.w(60), image.h(60),]} />
 
@@ -37,7 +38,7 @@ export default function Account() {
                             </View>
 
                             <Ionicons style={[mr(16)]} name="chevron-forward" size={20} color={Colors.light.textGrey} />
-                        </View>
+                        </TouchableOpacity>
 
                         <View style={[wFull, flex, gap(10), justifyBetween, itemsCenter, bg('#EDEDFD'), rounded(10), h(94), py(17), px(9), {}]}>
                             <View style={[flexCol, gap(16), w(126), h(60)]}>
@@ -69,32 +70,32 @@ export default function Account() {
                             <PageNavigator
                                 title='Emergency Contacts'
                                 navigate
-                                page={pages.emergencyContacts}
+                                page={`/(account)/${pages.emergencyContacts}`}
                                 source={images.emergencyContactsImage} imageStyle={[image.w(18), image.h(16.36)]} />
 
                             <PageNavigator
                                 navigate
-                                page={pages.savedAddresses}
+                                page={`/(account)/${pages.savedAddresses}`}
                                 title='Saved Addresses' source={images.locationImage} imageStyle={[image.w(15), image.h(20)]} />
 
                             <PageNavigator
                                 navigate
-                                page={pages.paymentInfo}
+                                page={`/(account)/${pages.paymentInfo}`}
                                 title='Payment Infomation' source={images.paymentCardImage} imageStyle={[image.w(18), image.h(14)]} />
 
                             <PageNavigator
                                 navigate
-                                page={pages.accountSecurity}
+                                page={`/(account)/${pages.accountSecurity}`}
                                 title='Account Security' source={images.securityImage} imageStyle={[image.w(18), image.h(22)]} />
 
                             <PageNavigator
                                 navigate
-                                page={pages.notifications}
+                                page={`/(account)/${pages.notifications}`}
                                 title='Notifications' source={images.notificationImage} imageStyle={[image.w(18), image.h(19)]} />
 
                             <PageNavigator
                                 navigate
-                                page={pages.contactSupport}
+                                page={`/(account)/${pages.contactSupport}`}
                                 title='Contact Support' source={images.headPhoneImage} imageStyle={[image.w(18), image.h(14.73)]} />
 
                             <PageNavigator navigate={false} title='Rate Us' source={images.rateStarImage} imageStyle={[image.w(18), image.h(17.13)]} />

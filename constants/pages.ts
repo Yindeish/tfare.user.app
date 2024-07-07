@@ -6,6 +6,7 @@ const pages = {
     orderRide: 'orderRide',
     bookRide: 'bookRide',
     availableRides: 'availableRides',
+    profileInfo: 'profileInfo',
     emergencyContacts: 'emergencyContacts',
     savedAddresses: 'savedAddresses',
     paymentInfo: 'paymentInfo',

@@ -131,7 +131,7 @@ export default function signin() {
                         </View>
                     </View>
 
-                    <Pressable style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]} onPress={() => { signIn(); signInwithToken(); router.push('/(app)/') }}>
+                    <Pressable style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]} onPress={() => { signIn(); signInwithToken(); router.push('/(tab)/') }}>
                         <Text style={[flex, itemsCenter, justifyCenter, signInText,]}>Sign In</Text>
                     </Pressable>
 

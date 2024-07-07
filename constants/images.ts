@@ -43,6 +43,9 @@ import emergencyContactsImage from '../assets/images/icons/emergency-contacts-im
 import paymentCardImage from '../assets/images/icons/payment-card-image.png';
 import securityImage from '../assets/images/icons/security-image.png';
 import rateStarImage from '../assets/images/icons/rate-star-image.png';
+import editBtnImage from '../assets/images/icons/edit-btn-image.png';
+import whiteBgEditBtnImage from '../assets/images/icons/white-bg-edit-btn-image.png';
+
 
 const images = {
     introScreenImage1,
@@ -90,6 +93,8 @@ const images = {
     paymentCardImage,
     securityImage,
     rateStarImage,
+    editBtnImage,
+    whiteBgEditBtnImage,
 }
 
 export { images }
