@@ -1,6 +1,6 @@
 import { Image, View, TouchableOpacity, ScrollView, Pressable } from 'react-native'
 import { Button, Text } from 'react-native-paper'
-import React from 'react'
+import React, { useEffect } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import { image, wHFull } from '@/utils/imageStyles'
 import PageFloatingTitle from '@/components/page/pageFloatingTitle'
@@ -13,8 +13,13 @@ import { Ionicons } from '@expo/vector-icons'
 import PageNavigator from '@/components/tab/account/pageNavigator'
 import { pages } from '@/constants/pages'
 import { router } from 'expo-router'
+import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
+import { setUserAccount } from '@/state/slices/account'
 
 export default function Account() {
+    const dispatch = useAppDispatch()
+
+
     return (
         <SafeScreen>
             <ScrollView style={[wHFull, relative]}>
@@ -40,6 +45,8 @@ export default function Account() {
                             <Ionicons style={[mr(16)]} name="chevron-forward" size={20} color={Colors.light.textGrey} />
                         </TouchableOpacity>
 
+                        {/* Wallet Block */}
+
                         <View style={[wFull, flex, gap(10), justifyBetween, itemsCenter, bg('#EDEDFD'), rounded(10), h(94), py(17), px(9), {}]}>
                             <View style={[flexCol, gap(16), w(126), h(60)]}>
 
@@ -64,6 +71,8 @@ export default function Account() {
                                 </View>
                             </TouchableOpacity>
                         </View>
+
+                        {/* Wallet Block */}
 
                         <View style={[wFull, flexCol, gap(16), bg(colors.white), pb(80)]}>
 

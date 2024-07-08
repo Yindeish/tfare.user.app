@@ -14,6 +14,8 @@ const pages = {
     notifications: 'notifications',
     contactSupport: 'contactSupport',
     deactivateAccount: 'deactivateAccount',
+    addNewContact: 'addNewContact',
+    saveNewAddress: 'saveNewAddress',
 }
 
 export { pages }

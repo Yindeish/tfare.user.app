@@ -9,7 +9,7 @@ import { c, colorBlack, colorWhite, fs12, fs14, fs16, fw400, fw500, fw700, neuri
 import { router } from 'expo-router';
 import { FilledForm, RecentDropoffLocations, RecentLocationsSnippet, RecentPickupLocations, RideRouteDetails, SearchingRide } from '@/components/page/orderRideBottomSheetComponents';
 import LayoutSelectors from '@/state/selectors/layout';
-import { closeBottomSheet, openBottomSheet, resetBottomSheetState, setBottomSheetSnapPoint, } from '@/state/slices/layout';
+import { closeBottomSheet, closeModal, openBottomSheet, resetBottomSheetState, setBottomSheetSnapPoint, } from '@/state/slices/layout';
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
 import { EBottomSheetStatus } from '@/state/enums/layout';
 import { images } from '@/constants/images';
@@ -194,10 +194,6 @@ function Ride() {
                 </BottomSheetModal>
 
                 {/* BottomSheet */}
-
-                {/* Overlay -> BackDrop */}
-                {/* <View style={[wHFull, bg(colors.grey900), absolute, top0, left0, zIndex(indices.low)]} /> */}
-                {/* Overlay -> BackDrop */}
             </View>
         </SafeScreen>
     );

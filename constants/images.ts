@@ -45,6 +45,10 @@ import securityImage from '../assets/images/icons/security-image.png';
 import rateStarImage from '../assets/images/icons/rate-star-image.png';
 import editBtnImage from '../assets/images/icons/edit-btn-image.png';
 import whiteBgEditBtnImage from '../assets/images/icons/white-bg-edit-btn-image.png';
+import profileImage from '../assets/images/icons/profile-image.png';
+import emailImage from '../assets/images/icons/email-image.png';
+import phoneImage from '../assets/images/icons/phone-image.png';
+import whatsappImage from '../assets/images/icons/whatsapp-image.png';
 
 
 const images = {
@@ -95,6 +99,10 @@ const images = {
     rateStarImage,
     editBtnImage,
     whiteBgEditBtnImage,
+    profileImage,
+    emailImage,
+    phoneImage,
+    whatsappImage,
 }
 
 export { images }

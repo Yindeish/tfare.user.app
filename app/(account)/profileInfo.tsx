@@ -4,7 +4,7 @@ import React from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { image, wHFull } from '@/utils/imageStyles'
-import { bg, flex, flexCol, gap, itemsCenter, justifyBetween, justifyCenter, mt, px, py, relative, rounded, wFull } from '@/utils/styles'
+import { bg, flex, flexCol, gap, h, itemsCenter, justifyBetween, justifyCenter, mt, px, py, relative, rounded, wFull } from '@/utils/styles'
 import Colors, { colors } from '@/constants/Colors'
 import { images } from '@/constants/images'
 import { c, colorBlack, colorWhite, fs12, fs14, fw500, neurialGrotesk } from '@/utils/fontStyles'
@@ -13,8 +13,25 @@ import { router } from 'expo-router'
 import { tabs } from '@/constants/tabs'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import AccountTextField from '@/components/page/accountTextFeild'
+import AccountSelectors from '@/state/selectors/account'
+import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
+import { setProfileCta, setUserProfileInfo, setUserProfileInfoFeild } from '@/state/slices/account'
+import { IStateInputProfile } from '@/state/types/account'
 
 export default function profileInfo() {
+    const dispatch = useAppDispatch()
+    const { profileCta, stateInput } = AccountSelectors();
+
+    const { emailInput, nameInput, phoneNoInput, userNameInput } = stateInput.profile;
+
+    const editProfile = () => {
+        dispatch(setProfileCta('save'));
+    }
+
+    const saveProfile = () => {
+        dispatch(setProfileCta('edit'));
+    }
+
     return (
         <SafeScreen>
             <View style={[wHFull,]}>
@@ -22,23 +39,21 @@ export default function profileInfo() {
 
                     {/* Page Header */}
 
-                    <View style={[wFull, flex, itemsCenter, justifyBetween, mt(47),]}>
-                        <AccountPageTitle
-                            title='Profile Information'
-                            onPress={() => router.push(`/(tab)/${tabs.account}`)}
-                            style={[]}
-                        />
-
+                    <AccountPageTitle
+                        title='Profile Information'
+                        onPress={() => router.push(`/(tab)/${tabs.account}`)}
+                        style={[]}
+                    >
                         {/* Edit / Save profile Btn */}
 
-                        {false ?
-                            (<TouchableOpacity style={[flex, rounded(100), gap(10), py(13), px(26), itemsCenter, bg('#F9F7F8'), { borderColor: Colors.light.border, borderWidth: 0.7 }]}>
+                        {profileCta === 'edit' ?
+                            (<TouchableOpacity onPress={editProfile} style={[flex, rounded(100), gap(10), py(13), px(26), itemsCenter, bg('#F9F7F8'), { borderColor: Colors.light.border, borderWidth: 0.7 }]}>
                                 <Image source={images.editBtnImage} style={[image.w(18), image.h(18),]} />
 
                                 <Text style={[neurialGrotesk, fs12, fw500, colorBlack]}>Edit</Text>
                             </TouchableOpacity>)
                             :
-                            (<TouchableOpacity style={[flex, rounded(100), gap(10), py(13), px(26), itemsCenter, bg(Colors.light.background), { borderColor: Colors.light.border, borderWidth: 0.7 }]}>
+                            (<TouchableOpacity onPress={saveProfile} style={[flex, rounded(100), gap(10), py(13), px(26), itemsCenter, bg(Colors.light.background), { borderColor: Colors.light.border, borderWidth: 0.7 }]}>
                                 <Image source={images.whiteBgEditBtnImage} style={[image.w(18), image.h(18),]} />
 
                                 <Text style={[neurialGrotesk, fs12, fw500, colorWhite]}>Save</Text>
@@ -46,17 +61,16 @@ export default function profileInfo() {
                         }
 
                         {/* Edit / Save profile Btn */}
-
-                    </View>
+                    </AccountPageTitle>
 
                     {/* Page Header */}
 
                     {/* User avatar */}
 
-                    <View style={[mt(28), flexCol, gap(16), itemsCenter, wFull]}>
+                    <View style={[mt(28), flexCol, gap(16), itemsCenter, wFull, h(134)]}>
                         <Image source={images.userProfileImage} style={[image.w(100), image.h(100), image.rounded(100)]} />
 
-                        <View style={[flex, itemsCenter, justifyCenter, gap(20)]}>
+                        {profileCta === 'save' && <View style={[flex, itemsCenter, justifyCenter, gap(20)]}>
                             <TouchableOpacity>
                                 <Text style={[neurialGrotesk, fw500, fs14, c(Colors.light.background)]}>Upload picture</Text>
                             </TouchableOpacity>
@@ -64,7 +78,7 @@ export default function profileInfo() {
                             <TouchableOpacity>
                                 <Text style={[neurialGrotesk, fw500, fs14, c(Colors.light.error)]}>Generate Avatar</Text>
                             </TouchableOpacity>
-                        </View>
+                        </View>}
                     </View>
 
                     {/* User avatar */}
@@ -73,42 +87,52 @@ export default function profileInfo() {
 
                         <AccountTextField
                             input={{
-                                fieldKey: 'name',
+                                fieldKey: 'nameInput',
                                 onChangeText: (key, value) => {
-                                    console.log({ key, value })
+                                    dispatch(setUserProfileInfoFeild({ key: key as unknown as keyof IStateInputProfile, value }))
                                 },
                                 palceHolder: '',
-                                value: 'Bolington',
+                                value: nameInput,
+                                editing: profileCta === 'save'
                             }}
                             label={{ text: 'Name' }}
                         />
 
                         <AccountTextField
                             input={{
-                                fieldKey: 'userName',
-                                onChangeText: () => { },
+                                fieldKey: 'userNameInput',
+                                onChangeText: (key, value) => {
+                                    dispatch(setUserProfileInfoFeild({ key: key as unknown as keyof IStateInputProfile, value }))
+                                },
                                 palceHolder: '',
-                                value: 'Bolington',
+                                value: userNameInput,
+                                editing: profileCta === 'save'
                             }}
                             label={{ text: 'Username' }}
                         />
 
                         <AccountTextField
                             input={{
-                                fieldKey: 'email',
-                                onChangeText: () => { },
+                                fieldKey: 'emailInput',
+                                onChangeText: (key, value) => {
+                                    dispatch(setUserProfileInfoFeild({ key: key as unknown as keyof IStateInputProfile, value }))
+                                },
                                 palceHolder: '',
-                                value: 'Bolington@gmail.com',
+                                value: emailInput,
+                                editing: profileCta === 'save',
                                 keyboardType: 'email-address'
                             }}
                             label={{ text: 'Email' }}
                         />
                         <AccountTextField
                             input={{
-                                fieldKey: 'phoneNo',
-                                onChangeText: () => { },
+                                fieldKey: 'phoneNoInput',
+                                onChangeText: (key, value) => {
+                                    dispatch(setUserProfileInfoFeild({ key: key as unknown as keyof IStateInputProfile, value }))
+                                },
                                 palceHolder: '',
-                                value: '8789723',
+                                value: phoneNoInput,
+                                editing: profileCta === 'save',
                                 keyboardType: 'numeric'
                             }}
                             label={{ text: 'Phone number' }}
