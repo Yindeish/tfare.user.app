@@ -3,10 +3,10 @@ import React from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { image, wHFull } from '@/utils/imageStyles'
-import { bg, flex, flexCol, gap, h, itemsCenter, justifyBetween, justifyCenter, mr, mt, p, pb, px, py, rounded, w, wFull } from '@/utils/styles'
+import { bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, mr, mt, p, pb, px, py, rounded, w, wFull } from '@/utils/styles'
 import Colors, { colors } from '@/constants/Colors'
 import { images } from '@/constants/images'
-import { c, colorBlack, colorWhite, fs12, fs14, fs16, fs18, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles'
+import { c, colorBlack, colorTextGrey, colorWhite, fs12, fs14, fs16, fs18, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles'
 import AccountPageTitle from '@/components/page/accountPageTitle'
 import { router } from 'expo-router'
 import { tabs } from '@/constants/tabs'
@@ -19,11 +19,40 @@ import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import { setEmergencyContactField } from '@/state/slices/account'
 import { IStateInputAddNewContact } from '@/state/types/account'
 import SavedAddressListTile from '@/components/page/SavedAddressesListTile'
+import AccountPageBlockTitle from '@/components/page/accountPageBlockTitle'
 
 export default function PaymentInfo() {
     const dispatch = useAppDispatch()
     const { stateInput, savedAddresses } = AccountSelectors();
     const { contactEmailInput, contactNameInput, contactPhoneNumberInput, contactWhatsAppInput } = stateInput.addNewContact;
+
+    interface IItem {
+        type: string,
+        date: string,
+        time: string,
+        amount: string,
+    }
+
+    const DATA: IItem[] = [
+        {
+            type: 'Card Top Up',
+            amount: '0000.00',
+            date: 'Apr 14, 2024',
+            time: '8:41 AM'
+        },
+        {
+            type: 'Virtual Account Funded',
+            amount: '0000.00',
+            date: 'Apr 14, 2024',
+            time: '8:41 AM'
+        },
+        {
+            type: 'Virtual Account Funded',
+            amount: '0000.00',
+            date: 'Apr 14, 2024',
+            time: '8:41 AM'
+        },
+    ];
 
     return (
         <SafeScreen>
@@ -70,10 +99,10 @@ export default function PaymentInfo() {
 
                         {/* Wallet Block */}
 
-                        {/* Debit Card Block */}
+                        {/* Virtual Card Block */}
 
                         <View style={[wFull, flexCol, gap(32)]}>
-                            <Text style={[pb(16), mr('auto'), colorBlack, fw700, wFull, fs16, { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>Virtual Account</Text>
+                            <AccountPageBlockTitle title='Virtual Account' />
 
                             <View style={[flexCol, gap(8)]}>
                                 <Text style={[fs12, fw400, colorBlack]}>Paystack Titan</Text>
@@ -86,7 +115,53 @@ export default function PaymentInfo() {
                             </View>
                         </View>
 
-                        {/* Debit Card Block */}
+                        {/* Virtual Card Block */}
+
+                        {/* Virtual Card Block */}
+
+                        <View style={[wFull, flexCol, gap(32)]}>
+                            <AccountPageBlockTitle title='Debit Cards' />
+
+                            <View style={[flexCol, gap(8)]}>
+                                <View style={[flex, itemsCenter, gap(16)]}>
+                                    <Image style={[image.w(18), image.h(14)]} source={images.paymentCardImage} />
+
+                                    <Text style={[fw400, fs14, colorBlack,]}>Mastercard ending with 4499</Text>
+                                </View>
+
+                                <View style={[flex, itemsCenter, gap(16)]}>
+                                    <Image style={[image.w(20), image.h(20)]} source={images.topupImage} />
+
+                                    <Text style={[fw400, fs14, colorBlack,]}>Add Debit Card</Text>
+                                </View>
+                            </View>
+                        </View>
+
+                        {/* Virtual Card Block */}
+
+                        {/* Wallet History Block */}
+
+                        <View style={[wFull, flexCol, gap(32)]}>
+                            <AccountPageBlockTitle title='Walet History' />
+
+                            <View style={[flexCol, { gap: 32, height: DATA.length * 100 }]}>
+                                {DATA.map((item, index) => (
+                                    <View style={[flex, wFull, itemsStart, justifyBetween, { paddingRight: 16, paddingBottom: 16, height: 59, borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]} key={index}>
+                                        <View style={[flexCol, itemsStart, justifyBetween, hFull]}>
+                                            <Text style={[fw700, fs14, colorBlack]}>{item.type}</Text>
+                                            <Text style={[colorTextGrey, fs12, fw400]}>{item.date}</Text>
+                                        </View>
+
+                                        <View style={[flexCol, itemsStart, justifyBetween, hFull]}>
+                                            <Text style={[fw400, fs14, { color: '#27AE65' }]}>{`₦${item.amount}`}</Text>
+                                            <Text style={[colorTextGrey, fw400, fs12]}>{item.time}</Text>
+                                        </View>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+
+                        {/* Wallet History Block */}
                     </View>
                 </PaddedScreen>
             </ScrollView>

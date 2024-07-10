@@ -18,7 +18,7 @@ export default function AccountPageTitle({ onPress, style, title, children }: { 
     return (
 
         <View style={[wFull, flex, itemsCenter, justifyBetween, mt(47), mb(28)]}>
-            <View style={[w(132), h(20), bg(colors.transparent), flex, justifyStart, itemsCenter, gap(10), { ...style as ViewStyle[] }]}>
+            <View style={[h(20), bg(colors.transparent), flex, justifyStart, itemsCenter, gap(10), { ...style as ViewStyle[] }]}>
                 <TouchableOpacity onPress={() => {
                     router.back();
                     onPress && onPress();

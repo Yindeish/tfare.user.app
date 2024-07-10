@@ -81,7 +81,59 @@ const initialState: IRideState = {
             saved: false
         },
         {
-            id: '#jhfdgej',
+            id: '#jhdgej',
+            dropoffBusstop: {
+                type: 'dropoffBusstop'
+            },
+            pickupBusstop: {
+                type: 'pickupBusstop'
+            },
+            availableSeats: [
+                { available: true, no: 1, selected: false },
+                { available: true, no: 3, selected: false },
+                { available: true, no: 4, selected: false },
+                { available: true, no: 6, selected: false },
+            ],
+            seats: [
+                { available: true, no: 1, selected: false },
+                { available: false, no: 2, selected: false },
+                { available: true, no: 3, selected: false },
+                { available: true, no: 4, selected: false },
+                { available: false, no: 5, selected: false },
+                { available: true, no: 6, selected: false },
+            ],
+            status: 'idle',
+            duration: '20-30mins',
+            saved: false
+        },
+        {
+            id: '#jhfdej',
+            dropoffBusstop: {
+                type: 'dropoffBusstop'
+            },
+            pickupBusstop: {
+                type: 'pickupBusstop'
+            },
+            availableSeats: [
+                { available: true, no: 1, selected: false },
+                { available: true, no: 3, selected: false },
+                { available: true, no: 4, selected: false },
+                { available: true, no: 6, selected: false },
+            ],
+            seats: [
+                { available: true, no: 1, selected: false },
+                { available: false, no: 2, selected: false },
+                { available: true, no: 3, selected: false },
+                { available: true, no: 4, selected: false },
+                { available: false, no: 5, selected: false },
+                { available: true, no: 6, selected: false },
+            ],
+            status: 'idle',
+            duration: '20-30mins',
+            saved: false
+        },
+        {
+            id: '#jhdej',
             dropoffBusstop: {
                 type: 'dropoffBusstop'
             },

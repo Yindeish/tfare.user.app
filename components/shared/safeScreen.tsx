@@ -1,6 +1,6 @@
 import { colors } from '@/constants/Colors';
 import Constants from 'expo-constants';
-import { View, Dimensions } from 'react-native';
+import { View, Dimensions, TouchableWithoutFeedback, Keyboard } from 'react-native';
 
 
 const SafeScreen = ({ children }: { children: React.ReactNode }) => {
@@ -9,7 +9,9 @@ const SafeScreen = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <View style={{ width, height, paddingTop: statusBarHeight, backgroundColor: colors.white }}>
-            {children}
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                {children}
+            </TouchableWithoutFeedback>
         </View>
     )
 }

@@ -14,6 +14,9 @@ import TripHistory from '@/components/tab/home/TripHistory';
 import { colorWhite, fs12, fw500, neurialGrotesk } from '@/utils/fontStyles';
 import { router } from 'expo-router';
 import { pages } from '@/constants/pages';
+import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
+import { openBottomSheet, setBottomSheetSnapPoint, setBottomSheetType } from '@/state/slices/layout';
+import { setCurrentRideView } from '@/state/slices/ride';
 
 const { orderRideBtn, orderRideText } = StyleSheet.create({
     orderRideBtn: {
@@ -33,6 +36,7 @@ const { orderRideBtn, orderRideText } = StyleSheet.create({
 export default function Index() {
     const { signOut } = useSession();
     const { signOut: signOutToken } = useTokenSession();
+    const dispatch = useAppDispatch()
     return (
         <SafeScreen>
             <ScrollView style={[wHFull, flexCol,]}>
@@ -42,7 +46,13 @@ export default function Index() {
 
                 <PaddedScreen styles={{ backgroundColor: colors.white, marginVertical: 20 }}>
                     <TouchableOpacity
-                        onPress={() => router.push(`/${pages.orderRide}`)}
+                        onPress={() => {
+                            router.push(`/${pages.orderRide}`);
+                            dispatch(setCurrentRideView('orderRide'));
+                            dispatch(setBottomSheetType('recentLocationsSnippet'));
+                            dispatch(setBottomSheetSnapPoint(0));
+                            dispatch(openBottomSheet());
+                        }}
                         style={[orderRideBtn, wFull, flex, itemsCenter, justifyCenter]}>
                         <Image style={{ width: 20, height: 17.27 }} source={images.whiteTripImage} />
 

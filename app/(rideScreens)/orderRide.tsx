@@ -9,7 +9,7 @@ import { c, colorBlack, colorWhite, fs12, fs14, fs16, fw400, fw500, fw700, neuri
 import { router } from 'expo-router';
 import { FilledForm, RecentDropoffLocations, RecentLocationsSnippet, RecentPickupLocations, RideRouteDetails, SearchingRide } from '@/components/page/orderRideBottomSheetComponents';
 import LayoutSelectors from '@/state/selectors/layout';
-import { closeBottomSheet, closeModal, openBottomSheet, resetBottomSheetState, setBottomSheetSnapPoint, } from '@/state/slices/layout';
+import { closeBottomSheet, closeModal, openBottomSheet, resetBottomSheetState, setBottomSheetSnapPoint, setBottomSheetType, } from '@/state/slices/layout';
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
 import { EBottomSheetStatus } from '@/state/enums/layout';
 import { images } from '@/constants/images';
@@ -58,6 +58,8 @@ function Ride() {
     const [initialRegion, setInitialRegion] = useState<Region | null>(initialRegionObject);
     const [markerCoordinate, setMarkerCoordinate] = useState<{ latitude: number, longitude: number } | null>(markerCoordinateObject);
 
+    const { height } = Dimensions.get('window');
+
     return (
         <SafeScreen>
             <View style={[wHFull, bg(colors.transparent), relative]}>
@@ -66,11 +68,15 @@ function Ride() {
 
                 {currentRideView === 'orderRide' ?
                     (<PageFloatingTitle view={false} onPress={() => {
-                        router.back();
+                        router.push(`/(tab)/`)
                         dispatch(closeBottomSheet());
                     }} title='Order a Ride' />) :
                     (<PageFloatingTitle view onPress={() => {
                         dispatch(closeBottomSheet());
+                        dispatch(setCurrentRideView('orderRide'));
+                        dispatch(setBottomSheetType('recentLocationsSnippet'));
+                        dispatch(openBottomSheet());
+                        dispatch(setBottomSheetSnapPoint(0));
                     }} title='Available Rides' />)}
 
                 {/* Page Title */}
@@ -98,10 +104,14 @@ function Ride() {
 
                 {/* Loaded Rides */}
 
-                {currentRideView === 'availableRides' && bottomSheet.type === EBottomSheetStatus.searchingRides && <View style={[w('90%'), h('70%'), bg(colors.transparent), absolute, t(200), l(20), zIndex(indices.high), py(8), { overflow: 'hidden' }]}>
+                {currentRideView === 'availableRides' && bottomSheet.type === EBottomSheetStatus.searchingRides && <View style={[w('90%'), h('70%'), bg(colors.transparent), absolute, t(200), l(20), zIndex(indices.high), py(8), { overflow: 'scroll', }]}>
 
-                    <ScrollView style={[wFull, bg(colors.transparent), flexCol, gap(32)]}>
-                        {availableRides.map((ride, index) => (
+                    <FlatList
+                        contentContainerStyle={[h('auto')]}
+                        style={[h('auto')]}
+                        horizontal={false}
+                        data={availableRides}
+                        renderItem={(({ index, item: ride }) => (
                             <RideBlock
                                 ride={ride}
                                 bgColor='#F9F7F8'
@@ -129,8 +139,7 @@ function Ride() {
                                 key={index}
                             />
                         ))}
-                    </ScrollView>
-
+                    />
                 </View>}
 
                 {/* Loaded Rides */}

@@ -19,7 +19,7 @@ export default function AvailableRide() {
 
     return (
         <SafeScreen>
-            <View style={[wHFull, relative, { overflow: 'scroll' }]}>
+            <ScrollView style={[wHFull, relative, { overflow: 'scroll' }]}>
 
                 <PageFloatingTitle title='Available Rides' color={{ icon: Colors.light.textGrey, text: colors.black }} view onPress={() => {
                     router.push(`/${pages.orderRide}`);
@@ -27,8 +27,8 @@ export default function AvailableRide() {
                 }} />
 
                 <PaddedScreen>
-                    <View style={[wFull, h('70%'), mt(130), { overflow: 'scroll', }]}>
-                        <ScrollView style={[wFull, h('auto'), flexCol, gap(26),]}>
+                    <View style={[wFull, mt(130), { overflow: 'scroll', }]}>
+                        <View style={[wFull, flexCol, gap(26),]}>
                             {availableRides.map((ride, index) => (
                                 <RideBlock
                                     bgColor='#F9F7F8'
@@ -57,10 +57,10 @@ export default function AvailableRide() {
                                     key={index}
                                 />
                             ))}
-                        </ScrollView>
+                        </View>
                     </View>
                 </PaddedScreen>
-            </View>
+            </ScrollView>
         </SafeScreen>
     )
 }
