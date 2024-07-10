@@ -3,10 +3,10 @@ import React from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { image, wHFull } from '@/utils/imageStyles'
-import { bg, flex, flexCol, gap, h, itemsCenter, justifyBetween, justifyCenter, mt, p, px, py, rounded, w, wFull } from '@/utils/styles'
+import { bg, flex, flexCol, gap, h, itemsCenter, justifyBetween, justifyCenter, mr, mt, p, pb, px, py, rounded, w, wFull } from '@/utils/styles'
 import Colors, { colors } from '@/constants/Colors'
 import { images } from '@/constants/images'
-import { c, colorBlack, colorWhite, fs12, fs14, fs18, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles'
+import { c, colorBlack, colorWhite, fs12, fs14, fs16, fs18, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles'
 import AccountPageTitle from '@/components/page/accountPageTitle'
 import { router } from 'expo-router'
 import { tabs } from '@/constants/tabs'
@@ -69,6 +69,24 @@ export default function PaymentInfo() {
                         </View>
 
                         {/* Wallet Block */}
+
+                        {/* Debit Card Block */}
+
+                        <View style={[wFull, flexCol, gap(32)]}>
+                            <Text style={[pb(16), mr('auto'), colorBlack, fw700, wFull, fs16, { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>Virtual Account</Text>
+
+                            <View style={[flexCol, gap(8)]}>
+                                <Text style={[fs12, fw400, colorBlack]}>Paystack Titan</Text>
+
+                                <TouchableOpacity style={[bg('#F9F7F8'), h(70), px(37), flex, itemsCenter, gap(10), rounded(50)]}>
+                                    <Text style={[colorBlack, fw700, { fontSize: 22 }]}>9882910472</Text>
+
+                                    <Image style={[image.w(20), image.h(20)]} source={images.copyImage} />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        {/* Debit Card Block */}
                     </View>
                 </PaddedScreen>
             </ScrollView>

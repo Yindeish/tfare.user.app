@@ -39,12 +39,12 @@ export default function AppLayout() {
     <Stack.Screen name={pages.accountSecurity} />
     <Stack.Screen name={pages.notifications} />
     <Stack.Screen name={pages.contactSupport} />
-    <Stack.Screen name={pages.deactivateAccount}
-      options={{
+    {/* <Stack.Screen name={pages.deactivateAccount} */}
+    {/* options={{
         presentation: 'modal',
         // gestureEnabled: true,
         // animation: 'slide_from_bottom'
-      }} />
+      }} /> */}
   </Stack>
 }
 

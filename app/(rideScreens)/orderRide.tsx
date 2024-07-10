@@ -66,6 +66,7 @@ function Ride() {
 
                 {currentRideView === 'orderRide' ?
                     (<PageFloatingTitle view={false} onPress={() => {
+                        router.back();
                         dispatch(closeBottomSheet());
                     }} title='Order a Ride' />) :
                     (<PageFloatingTitle view onPress={() => {

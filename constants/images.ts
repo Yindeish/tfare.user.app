@@ -49,6 +49,7 @@ import profileImage from '../assets/images/icons/profile-image.png';
 import emailImage from '../assets/images/icons/email-image.png';
 import phoneImage from '../assets/images/icons/phone-image.png';
 import whatsappImage from '../assets/images/icons/whatsapp-image.png';
+import copyImage from '../assets/images/icons/copy-image.png';
 
 
 const images = {
@@ -103,6 +104,7 @@ const images = {
     emailImage,
     phoneImage,
     whatsappImage,
+    copyImage,
 }
 
 export { images }
