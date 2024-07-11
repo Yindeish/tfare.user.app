@@ -15,6 +15,7 @@ import { pages } from '@/constants/pages'
 import { router } from 'expo-router'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import { setUserAccount } from '@/state/slices/account'
+import PageTitle from '@/components/shared/pageTitle'
 
 export default function Account() {
     const dispatch = useAppDispatch()
@@ -23,14 +24,13 @@ export default function Account() {
     return (
         <SafeScreen>
             <ScrollView style={[wHFull, relative]}>
-
-                <PageFloatingTitle
-                    title='Account'
-                    color={{ icon: Colors.light.textGrey, text: colors.black }}
-                    onPress={() => { }} />
-
                 <PaddedScreen>
-                    <View style={[wFull, flexCol, gap(32), mt(120)]}>
+                    <PageTitle
+                        title='Account'
+                        onPress={() => router.back()}
+                    />
+
+                    <View style={[wFull, flexCol, gap(32),]}>
 
                         <TouchableOpacity onPress={() => router.push(`/(account)/${pages.profileInfo}`)} style={[wFull, flex, itemsCenter, justifyBetween]}>
                             <View style={[flex, gap(14), itemsCenter, { flex: 0.8 }]}>

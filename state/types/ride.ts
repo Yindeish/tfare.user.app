@@ -69,6 +69,8 @@ interface IRideState {
     userSelectedSeats: ISeat[] | [],
     ticketAsTicket1: TTicketAsTicket1 | null,
     currentSeat: ISeat | null,
+    driverRatingInput: number | null,
+    driverRatingCommentInput: string
 }
 
 export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, TTicketAsTicket1, ISeat, ITicket, IRoute, TAddTicketStatus }

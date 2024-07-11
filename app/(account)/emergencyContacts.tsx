@@ -7,7 +7,7 @@ import { bg, flex, flexCol, gap, h, itemsCenter, justifyBetween, justifyCenter, 
 import Colors, { colors } from '@/constants/Colors'
 import { images } from '@/constants/images'
 import { c, colorBlack, colorWhite, fs12, fs14, fw500, neurialGrotesk } from '@/utils/fontStyles'
-import AccountPageTitle from '@/components/page/accountPageTitle'
+import AccountPageTitle from '@/components/shared/pageTitle'
 import { router } from 'expo-router'
 import { tabs } from '@/constants/tabs'
 import { TouchableOpacity } from 'react-native-gesture-handler'

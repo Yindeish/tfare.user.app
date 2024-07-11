@@ -1,11 +1,27 @@
 const pages = {
+    // Auth
     signin: 'signin',
     signup: 'signup',
     securityQuestion: 'securityQuestion',
-    home: 'home',
+    // Auth
+
+    // Tab
+    home: '/',
+    // Tab
+
+    // Ride
     orderRide: 'orderRide',
     bookRide: 'bookRide',
     availableRides: 'availableRides',
+    buyTicket: 'buyTicket',
+    ridePaymentInfo: 'paymentInfo',
+    rideBooked: 'rideBooked',
+    driverProfile: 'driverProfile',
+    chat: 'chat',
+    tripStarted: 'tripStarted',
+    // Ride
+
+    // Account
     profileInfo: 'profileInfo',
     emergencyContacts: 'emergencyContacts',
     savedAddresses: 'savedAddresses',
@@ -16,6 +32,7 @@ const pages = {
     deactivateAccount: 'deactivateAccount',
     addNewContact: 'addNewContact',
     saveNewAddress: 'saveNewAddress',
+    // Account
 }
 
 export { pages }

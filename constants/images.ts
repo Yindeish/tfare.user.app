@@ -50,6 +50,13 @@ import emailImage from '../assets/images/icons/email-image.png';
 import phoneImage from '../assets/images/icons/phone-image.png';
 import whatsappImage from '../assets/images/icons/whatsapp-image.png';
 import copyImage from '../assets/images/icons/copy-image.png';
+import startRatingImage from '../assets/images/icons/start-rating-image.png';
+import checkTripImage from '../assets/images/icons/check-trip-image.png';
+import chatImage from '../assets/images/icons/chat-image.png';
+import redBgCautionImage from '../assets/images/icons/red-bg-caution-image.png';
+import tripChargeImage from '../assets/images/icons/trip-charge-image.png';
+import whiteBgStarRatingImage from '../assets/images/icons/white-bg-star-rating-image.png';
+import greenBgCheckboxImage from '../assets/images/icons/green-bg-checkbox-image.png';
 
 
 const images = {
@@ -105,6 +112,13 @@ const images = {
     phoneImage,
     whatsappImage,
     copyImage,
+    startRatingImage,
+    checkTripImage,
+    chatImage,
+    redBgCautionImage,
+    tripChargeImage,
+    whiteBgStarRatingImage,
+    greenBgCheckboxImage,
 }
 
 export { images }

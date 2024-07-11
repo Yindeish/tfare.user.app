@@ -6,7 +6,7 @@ import React, { useEffect } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import { bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyStart, mb, mt, p, pr, px, py, relative, rounded, w, wFull, wHFull } from '@/utils/styles'
 import PageFloatingTitle from '@/components/page/pageFloatingTitle'
-import { router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import Colors, { colors } from '@/constants/Colors'
 import { c, colorBlack, colorWhite, fs12, fs14, fs18, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles'
 import { image } from '@/utils/imageStyles'
@@ -41,6 +41,8 @@ const { sharedStyle, availableSeatStyle, selectedSeatStyle, unavailableSeatStyle
 });
 
 export default function BookRide() {
+    const { rideId } = useLocalSearchParams();
+
     const dispatch = useAppDispatch();
     const { addTicketStatus, userRide, ticketAsTicket1, pickupBusstopInput, dropoffBusstopInput, currentSeat } = RideSelectors()
 
@@ -68,7 +70,7 @@ export default function BookRide() {
                     <PageFloatingTitle
                         title='Book Ride'
                         color={{ icon: Colors.light.textGrey, text: colors.black }}
-                        onPress={() => router.back()}
+                        onPress={() => router.push(`/${pages.availableRides}`)}
                         view={false}
                     />
                     {/* Page Title */}

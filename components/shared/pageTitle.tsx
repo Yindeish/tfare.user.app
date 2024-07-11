@@ -9,7 +9,7 @@ import { router } from "expo-router";
 import { TouchableOpacity, View, ViewStyle } from "react-native";
 import { Text } from "react-native-paper";
 
-export default function AccountPageTitle({ onPress, style, title, children }: { onPress?: Function, style?: ViewStyle | ViewStyle[], title: string, children?: React.ReactNode }) {
+export default function PageTitle({ onPress, style, title, children }: { onPress?: Function, style?: ViewStyle | ViewStyle[], title: string, children?: React.ReactNode }) {
     const dispatch = useAppDispatch()
     const { profileCta, stateInput } = AccountSelectors();
 

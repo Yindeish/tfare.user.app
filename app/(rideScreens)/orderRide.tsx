@@ -134,7 +134,7 @@ function Ride() {
                                         tickets: []
                                     }))
 
-                                    router.push(`/${pages.bookRide}`)
+                                    router.push(`/${ride.id}/${pages.bookRide}`)
                                 }}
                                 key={index}
                             />

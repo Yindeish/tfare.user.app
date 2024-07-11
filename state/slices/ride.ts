@@ -16,7 +16,7 @@ const initialState: IRideState = {
     addTicketStatus: 'idle',
     availableRides: [
         {
-            id: '#878dfgj',
+            id: '878dfgj',
             dropoffBusstop: {
                 type: 'dropoffBusstop'
             },
@@ -37,7 +37,7 @@ const initialState: IRideState = {
             saved: false
         },
         {
-            id: '#8787ej',
+            id: '8787ej',
             dropoffBusstop: {
                 type: 'dropoffBusstop',
             },
@@ -59,7 +59,7 @@ const initialState: IRideState = {
             saved: false
         },
         {
-            id: '#87dgej',
+            id: '87dgej',
             dropoffBusstop: {
                 type: 'dropoffBusstop'
             },
@@ -81,7 +81,7 @@ const initialState: IRideState = {
             saved: false
         },
         {
-            id: '#jhdgej',
+            id: 'jhdgej',
             dropoffBusstop: {
                 type: 'dropoffBusstop'
             },
@@ -107,7 +107,7 @@ const initialState: IRideState = {
             saved: false
         },
         {
-            id: '#jhfdej',
+            id: 'jhfdej',
             dropoffBusstop: {
                 type: 'dropoffBusstop'
             },
@@ -133,7 +133,7 @@ const initialState: IRideState = {
             saved: false
         },
         {
-            id: '#jhdej',
+            id: 'jhdej',
             dropoffBusstop: {
                 type: 'dropoffBusstop'
             },
@@ -163,6 +163,8 @@ const initialState: IRideState = {
     ticketAsTicket1: null,
     userRide: null,
     currentSeat: null,
+    driverRatingInput: null,
+    driverRatingCommentInput: ''
 }
 
 const RideSlice = createSlice({
@@ -323,10 +325,18 @@ const RideSlice = createSlice({
                     }
                 }
             }
+        },
+        setDriverRatingInput: (state, action: PayloadAction<number | null>) => {
+            state.driverRatingInput = action.payload;
+        },
+        setDriverRatingCommentInput: (state, action: PayloadAction<string>) => {
+            state.driverRatingCommentInput = action.payload;
         }
     }
 })
 
-export const { setDropoffBusstopInput, setLoading, setPickupBusstopInput, setUserCounterFare, setCurrentRideView, setAddTicketStatus, setAvailableRides, setUserRide, setUserSelectedSeats, setTicketAsTicket1, setSearchMatchBusstops, createTicket, selectSeat, setCurrentSeat, unselectSeat, removeTicket, editTicket } = RideSlice.actions;
+export const { setDropoffBusstopInput, setLoading, setPickupBusstopInput, setUserCounterFare, setCurrentRideView, setAddTicketStatus, setAvailableRides, setUserRide, setUserSelectedSeats, setTicketAsTicket1, setSearchMatchBusstops, createTicket, selectSeat, setCurrentSeat, unselectSeat, removeTicket, editTicket,
+    setDriverRatingInput, setDriverRatingCommentInput,
+} = RideSlice.actions;
 
 export default RideSlice.reducer;

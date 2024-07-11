@@ -14,7 +14,7 @@ const RideBlock = ({ bgColor, ctaType, roundedCorners, ride, onPress, touchable 
 
         <View style={[wFull, h(45), flex, itemsCenter, justifyBetween, gap(14)]}>
             <View style={[flexCol, gap(12), itemsStart]}>
-                <Text style={[colorBlack, neurialGrotesk, fw700, fs14]}>Rider {ride?.id}</Text>
+                <Text style={[colorBlack, neurialGrotesk, fw700, fs14]}>Rider #{ride?.id}</Text>
                 <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Honda Accord</Text>
             </View>
 

@@ -1,10 +1,10 @@
 import { View, Text, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { image, mXAuto, wHFull } from '@/utils/imageStyles'
 import { bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, mb, mt, p, pb, px, py, rounded, w, wFull } from '@/utils/styles'
-import AccountPageTitle from '@/components/page/accountPageTitle'
+import AccountPageTitle from '@/components/shared/pageTitle'
 import { router } from 'expo-router'
 import { tabs } from '@/constants/tabs'
 import AccountSelectors from '@/state/selectors/account'
@@ -20,6 +20,7 @@ import { colorBlack, colorWhite, fs14, fs16, fs18, fw500, fw700, neurialGrotesk 
 import AccountTextField from '@/components/page/accountTextFeild'
 import RadioBtnListTile from '@/components/page/RadioBtnListTile'
 import { deactivateAccountReasons } from '@/constants/deactivateAccountReasons'
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
 
 export default function accountSecurity() {
     const dispatch = useAppDispatch()
@@ -28,6 +29,26 @@ export default function accountSecurity() {
     useEffect(() => {
         dispatch(openModal());
     }, [])
+
+    const reasonInput = stateInput?.deactivateAccount?.reasonInput;
+
+    let [commentBoxShowable, setCommentBoxShowable] = useState(false)
+
+    // Updating the bottom Modal
+    useEffect(() => {
+        console.log({ reasonInput: stateInput?.deactivateAccount?.reasonInput })
+
+        if (reasonInput.toLowerCase() === deactivateAccountReasons[0].toLowerCase() ||
+            reasonInput.toLowerCase() === deactivateAccountReasons[0].toLowerCase() ||
+            reasonInput.toLowerCase() === deactivateAccountReasons[1].toLowerCase() ||
+            reasonInput.toLowerCase() === deactivateAccountReasons[2].toLowerCase() ||
+            reasonInput.toLowerCase() === deactivateAccountReasons[3].toLowerCase() ||
+            reasonInput.toLowerCase() === deactivateAccountReasons[4].toLowerCase()) {
+            setCommentBoxShowable(false);
+        }
+        else setCommentBoxShowable(true);
+    }, [stateInput?.deactivateAccount?.reasonInput])
+    // Updating the bottom Modal
 
     return (
         <SafeScreen>
@@ -112,8 +133,11 @@ export default function accountSecurity() {
                                                     dispatch(setDeactivateAccountField({ key: 'reasonInput', value: value.toLowerCase() === stateInput.deactivateAccount.reasonInput.toLowerCase() ? '' : value.toLowerCase() }))
                                                 }
 
-                                                if (reason) {
-                                                    dispatch(setDeactivateAccountField({ key: 'reasonInput', value: value.toLowerCase() === stateInput.deactivateAccount.reasonInput.toLowerCase() ? '' : value.toLowerCase() }))
+                                                // if (reason) {
+                                                //     dispatch(setDeactivateAccountField({ key: 'reasonInput', value: value.toLowerCase() === stateInput.deactivateAccount.reasonInput.toLowerCase() ? '' : value.toLowerCase() }))
+                                                // }
+                                                if (reason.toLowerCase() === 'other') {
+                                                    dispatch(setDeactivateAccountField({ key: 'reasonInput', value: '' }))
                                                 }
                                             },
                                             value: stateInput.deactivateAccount.reasonInput
@@ -125,22 +149,24 @@ export default function accountSecurity() {
 
                             </View>
 
-                            <TextInput
-                                onChangeText={(text) => {
-                                    dispatch(setDeactivateAccountField({ key: 'reasonInput', value: text }))
-                                }}
+                            {commentBoxShowable &&
 
-                                value={stateInput.deactivateAccount.reasonInput}
-                                placeholder={'Input Comments'}
-                                multiline
-                                numberOfLines={4}
+                                <BottomSheetTextInput
+                                    onChangeText={(text) => {
+                                        dispatch(setDeactivateAccountField({ key: 'reasonInput', value: text }))
+                                    }}
 
-                                style={[py(16), px(24), rounded(10), bg(colors.transparent), colorBlack, fs14, fw500, wFull, { borderWidth: 0.7, borderColor: Colors.light.border }]}
+                                    value={stateInput.deactivateAccount.reasonInput}
+                                    placeholder={'Input Comments'}
+                                    multiline
+                                    numberOfLines={4}
 
-                                selectionColor={colors.transparent}
-                                underlineColorAndroid={colors.transparent}
-                                placeholderTextColor={Colors.light.textGrey}
-                            />
+                                    style={[py(16), px(24), rounded(10), bg(colors.transparent), colorBlack, fs14, fw500, wFull, { borderWidth: 0.7, borderColor: Colors.light.border }]}
+
+                                    selectionColor={colors.transparent}
+                                    underlineColorAndroid={colors.transparent}
+                                    placeholderTextColor={Colors.light.textGrey}
+                                />}
 
                             <TouchableOpacity onPress={() => {
                                 dispatch(closeModal())

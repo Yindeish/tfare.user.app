@@ -9,6 +9,7 @@ import { fonts } from '../../constants/fonts';
 import { bg, flex, flexCenter, flexCol, flexYCenter, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, mLAuto, mXAuto, pAuto, pLAuto, wFull, wHFull } from '../../utils/styles';
 import Colors, { colors } from '../../constants/Colors';
 import PaddedScreen from '@/components/shared/paddedScreen';
+import { pages } from '@/constants/pages';
 
 const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noAccount, signupLink, invalidEntryText } = StyleSheet.create({
     signInTitle: {
@@ -131,7 +132,10 @@ export default function signin() {
                         </View>
                     </View>
 
-                    <Pressable style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]} onPress={() => { signIn(); signInwithToken(); router.push('/(tab)/') }}>
+                    <Pressable style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]} onPress={() => {
+                        signIn(); signInwithToken();
+                        router.replace('/(tab)/')
+                    }}>
                         <Text style={[flex, itemsCenter, justifyCenter, signInText,]}>Sign In</Text>
                     </Pressable>
 
