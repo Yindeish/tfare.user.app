@@ -3,7 +3,8 @@ const cancelRideReasons = [
     'Plans Changed',
     'Driver is taking too long',
     'Rider Description does not match',
-    'Price is not reasonable'
+    'Price is not reasonable',
+    'other'
 ]
 
 export { cancelRideReasons }

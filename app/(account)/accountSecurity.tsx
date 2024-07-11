@@ -36,8 +36,6 @@ export default function accountSecurity() {
 
     // Updating the bottom Modal
     useEffect(() => {
-        console.log({ reasonInput: stateInput?.deactivateAccount?.reasonInput })
-
         if (reasonInput.toLowerCase() === deactivateAccountReasons[0].toLowerCase() ||
             reasonInput.toLowerCase() === deactivateAccountReasons[0].toLowerCase() ||
             reasonInput.toLowerCase() === deactivateAccountReasons[1].toLowerCase() ||

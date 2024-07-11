@@ -17,7 +17,7 @@ import MapView, { Marker } from 'react-native-maps';
 import { CancelRide, TripCompletedSheet, TripStartedSheet } from "@/components/page/tripStartedBottomSheetComponents";
 import BottomSheetModal from "@/components/shared/bottomSheetModal";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
-import { openModal } from "@/state/slices/layout";
+import { closeBottomSheet, closeModal, openBottomSheet, openModal } from "@/state/slices/layout";
 
 type Region = {
     latitude: number;
@@ -32,7 +32,15 @@ function TripStarted() {
     const { pickupBusstopInput, dropoffBusstopInput } = RideSelectors()
 
     useEffect(() => {
-        dispatch(openModal());
+
+        if (bottomSheet.type === EBottomSheetStatus.tripStarted || bottomSheet.type === EBottomSheetStatus.tripCompleted) {
+            dispatch(openModal());
+            dispatch(closeBottomSheet());
+        }
+        if (bottomSheet.type === EBottomSheetStatus.cancelRide) {
+            dispatch(closeModal());
+            dispatch(openBottomSheet());
+        }
     }, [])
 
     const [locationError, setLocationError] = useState<string | null>(null);
@@ -112,11 +120,11 @@ function TripStarted() {
 
                 <BottomSheet>
 
-                    {false
-                        // bottomSheet.type === EBottomSheetStatus.tripStarted
+                    {
+                        bottomSheet.type === EBottomSheetStatus.tripStarted
                         && <TripStartedSheet />}
-                    {false
-                        // bottomSheet.type === EBottomSheetStatus.tripCompleted
+                    {
+                        bottomSheet.type === EBottomSheetStatus.tripCompleted
                         && <TripCompletedSheet />}
 
                 </BottomSheet>
@@ -132,8 +140,8 @@ function TripStarted() {
                         // dispatch(setBottomSheetSnapPoint(-1));
                     }}>
 
-                    {true
-                        // bottomSheet.type === EBottomSheetStatus.cancelRide
+                    {
+                        bottomSheet.type === EBottomSheetStatus.cancelRide
                         && <CancelRide />}
 
                 </BottomSheetModal>

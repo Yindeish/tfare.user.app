@@ -4,6 +4,7 @@ type TLoadingType = string;
 type TCurrentrideView = 'orderRide' | 'availableRides';
 type TTicketAsTicket1 = Pick<ITicket, 'id' | 'seat'>;
 type TAddTicketStatus = 'idle' | 'btnVisible' | 'newTicketBlock';
+type TActiveTab = 'pending' | 'completed' | 'cancelled';
 
 interface IRoute {
     routeName: string;
@@ -70,7 +71,9 @@ interface IRideState {
     ticketAsTicket1: TTicketAsTicket1 | null,
     currentSeat: ISeat | null,
     driverRatingInput: number | null,
-    driverRatingCommentInput: string
+    driverRatingCommentInput: string,
+    cancelRideReason: string,
+    activeTab: TActiveTab
 }
 
-export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, TTicketAsTicket1, ISeat, ITicket, IRoute, TAddTicketStatus }
+export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, TTicketAsTicket1, ISeat, ITicket, IRoute, TAddTicketStatus, TActiveTab }

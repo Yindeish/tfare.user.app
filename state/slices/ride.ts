@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ESlicesNames } from "../enums/slicesNames";
-import { IBusStop, ILoading, IRide, IRideState, ISeat, ITicket, TAddTicketStatus, TCurrentrideView, TTicketAsTicket1 } from "../types/ride";
+import { IBusStop, ILoading, IRide, IRideState, ISeat, ITicket, TActiveTab, TAddTicketStatus, TCurrentrideView, TTicketAsTicket1 } from "../types/ride";
 
 
 const initialState: IRideState = {
@@ -164,7 +164,9 @@ const initialState: IRideState = {
     userRide: null,
     currentSeat: null,
     driverRatingInput: null,
-    driverRatingCommentInput: ''
+    driverRatingCommentInput: '',
+    cancelRideReason: '',
+    activeTab: 'completed'
 }
 
 const RideSlice = createSlice({
@@ -331,12 +333,19 @@ const RideSlice = createSlice({
         },
         setDriverRatingCommentInput: (state, action: PayloadAction<string>) => {
             state.driverRatingCommentInput = action.payload;
+        },
+        setCancelRideReason: (state, action) => {
+            state.cancelRideReason = action.payload;
+        },
+        setActiveTab: (state, action: PayloadAction<TActiveTab>) => {
+            state.activeTab = action.payload
         }
     }
 })
 
 export const { setDropoffBusstopInput, setLoading, setPickupBusstopInput, setUserCounterFare, setCurrentRideView, setAddTicketStatus, setAvailableRides, setUserRide, setUserSelectedSeats, setTicketAsTicket1, setSearchMatchBusstops, createTicket, selectSeat, setCurrentSeat, unselectSeat, removeTicket, editTicket,
     setDriverRatingInput, setDriverRatingCommentInput,
+    setCancelRideReason, setActiveTab,
 } = RideSlice.actions;
 
 export default RideSlice.reducer;

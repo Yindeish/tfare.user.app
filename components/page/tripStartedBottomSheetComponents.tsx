@@ -9,10 +9,11 @@ import Colors, { colors } from "@/constants/Colors";
 import { useEffect, useState } from "react";
 import CtaBtn from "../shared/ctaBtn";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
-import { setDriverRatingCommentInput, setDriverRatingInput } from "@/state/slices/ride";
+import { setCancelRideReason, setDriverRatingCommentInput, setDriverRatingInput } from "@/state/slices/ride";
 import RideSelectors from "@/state/selectors/ride";
 import { cancelRideReasons } from "@/constants/cancelRideReasons";
 import RadioBtnListTile from "./RadioBtnListTile";
+import { closeModal } from "@/state/slices/layout";
 
 function TripStartedSheet() {
 
@@ -203,9 +204,23 @@ function TripCompletedSheet() {
 
 function CancelRide() {
     const dispatch = useAppDispatch()
-    const { driverRatingCommentInput, } = RideSelectors();
+    const { driverRatingCommentInput, cancelRideReason } = RideSelectors();
 
     let [commentBoxShowable, setCommentBoxShowable] = useState(false)
+
+    // Updating the bottom Modal
+    useEffect(() => {
+        if (cancelRideReason.toLowerCase() === cancelRideReasons[0].toLowerCase() ||
+            cancelRideReason.toLowerCase() === cancelRideReasons[0].toLowerCase() ||
+            cancelRideReason.toLowerCase() === cancelRideReasons[1].toLowerCase() ||
+            cancelRideReason.toLowerCase() === cancelRideReasons[2].toLowerCase() ||
+            cancelRideReason.toLowerCase() === cancelRideReasons[3].toLowerCase() ||
+            cancelRideReason.toLowerCase() === cancelRideReasons[4].toLowerCase()) {
+            setCommentBoxShowable(false);
+        }
+        else setCommentBoxShowable(true);
+    }, [cancelRideReason])
+    // Updating the bottom Modal
 
     return (
         <View style={[w('90%'), hFull, mXAuto, rounded(10), py(34), px(24), bg(colors.white), flexCol, gap(30),]} >
@@ -214,12 +229,11 @@ function CancelRide() {
 
                 <Image style={[image.w(20), image.h(20)]} source={images.cancelImage} />
 
-                <Text style={[neurialGrotesk, fw700, fs16, colorBlack,]}>Deactivate Account</Text>
+                <Text style={[neurialGrotesk, fw700, fs16, colorBlack,]}>Cancel Ride</Text>
             </View>
 
             <View style={[flexCol, gap(2), itemsCenter, mXAuto]}>
-                <Text style={[neurialGrotesk, fw700, fs14]}>Why do you want to Deactivate your</Text>
-                <Text style={[neurialGrotesk, fw700, fs14]}>account?</Text>
+                <Text style={[neurialGrotesk, fw700, fs14]}>Why do you want to cancel your order?</Text>
             </View>
 
             <View style={[flexCol, gap(10)]}>
@@ -230,17 +244,15 @@ function CancelRide() {
                             onChange: (value: string) => {
 
                                 if (reason.toLowerCase() !== 'other') {
-                                    // dispatch(setDeactivateAccountField({ key: 'reasonInput', value: value.toLowerCase() === stateInput.deactivateAccount.reasonInput.toLowerCase() ? '' : value.toLowerCase() }))
+                                    dispatch(setCancelRideReason(value.toLowerCase() === cancelRideReason.toLowerCase() ? '' : value.toLowerCase()))
                                 }
 
-                                // if (reason) {
-                                //     dispatch(setDeactivateAccountField({ key: 'reasonInput', value: value.toLowerCase() === stateInput.deactivateAccount.reasonInput.toLowerCase() ? '' : value.toLowerCase() }))
-                                // }
                                 if (reason.toLowerCase() === 'other') {
-                                    // dispatch(setDeactivateAccountField({ key: 'reasonInput', value: '' }))
+                                    dispatch(setCancelRideReason(''))
                                 }
+
                             },
-                            value: driverRatingCommentInput
+                            value: cancelRideReason.toLowerCase()
                         }}
                         label={{ text: reason }}
                         key={index}
@@ -254,7 +266,7 @@ function CancelRide() {
 
                 <TextInput
                     onChangeText={(text) => {
-                        // dispatch(setDeactivateAccountField({ key: 'reasonInput', value: text }))
+                        dispatch(setCancelRideReason(text))
                     }}
 
                     value={driverRatingCommentInput}
@@ -271,7 +283,7 @@ function CancelRide() {
             }
 
             <TouchableOpacity onPress={() => {
-                // dispatch(closeModal())
+                dispatch(closeModal())
 
                 // submit reason to the server
             }}>

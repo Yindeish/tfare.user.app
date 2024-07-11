@@ -23,7 +23,8 @@ export default function Index() {
 
     else {
         // return <Redirect href="/(auth)/signin" />; // uncomment after testing
-        return <Redirect href={`/(rideScreens)/1/${pages.tripStarted}`} />;
+        // return <Redirect href={`/(rideScreens)/1/${pages.tripHistory}`} />; // part of testing
+        return <Redirect href={`/(rideScreens)/${pages.tripHistory}`} />; // part of testing
 
     }
 }

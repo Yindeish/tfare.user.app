@@ -19,6 +19,7 @@ const pages = {
     driverProfile: 'driverProfile',
     chat: 'chat',
     tripStarted: 'tripStarted',
+    tripHistory: 'tripHistory',
     // Ride
 
     // Account
