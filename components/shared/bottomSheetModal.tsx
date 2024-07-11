@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, Button, ViewStyle } from 'react-native';
 import {
     BottomSheetModal,
     BottomSheetView,
@@ -8,21 +8,21 @@ import {
 } from '@gorhom/bottom-sheet';
 import LayoutSelectors from '@/state/selectors/layout';
 import { useSharedValue } from 'react-native-reanimated';
-import { bg } from '@/utils/styles';
+import { absolute, bg, hFull, left0, top0, wFull } from '@/utils/styles';
 import { colors } from '@/constants/Colors';
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
 import { closeModal } from '@/state/slices/layout';
 
 type TOnDismiss = () => void;
 
-function bottomSheetModal({ children, onDismiss }: { children: React.ReactNode, onDismiss?: TOnDismiss }) {
+function bottomSheetModal({ children, onDismiss, initialIdex, bgColor, indicator = true }: { children: React.ReactNode, onDismiss?: TOnDismiss, initialIdex?: number, bgColor?: string, indicator?: boolean }) {
     const dispatch = useAppDispatch()
     const { modal } = LayoutSelectors();
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const animatedIndex = useSharedValue(0);
     const animatedPosition = useSharedValue(0);
-    const snapPoints = useMemo(() => [300, 400], []);
+    const snapPoints = useMemo(() => [300, 400, '90%'], []);
 
     useEffect(() => {
         if (modal.visible) {
@@ -40,7 +40,8 @@ function bottomSheetModal({ children, onDismiss }: { children: React.ReactNode, 
             width: 140,
             height: 4,
             borderRadius: 100,
-            marginTop: 10
+            marginTop: 10,
+            display: indicator === false ? 'none' : 'flex'
         },
     });
 
@@ -53,9 +54,9 @@ function bottomSheetModal({ children, onDismiss }: { children: React.ReactNode, 
                 appearsOnIndex={0}
                 animatedIndex={animatedIndex}
                 animatedPosition={animatedPosition}
-                style={[bg(colors.transparent)]}
+                style={[bg(colors.black), wFull, hFull, absolute, top0, left0]}
                 pressBehavior={'close'}
-                opacity={0.4}
+                opacity={0.6}
                 onPress={() => dispatch(closeModal())}
             />
         ),
@@ -66,13 +67,12 @@ function bottomSheetModal({ children, onDismiss }: { children: React.ReactNode, 
 
         <BottomSheetModal
             ref={bottomSheetModalRef}
-            // index={1}
-            index={modal.visible ? 0 : -1}
+            index={initialIdex ? initialIdex : modal.visible ? 0 : -1}
             snapPoints={snapPoints}
             onChange={handleSheetChanges}
             animatedIndex={animatedIndex}
             backdropComponent={renderBackdrop}
-            backgroundStyle={[{ borderRadius: 0, }]}
+            backgroundStyle={[{ borderRadius: 0, }, bg(bgColor || colors.white)]}
             enablePanDownToClose
             handleIndicatorStyle={draggableIcon}
             onDismiss={onDismiss}

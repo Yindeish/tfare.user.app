@@ -16,7 +16,7 @@ const initialState: IRideState = {
     addTicketStatus: 'idle',
     availableRides: [
         {
-            id: '#878dfgj',
+            id: '878dfgj',
             dropoffBusstop: {
                 type: 'dropoffBusstop'
             },
@@ -37,7 +37,7 @@ const initialState: IRideState = {
             saved: false
         },
         {
-            id: '#8787ej',
+            id: '8787ej',
             dropoffBusstop: {
                 type: 'dropoffBusstop',
             },
@@ -59,7 +59,7 @@ const initialState: IRideState = {
             saved: false
         },
         {
-            id: '#87dgej',
+            id: '87dgej',
             dropoffBusstop: {
                 type: 'dropoffBusstop'
             },
@@ -81,7 +81,59 @@ const initialState: IRideState = {
             saved: false
         },
         {
-            id: '#jhfdgej',
+            id: 'jhdgej',
+            dropoffBusstop: {
+                type: 'dropoffBusstop'
+            },
+            pickupBusstop: {
+                type: 'pickupBusstop'
+            },
+            availableSeats: [
+                { available: true, no: 1, selected: false },
+                { available: true, no: 3, selected: false },
+                { available: true, no: 4, selected: false },
+                { available: true, no: 6, selected: false },
+            ],
+            seats: [
+                { available: true, no: 1, selected: false },
+                { available: false, no: 2, selected: false },
+                { available: true, no: 3, selected: false },
+                { available: true, no: 4, selected: false },
+                { available: false, no: 5, selected: false },
+                { available: true, no: 6, selected: false },
+            ],
+            status: 'idle',
+            duration: '20-30mins',
+            saved: false
+        },
+        {
+            id: 'jhfdej',
+            dropoffBusstop: {
+                type: 'dropoffBusstop'
+            },
+            pickupBusstop: {
+                type: 'pickupBusstop'
+            },
+            availableSeats: [
+                { available: true, no: 1, selected: false },
+                { available: true, no: 3, selected: false },
+                { available: true, no: 4, selected: false },
+                { available: true, no: 6, selected: false },
+            ],
+            seats: [
+                { available: true, no: 1, selected: false },
+                { available: false, no: 2, selected: false },
+                { available: true, no: 3, selected: false },
+                { available: true, no: 4, selected: false },
+                { available: false, no: 5, selected: false },
+                { available: true, no: 6, selected: false },
+            ],
+            status: 'idle',
+            duration: '20-30mins',
+            saved: false
+        },
+        {
+            id: 'jhdej',
             dropoffBusstop: {
                 type: 'dropoffBusstop'
             },
@@ -111,6 +163,8 @@ const initialState: IRideState = {
     ticketAsTicket1: null,
     userRide: null,
     currentSeat: null,
+    driverRatingInput: null,
+    driverRatingCommentInput: ''
 }
 
 const RideSlice = createSlice({
@@ -271,10 +325,18 @@ const RideSlice = createSlice({
                     }
                 }
             }
+        },
+        setDriverRatingInput: (state, action: PayloadAction<number | null>) => {
+            state.driverRatingInput = action.payload;
+        },
+        setDriverRatingCommentInput: (state, action: PayloadAction<string>) => {
+            state.driverRatingCommentInput = action.payload;
         }
     }
 })
 
-export const { setDropoffBusstopInput, setLoading, setPickupBusstopInput, setUserCounterFare, setCurrentRideView, setAddTicketStatus, setAvailableRides, setUserRide, setUserSelectedSeats, setTicketAsTicket1, setSearchMatchBusstops, createTicket, selectSeat, setCurrentSeat, unselectSeat, removeTicket, editTicket } = RideSlice.actions;
+export const { setDropoffBusstopInput, setLoading, setPickupBusstopInput, setUserCounterFare, setCurrentRideView, setAddTicketStatus, setAvailableRides, setUserRide, setUserSelectedSeats, setTicketAsTicket1, setSearchMatchBusstops, createTicket, selectSeat, setCurrentSeat, unselectSeat, removeTicket, editTicket,
+    setDriverRatingInput, setDriverRatingCommentInput,
+} = RideSlice.actions;
 
 export default RideSlice.reducer;

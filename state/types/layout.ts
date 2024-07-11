@@ -2,7 +2,7 @@ type TVoidFn = () => void;
 type TVoidFnWithVal = <T>(val: T) => void;
 // type TBottomSheetHeight = 601 | 508 | 436 | 477 | 400 | number;
 type TBottomSheetSnapPoint = number;
-type TBottomSheetType = 'recentLocationsSnippet' | 'recentPickupLocations' | 'recentDropoffLocations' | 'routeRideDetails' | 'filledForm' | 'searchingRides' | 'loadedRides';
+type TBottomSheetType = 'recentLocationsSnippet' | 'recentPickupLocations' | 'recentDropoffLocations' | 'routeRideDetails' | 'filledForm' | 'searchingRides' | 'loadedRides' | 'tripStarted' | 'tripCompleted' | 'cancelRide';
 
 interface IModal {
     type: string,

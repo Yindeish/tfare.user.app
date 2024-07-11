@@ -2,7 +2,8 @@
 
 enum ESlicesNames {
     layout = 'layout',
-    ride = 'ride'
+    ride = 'ride',
+    account = 'account',
 }
 
 export { ESlicesNames }

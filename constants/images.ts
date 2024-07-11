@@ -39,6 +39,25 @@ import greenBgCoasterImage from '../assets/images/icons/green-bg-coaster-image.p
 import redBgCoasterImage from '../assets/images/icons/red-bg-coaster-image.png';
 import waitChairImage from '../assets/images/icons/wait-chair-image.png';
 import blackBgWaitChairImage from '../assets/images/icons/black-bg-wait-chair-image.png';
+import emergencyContactsImage from '../assets/images/icons/emergency-contacts-image.png';
+import paymentCardImage from '../assets/images/icons/payment-card-image.png';
+import securityImage from '../assets/images/icons/security-image.png';
+import rateStarImage from '../assets/images/icons/rate-star-image.png';
+import editBtnImage from '../assets/images/icons/edit-btn-image.png';
+import whiteBgEditBtnImage from '../assets/images/icons/white-bg-edit-btn-image.png';
+import profileImage from '../assets/images/icons/profile-image.png';
+import emailImage from '../assets/images/icons/email-image.png';
+import phoneImage from '../assets/images/icons/phone-image.png';
+import whatsappImage from '../assets/images/icons/whatsapp-image.png';
+import copyImage from '../assets/images/icons/copy-image.png';
+import startRatingImage from '../assets/images/icons/start-rating-image.png';
+import checkTripImage from '../assets/images/icons/check-trip-image.png';
+import chatImage from '../assets/images/icons/chat-image.png';
+import redBgCautionImage from '../assets/images/icons/red-bg-caution-image.png';
+import tripChargeImage from '../assets/images/icons/trip-charge-image.png';
+import whiteBgStarRatingImage from '../assets/images/icons/white-bg-star-rating-image.png';
+import greenBgCheckboxImage from '../assets/images/icons/green-bg-checkbox-image.png';
+
 
 const images = {
     introScreenImage1,
@@ -82,6 +101,24 @@ const images = {
     redBgCoasterImage,
     waitChairImage,
     blackBgWaitChairImage,
+    emergencyContactsImage,
+    paymentCardImage,
+    securityImage,
+    rateStarImage,
+    editBtnImage,
+    whiteBgEditBtnImage,
+    profileImage,
+    emailImage,
+    phoneImage,
+    whatsappImage,
+    copyImage,
+    startRatingImage,
+    checkTripImage,
+    chatImage,
+    redBgCautionImage,
+    tripChargeImage,
+    whiteBgStarRatingImage,
+    greenBgCheckboxImage,
 }
 
 export { images }

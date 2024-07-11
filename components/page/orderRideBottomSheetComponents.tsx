@@ -12,7 +12,7 @@ import { useDispatch } from "react-redux";
 import { closeBottomSheet, openBottomSheet, openModal, resetBottomSheetState, setBottomSheetSnapPoint, setBottomSheetType } from "@/state/slices/layout";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
 import RideSelectors from "@/state/selectors/ride";
-import { setCurrentRideView, setDropoffBusstopInput, setPickupBusstopInput, setUserProposedAmount } from "@/state/slices/ride";
+import { setCurrentRideView, setDropoffBusstopInput, setPickupBusstopInput, setUserCounterFare } from "@/state/slices/ride";
 import { router } from "expo-router";
 import BottomSheet, { BottomSheetFlatList, BottomSheetView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import BottomSheetTitle from "../shared/bottomSheetTitle";
@@ -582,7 +582,7 @@ const FilledForm = () => {
 
 const RideRouteDetails = () => {
     const dispatch = useAppDispatch();
-    const { dropoffBusstopInput, userProposedAmount } = RideSelectors()
+    const { dropoffBusstopInput, userCounterFare } = RideSelectors()
 
     return (
         <PaddedScreen>
@@ -618,9 +618,9 @@ const RideRouteDetails = () => {
                                 placeholderTextColor={Colors.light.textGrey}
                                 cursorColor={Colors.light.textGrey}
                                 placeholder="Input your offer"
-                                value={userProposedAmount?.toString()}
+                                value={userCounterFare?.toString()}
                                 onChangeText={(text) => {
-                                    dispatch(setUserProposedAmount(Number(text)));
+                                    dispatch(setUserCounterFare(Number(text)));
                                 }}
                             />
                         </View>
@@ -674,7 +674,7 @@ const SearchingRide = () => {
                 <TouchableOpacity
                     onPress={() => {
                         dispatch(closeBottomSheet());
-                        router.push(`/(app)/`);
+                        router.push(`//`);
                     }} style={[bg('#F9F7F8'), wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
                     <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw700, fs16]}>Cancel</Text>
 
