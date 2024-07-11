@@ -2,6 +2,7 @@ import { View, Text, Dimensions } from 'react-native'
 import React, { useEffect } from 'react'
 import { Redirect } from 'expo-router';
 import { useSession } from '@/contexts/userTokenContext';
+import { pages } from '@/constants/pages';
 
 export default function Index() {
     const { session, isLoading } = useSession();
@@ -21,6 +22,8 @@ export default function Index() {
     }
 
     else {
-        return <Redirect href="/(auth)/signin" />;
+        // return <Redirect href="/(auth)/signin" />; // uncomment after testing
+        return <Redirect href={`/(rideScreens)/1/${pages.tripStarted}`} />;
+
     }
 }

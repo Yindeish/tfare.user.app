@@ -3,12 +3,13 @@ import React, { useEffect, useState } from 'react'
 import { Link, router } from 'expo-router'
 import { useSession } from '../../contexts/userSignedInContext';
 import { useSession as useTokenSession } from '../../contexts/userTokenContext';
-import SafeScreen from '../../components/safeScreen';
+import SafeScreen from '../../components/shared/safeScreen';
 import { MD2Colors, Text } from 'react-native-paper';
 import { fonts } from '../../constants/fonts';
-import { flex, flexCenter, flexCol, flexYCenter, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, mLAuto, mXAuto, pAuto, pLAuto, wFull, wHFull } from '../../utils/styles';
+import { bg, flex, flexCenter, flexCol, flexYCenter, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, mLAuto, mXAuto, pAuto, pLAuto, wFull, wHFull } from '../../utils/styles';
 import Colors, { colors } from '../../constants/Colors';
-import PaddedScreen from '@/components/paddedScreen';
+import PaddedScreen from '@/components/shared/paddedScreen';
+import { pages } from '@/constants/pages';
 
 const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noAccount, signupLink, invalidEntryText } = StyleSheet.create({
     signInTitle: {
@@ -97,7 +98,7 @@ export default function signin() {
         <SafeScreen>
             <PaddedScreen styles={wHFull}>
                 <View style={[wHFull, flexCol, itemsStart, justifyCenter, { gap: 40 }]}>
-                    <View style={[flexCol, { gap: 2 }]}>
+                    <View style={[flexCol, wFull, { gap: 2 }]}>
                         <Text style={signInTitle}>Sign in</Text>
                         <Text style={signInTitle}>to continue</Text>
                     </View>
@@ -107,10 +108,10 @@ export default function signin() {
                             style={[textInput, invalidEntry && { borderColor: Colors.light.error }]}
                             placeholder='Email Address'
                             underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={'#747474'}
+                            placeholderTextColor={Colors.light.textGrey}
                             value={email}
                             autoFocus
-                            cursorColor={'#747474'}
+                            cursorColor={Colors.light.textGrey}
                             onChangeText={(text) => onChange('email', text)}
                         />
 
@@ -118,7 +119,7 @@ export default function signin() {
                             style={[textInput, invalidEntry && { borderColor: Colors.light.error }]}
                             placeholder="Password"
                             underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={'#747474'}
+                            placeholderTextColor={Colors.light.textGrey}
                             value={password}
                             secureTextEntry={secureTextEntry}
                             onChangeText={(text) => onChange('password', text)}
@@ -131,7 +132,10 @@ export default function signin() {
                         </View>
                     </View>
 
-                    <Pressable style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]} onPress={() => { signIn(); signInwithToken(); router.push('/(app)/') }}>
+                    <Pressable style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]} onPress={() => {
+                        signIn(); signInwithToken();
+                        router.replace('/(tab)/')
+                    }}>
                         <Text style={[flex, itemsCenter, justifyCenter, signInText,]}>Sign In</Text>
                     </Pressable>
 

@@ -1,7 +1,7 @@
 import { View, StyleSheet, FlatList, Dimensions, ScrollView } from 'react-native'
 import { Text } from 'react-native-paper'
 import React from 'react'
-import PaddedScreen from '@/components/paddedScreen';
+import PaddedScreen from '@/components/shared/paddedScreen';
 import { fonts } from '@/constants/fonts';
 import Colors, { colors } from '@/constants/Colors';
 import { flex, flexCol, hFull, itemsStart, justifyBetween, wFull } from '@/utils/styles';

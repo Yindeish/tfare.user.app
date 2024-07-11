@@ -1,5 +1,5 @@
 import React from 'react';
-import SafeScreen from '../../components/safeScreen';
+import SafeScreen from '../../components/shared/safeScreen';
 import Colors, { colors } from '../../constants/Colors';
 import { fonts } from '../../constants/fonts';
 import { images } from '../../constants/images';
@@ -10,7 +10,7 @@ import { useRef, useState } from 'react';
 import { View, StyleSheet, TextInput, TouchableOpacity, Pressable, Button, Image } from 'react-native'
 import { Menu, Text } from 'react-native-paper'
 import RBSheet from 'react-native-raw-bottom-sheet';
-import PaddedScreen from '@/components/paddedScreen';
+import PaddedScreen from '@/components/shared/paddedScreen';
 // import { Image, ImageStyle } from 'expo-image';
 
 const { securityQuestionTitle, textInput, questionSelectText, questionMenuDropdown, menuItem, form, signUpBtn, signUpText, bottomSheetImage, bottomSheetMessage } = StyleSheet.create({
@@ -43,7 +43,7 @@ const { securityQuestionTitle, textInput, questionSelectText, questionMenuDropdo
         paddingBottom: 'auto',
         backgroundColor: '#F9F7F8',
         fontFamily: fonts.neurialGrotesk,
-        color: '#747474'
+        color: Colors.light.textGrey
     },
     questionMenuDropdown: {
         width: '90%',
@@ -126,7 +126,7 @@ export default function SecurityQuestion() {
                                             <Entypo
                                                 name="chevron-small-down"
                                                 size={35}
-                                                color="#747474"
+                                                color={Colors.light.textGrey}
                                                 style={{
                                                     transform: [{ rotate: !questionDropDownVisible ? '0deg' : '180deg' }]
                                                 }}
@@ -158,9 +158,9 @@ export default function SecurityQuestion() {
                             style={[textInput]}
                             placeholder='Enter Question'
                             underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={'#747474'}
+                            placeholderTextColor={Colors.light.textGrey}
                             value={question}
-                            cursorColor={'#747474'}
+                            cursorColor={Colors.light.textGrey}
                             onChangeText={(text) => onChange('question', text)}
                         />}
 
@@ -168,9 +168,9 @@ export default function SecurityQuestion() {
                             style={[textInput]}
                             placeholder='Enter Answer'
                             underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={'#747474'}
+                            placeholderTextColor={Colors.light.textGrey}
                             value={answer}
-                            cursorColor={'#747474'}
+                            cursorColor={Colors.light.textGrey}
                             onChangeText={(text) => onChange('answer', text)}
                         />
                     </View>
@@ -240,7 +240,7 @@ export default function SecurityQuestion() {
                                                     <Entypo
                                                         name="chevron-small-down"
                                                         size={35}
-                                                        color="#747474"
+                                                        color={Colors.light.textGrey}
                                                         style={{
                                                             transform: [{ rotate: !questionDropDownVisible ? '0deg' : '180deg' }]
                                                         }}
@@ -261,9 +261,9 @@ export default function SecurityQuestion() {
                                     style={[textInput]}
                                     placeholder='Enter Answer'
                                     underlineColorAndroid={colors.transparent}
-                                    placeholderTextColor={'#747474'}
+                                    placeholderTextColor={Colors.light.textGrey}
                                     value={answer}
-                                    cursorColor={'#747474'}
+                                    cursorColor={Colors.light.textGrey}
                                     onChangeText={(text) => onChange('answer', text)}
                                 />
                             </View>
