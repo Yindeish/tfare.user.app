@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from 'react-native'
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { useSharedValue } from 'react-native-reanimated';
-import { absolute, bg, h, hFull, left0, top0, w, wFull, wHFull } from '@/utils/styles';
+import { absolute, bg, bottom0, h, hFull, left0, right0, top0, w, wFull, wHFull, zIndex } from '@/utils/styles';
 import { colors } from '@/constants/Colors';
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
 import { resetBottomSheetState, setBottomSheetSnapPoint } from '@/state/slices/layout';
@@ -51,7 +51,8 @@ const bottomSheet = ({ children }: { children: React.ReactNode }) => {
                 appearsOnIndex={0}
                 animatedIndex={animatedIndex}
                 animatedPosition={animatedPosition}
-                style={[bg(colors.black), wFull, hFull, absolute, top0, left0]}
+                // style={[bg(colors.black),wFull, hFull, absolute, top0, left0, bottom0, right0]}
+                style={[bg(colors.black), absolute, top0, left0, bottom0, right0, { height: '1000%', top: '-100%' }]}
                 pressBehavior={'close'}
                 opacity={0.4}
                 onPress={() => dispatch(resetBottomSheetState())}

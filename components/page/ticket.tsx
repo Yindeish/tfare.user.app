@@ -1,0 +1,169 @@
+import { Image, StyleSheet, TextStyle, TouchableOpacity, View, ScrollView } from 'react-native'
+import { Text } from 'react-native-paper'
+import React, { useEffect } from 'react'
+import { bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyStart, mb, mt, p, pr, px, py, relative, rounded, w, wFull, wHFull } from '@/utils/styles'
+import Colors, { colors } from '@/constants/Colors'
+import { c, colorBlack, colorWhite, fs12, fs14, fs18, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles'
+import { image } from '@/utils/imageStyles'
+import { images } from '@/constants/images'
+import RideSelectors from '@/state/selectors/ride'
+import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
+import Checkbox from 'expo-checkbox'
+import { closeModal, openBottomSheet, openModal, setBottomSheetSnapPoint, setBottomSheetType } from '@/state/slices/layout'
+import { ITicket } from '@/state/types/ride'
+import { setCurrentTicket, toggleTicketAsFirstTicket } from '@/state/slices/ride'
+
+function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
+    const dispatch = useAppDispatch();
+    const { currentTicket, stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentNumberOfTickets } = RideSelectors()
+
+
+    // If ticket number is 1
+
+    if (ticket.number === 1) {
+        return (<View style={[wFull, flexCol, gap(32), mt(32)]}>
+            <Text style={[colorBlack, neurialGrotesk, fw700, fs14]}>Ticket 1</Text>
+
+            {/* Pick up block */}
+
+            <View style={[wFull, flexCol, gap(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
+                <View style={[flexCol, gap(15)]}>
+                    <View style={[flex, gap(12), itemsCenter]}>
+                        <Image source={images.greenBgCoasterImage} style={[image.w(20), image.h(20)]} />
+
+                        <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Pick up Bus Stop</Text>
+                    </View>
+
+                    <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.pickupBusstop?.routeName}</Text>
+                </View>
+            </View>
+
+            {/* Pick up block */}
+            {/* Drop off block */}
+
+            <View style={[wFull, flex, justifyBetween, pr(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
+                <View style={[flexCol, gap(15)]}>
+                    <View style={[flex, gap(12), itemsCenter]}>
+                        <Image source={images.redBgCoasterImage} style={[image.w(20), image.h(20)]} />
+
+                        <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Drop off Bus Stop</Text>
+                    </View>
+
+                    <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.dropoffBusstop?.routeName}</Text>
+                </View>
+
+                <View style={[flexCol, gap(16), justifyStart]}>
+                    <View style={[flex, itemsCenter, gap(8)]}>
+                        <Image style={[image.w(14), image.h(11)]} source={images.rideOfferImage} />
+                        <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12]}>Ticket fee</Text>
+                    </View>
+
+                    <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}> ₦ 550.00</Text>
+                </View>
+            </View>
+
+            {/* Drop off block */}
+
+        </View>)
+    }
+
+    else {
+        return (
+            <View style={[wFull, flexCol, gap(32), itemsStart, mt(40)]}>
+
+                <View style={[flex, itemsCenter, gap(4)]}>
+                    <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}>{`Ticket ${ticket?.number}`}</Text>
+
+                    <Text style={[fw400, fs12, c(Colors.light.textGrey)]}>(You have selected more than 1 seat)</Text>
+                </View>
+
+                {/* Ceckbox block for toggling same ticket as first ticket */}
+
+                <View style={[flex, gap(12), itemsCenter]}>
+
+                    <Checkbox
+                        value={ticket.sameAsFirstTicket}
+                        onValueChange={() => {
+                            dispatch(toggleTicketAsFirstTicket({ currentNumberOfTickets: ticket.number }))
+                        }
+                        }
+                        color={ticket.sameAsFirstTicket ? '#27AE65' : colors.grey500}
+                    />
+
+                    <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Same pickup and dropoff as Ticket 1?</Text>
+                </View>
+
+                {/* Ceckbox block for toggling same ticket as first ticket */}
+
+                {/* If the ticket is not the same as first ticket, Select ticket details shows otherwise Ticket pick up and drop off bus stop inputs show  */}
+
+                {/* Select details block */}
+
+                {!ticket.dropoffBusstop && !ticket.pickupBusstop && <TouchableOpacity onPress={() => {
+                    dispatch(setCurrentTicket(ticket));
+
+                    dispatch(openBottomSheet());
+                    dispatch(setBottomSheetSnapPoint(5))
+                    dispatch(setBottomSheetType('ticketDetails'));
+                }}>
+                    <View style={[w('auto'), h(50), p(16), rounded(100), flex, itemsCenter, justifyCenter, gap(10), bg(colors.white), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
+                        <Image style={[image.w(20), image.h(20)]} source={images.blackBgWaitChairImage} />
+
+                        <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>Select Ticket Details</Text>
+                    </View>
+                </TouchableOpacity>}
+
+                {/* Select details block */}
+
+                {/* Bus Stop Inputs */}
+
+                {ticket.dropoffBusstop && ticket.pickupBusstop &&
+                    (<>
+                        {/* Pick up block */}
+
+                        <View style={[wFull, flexCol, gap(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
+                            <View style={[flexCol, gap(15)]}>
+                                <View style={[flex, gap(12), itemsCenter]}>
+                                    <Image source={images.greenBgCoasterImage} style={[image.w(20), image.h(20)]} />
+
+                                    <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Pick up Bus Stop</Text>
+                                </View>
+
+                                <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.pickupBusstop.routeName}</Text>
+                            </View>
+                        </View>
+
+                        {/* Pick up block */}
+                        {/* Drop off block */}
+
+                        <View style={[wFull, flex, justifyBetween, pr(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
+                            <View style={[flexCol, gap(15)]}>
+                                <View style={[flex, gap(12), itemsCenter]}>
+                                    <Image source={images.redBgCoasterImage} style={[image.w(20), image.h(20)]} />
+
+                                    <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Drop off Bus Stop</Text>
+                                </View>
+
+                                <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.dropoffBusstop.routeName}</Text>
+                            </View>
+
+                            <View style={[flexCol, gap(16), justifyStart]}>
+                                <View style={[flex, itemsCenter, gap(8)]}>
+                                    <Image style={[image.w(14), image.h(11)]} source={images.rideOfferImage} />
+                                    <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12]}>Ticket fee</Text>
+                                </View>
+
+                                <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}> ₦ 550.00</Text>
+                            </View>
+                        </View>
+                        {/* Drop off block */}
+
+                    </>)}
+
+                {/* Bus Stop Inputs */}
+            </View>)
+    }
+
+}
+
+export default Ticket;

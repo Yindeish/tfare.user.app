@@ -12,7 +12,7 @@ import { useDispatch } from "react-redux";
 import { closeBottomSheet, openBottomSheet, openModal, resetBottomSheetState, setBottomSheetSnapPoint, setBottomSheetType } from "@/state/slices/layout";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
 import RideSelectors from "@/state/selectors/ride";
-import { setCurrentRideView, setDropoffBusstopInput, setPickupBusstopInput, setUserCounterFare } from "@/state/slices/ride";
+import { setCurrentRideView, setStateInputField, } from "@/state/slices/ride";
 import { router } from "expo-router";
 import BottomSheet, { BottomSheetFlatList, BottomSheetView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import BottomSheetTitle from "../shared/bottomSheetTitle";
@@ -20,7 +20,7 @@ import BottomSheetTitle from "../shared/bottomSheetTitle";
 const RecentLocationsSnippet = () => {
     const dispatch = useDispatch();
     const { bottomSheet } = LayoutSelectors();
-    const { dropoffBusstopInput, pickupBusstopInput } = RideSelectors();
+    const { stateInput: { dropoffBusstopInput, pickupBusstopInput } } = RideSelectors();
 
     const DATA = [
         {
@@ -78,7 +78,7 @@ const RecentLocationsSnippet = () => {
                             placeholder="Enter Location"
                             value={pickupBusstopInput}
                             onChangeText={(text) => {
-                                dispatch(setPickupBusstopInput(text));
+                                dispatch(setStateInputField({ key: 'pickupBusstopInput', value: text }));
                             }}
                         />
 
@@ -92,7 +92,7 @@ const RecentLocationsSnippet = () => {
                         horizontal
                         data={DATA}
                         renderItem={({ item }) => (
-                            <TouchableOpacity onPress={() => dispatch(setPickupBusstopInput(item.name))}>
+                            <TouchableOpacity onPress={() => dispatch(setStateInputField({ key: 'pickupBusstopInput', value: item.name }))}>
                                 <View style={[w(98), hFull, rounded(100), py(16), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
                                     <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item.name}</Text>
                                 </View>
@@ -123,7 +123,7 @@ const RecentLocationsSnippet = () => {
                             placeholder="Enter Destination"
                             value={dropoffBusstopInput}
                             onChangeText={(text) => {
-                                dispatch(setDropoffBusstopInput(text));
+                                dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: text }));
                             }}
                         />
 
@@ -135,7 +135,7 @@ const RecentLocationsSnippet = () => {
                         horizontal
                         data={DATA}
                         renderItem={({ item }) => (
-                            <TouchableOpacity onPress={() => dispatch(setDropoffBusstopInput(item.name))}>
+                            <TouchableOpacity onPress={() => dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: item.name }))}>
                                 <View style={[w(98), hFull, rounded(100), py(16), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
                                     <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item.name}</Text>
                                 </View>
@@ -166,7 +166,7 @@ const RecentLocationsSnippet = () => {
 const RecentPickupLocations = () => {
     const dispatch = useAppDispatch();
     const { bottomSheet } = LayoutSelectors();
-    const { pickupBusstopInput } = RideSelectors()
+    const { stateInput: { pickupBusstopInput } } = RideSelectors()
 
     let [inputtingPickupBusstop, setInputtingPickupBusstop] = useState(false);
     const DATA = [
@@ -225,7 +225,7 @@ const RecentPickupLocations = () => {
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
                             value={pickupBusstopInput}
-                            onChangeText={(text) => dispatch(setPickupBusstopInput(text))}
+                            onChangeText={(text) => dispatch(setStateInputField({ key: 'pickupBusstopInput', value: text }))}
                         />
 
                         <Image style={[image.w(22), image.h(22)]} source={images.pickUpImage} />
@@ -332,7 +332,7 @@ const RecentPickupLocations = () => {
 const RecentDropoffLocations = () => {
     const dispatch = useAppDispatch();
     const { bottomSheet } = LayoutSelectors();
-    const { dropoffBusstopInput } = RideSelectors()
+    const { stateInput: { dropoffBusstopInput } } = RideSelectors()
 
     let [inputtingDropoffBuststop, setInputtingDropoffBuststop] = useState(false);
     const DATA = [
@@ -391,7 +391,7 @@ const RecentDropoffLocations = () => {
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
                             value={dropoffBusstopInput}
-                            onChangeText={(text) => dispatch(setDropoffBusstopInput(text))}
+                            onChangeText={(text) => dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: text }))}
                         />
 
                         <Image style={[image.w(22), image.h(22)]} source={images.dropOffImage} />
@@ -496,7 +496,7 @@ const RecentDropoffLocations = () => {
 
 const FilledForm = () => {
     const dispatch = useAppDispatch();
-    const { pickupBusstopInput, dropoffBusstopInput } = RideSelectors()
+    const { stateInput: { pickupBusstopInput, dropoffBusstopInput } } = RideSelectors()
     let [inputting, setInputting] = useState({
         pickupBusstop: false,
         dropoffpickupBusstop: false,
@@ -523,7 +523,7 @@ const FilledForm = () => {
                             onFocus={() => onChange('pickupBusstop', true)}
                             onBlur={() => onChange('pickupBusstop', false)}
                             value={pickupBusstopInput}
-                            onChangeText={(text) => dispatch(setPickupBusstopInput(text))}
+                            onChangeText={(text) => dispatch(setStateInputField({ key: 'pickupBusstopInput', value: text }))}
                         />
                     </View>
 
@@ -555,7 +555,7 @@ const FilledForm = () => {
                             onFocus={() => onChange('pickupBusstop', true)}
                             onBlur={() => onChange('pickupBusstop', false)}
                             value={dropoffBusstopInput}
-                            onChangeText={(text) => dispatch(setDropoffBusstopInput(text))}
+                            onChangeText={(text) => dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: text }))}
                         />
                     </View>
 
@@ -582,7 +582,7 @@ const FilledForm = () => {
 
 const RideRouteDetails = () => {
     const dispatch = useAppDispatch();
-    const { dropoffBusstopInput, userCounterFare } = RideSelectors()
+    const { stateInput: { dropoffBusstopInput, userCounterFareInput } } = RideSelectors()
 
     return (
         <PaddedScreen>
@@ -618,9 +618,9 @@ const RideRouteDetails = () => {
                                 placeholderTextColor={Colors.light.textGrey}
                                 cursorColor={Colors.light.textGrey}
                                 placeholder="Input your offer"
-                                value={userCounterFare?.toString()}
+                                value={userCounterFareInput?.toString()}
                                 onChangeText={(text) => {
-                                    dispatch(setUserCounterFare(Number(text)));
+                                    dispatch(setStateInputField({ key: 'userCounterFareInput', value: Number(text) }));
                                 }}
                             />
                         </View>

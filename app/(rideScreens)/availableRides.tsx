@@ -15,7 +15,7 @@ import { IRide } from '@/state/types/ride'
 
 export default function AvailableRide() {
     const dispatch = useAppDispatch()
-    const { availableRides, pickupBusstopInput, dropoffBusstopInput } = RideSelectors()
+    const { availableRides, stateInput: { pickupBusstopInput, dropoffBusstopInput } } = RideSelectors()
 
     return (
         <SafeScreen>

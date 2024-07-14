@@ -9,7 +9,7 @@ import Colors, { colors } from "@/constants/Colors";
 import { useEffect, useState } from "react";
 import CtaBtn from "../shared/ctaBtn";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
-import { setCancelRideReason, setDriverRatingCommentInput, setDriverRatingInput } from "@/state/slices/ride";
+import { setStateInputField } from "@/state/slices/ride";
 import RideSelectors from "@/state/selectors/ride";
 import { cancelRideReasons } from "@/constants/cancelRideReasons";
 import RadioBtnListTile from "./RadioBtnListTile";
@@ -94,10 +94,10 @@ function TripStartedSheet() {
 
 function TripCompletedSheet() {
     const dispatch = useAppDispatch()
-    const { driverRatingInput, driverRatingCommentInput } = RideSelectors()
+    const { stateInput: { driverRatingInput, driverRatingCommentInput } } = RideSelectors()
 
     const rateDriver = (rating: number) => {
-        dispatch(setDriverRatingInput(rating))
+        dispatch(setStateInputField({ key: 'driverRatingInput', value: rating }))
         // update in DB
     }
 
@@ -172,7 +172,7 @@ function TripCompletedSheet() {
 
                 <TextInput
                     onChangeText={(text) => {
-                        dispatch(setDriverRatingCommentInput(text))
+                        dispatch(setStateInputField({ key: 'driverRatingCommentInput', value: text }))
                     }}
 
                     value={driverRatingCommentInput}
@@ -204,22 +204,22 @@ function TripCompletedSheet() {
 
 function CancelRide() {
     const dispatch = useAppDispatch()
-    const { driverRatingCommentInput, cancelRideReason } = RideSelectors();
+    const { stateInput: { driverRatingCommentInput, cancelRideReasonInput } } = RideSelectors();
 
     let [commentBoxShowable, setCommentBoxShowable] = useState(false)
 
     // Updating the bottom Modal
     useEffect(() => {
-        if (cancelRideReason.toLowerCase() === cancelRideReasons[0].toLowerCase() ||
-            cancelRideReason.toLowerCase() === cancelRideReasons[0].toLowerCase() ||
-            cancelRideReason.toLowerCase() === cancelRideReasons[1].toLowerCase() ||
-            cancelRideReason.toLowerCase() === cancelRideReasons[2].toLowerCase() ||
-            cancelRideReason.toLowerCase() === cancelRideReasons[3].toLowerCase() ||
-            cancelRideReason.toLowerCase() === cancelRideReasons[4].toLowerCase()) {
+        if (cancelRideReasonInput.toLowerCase() === cancelRideReasons[0].toLowerCase() ||
+            cancelRideReasonInput.toLowerCase() === cancelRideReasons[0].toLowerCase() ||
+            cancelRideReasonInput.toLowerCase() === cancelRideReasons[1].toLowerCase() ||
+            cancelRideReasonInput.toLowerCase() === cancelRideReasons[2].toLowerCase() ||
+            cancelRideReasonInput.toLowerCase() === cancelRideReasons[3].toLowerCase() ||
+            cancelRideReasonInput.toLowerCase() === cancelRideReasons[4].toLowerCase()) {
             setCommentBoxShowable(false);
         }
         else setCommentBoxShowable(true);
-    }, [cancelRideReason])
+    }, [cancelRideReasonInput])
     // Updating the bottom Modal
 
     return (
@@ -244,15 +244,15 @@ function CancelRide() {
                             onChange: (value: string) => {
 
                                 if (reason.toLowerCase() !== 'other') {
-                                    dispatch(setCancelRideReason(value.toLowerCase() === cancelRideReason.toLowerCase() ? '' : value.toLowerCase()))
+                                    dispatch(setStateInputField({ key: 'cancelRideReasonInput', value: value.toLowerCase() === cancelRideReasonInput.toLowerCase() ? '' : value.toLowerCase() }))
                                 }
 
                                 if (reason.toLowerCase() === 'other') {
-                                    dispatch(setCancelRideReason(''))
+                                    dispatch(setStateInputField({ key: 'cancelRideReasonInput', value: '' }))
                                 }
 
                             },
-                            value: cancelRideReason.toLowerCase()
+                            value: cancelRideReasonInput.toLowerCase()
                         }}
                         label={{ text: reason }}
                         key={index}
@@ -266,7 +266,7 @@ function CancelRide() {
 
                 <TextInput
                     onChangeText={(text) => {
-                        dispatch(setCancelRideReason(text))
+                        dispatch(setStateInputField({ key: 'cancelRideReasonInput', value: text }))
                     }}
 
                     value={driverRatingCommentInput}

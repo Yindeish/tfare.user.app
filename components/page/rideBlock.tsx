@@ -14,13 +14,13 @@ const RideBlock = ({ bgColor, ctaType, roundedCorners, ride, onPress, touchable 
 
         <View style={[wFull, h(45), flex, itemsCenter, justifyBetween, gap(14)]}>
             <View style={[flexCol, gap(12), itemsStart]}>
-                <Text style={[colorBlack, neurialGrotesk, fw700, fs14]}>Rider #{ride?.id}</Text>
+                <Text style={[colorBlack, fw700, fs14]}>Rider #{ride?.id}</Text>
                 <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Honda Accord</Text>
             </View>
 
             <View style={[w('auto'), h(45), rounded(100), flex, itemsCenter, gap(16), bg(colors.white), p(16), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
                 <Image style={[image.w(18), image.h(14.73)]} source={images.passengersImage} />
-                <Text style={[fs12, fw500, neurialGrotesk, colorBlack]}>{ride?.availableSeats?.length} seats Available</Text>
+                <Text style={[fs12, fw500, colorBlack]}>{ride?.availableSeats} seats Available</Text>
             </View>
         </View>
 

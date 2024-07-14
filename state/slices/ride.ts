@@ -1,17 +1,14 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ESlicesNames } from "../enums/slicesNames";
-import { IBusStop, ILoading, IRide, IRideState, ISeat, ITicket, TActiveTab, TAddTicketStatus, TCurrentrideView, TTicketAsTicket1 } from "../types/ride";
+import { IBusStop, ILoading, IRide, IRideState, IStateInput, ITicket, TActiveTab, TAddTicketStatus, TCurrentrideView, TTicketAsTicket1 } from "../types/ride";
 
 
 const initialState: IRideState = {
-    dropoffBusstopInput: '',
     loading: {
         status: 'idle',
         type: ''
     },
     searchMatchBusstops: [],
-    pickupBusstopInput: '',
-    userCounterFare: null,
     currentRideView: 'orderRide',
     addTicketStatus: 'idle',
     availableRides: [
@@ -23,18 +20,12 @@ const initialState: IRideState = {
             pickupBusstop: {
                 type: 'pickupBusstop'
             },
-            availableSeats: [
-                { available: true, no: 1, selected: false },
-                { available: true, no: 3, selected: false },
-            ],
-            seats: [
-                { available: true, no: 1, selected: false },
-                { available: false, no: 2, selected: false },
-                { available: true, no: 3, selected: false },
-            ],
+            availableSeats: 2,
+            seats: 3,
             status: 'idle',
             duration: '3-4hrs',
-            saved: false
+            saved: false,
+            busStops: [],
         },
         {
             id: '8787ej',
@@ -44,19 +35,12 @@ const initialState: IRideState = {
             pickupBusstop: {
                 type: 'pickupBusstop'
             },
-            availableSeats: [
-                { available: true, no: 1, selected: false },
-            ],
-            seats: [
-                { available: true, no: 1, selected: false },
-                { available: false, no: 2, selected: false },
-                { available: false, no: 3, selected: false },
-                { available: false, no: 4, selected: false },
-                { available: false, no: 5, selected: false },
-            ],
+            availableSeats: 3,
+            seats: 6,
             status: 'idle',
             duration: '1-2hrs',
-            saved: false
+            saved: false,
+            busStops: [],
         },
         {
             id: '87dgej',
@@ -66,19 +50,12 @@ const initialState: IRideState = {
             pickupBusstop: {
                 type: 'pickupBusstop'
             },
-            availableSeats: [
-                { available: true, no: 1, selected: false },
-                { available: true, no: 4, selected: false },
-            ],
-            seats: [
-                { available: true, no: 1, selected: false },
-                { available: false, no: 2, selected: false },
-                { available: false, no: 3, selected: false },
-                { available: true, no: 4, selected: false },
-            ],
+            availableSeats: 1,
+            seats: 3,
             status: 'idle',
             duration: '40-50mins',
-            saved: false
+            saved: false,
+            busStops: [],
         },
         {
             id: 'jhdgej',
@@ -88,23 +65,12 @@ const initialState: IRideState = {
             pickupBusstop: {
                 type: 'pickupBusstop'
             },
-            availableSeats: [
-                { available: true, no: 1, selected: false },
-                { available: true, no: 3, selected: false },
-                { available: true, no: 4, selected: false },
-                { available: true, no: 6, selected: false },
-            ],
-            seats: [
-                { available: true, no: 1, selected: false },
-                { available: false, no: 2, selected: false },
-                { available: true, no: 3, selected: false },
-                { available: true, no: 4, selected: false },
-                { available: false, no: 5, selected: false },
-                { available: true, no: 6, selected: false },
-            ],
+            availableSeats: 4,
+            seats: 5,
             status: 'idle',
             duration: '20-30mins',
-            saved: false
+            saved: false,
+            busStops: [],
         },
         {
             id: 'jhfdej',
@@ -114,23 +80,12 @@ const initialState: IRideState = {
             pickupBusstop: {
                 type: 'pickupBusstop'
             },
-            availableSeats: [
-                { available: true, no: 1, selected: false },
-                { available: true, no: 3, selected: false },
-                { available: true, no: 4, selected: false },
-                { available: true, no: 6, selected: false },
-            ],
-            seats: [
-                { available: true, no: 1, selected: false },
-                { available: false, no: 2, selected: false },
-                { available: true, no: 3, selected: false },
-                { available: true, no: 4, selected: false },
-                { available: false, no: 5, selected: false },
-                { available: true, no: 6, selected: false },
-            ],
+            availableSeats: 0,
+            seats: 4,
             status: 'idle',
             duration: '20-30mins',
-            saved: false
+            saved: false,
+            busStops: [],
         },
         {
             id: 'jhdej',
@@ -140,53 +95,64 @@ const initialState: IRideState = {
             pickupBusstop: {
                 type: 'pickupBusstop'
             },
-            availableSeats: [
-                { available: true, no: 1, selected: false },
-                { available: true, no: 3, selected: false },
-                { available: true, no: 4, selected: false },
-                { available: true, no: 6, selected: false },
-            ],
-            seats: [
-                { available: true, no: 1, selected: false },
-                { available: false, no: 2, selected: false },
-                { available: true, no: 3, selected: false },
-                { available: true, no: 4, selected: false },
-                { available: false, no: 5, selected: false },
-                { available: true, no: 6, selected: false },
-            ],
+            availableSeats: 3,
+            seats: 5,
             status: 'idle',
             duration: '20-30mins',
-            saved: false
+            saved: false,
+            busStops: [],
         },
     ],
-    userSelectedSeats: [],
     ticketAsTicket1: null,
-    userRide: null,
-    currentSeat: null,
-    driverRatingInput: null,
-    driverRatingCommentInput: '',
-    cancelRideReason: '',
-    activeTab: 'completed'
+    // userRide: null,
+    userRide: {
+        dropoffBusstop: {
+            type: 'pickupBusstop'
+        },
+        pickupBusstop: {
+            type: 'dropoffBusstop'
+        },
+        saved: false,
+        status: 'idle',
+        tickets: [
+            // {
+            //     dropoffBusstop: { type: 'dropoffBusstop' },
+            //     pickupBusstop: { type: 'pickupBusstop' },
+            //     sameAsFirstTicket: true
+            // },
+            // {
+            //     dropoffBusstop: { type: 'dropoffBusstop' },
+            //     pickupBusstop: { type: 'pickupBusstop' },
+            //     sameAsFirstTicket: false
+            // },
+        ]
+    },
+    currentNumberOfTickets: 1,
+    activeTab: 'completed',
+    currentTicket: null,
+    stateInput: {
+        cancelRideReasonInput: '',
+        driverRatingCommentInput: '',
+        driverRatingInput: null,
+        dropoffBusstopInput: '',
+        pickupBusstopInput: '',
+        userCounterFareInput: null,
+    }
 }
 
 const RideSlice = createSlice({
     name: ESlicesNames.ride,
     initialState,
     reducers: {
-        setPickupBusstopInput: (state, action: PayloadAction<string>) => {
-            state.pickupBusstopInput = action.payload;
-        },
-        setDropoffBusstopInput: (state, action: PayloadAction<string>) => {
-            state.dropoffBusstopInput = action.payload;
+        setStateInputField: (state, action: PayloadAction<{ key: keyof IStateInput, value: string | number }>) => {
+            const { key, value } = action.payload;
+            state.stateInput[key] = value as never;
         },
         setSearchMatchBusstops: (state, action: PayloadAction<IBusStop[] | []>) => {
             state.searchMatchBusstops = action.payload;
         },
         setLoading: (state, action: PayloadAction<ILoading>) => {
             state.loading = action.payload;
-        },
-        setUserCounterFare: (state, action: PayloadAction<number | null>) => {
-            state.userCounterFare = action.payload;
         },
         setCurrentRideView: (state, action: PayloadAction<TCurrentrideView>) => {
             state.currentRideView = action.payload;
@@ -200,142 +166,99 @@ const RideSlice = createSlice({
         setUserRide: (state, action: PayloadAction<IRide | null>) => {
             state.userRide = action.payload;
         },
-        setUserSelectedSeats: (state, action: PayloadAction<ISeat[] | []>) => {
-            state.userSelectedSeats = action.payload;
-        },
         setTicketAsTicket1: (state, action: PayloadAction<TTicketAsTicket1 | null>) => {
             state.ticketAsTicket1 = action.payload;
         },
-        setCurrentSeat: (state, action: PayloadAction<number>) => {
-            const seat = state.userRide?.seats?.find(seat => seat.no === action.payload);
-
-            state.currentSeat = seat as ISeat;
+        setCurrentNumberOfTickets: (state, action: PayloadAction<number>) => {
+            state.currentNumberOfTickets = action.payload;
         },
-        selectSeat: (state, action: PayloadAction<number>) => {
-            const seatSelected = (state.userRide?.seats as ISeat[]).find(seat => seat?.no === action.payload)?.selected;
+        setCurrentTicket: (state, action: PayloadAction<ITicket>) => {
+            state.currentTicket = action.payload;
+        },
+        createTicket: (state, action: PayloadAction<{ currentNumberOfTickets: number }>) => {
+            const { currentNumberOfTickets } = action.payload;
 
-            if (!seatSelected) {
-                if (state.userRide && state.userRide.seats) {
-                    const updatedSeats = state.userRide.seats.map(seat => {
-                        if (seat.no === action.payload) {
-                            return {
-                                ...seat,
-                                selected: true,
-                                available: true
-                            };
-                        } else {
-                            return seat;
-                        }
-                    });
+            if (state.userRide && state.userRide.tickets) {
+                // Reset user tickets list
+                state.userRide.tickets = []; //pop and push later; this is a bad practice. Having to refres te list
 
-                    state.userRide.seats = updatedSeats;
+                for (let val = 0; val < currentNumberOfTickets; val++) {
+                    const newTicket: ITicket = {
+                        dropoffBusstop: (val + 1) === 1 ? { type: 'dropoffBusstop', routeName: state.stateInput.dropoffBusstopInput } : null, // setting the first ticket to use the underlying credentials
+                        pickupBusstop: (val + 1) === 1 ? { type: 'pickupBusstop', routeName: state.stateInput.pickupBusstopInput } : null, // setting the first ticket to use the underlying credentials
+                        owner: {},
+                        sameAsFirstTicket: (val + 1) === 1 ? true : false, // setting the first ticket to use the underlying credentials
+                        number: val + 1
+                    }
+
+                    state.userRide.tickets = [...state.userRide?.tickets, newTicket];
                 }
-
-            }
-            else return;
+            } else return;
         },
-        unselectSeat: (state, action: PayloadAction<number>) => {
-            const seatSelected = (state.userRide?.seats as ISeat[]).find(seat => seat?.no === action.payload)?.selected;
+        toggleTicketAsFirstTicket: (state, action: PayloadAction<{ currentNumberOfTickets: number }>) => {
+            const { currentNumberOfTickets } = action.payload;
 
-            if (seatSelected) {
-                if (state.userRide && state.userRide.seats) {
-                    const updatedSeats = state.userRide.seats.map(seat => {
-                        if (seat.no === action.payload) {
-                            return {
-                                ...seat,
-                                selected: false,
-                                available: true
-                            };
-                        } else {
-                            return seat;
-                        }
-                    });
+            if (state.userRide && state.userRide.tickets) {
+                const firstTicket = state.userRide.tickets.find(ticket => Number(ticket.number) === 1);
 
-                    state.userRide.seats = updatedSeats;
-                }
+                const ticket = state.userRide.tickets.find(ticket => Number(ticket.number) === Number(currentNumberOfTickets));
 
-            }
-            else return;
-        },
-        createTicket: (state, action: PayloadAction<{ seatNo: number, subsequentTicket: boolean }>) => {
-            const { seatNo, subsequentTicket } = action.payload;
-            const ticketInRide = (state.userRide?.tickets as ITicket[]).find(ticket => ticket?.seat?.no === seatNo);
+                if (ticket) {
+                    state.userRide.tickets = state.userRide.tickets.map((ticket,) => {
 
-            if (!ticketInRide) {
-                if (state.userRide && state.userRide.tickets) {
-                    const updatedUserRide: IRide = {
-                        ...state.userRide,
-                        tickets: [
-                            ...state.userRide?.tickets as ITicket[], {
-                                seat: {
-                                    no: seatNo,
-                                    selected: true,
-                                    available: true
-                                },
-                                owner: {},
-                                pickupBusstop: state.userRide.tickets.length === 0 ?
-                                    {
-                                        routeName: state.pickupBusstopInput,
-                                        type: 'pickupBusstop'
-                                    }
-                                    : null,
-                                dropoffBusstop: state.userRide.tickets.length === 0 ? {
-                                    routeName: state.dropoffBusstopInput,
-                                    type: 'dropoffBusstop'
-                                } : null,
+                        if (Number(ticket.number) === Number(currentNumberOfTickets)) {
+
+                            if (!ticket.sameAsFirstTicket) {
+                                return {
+                                    ...firstTicket,
+                                    number: Number(currentNumberOfTickets)
+                                }
+                            } else {
+                                return {
+                                    dropoffBusstop: null,
+                                    pickupBusstop: null,
+                                    sameAsFirstTicket: false,
+                                    number: Number(currentNumberOfTickets)
+                                }
                             }
-                        ]
+                        } else return ticket
                     }
-
-                    state.userRide = updatedUserRide;
+                    ) as ITicket[];
                 }
             }
         },
-        editTicket: (state, action: PayloadAction<number>) => {
-            const { payload } = action;
-            const matchTicket = state.userRide?.tickets?.find(ticket => ticket?.seat?.no === payload);
+        editTicket: (state, action: PayloadAction<{ currentNumberOfTickets: number }>) => {
+            const { currentNumberOfTickets } = action.payload;
 
-            (matchTicket as ITicket).pickupBusstop = {
-                type: 'pickupBusstop',
-                routeName: state.pickupBusstopInput
-            };
+            if (state.userRide && state.userRide.tickets) {
+                const ticket = state.userRide.tickets.find(ticket => Number(ticket.number) === Number(currentNumberOfTickets));
+                console.log({ ticket })
 
-            (matchTicket as ITicket).dropoffBusstop = {
-                type: 'dropoffBusstop',
-                routeName: state.dropoffBusstopInput
-            }
+                if (ticket) {
+                    state.userRide.tickets = state.userRide.tickets.map((ticket,) => {
 
-            state.userRide?.tickets?.map(ticket => {
-                if (matchTicket?.seat?.no === payload) {
-                    return {
-                        ...ticket,
-                        ...matchTicket
+                        if (Number(ticket.number) === Number(currentNumberOfTickets)) {
+
+                            return {
+                                ...ticket,
+                                pickupBusstop: {
+                                    type: 'pickupBusstop',
+                                    routeName: state.stateInput.pickupBusstopInput,
+                                },
+                                dropoffBusstop: {
+                                    type: 'dropoffBusstop',
+                                    routeName: state.stateInput.dropoffBusstopInput,
+                                },
+                                sameAsFirstTicket: false
+                            }
+                        } else return ticket
                     }
-                }
-            })
+                    ) as ITicket[];
+                } else return;
+            } else return;
         },
-        removeTicket: (state, action: PayloadAction<number>) => {
-            const ticketInRide = (state.userRide?.tickets as ITicket[]).find(ticket => ticket?.seat?.no === action.payload);
+        removeTicket: (state, action: PayloadAction<{ currentNumberOfTickets: number }>) => {
 
-            if (ticketInRide) {
-                if (state.userRide && state.userRide.tickets) {
-                    const updatedRideTicket = state.userRide.tickets.filter((ride) => ride?.seat?.no !== action.payload);
-
-                    state.userRide = {
-                        ...state.userRide,
-                        tickets: updatedRideTicket
-                    }
-                }
-            }
-        },
-        setDriverRatingInput: (state, action: PayloadAction<number | null>) => {
-            state.driverRatingInput = action.payload;
-        },
-        setDriverRatingCommentInput: (state, action: PayloadAction<string>) => {
-            state.driverRatingCommentInput = action.payload;
-        },
-        setCancelRideReason: (state, action) => {
-            state.cancelRideReason = action.payload;
         },
         setActiveTab: (state, action: PayloadAction<TActiveTab>) => {
             state.activeTab = action.payload
@@ -343,9 +266,12 @@ const RideSlice = createSlice({
     }
 })
 
-export const { setDropoffBusstopInput, setLoading, setPickupBusstopInput, setUserCounterFare, setCurrentRideView, setAddTicketStatus, setAvailableRides, setUserRide, setUserSelectedSeats, setTicketAsTicket1, setSearchMatchBusstops, createTicket, selectSeat, setCurrentSeat, unselectSeat, removeTicket, editTicket,
-    setDriverRatingInput, setDriverRatingCommentInput,
-    setCancelRideReason, setActiveTab,
+export const { setLoading, setCurrentRideView,
+    setAddTicketStatus, setAvailableRides,
+    setUserRide, setTicketAsTicket1, setSearchMatchBusstops,
+    setCurrentNumberOfTickets, removeTicket, editTicket,
+    setActiveTab, setStateInputField, createTicket, toggleTicketAsFirstTicket,
+    setCurrentTicket,
 } = RideSlice.actions;
 
 export default RideSlice.reducer;

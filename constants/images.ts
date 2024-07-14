@@ -57,6 +57,7 @@ import redBgCautionImage from '../assets/images/icons/red-bg-caution-image.png';
 import tripChargeImage from '../assets/images/icons/trip-charge-image.png';
 import whiteBgStarRatingImage from '../assets/images/icons/white-bg-star-rating-image.png';
 import greenBgCheckboxImage from '../assets/images/icons/green-bg-checkbox-image.png';
+import whiteBgTicketImage from '../assets/images/icons/white-bg-ticket-image.png';
 
 
 const images = {
@@ -119,6 +120,7 @@ const images = {
     tripChargeImage,
     whiteBgStarRatingImage,
     greenBgCheckboxImage,
+    whiteBgTicketImage,
 }
 
 export { images }

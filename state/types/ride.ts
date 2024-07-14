@@ -2,7 +2,7 @@ type TBusStop = 'pickupBusstop' | 'dropoffBusstop';
 type TLoadingStatus = 'idle' | 'succeeded' | 'failed';
 type TLoadingType = string;
 type TCurrentrideView = 'orderRide' | 'availableRides';
-type TTicketAsTicket1 = Pick<ITicket, 'id' | 'seat'>;
+type TTicketAsTicket1 = Pick<ITicket, 'id'>;
 type TAddTicketStatus = 'idle' | 'btnVisible' | 'newTicketBlock';
 type TActiveTab = 'pending' | 'completed' | 'cancelled';
 
@@ -24,10 +24,12 @@ interface ILoading {
 
 interface ITicket {
     id?: string,
-    seat: ISeat | null,
     owner?: {},
     pickupBusstop?: IBusStop | null,
     dropoffBusstop?: IBusStop | null,
+    time?: string,
+    sameAsFirstTicket?: boolean,
+    number: number
 }
 
 interface IDriverDetails {
@@ -35,11 +37,13 @@ interface IDriverDetails {
     // driver info
 }
 
-interface ISeat {
-    id?: string,
-    no: number,
-    available?: boolean,
-    selected?: boolean
+interface IStateInput {
+    pickupBusstopInput: string,
+    dropoffBusstopInput: string,
+    userCounterFareInput: number | null,
+    driverRatingInput: number | null,
+    driverRatingCommentInput: string,
+    cancelRideReasonInput: string,
 }
 
 interface IRide {
@@ -48,11 +52,11 @@ interface IRide {
     dropoffBusstop: IBusStop,
     saved: boolean,
     tickets?: ITicket[] | [],
-    status: 'idle' | 'canceled' | 'accepted' | 'started',
+    status: 'idle' | 'cancelled' | 'accepted' | 'started',
     userCounterFare?: number | null,
     duration?: string,
-    availableSeats?: ISeat[] | [],
-    seats?: ISeat[] | [],
+    availableSeats?: number,
+    seats?: number,
     driverDetails?: IDriverDetails,
     busStops?: IBusStop[] | [],
 }
@@ -60,20 +64,15 @@ interface IRide {
 interface IRideState {
     loading: ILoading,
     searchMatchBusstops: IBusStop[] | [],
-    pickupBusstopInput: string,
-    dropoffBusstopInput: string,
     currentRideView: TCurrentrideView,
     addTicketStatus: TAddTicketStatus,
     userRide: IRide | null,
-    userCounterFare: number | null,
     availableRides: IRide[] | [],
-    userSelectedSeats: ISeat[] | [],
     ticketAsTicket1: TTicketAsTicket1 | null,
-    currentSeat: ISeat | null,
-    driverRatingInput: number | null,
-    driverRatingCommentInput: string,
-    cancelRideReason: string,
+    currentNumberOfTickets: number,
     activeTab: TActiveTab
+    stateInput: IStateInput,
+    currentTicket: ITicket | null,
 }
 
-export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, TTicketAsTicket1, ISeat, ITicket, IRoute, TAddTicketStatus, TActiveTab }
+export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, TTicketAsTicket1, ITicket, IRoute, TAddTicketStatus, TActiveTab, IStateInput }

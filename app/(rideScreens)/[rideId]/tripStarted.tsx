@@ -29,7 +29,7 @@ type Region = {
 function TripStarted() {
     const dispatch = useAppDispatch()
     const { bottomSheet } = LayoutSelectors();
-    const { pickupBusstopInput, dropoffBusstopInput } = RideSelectors()
+    const { stateInput: { pickupBusstopInput, dropoffBusstopInput } } = RideSelectors()
 
     useEffect(() => {
 

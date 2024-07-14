@@ -40,7 +40,7 @@ type Region = {
 function Ride() {
     const dispatch = useAppDispatch()
     const { bottomSheet, modal } = LayoutSelectors();
-    const { pickupBusstopInput, dropoffBusstopInput, currentRideView, availableRides, } = RideSelectors()
+    const { stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentRideView, availableRides, } = RideSelectors()
 
     const [locationError, setLocationError] = useState<string | null>(null);
     const initialRegionObject = {
