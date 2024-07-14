@@ -2,28 +2,27 @@ import { Image, StyleSheet, TextStyle, TouchableOpacity, View, ScrollView } from
 import { Text } from 'react-native-paper'
 import React, { useEffect } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
-import { bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyStart, mb, mt, p, pr, px, py, relative, rounded, w, wFull, wHFull } from '@/utils/styles'
+import { absolute, b, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyStart, l, mb, mt, p, pr, px, py, relative, rounded, w, wFull, wHFull, zIndex } from '@/utils/styles'
 import PageFloatingTitle from '@/components/page/pageFloatingTitle'
 import { router, useLocalSearchParams } from 'expo-router'
 import Colors, { colors } from '@/constants/Colors'
 import { c, colorBlack, colorWhite, fs12, fs14, fs18, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles'
 import { image } from '@/utils/imageStyles'
 import { images } from '@/constants/images'
-import { FontAwesome6 } from '@expo/vector-icons'
 import { pages } from '@/constants/pages'
 import RideBlock from '@/components/page/rideBlock'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { FlatList } from 'react-native-gesture-handler'
 import RideSelectors from '@/state/selectors/ride'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
-import { createTicket, editTicket, removeTicket, setAddTicketStatus, setCurrentNumberOfTickets, setTicketAsTicket1, } from '@/state/slices/ride'
-import Checkbox from 'expo-checkbox'
-import BottomSheetModal from '@/components/shared/bottomSheetModal'
+import { createTicket, setCurrentNumberOfTickets, } from '@/state/slices/ride'
 import { closeModal, openModal } from '@/state/slices/layout'
 import { IRide, } from '@/state/types/ride'
 import Ticket from '@/components/page/ticket'
 import BottomSheet from '@/components/shared/bottomSheet'
 import TicketDetailsSheet from '@/components/page/bookRideSheetComponent'
+import CtaBtn from '@/components/shared/ctaBtn'
+import { indices } from '@/constants/zIndices'
 
 const { sharedStyle, availableSeatStyle, selectedSeatStyle, unavailableSeatStyle } = StyleSheet.create({
     sharedStyle: {
@@ -45,7 +44,7 @@ export default function BookRide() {
     const { rideId } = useLocalSearchParams();
 
     const dispatch = useAppDispatch();
-    const { addTicketStatus, userRide, ticketAsTicket1, stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentNumberOfTickets } = RideSelectors()
+    const { userRide, stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentNumberOfTickets } = RideSelectors()
 
     useEffect(() => {
         dispatch(closeModal());
@@ -141,6 +140,30 @@ export default function BookRide() {
                         </TouchableOpacity>}
 
                         {/* Add another ticket btn */}
+
+                        {/* Buy Ticket Btn */}
+
+                        <View style={[absolute, zIndex(indices.xHigh), b('30%'), l(20), wFull]}>
+                            <CtaBtn
+                                img={{
+                                    src: images.whiteBgTicketImage,
+                                    w: 22, h: 14
+                                }}
+                                onPress={() => { }}
+                                text={{
+                                    name: 'Buy Ticket',
+                                    color: colors.white
+                                }}
+                                bg={{
+                                    color: Colors.light.background
+                                }}
+                            />
+                        </View>
+
+                        {/* Buy Ticket Btn */}
+
+                        {/* Payment options */}
+                        {/* Payment options */}
 
                         {/* BottomSheet */}
 

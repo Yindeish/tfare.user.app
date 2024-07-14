@@ -3,9 +3,9 @@ import { RootState } from "../store";
 
 
 function RideSelectors() {
-    const { loading, currentRideView, addTicketStatus, availableRides, userRide, searchMatchBusstops, ticketAsTicket1, currentNumberOfTickets, activeTab, stateInput, currentTicket } = useAppSelector((state: RootState) => state.ride);
+    const { loading, currentRideView, addTicketStatus, availableRides, userRide, searchMatchBusstops, ticketAsTicket1, currentNumberOfTickets, activeTab, stateInput, currentTicket, counterFareStatus } = useAppSelector((state: RootState) => state.ride);
 
-    return { loading, currentRideView, addTicketStatus, availableRides, userRide, searchMatchBusstops, ticketAsTicket1, currentNumberOfTickets, activeTab, stateInput, currentTicket };
+    return { loading, currentRideView, addTicketStatus, availableRides, userRide, searchMatchBusstops, ticketAsTicket1, currentNumberOfTickets, activeTab, stateInput, currentTicket, counterFareStatus };
 }
 
 export default RideSelectors;

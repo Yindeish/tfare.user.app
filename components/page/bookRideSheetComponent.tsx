@@ -9,7 +9,7 @@ import { images } from "@/constants/images";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import Colors, { colors } from "@/constants/Colors";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
-import { editTicket, setStateInputField } from "@/state/slices/ride";
+import { editTicketBusstops, setStateInputField } from "@/state/slices/ride";
 import RideSelectors from "@/state/selectors/ride";
 import { closeBottomSheet } from "@/state/slices/layout";
 
@@ -137,8 +137,7 @@ function TicketDetailsSheet() {
             </View>
 
             <TouchableOpacity onPress={() => {
-                console.log({ currentTicket })
-                dispatch(editTicket({ currentNumberOfTickets: Number(currentTicket?.number as number) }))
+                dispatch(editTicketBusstops({ currentNumberOfTickets: Number(currentTicket?.number as number) }))
                 dispatch(closeBottomSheet());
             }}>
                 <View style={[wFull, h(50), mt(32), rounded(10), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.banner)]}>

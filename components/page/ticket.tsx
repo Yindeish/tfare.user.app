@@ -1,7 +1,7 @@
-import { Image, StyleSheet, TextStyle, TouchableOpacity, View, ScrollView } from 'react-native'
+import { Image, StyleSheet, TextStyle, TouchableOpacity, View, ScrollView, TextInput } from 'react-native'
 import { Text } from 'react-native-paper'
 import React, { useEffect } from 'react'
-import { bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyStart, mb, mt, p, pr, px, py, relative, rounded, w, wFull, wHFull } from '@/utils/styles'
+import { bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyStart, mb, mt, p, pb, pl, pr, px, py, relative, rounded, w, wFull, wHFull } from '@/utils/styles'
 import Colors, { colors } from '@/constants/Colors'
 import { c, colorBlack, colorWhite, fs12, fs14, fs18, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles'
 import { image } from '@/utils/imageStyles'
@@ -11,11 +11,12 @@ import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import Checkbox from 'expo-checkbox'
 import { closeModal, openBottomSheet, openModal, setBottomSheetSnapPoint, setBottomSheetType } from '@/state/slices/layout'
 import { ITicket } from '@/state/types/ride'
-import { setCurrentTicket, toggleTicketAsFirstTicket } from '@/state/slices/ride'
+import { editTicketCounterFare, setCurrentTicket, setStateInputField, toggleTicketAsFirstTicket } from '@/state/slices/ride'
+import CounterFareCtaBtn from './counterFareCtaBtn'
 
 function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
     const dispatch = useAppDispatch();
-    const { currentTicket, stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentNumberOfTickets } = RideSelectors()
+    const { currentTicket, stateInput: { pickupBusstopInput, dropoffBusstopInput, userCounterFareInput }, currentNumberOfTickets } = RideSelectors()
 
 
     // If ticket number is 1
@@ -95,7 +96,7 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
 
                 {/* Ceckbox block for toggling same ticket as first ticket */}
 
-                {/* If the ticket is not the same as first ticket, Select ticket details shows otherwise Ticket pick up and drop off bus stop inputs show  */}
+                {/* If the ticket's pick and drop of bus stops are not empty, Select ticket details shows otherwise Ticket pick up and drop off bus stop inputs show  */}
 
                 {/* Select details block */}
 
@@ -156,8 +157,57 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
                                 <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}> ₦ 550.00</Text>
                             </View>
                         </View>
+
                         {/* Drop off block */}
 
+                        {/* Counter fare block */}
+
+                        <View style={[wFull, flexCol, gap(16), pb(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
+
+                            <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12,]}>Want to send a counter offer? </Text>
+
+                            <View style={[wFull, flex, justifyBetween]}>
+                                <View style={[flex, gap(16), itemsCenter, justifyStart, w('57%'), h(50), pl(16), rounded(10), bg(colors.white), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
+                                    <Image
+                                        style={[image.w(14), image.h(10)]}
+                                        source={images.rideOfferImage}
+                                    />
+
+                                    <View style={[flex, itemsCenter,]}>
+                                        <Text style={[c(Colors.light.textGrey), fs14, fw500]}>₦</Text>
+                                        <TextInput
+                                            onFocus={() => dispatch(setCurrentTicket(ticket))}
+                                            onChangeText={(text) => () => {
+                                                dispatch(setStateInputField({ key: 'userCounterFareInput', value: text }))
+                                                dispatch(editTicketCounterFare({ currentNumberOfTickets: Number(currentTicket?.number) }))
+                                            }}
+                                            value={userCounterFareInput?.toString()}
+                                            placeholder={'Negotiate fare'}
+                                            style={[py(16), pr(10), , bg(colors.transparent), c(Colors.light.textGrey), fs14, fw500, h(50), { borderWidth: 0, borderColor: colors.transparent, flex: 0.9 }]}
+
+                                            cursorColor={Colors.light.background}
+                                            selectionColor={colors.transparent}
+                                            keyboardType={'numeric'}
+                                            underlineColorAndroid={colors.transparent}
+                                            placeholderTextColor={Colors.light.textGrey}
+                                        />
+                                    </View>
+                                </View>
+
+                                <CounterFareCtaBtn />
+
+                            </View>
+
+                            {true && <View style={[wFull, flex, itemsCenter, justifyStart, gap(12)]}>
+                                <Image style={[image.w(20), image.h(21), { objectFit: 'contain' }]} source={images.cautionImage} />
+
+                                <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.error)]}>
+                                    Offer too low to work with
+                                </Text>
+                            </View>}
+                        </View>
+
+                        {/* Counter fare block */}
                     </>)}
 
                 {/* Bus Stop Inputs */}

@@ -2,9 +2,8 @@ type TBusStop = 'pickupBusstop' | 'dropoffBusstop';
 type TLoadingStatus = 'idle' | 'succeeded' | 'failed';
 type TLoadingType = string;
 type TCurrentrideView = 'orderRide' | 'availableRides';
-type TTicketAsTicket1 = Pick<ITicket, 'id'>;
-type TAddTicketStatus = 'idle' | 'btnVisible' | 'newTicketBlock';
 type TActiveTab = 'pending' | 'completed' | 'cancelled';
+type TCounterFareStatus = 'idle' | 'pending' | 'accepted' | 'rejected';
 
 interface IRoute {
     routeName: string;
@@ -29,7 +28,9 @@ interface ITicket {
     dropoffBusstop?: IBusStop | null,
     time?: string,
     sameAsFirstTicket?: boolean,
-    number: number
+    number: number,
+    userCounterFare?: number | null,
+    rideFee?: number
 }
 
 interface IDriverDetails {
@@ -53,7 +54,6 @@ interface IRide {
     saved: boolean,
     tickets?: ITicket[] | [],
     status: 'idle' | 'cancelled' | 'accepted' | 'started',
-    userCounterFare?: number | null,
     duration?: string,
     availableSeats?: number,
     seats?: number,
@@ -65,14 +65,13 @@ interface IRideState {
     loading: ILoading,
     searchMatchBusstops: IBusStop[] | [],
     currentRideView: TCurrentrideView,
-    addTicketStatus: TAddTicketStatus,
     userRide: IRide | null,
     availableRides: IRide[] | [],
-    ticketAsTicket1: TTicketAsTicket1 | null,
     currentNumberOfTickets: number,
     activeTab: TActiveTab
     stateInput: IStateInput,
     currentTicket: ITicket | null,
+    counterFareStatus: TCounterFareStatus
 }
 
-export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, TTicketAsTicket1, ITicket, IRoute, TAddTicketStatus, TActiveTab, IStateInput }
+export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, ITicket, IRoute, TActiveTab, IStateInput, TCounterFareStatus }

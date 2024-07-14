@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ESlicesNames } from "../enums/slicesNames";
-import { IBusStop, ILoading, IRide, IRideState, IStateInput, ITicket, TActiveTab, TAddTicketStatus, TCurrentrideView, TTicketAsTicket1 } from "../types/ride";
+import { IBusStop, ILoading, IRide, IRideState, IStateInput, ITicket, TActiveTab, TCounterFareStatus, TCurrentrideView, } from "../types/ride";
 
 
 const initialState: IRideState = {
@@ -10,7 +10,6 @@ const initialState: IRideState = {
     },
     searchMatchBusstops: [],
     currentRideView: 'orderRide',
-    addTicketStatus: 'idle',
     availableRides: [
         {
             id: '878dfgj',
@@ -103,7 +102,6 @@ const initialState: IRideState = {
             busStops: [],
         },
     ],
-    ticketAsTicket1: null,
     // userRide: null,
     userRide: {
         dropoffBusstop: {
@@ -115,16 +113,6 @@ const initialState: IRideState = {
         saved: false,
         status: 'idle',
         tickets: [
-            // {
-            //     dropoffBusstop: { type: 'dropoffBusstop' },
-            //     pickupBusstop: { type: 'pickupBusstop' },
-            //     sameAsFirstTicket: true
-            // },
-            // {
-            //     dropoffBusstop: { type: 'dropoffBusstop' },
-            //     pickupBusstop: { type: 'pickupBusstop' },
-            //     sameAsFirstTicket: false
-            // },
         ]
     },
     currentNumberOfTickets: 1,
@@ -137,7 +125,8 @@ const initialState: IRideState = {
         dropoffBusstopInput: '',
         pickupBusstopInput: '',
         userCounterFareInput: null,
-    }
+    },
+    counterFareStatus: 'idle'
 }
 
 const RideSlice = createSlice({
@@ -157,17 +146,11 @@ const RideSlice = createSlice({
         setCurrentRideView: (state, action: PayloadAction<TCurrentrideView>) => {
             state.currentRideView = action.payload;
         },
-        setAddTicketStatus: (state, action: PayloadAction<TAddTicketStatus>) => {
-            state.addTicketStatus = action.payload;
-        },
         setAvailableRides: (state, action) => {
             state.availableRides = action.payload;
         },
         setUserRide: (state, action: PayloadAction<IRide | null>) => {
             state.userRide = action.payload;
-        },
-        setTicketAsTicket1: (state, action: PayloadAction<TTicketAsTicket1 | null>) => {
-            state.ticketAsTicket1 = action.payload;
         },
         setCurrentNumberOfTickets: (state, action: PayloadAction<number>) => {
             state.currentNumberOfTickets = action.payload;
@@ -188,7 +171,8 @@ const RideSlice = createSlice({
                         pickupBusstop: (val + 1) === 1 ? { type: 'pickupBusstop', routeName: state.stateInput.pickupBusstopInput } : null, // setting the first ticket to use the underlying credentials
                         owner: {},
                         sameAsFirstTicket: (val + 1) === 1 ? true : false, // setting the first ticket to use the underlying credentials
-                        number: val + 1
+                        number: val + 1,
+                        userCounterFare: (val + 1) === 1 ? state.stateInput.userCounterFareInput : null
                     }
 
                     state.userRide.tickets = [...state.userRide?.tickets, newTicket];
@@ -227,12 +211,11 @@ const RideSlice = createSlice({
                 }
             }
         },
-        editTicket: (state, action: PayloadAction<{ currentNumberOfTickets: number }>) => {
+        editTicketBusstops: (state, action: PayloadAction<{ currentNumberOfTickets: number }>) => {
             const { currentNumberOfTickets } = action.payload;
 
             if (state.userRide && state.userRide.tickets) {
                 const ticket = state.userRide.tickets.find(ticket => Number(ticket.number) === Number(currentNumberOfTickets));
-                console.log({ ticket })
 
                 if (ticket) {
                     state.userRide.tickets = state.userRide.tickets.map((ticket,) => {
@@ -257,21 +240,45 @@ const RideSlice = createSlice({
                 } else return;
             } else return;
         },
+        editTicketCounterFare: (state, action: PayloadAction<{ currentNumberOfTickets: number }>) => {
+            const { currentNumberOfTickets } = action.payload;
+
+            if (state.userRide && state.userRide.tickets) {
+                const ticket = state.userRide.tickets.find(ticket => Number(ticket.number) === Number(currentNumberOfTickets));
+
+                if (ticket) {
+                    state.userRide.tickets = state.userRide.tickets.map((ticket,) => {
+
+                        if (Number(ticket.number) === Number(currentNumberOfTickets)) {
+
+                            return {
+                                ...ticket,
+                                userCounterFare: state.stateInput.userCounterFareInput
+                            }
+                        } else return ticket
+                    }
+                    ) as ITicket[];
+                } else return;
+            } else return;
+        },
         removeTicket: (state, action: PayloadAction<{ currentNumberOfTickets: number }>) => {
 
         },
         setActiveTab: (state, action: PayloadAction<TActiveTab>) => {
             state.activeTab = action.payload
+        },
+        setCounterFareStatus: (state, action: PayloadAction<TCounterFareStatus>) => {
+            state.counterFareStatus = action.payload;
         }
     }
 })
 
 export const { setLoading, setCurrentRideView,
-    setAddTicketStatus, setAvailableRides,
-    setUserRide, setTicketAsTicket1, setSearchMatchBusstops,
-    setCurrentNumberOfTickets, removeTicket, editTicket,
+    setAvailableRides,
+    setUserRide, setSearchMatchBusstops,
+    setCurrentNumberOfTickets, removeTicket, editTicketBusstops,
     setActiveTab, setStateInputField, createTicket, toggleTicketAsFirstTicket,
-    setCurrentTicket,
+    setCurrentTicket, editTicketCounterFare, setCounterFareStatus,
 } = RideSlice.actions;
 
 export default RideSlice.reducer;
