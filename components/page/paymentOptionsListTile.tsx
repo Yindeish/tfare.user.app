@@ -5,7 +5,7 @@ import { TouchableOpacity, View } from "react-native";
 import { RadioButton, Text } from "react-native-paper";
 
 
-function RidePaymentInfoListTile({ subTitle, title, input }: { title: string, subTitle: string, input: { onChange: Function, value: string } }) {
+function PaymentOptionsListTile({ subTitle, title, input }: { title: string, subTitle: string, input: { onChange: Function, value: string } }) {
 
 
     return (
@@ -28,4 +28,4 @@ function RidePaymentInfoListTile({ subTitle, title, input }: { title: string, su
     )
 }
 
-export default RidePaymentInfoListTile;
+export default PaymentOptionsListTile;

@@ -71,7 +71,8 @@ interface IRideState {
     activeTab: TActiveTab
     stateInput: IStateInput,
     currentTicket: ITicket | null,
-    counterFareStatus: TCounterFareStatus
+    counterFareStatus: TCounterFareStatus,
+    allTicketsFilled: boolean,
 }
 
 export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, ITicket, IRoute, TActiveTab, IStateInput, TCounterFareStatus }

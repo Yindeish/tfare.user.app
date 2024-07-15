@@ -2,7 +2,7 @@ import { Image, StyleSheet, TextStyle, TouchableOpacity, View, ScrollView } from
 import { Text } from 'react-native-paper'
 import React, { useEffect } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
-import { absolute, b, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyStart, l, mb, mt, p, pr, px, py, relative, rounded, w, wFull, wHFull, zIndex } from '@/utils/styles'
+import { absolute, b, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyStart, l, mb, mt, p, pb, pr, px, py, relative, rounded, w, wFull, wHFull, zIndex } from '@/utils/styles'
 import PageFloatingTitle from '@/components/page/pageFloatingTitle'
 import { router, useLocalSearchParams } from 'expo-router'
 import Colors, { colors } from '@/constants/Colors'
@@ -15,14 +15,17 @@ import PaddedScreen from '@/components/shared/paddedScreen'
 import { FlatList } from 'react-native-gesture-handler'
 import RideSelectors from '@/state/selectors/ride'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
-import { createTicket, setCurrentNumberOfTickets, } from '@/state/slices/ride'
+import { createTicket, setAllTicketsFilled, setCurrentNumberOfTickets, } from '@/state/slices/ride'
 import { closeModal, openModal } from '@/state/slices/layout'
 import { IRide, } from '@/state/types/ride'
 import Ticket from '@/components/page/ticket'
 import BottomSheet from '@/components/shared/bottomSheet'
-import TicketDetailsSheet from '@/components/page/bookRideSheetComponent'
+import { RideBookedSheet, TicketDetailsSheet } from '@/components/page/bookRideSheetComponent'
 import CtaBtn from '@/components/shared/ctaBtn'
 import { indices } from '@/constants/zIndices'
+import { Ionicons } from '@expo/vector-icons'
+import BuyTicketListTile from '@/components/page/buyTicketListTile'
+import LayoutSelectors from '@/state/selectors/layout'
 
 const { sharedStyle, availableSeatStyle, selectedSeatStyle, unavailableSeatStyle } = StyleSheet.create({
     sharedStyle: {
@@ -44,7 +47,8 @@ export default function BookRide() {
     const { rideId } = useLocalSearchParams();
 
     const dispatch = useAppDispatch();
-    const { userRide, stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentNumberOfTickets } = RideSelectors()
+    const { userRide, allTicketsFilled, stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentNumberOfTickets } = RideSelectors()
+    const { bottomSheet } = LayoutSelectors()
 
     useEffect(() => {
         dispatch(closeModal());
@@ -63,6 +67,19 @@ export default function BookRide() {
 
         dispatch(createTicket({ currentNumberOfTickets: ticketNumber }))
     }
+
+    // check if all tickets have been filled
+    useEffect(() => {
+        if (userRide && userRide?.tickets) {
+            const allTciketsFilled = userRide?.tickets.every(ticket =>
+                ticket.dropoffBusstop && ticket.dropoffBusstop &&
+                ticket.dropoffBusstop.routeName !== '' && ticket.dropoffBusstop.routeName !== '');
+
+            if (allTciketsFilled) dispatch(setAllTicketsFilled(true))
+            else dispatch(setAllTicketsFilled(false))
+        }
+    }, [userRide?.tickets])
+    // check if all tickets have been filled
 
     return (
         <SafeScreen>
@@ -141,9 +158,10 @@ export default function BookRide() {
 
                         {/* Add another ticket btn */}
 
+                        {/* Shows when all the tickets have been filled (counter fare are optional) */}
                         {/* Buy Ticket Btn */}
 
-                        <View style={[absolute, zIndex(indices.xHigh), b('30%'), l(20), wFull]}>
+                        {allTicketsFilled && <View style={[absolute, zIndex(indices.xHigh), b('30%'), l(20), wFull]}>
                             <CtaBtn
                                 img={{
                                     src: images.whiteBgTicketImage,
@@ -158,11 +176,69 @@ export default function BookRide() {
                                     color: Colors.light.background
                                 }}
                             />
-                        </View>
+                        </View>}
 
                         {/* Buy Ticket Btn */}
 
+                        {/* Shows when buy ticket cta btn is clicked */}
+
                         {/* Payment options */}
+
+                        <View style={[wFull, flexCol, gap(16)]}>
+                            <View style={[wFull, flexCol, gap(16), pb(16), { borderBottomColor: Colors.light.border, borderBottomWidth: 0.7 }]}>
+
+                                <TouchableOpacity
+                                    onPress={() => router.push(`/${pages.paymentOptions}`)}
+                                    style={[wFull, flex, justifyBetween, itemsCenter]}>
+                                    <Text style={[neurialGrotesk, fs14, fw700, colorBlack]}>Pay with</Text>
+
+                                    <View style={[flex, gap(16), itemsCenter]}>
+                                        <Text style={[neurialGrotesk, fw400, fs14, colorBlack]}>Wallet</Text>
+
+                                        <Ionicons name="chevron-back" size={20} color={Colors.light.textGrey} />
+                                    </View>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={[wFull, flex, justifyBetween, itemsCenter]}>
+                                    <Text style={[neurialGrotesk, fs14, fw700, c(Colors.light.border)]}>Offers</Text>
+
+                                    <View style={[flex, gap(16), itemsCenter]}>
+                                        <Text style={[neurialGrotesk, fw400, fs14, c(Colors.light.border)]}>Unavailable</Text>
+
+                                        <Ionicons name="chevron-back" size={20} color={Colors.light.border} />
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={[wFull, flexCol, gap(16), pb(16), { borderBottomColor: Colors.light.border, borderBottomWidth: 0.7 }]}>
+                                <BuyTicketListTile
+                                    leadingText='Trip ID'
+                                    trailing={{
+                                        text: '#1234567ABC',
+                                    }}
+                                />
+                                <BuyTicketListTile
+                                    leadingText='Trip Cost'
+                                    trailing={{
+                                        text: ' ₦ 500.00',
+                                    }}
+                                />
+                                <BuyTicketListTile
+                                    leadingText='Discount'
+                                    trailing={{
+                                        text: ' ₦ 0000.00',
+                                    }}
+                                />
+                            </View>
+
+                            <BuyTicketListTile
+                                leadingText='Total'
+                                trailing={{
+                                    text: ' ₦ 500.00',
+                                }}
+                            />
+                        </View>
+
                         {/* Payment options */}
 
                         {/* BottomSheet */}
@@ -170,7 +246,8 @@ export default function BookRide() {
                         <BottomSheet
                         >
 
-                            <TicketDetailsSheet />
+                            {bottomSheet.type === 'ticketDetails' && <TicketDetailsSheet />}
+                            {bottomSheet.type === 'rideBooked' && <RideBookedSheet />}
 
                         </BottomSheet>
 

@@ -14,7 +14,7 @@ const pages = {
     bookRide: 'bookRide',
     availableRides: 'availableRides',
     buyTicket: 'buyTicket',
-    ridePaymentInfo: 'paymentInfo',
+    paymentOptions: 'paymentOptions',
     rideBooked: 'rideBooked',
     driverProfile: 'driverProfile',
     chat: 'chat',

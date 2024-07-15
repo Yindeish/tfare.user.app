@@ -12,9 +12,10 @@ import { images } from '@/constants/images'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import PageFloatingTitle from '@/components/page/pageFloatingTitle'
 import PageTitle from '@/components/shared/pageTitle'
-import RidePaymentInfoListTile from '@/components/page/ridePaymentInfoListTile'
+import PaymentOptionsListTile from '@/components/page/PaymentOptionsListTile'
 
-export default function PaymentInfo() {
+
+export default function PaymentOptions() {
     const dispatch = useAppDispatch()
 
 
@@ -26,7 +27,7 @@ export default function PaymentInfo() {
 
                     <View style={[wFull, flexCol, gap(24)]}>
 
-                        <RidePaymentInfoListTile
+                        <PaymentOptionsListTile
                             input={{
                                 onChange: (val: string) => {
 
@@ -37,7 +38,7 @@ export default function PaymentInfo() {
                             subTitle={`Balance: ₦${'0000.00'}`}
                         />
 
-                        <RidePaymentInfoListTile
+                        <PaymentOptionsListTile
                             input={{
                                 onChange: (val: string) => {
 
@@ -48,7 +49,7 @@ export default function PaymentInfo() {
                             subTitle={`Pay driver with cash`}
                         />
 
-                        <RidePaymentInfoListTile
+                        <PaymentOptionsListTile
                             input={{
                                 onChange: (val: string) => {
 

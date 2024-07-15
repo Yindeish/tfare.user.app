@@ -126,7 +126,8 @@ const initialState: IRideState = {
         pickupBusstopInput: '',
         userCounterFareInput: null,
     },
-    counterFareStatus: 'idle'
+    counterFareStatus: 'idle',
+    allTicketsFilled: false,
 }
 
 const RideSlice = createSlice({
@@ -269,7 +270,10 @@ const RideSlice = createSlice({
         },
         setCounterFareStatus: (state, action: PayloadAction<TCounterFareStatus>) => {
             state.counterFareStatus = action.payload;
-        }
+        },
+        setAllTicketsFilled: (state, action) => {
+            state.allTicketsFilled = action.payload;
+        },
     }
 })
 
@@ -279,6 +283,7 @@ export const { setLoading, setCurrentRideView,
     setCurrentNumberOfTickets, removeTicket, editTicketBusstops,
     setActiveTab, setStateInputField, createTicket, toggleTicketAsFirstTicket,
     setCurrentTicket, editTicketCounterFare, setCounterFareStatus,
+    setAllTicketsFilled,
 } = RideSlice.actions;
 
 export default RideSlice.reducer;
