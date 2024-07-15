@@ -9,6 +9,9 @@ export const fontStyles: Record<string, TextStyle> = {
     fw400: {
         fontWeight: '400'
     },
+    fw600: {
+        fontWeight: '600'
+    },
     fw500: {
         fontWeight: '500'
     },
@@ -47,7 +50,7 @@ export const fontStyles: Record<string, TextStyle> = {
     }
 }
 
-export const { neurialGrotesk, fw400, fw500, fw700, fs10, fs12, fs14, fs16, fs18, colorBlack, colorWhite, colorBorderGrey, colorTextGrey, colorBlueBg } = fontStyles;
+export const { neurialGrotesk, fw400, fw500, fw600, fw700, fs10, fs12, fs14, fs16, fs18, colorBlack, colorWhite, colorBorderGrey, colorTextGrey, colorBlueBg } = fontStyles;
 
 
 type TFS = <T extends string>(val: T) => TextStyle;

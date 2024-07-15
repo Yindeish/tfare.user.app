@@ -59,6 +59,7 @@ import whiteBgStarRatingImage from '../assets/images/icons/white-bg-star-rating-
 import greenBgCheckboxImage from '../assets/images/icons/green-bg-checkbox-image.png';
 import whiteBgTicketImage from '../assets/images/icons/white-bg-ticket-image.png';
 import greenBgCheckTripImage from '../assets/images/icons/green-bg-check-trip-image.png';
+import expandImage from '../assets/images/icons/expand-image.png';
 
 
 const images = {
@@ -123,6 +124,7 @@ const images = {
     greenBgCheckboxImage,
     whiteBgTicketImage,
     greenBgCheckTripImage,
+    expandImage,
 }
 
 export { images }
