@@ -1,11 +1,10 @@
 import { absolute, b, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyStart, l, mb, mt, p, pb, pr, px, py, relative, rounded, w, wFull, wHFull, zIndex } from '@/utils/styles'
 import { c, colorBlack, colorWhite, fs12, fs14, fs18, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles'
-import { View } from "react-native-reanimated/lib/typescript/Animated"; // check if this works!
 import { Text } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { images } from '@/constants/images';
-import { Image } from 'react-native';
+import { Image, View } from 'react-native';
 import { image } from '@/utils/imageStyles';
 
 

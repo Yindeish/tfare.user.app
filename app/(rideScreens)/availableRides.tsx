@@ -11,7 +11,6 @@ import { setCurrentRideView, setUserRide } from '@/state/slices/ride'
 import RideBlock from '@/components/page/rideBlock'
 import RideSelectors from '@/state/selectors/ride'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
-import { IRide } from '@/state/types/ride'
 
 export default function AvailableRide() {
     const dispatch = useAppDispatch()

@@ -17,7 +17,9 @@ const bottomSheet = ({ children }: { children: React.ReactNode }) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
     const animatedIndex = useSharedValue(0);
     const animatedPosition = useSharedValue(0);
-    const snapPoints = useMemo(() => [601, 508, 436, 477, 400, '95%'], []);
+    // const snapPoints = useMemo(() => [601, 508, 436, 477, 400, '95%'], []);
+    // const snapPoints = useMemo(() => [400, 436,  477, 508, 601, '95%'], []);
+    const snapPoints = useMemo(() => ['55%', '60%', '65%', '70%', '75%', '90%'], []);
 
     const handleSheetChanges = useCallback((index: number) => {
     }, []);
@@ -29,6 +31,9 @@ const bottomSheet = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         if (!bottomSheet.visible) {
             bottomSheetRef.current?.close();
+        }
+        if (bottomSheet.visible) {
+            bottomSheetRef.current?.snapToIndex(bottomSheet.snapPoint)
         }
     }, [bottomSheet.visible])
 
@@ -70,7 +75,7 @@ const bottomSheet = ({ children }: { children: React.ReactNode }) => {
             enableHandlePanningGesture
             animateOnMount
             animatedIndex={animatedIndex}
-            index={bottomSheet.visible ? 0 : -1}
+            index={bottomSheet.visible ? bottomSheet.snapPoint : -1}
             backdropComponent={renderBackdrop}
             backgroundStyle={[{ borderRadius: 0, }]}
             enablePanDownToClose

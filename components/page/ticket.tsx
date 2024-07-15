@@ -13,9 +13,12 @@ import { closeModal, openBottomSheet, openModal, setBottomSheetSnapPoint, setBot
 import { ITicket } from '@/state/types/ride'
 import { editTicketCounterFare, setCurrentTicket, setStateInputField, toggleTicketAsFirstTicket } from '@/state/slices/ride'
 import CounterFareCtaBtn from './counterFareCtaBtn'
+import { useBottomSheet } from '@/contexts/useBottomSheetContext'
+import { TicketDetailsSheet } from './bookRideSheetComponent'
 
 function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
     const dispatch = useAppDispatch();
+    const { showBottomSheet } = useBottomSheet()
     const { currentTicket, stateInput: { pickupBusstopInput, dropoffBusstopInput, userCounterFareInput }, currentNumberOfTickets } = RideSelectors()
 
 
@@ -103,9 +106,7 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
                 {!ticket.dropoffBusstop && !ticket.pickupBusstop && <TouchableOpacity onPress={() => {
                     dispatch(setCurrentTicket(ticket));
 
-                    dispatch(openBottomSheet());
-                    dispatch(setBottomSheetSnapPoint(5))
-                    dispatch(setBottomSheetType('ticketDetails'));
+                    showBottomSheet([516, 601], <TicketDetailsSheet />)
                 }}>
                     <View style={[w('auto'), h(50), p(16), rounded(100), flex, itemsCenter, justifyCenter, gap(10), bg(colors.white), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
                         <Image style={[image.w(20), image.h(20)]} source={images.blackBgWaitChairImage} />

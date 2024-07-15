@@ -14,9 +14,10 @@ import RideSelectors from "@/state/selectors/ride";
 import { cancelRideReasons } from "@/constants/cancelRideReasons";
 import RadioBtnListTile from "./RadioBtnListTile";
 import { closeModal } from "@/state/slices/layout";
+import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 
 function TripStartedSheet() {
-
+    const { showBottomSheet } = useBottomSheet()
 
     return (
         <PaddedScreen>
@@ -83,7 +84,9 @@ function TripStartedSheet() {
                     img={{
                         src: images.cancelImage
                     }}
-                    onPress={() => { }}
+                    onPress={() => {
+                        showBottomSheet([660], <CancelRide />)
+                    }}
                     text={{ name: 'Cancel Order', color: Colors.light.textGrey }}
                     bg={{ color: '#F9F7F8', borderColor: Colors.light.border }}
                 />
@@ -94,10 +97,12 @@ function TripStartedSheet() {
 
 function TripCompletedSheet() {
     const dispatch = useAppDispatch()
+    const { hideBottomSheet } = useBottomSheet()
     const { stateInput: { driverRatingInput, driverRatingCommentInput } } = RideSelectors()
 
     const rateDriver = (rating: number) => {
         dispatch(setStateInputField({ key: 'driverRatingInput', value: rating }))
+        hideBottomSheet()
         // update in DB
     }
 

@@ -16,10 +16,15 @@ import CtaBtn from "../shared/ctaBtn";
 import RideBlock from "./rideBlock";
 import { IRide } from "@/state/types/ride";
 import BuyTicketListTile from "./buyTicketListTile";
+import { useBottomSheet } from "@/contexts/useBottomSheetContext";
+import { useEffect } from "react";
+import { router } from "expo-router";
+import { pages } from "@/constants/pages";
 
 
 function TicketDetailsSheet() {
     const dispatch = useAppDispatch()
+    const { showBottomSheet, hideBottomSheet } = useBottomSheet()
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentTicket } = RideSelectors()
 
     const DATA = [
@@ -142,7 +147,7 @@ function TicketDetailsSheet() {
 
             <TouchableOpacity onPress={() => {
                 dispatch(editTicketBusstops({ currentNumberOfTickets: Number(currentTicket?.number as number) }))
-                dispatch(closeBottomSheet());
+                hideBottomSheet();
             }}>
                 <View style={[wFull, h(50), mt(32), rounded(10), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.banner)]}>
                     <Text style={[neurialGrotesk, fw700, fs18, colorWhite]}>Add Details</Text>
@@ -155,8 +160,17 @@ function TicketDetailsSheet() {
     )
 }
 
-function RideBookedSheet() {
+function RideBookedSheet({ rideId }: { rideId: string }) {
     const { userRide } = RideSelectors()
+    const { hideBottomSheet } = useBottomSheet()
+
+    useEffect(() => {
+        // if a signal is recieved from the driver to start the trip
+        // for now dummy redirection
+        setTimeout(() => {
+            router.push(`/${rideId}/${pages.tripStarted}`)
+        }, 3000)
+    })
 
     return (
         <PaddedScreen>
@@ -169,7 +183,7 @@ function RideBookedSheet() {
                             <Text style={[neurialGrotesk, fw700, colorBlack, { fontSize: 22 }]}>Trip Booked</Text>
                         </View>
 
-                        <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Your Trip has been successfully booked</Text>
+                        <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey), mXAuto]}>Your Trip has been successfully booked</Text>
                     </View>
                 </PaddedScreen>
 

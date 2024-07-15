@@ -5,7 +5,7 @@ import { EBottomSheetStatus } from "../enums/layout";
 
 const initialState: ILayoutState = {
     bottomSheet: {
-        snapPoint: 0,
+        snapPoint: 4,
         props: null,
         type: EBottomSheetStatus.recentLocationsSnippet,
         visible: true

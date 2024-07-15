@@ -48,10 +48,10 @@ export default function Index() {
                     <TouchableOpacity
                         onPress={() => {
                             router.push(`/${pages.orderRide}`);
-                            dispatch(setCurrentRideView('orderRide'));
-                            dispatch(setBottomSheetType('recentLocationsSnippet'));
-                            dispatch(setBottomSheetSnapPoint(0));
-                            dispatch(openBottomSheet());
+                            // dispatch(setCurrentRideView('orderRide'));
+                            // dispatch(setBottomSheetType('recentLocationsSnippet'));
+                            // dispatch(setBottomSheetSnapPoint(0));
+                            // dispatch(openBottomSheet());
                         }}
                         style={[orderRideBtn, wFull, flex, itemsCenter, justifyCenter]}>
                         <Image style={{ width: 20, height: 17.27 }} source={images.whiteTripImage} />

@@ -1,6 +1,6 @@
 import { Image, TextInput, TouchableOpacity, View, } from 'react-native'
 import { Text } from 'react-native-paper'
-import React from 'react'
+import React, { useEffect } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import { bg, flex, flexCol, gap, h, itemsCenter, justifyBetween, justifyCenter, justifyStart, ml, mt, p, pt, px, py, relative, rounded, w, wFull, wHFull } from '@/utils/styles'
 import Colors, { colors } from '@/constants/Colors'
@@ -12,11 +12,20 @@ import { images } from '@/constants/images'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import PageFloatingTitle from '@/components/page/pageFloatingTitle'
 import PageTitle from '@/components/shared/pageTitle'
-import PaymentOptionsListTile from '@/components/page/PaymentOptionsListTile'
+import PaymentOptionsListTile from '@/components/page/paymentOptionsListTile'
+import CtaBtn from '@/components/shared/ctaBtn'
+import { router, useLocalSearchParams } from 'expo-router'
+import { pages } from '@/constants/pages'
+import { openBottomSheet, setBottomSheetSnapPoint, setBottomSheetType } from '@/state/slices/layout'
+import LayoutSelectors from '@/state/selectors/layout'
+import { useBottomSheet } from '@/contexts/useBottomSheetContext'
+import { RideBookedSheet } from '@/components/page/bookRideSheetComponent'
 
 
 export default function PaymentOptions() {
     const dispatch = useAppDispatch()
+    const { rideId } = useLocalSearchParams();
+    const { showBottomSheet } = useBottomSheet()
 
 
     return (
@@ -58,6 +67,18 @@ export default function PaymentOptions() {
                             }}
                             title='Pay online'
                             subTitle={`Pay with third party`}
+                        />
+                    </View>
+
+                    <View style={[wFull, mt('97%')]}>
+                        <CtaBtn
+                            img={{ src: images.proceedCheckImage, w: 20, h: 20 }}
+                            onPress={() => {
+                                router.push(`/${rideId}/${pages.bookRide}`);
+                                showBottomSheet([800], <RideBookedSheet rideId={rideId as string} />)
+                            }}
+                            text={{ name: 'Proceed', color: colors.white }}
+                            bg={{ color: Colors.light.background }}
                         />
                     </View>
                 </PaddedScreen>

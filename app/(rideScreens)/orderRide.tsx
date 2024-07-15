@@ -24,6 +24,7 @@ import BottomSheetModal from '@/components/shared/bottomSheetModal';
 import { FontAwesome6 } from '@expo/vector-icons';
 import RideBlock from '@/components/page/rideBlock';
 import { IRide } from '@/state/types/ride';
+import { useBottomSheet } from '@/contexts/useBottomSheetContext';
 
 const { mapView } = StyleSheet.create({
     mapView: {
@@ -40,7 +41,12 @@ type Region = {
 function Ride() {
     const dispatch = useAppDispatch()
     const { bottomSheet, modal } = LayoutSelectors();
+    const { showBottomSheet } = useBottomSheet();
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentRideView, availableRides, } = RideSelectors()
+
+    useEffect(() => {
+        showBottomSheet([601], <RecentLocationsSnippet />)
+    }, [])
 
     const [locationError, setLocationError] = useState<string | null>(null);
     const initialRegionObject = {
@@ -57,8 +63,6 @@ function Ride() {
 
     const [initialRegion, setInitialRegion] = useState<Region | null>(initialRegionObject);
     const [markerCoordinate, setMarkerCoordinate] = useState<{ latitude: number, longitude: number } | null>(markerCoordinateObject);
-
-    const { height } = Dimensions.get('window');
 
     return (
         <SafeScreen>
@@ -182,7 +186,7 @@ function Ride() {
 
                 {/* BottomSheet */}
 
-                <BottomSheet>
+                {/* <BottomSheet>
                     {bottomSheet.type === EBottomSheetStatus.recentLocationsSnippet && <RecentLocationsSnippet />}
 
                     {bottomSheet.type === EBottomSheetStatus.recentPickupLocations && <RecentPickupLocations />}
@@ -193,8 +197,8 @@ function Ride() {
 
                     {bottomSheet.type === EBottomSheetStatus.routeRideDetails && <RideRouteDetails />}
 
-                    {/* {bottomSheet.type === EBottomSheetStatus.searchingRides && <SearchingRide />} */}
-                </BottomSheet>
+                </BottomSheet> */}
+                {/* {bottomSheet.type === EBottomSheetStatus.searchingRides && <SearchingRide />} */}
 
                 <BottomSheetModal onDismiss={() => {
                     dispatch(setBottomSheetSnapPoint(-1));

@@ -16,16 +16,12 @@ import { FlatList } from 'react-native-gesture-handler'
 import RideSelectors from '@/state/selectors/ride'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import { createTicket, setAllTicketsFilled, setCurrentNumberOfTickets, } from '@/state/slices/ride'
-import { closeModal, openModal } from '@/state/slices/layout'
 import { IRide, } from '@/state/types/ride'
 import Ticket from '@/components/page/ticket'
-import BottomSheet from '@/components/shared/bottomSheet'
-import { RideBookedSheet, TicketDetailsSheet } from '@/components/page/bookRideSheetComponent'
 import CtaBtn from '@/components/shared/ctaBtn'
 import { indices } from '@/constants/zIndices'
 import { Ionicons } from '@expo/vector-icons'
 import BuyTicketListTile from '@/components/page/buyTicketListTile'
-import LayoutSelectors from '@/state/selectors/layout'
 
 const { sharedStyle, availableSeatStyle, selectedSeatStyle, unavailableSeatStyle } = StyleSheet.create({
     sharedStyle: {
@@ -48,11 +44,6 @@ export default function BookRide() {
 
     const dispatch = useAppDispatch();
     const { userRide, allTicketsFilled, stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentNumberOfTickets } = RideSelectors()
-    const { bottomSheet } = LayoutSelectors()
-
-    useEffect(() => {
-        dispatch(closeModal());
-    }, [])
 
     // create a single ticket based on the default number of tickets
     useEffect(() => {
@@ -184,18 +175,18 @@ export default function BookRide() {
 
                         {/* Payment options */}
 
-                        <View style={[wFull, flexCol, gap(16)]}>
+                        <View style={[wFull, flexCol, gap(16), mt(32)]}>
                             <View style={[wFull, flexCol, gap(16), pb(16), { borderBottomColor: Colors.light.border, borderBottomWidth: 0.7 }]}>
 
                                 <TouchableOpacity
-                                    onPress={() => router.push(`/${pages.paymentOptions}`)}
+                                    onPress={() => router.push(`/${rideId}/${pages.paymentOptions}`)}
                                     style={[wFull, flex, justifyBetween, itemsCenter]}>
                                     <Text style={[neurialGrotesk, fs14, fw700, colorBlack]}>Pay with</Text>
 
                                     <View style={[flex, gap(16), itemsCenter]}>
                                         <Text style={[neurialGrotesk, fw400, fs14, colorBlack]}>Wallet</Text>
 
-                                        <Ionicons name="chevron-back" size={20} color={Colors.light.textGrey} />
+                                        <Ionicons name="chevron-forward" size={20} color={Colors.light.textGrey} />
                                     </View>
                                 </TouchableOpacity>
 
@@ -205,7 +196,7 @@ export default function BookRide() {
                                     <View style={[flex, gap(16), itemsCenter]}>
                                         <Text style={[neurialGrotesk, fw400, fs14, c(Colors.light.border)]}>Unavailable</Text>
 
-                                        <Ionicons name="chevron-back" size={20} color={Colors.light.border} />
+                                        <Ionicons name="chevron-forward" size={20} color={Colors.light.border} />
                                     </View>
                                 </TouchableOpacity>
                             </View>
@@ -240,18 +231,6 @@ export default function BookRide() {
                         </View>
 
                         {/* Payment options */}
-
-                        {/* BottomSheet */}
-
-                        <BottomSheet
-                        >
-
-                            {bottomSheet.type === 'ticketDetails' && <TicketDetailsSheet />}
-                            {bottomSheet.type === 'rideBooked' && <RideBookedSheet />}
-
-                        </BottomSheet>
-
-                        {/* BottomSheet */}
                     </PaddedScreen>
                 </View>
             </ScrollView>

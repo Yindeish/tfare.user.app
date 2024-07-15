@@ -18,6 +18,7 @@ import { CancelRide, TripCompletedSheet, TripStartedSheet } from "@/components/p
 import BottomSheetModal from "@/components/shared/bottomSheetModal";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
 import { closeBottomSheet, closeModal, openBottomSheet, openModal } from "@/state/slices/layout";
+import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 
 type Region = {
     latitude: number;
@@ -28,19 +29,16 @@ type Region = {
 
 function TripStarted() {
     const dispatch = useAppDispatch()
-    const { bottomSheet } = LayoutSelectors();
+    const { } = LayoutSelectors();
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput } } = RideSelectors()
+    const { showBottomSheet, setBottomSheetType, bottomSheetType } = useBottomSheet()
 
     useEffect(() => {
+        showBottomSheet([480], <TripStartedSheet />)
 
-        if (bottomSheet.type === EBottomSheetStatus.tripStarted || bottomSheet.type === EBottomSheetStatus.tripCompleted) {
-            dispatch(openModal());
-            dispatch(closeBottomSheet());
-        }
-        if (bottomSheet.type === EBottomSheetStatus.cancelRide) {
-            dispatch(closeModal());
-            dispatch(openBottomSheet());
-        }
+        setTimeout(() => {
+            showBottomSheet([626, 800], <TripCompletedSheet />)
+        }, 3000)
     }, [])
 
     const [locationError, setLocationError] = useState<string | null>(null);
@@ -66,6 +64,7 @@ function TripStarted() {
                 {/* Drop off inputs block */}
 
                 {true
+                    // add bottomType condition here later
                     // (bottomSheet.type === EBottomSheetStatus.tripStarted || bottomSheet.type === EBottomSheetStatus.tripCompleted) && (dropoffBusstopInput !== '')
                     && <View style={[w('90%'), h(104), bg(colors.white), flexCol, justifyStart, gap(16), absolute, t(77), l(20), zIndex(indices.high), rounded(10), py(16), px(24)]}>
 
@@ -81,6 +80,8 @@ function TripStarted() {
                     </View>}
 
                 {/* Drop off inputs block */}
+
+                {/* MapView */}
 
                 <MapView
                     style={[wHFull]}
@@ -115,37 +116,6 @@ function TripStarted() {
                 </MapView>
 
                 {/* MapView */}
-
-                {/* BottomSheet */}
-
-                <BottomSheet>
-
-                    {
-                        bottomSheet.type === EBottomSheetStatus.tripStarted
-                        && <TripStartedSheet />}
-                    {
-                        bottomSheet.type === EBottomSheetStatus.tripCompleted
-                        && <TripCompletedSheet />}
-
-                </BottomSheet>
-
-                {/* BottomSheet */}
-
-                {/* BottomSheet Modal */}
-                <BottomSheetModal
-                    initialIdex={2}
-                    bgColor={colors.transparent}
-                    indicator={false}
-                    onDismiss={() => {
-                        // dispatch(setBottomSheetSnapPoint(-1));
-                    }}>
-
-                    {
-                        bottomSheet.type === EBottomSheetStatus.cancelRide
-                        && <CancelRide />}
-
-                </BottomSheetModal>
-                {/* BottomSheet Modal */}
             </View>
         </SafeScreen>
     )
