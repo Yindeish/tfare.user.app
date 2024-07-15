@@ -15,12 +15,10 @@ import { EBottomSheetStatus } from '@/state/enums/layout';
 import { images } from '@/constants/images';
 import { image } from '@/utils/imageStyles';
 import PageFloatingTitle from '@/components/page/pageFloatingTitle';
-import BottomSheet from '@/components/shared/bottomSheet';
 import { pages } from '@/constants/pages';
 import RideSelectors from '@/state/selectors/ride';
 import { indices } from '@/constants/zIndices';
 import { setCurrentRideView, setUserRide } from '@/state/slices/ride';
-import BottomSheetModal from '@/components/shared/bottomSheetModal';
 import { FontAwesome6 } from '@expo/vector-icons';
 import RideBlock from '@/components/page/rideBlock';
 import { IRide } from '@/state/types/ride';
@@ -184,30 +182,6 @@ function Ride() {
 
                 {/* MapView */}
 
-                {/* BottomSheet */}
-
-                {/* <BottomSheet>
-                    {bottomSheet.type === EBottomSheetStatus.recentLocationsSnippet && <RecentLocationsSnippet />}
-
-                    {bottomSheet.type === EBottomSheetStatus.recentPickupLocations && <RecentPickupLocations />}
-
-                    {bottomSheet.type === EBottomSheetStatus.recentDropoffLocations && <RecentDropoffLocations />}
-
-                    {bottomSheet.type === EBottomSheetStatus.filledForm && <FilledForm />}
-
-                    {bottomSheet.type === EBottomSheetStatus.routeRideDetails && <RideRouteDetails />}
-
-                </BottomSheet> */}
-                {/* {bottomSheet.type === EBottomSheetStatus.searchingRides && <SearchingRide />} */}
-
-                <BottomSheetModal onDismiss={() => {
-                    dispatch(setBottomSheetSnapPoint(-1));
-                    router.push(`/${pages.availableRides}`)
-                }}>
-                    {bottomSheet.type === EBottomSheetStatus.searchingRides && <SearchingRide />}
-                </BottomSheetModal>
-
-                {/* BottomSheet */}
             </View>
         </SafeScreen>
     );
