@@ -14,6 +14,22 @@ interface IUserNotification {
 interface IUserWallet extends Partial<IFlutterwaveWallet> {
 }
 
+interface IUser {
+    __v: number,
+    _id: string,
+    createdAt: Date,
+    deactivated: boolean,
+    deleted: boolean,
+    otpExpires: Date,
+    gender: string,
+    otp: string,
+    password: string,
+    phoneNumber: string,
+    profileName: string,
+    role: string,
+    updatedAt: Date,
+}
+
 interface IUserAccount {
     name: string,
     userName: string,
@@ -99,5 +115,6 @@ export type {
     IStateInputDeactivateAccount,
     IStateInputNotifications,
     IStateInputProfile, IStateInputSaveNewAddress,
-    TProfileCta, IUserAccount
+    TProfileCta, IUserAccount,
+    IUser,
 }

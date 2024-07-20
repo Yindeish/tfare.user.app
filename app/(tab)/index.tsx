@@ -1,7 +1,7 @@
 import { Text, TouchableOpacity, View, Image, StyleSheet, ScrollView } from 'react-native';
 import { useSession } from '../../contexts/userSignedInContext';
 import { useSession as useTokenSession } from '../../contexts/userTokenContext';
-import React from 'react';
+import React, { useEffect } from 'react';
 import SafeScreen from '@/components/shared/safeScreen';
 import { flex, flexCol, itemsCenter, justifyCenter, wFull, wHFull } from '@/utils/styles';
 import Colors, { colors } from '@/constants/Colors';
@@ -34,9 +34,9 @@ const { orderRideBtn, orderRideText } = StyleSheet.create({
 });
 
 export default function Index() {
-    const { signOut } = useSession();
-    const { signOut: signOutToken } = useTokenSession();
-    const dispatch = useAppDispatch()
+    const { signOut, userSession } = useSession(); // testing
+    const { signOut: signOutToken } = useTokenSession(); // testing
+
     return (
         <SafeScreen>
             <ScrollView style={[wHFull, flexCol,]}>

@@ -1,9 +1,6 @@
 import { Redirect, Stack, Tabs } from 'expo-router';
 import { Dimensions, View, Image } from 'react-native';
 import { useSession } from '../../contexts/userSignedInContext';
-import { useEffect } from 'react';
-import { pages } from '@/constants/pages';
-import { FontAwesome } from '@expo/vector-icons';
 import { tabs } from '@/constants/tabs';
 import Colors, { colors } from '@/constants/Colors';
 // import HomeSVG from '@/components/svg/home';
@@ -13,19 +10,15 @@ import { images } from '@/constants/images';
 
 
 export default function AppLayout() {
-  const { session, isLoading } = useSession();
+  const { userSession, isLoading, } = useSession();
 
   const { width, height } = Dimensions.get('window');
-
-  useEffect(() => {
-    console.log({ session })
-  }, [session])
 
   if (isLoading) {
     return <View style={{ width, height, backgroundColor: '#D8D8D8' }} />;
   }
 
-  if (!session) {
+  if (!userSession) {
     return <Redirect href="/(auth)/signin" />;
   }
 

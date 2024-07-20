@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import AxiosConfig from "./axios.config";
+import AxiosConfig from "./fetch.config";
 
 const { axios } = AxiosConfig;
 
@@ -9,8 +9,10 @@ const get = async ({ url }: { url: string }) => {
             .get(url);
 
         console.log('response.data', response.data);
+        return response.data
     } catch (error) {
         console.error('error', error);
+        return error;
     }
 }
 
@@ -23,18 +25,22 @@ const getWithBearerToken = async ({ token }: { token: string }) => {
                 }
             });
         console.log('response.data', response.data);
+        return response.data
     } catch (error) {
         console.error('error', error);
+        return error;
     }
 }
 
-const post = async ({ data, url }: { data: object, url: string }) => {
+const post = async ({ data, url }: { data?: object, url: string }) => {
     try {
         const response = await axios
             .post(url, data);
         console.log('response.data', response.data);
+        return response.data
     } catch (error) {
         console.error('error', error);
+        return error;
     }
 }
 
@@ -47,8 +53,10 @@ const postWithBearerToken = async ({ data, url, token }: { token: string, url: s
                 }
             });
         console.log('response.data', response.data);
+        return response.data
     } catch (error) {
         console.error('error', error);
+        return error;
     }
 }
 
