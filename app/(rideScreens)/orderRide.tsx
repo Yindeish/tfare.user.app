@@ -38,8 +38,7 @@ type Region = {
 
 function Ride() {
     const dispatch = useAppDispatch()
-    const { bottomSheet, modal } = LayoutSelectors();
-    const { showBottomSheet } = useBottomSheet();
+    const { showBottomSheet, hideBottomSheet, bottomSheetType } = useBottomSheet();
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentRideView, availableRides, } = RideSelectors()
 
     useEffect(() => {
@@ -71,7 +70,7 @@ function Ride() {
                 {currentRideView === 'orderRide' ?
                     (<PageFloatingTitle view={false} onPress={() => {
                         router.push(`/(tab)/`)
-                        dispatch(closeBottomSheet());
+                        hideBottomSheet()
                     }} title='Order a Ride' />) :
                     (<PageFloatingTitle view onPress={() => {
                         dispatch(closeBottomSheet());
@@ -85,7 +84,7 @@ function Ride() {
 
                 {/* Pick and drop off inputs block */}
 
-                {(bottomSheet.type === EBottomSheetStatus.routeRideDetails || bottomSheet.type === EBottomSheetStatus.searchingRides) && (pickupBusstopInput !== '' && dropoffBusstopInput !== '') && <View style={[w('90%'), h(104), bg(colors.white), flexCol, justifyStart, gap(16), absolute, t(77), l(20), zIndex(indices.high), rounded(10), py(16), px(24)]}>
+                {(bottomSheetType === EBottomSheetStatus.routeRideDetails || bottomSheetType === EBottomSheetStatus.searchingRides) && (pickupBusstopInput !== '' && dropoffBusstopInput !== '') && <View style={[w('90%'), h(104), bg(colors.white), flexCol, justifyStart, gap(16), absolute, t(77), l(20), zIndex(indices.high), rounded(10), py(16), px(24)]}>
 
                     <View style={[flex, itemsCenter, gap(16), justifyStart]}>
                         <Image style={[image.w(15), image.h(20)]} source={images.yellowLocationImage} />
@@ -106,7 +105,7 @@ function Ride() {
 
                 {/* Loaded Rides */}
 
-                {currentRideView === 'availableRides' && bottomSheet.type === EBottomSheetStatus.searchingRides && <View style={[w('90%'), h('70%'), bg(colors.transparent), absolute, t(200), l(20), zIndex(indices.high), py(8), { overflow: 'scroll', }]}>
+                {currentRideView === 'availableRides' && bottomSheetType === EBottomSheetStatus.searchingRides && <View style={[w('90%'), h('70%'), bg(colors.transparent), absolute, t(200), l(20), zIndex(indices.high), py(8), { overflow: 'scroll', }]}>
 
                     <FlatList
                         contentContainerStyle={[h('auto')]}

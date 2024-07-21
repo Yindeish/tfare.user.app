@@ -1,26 +1,26 @@
 import { View, Pressable, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Link, router } from 'expo-router'
-import { useSession } from '../../contexts/userSignedInContext';
-import { useSession as useTokenSession } from '../../contexts/userTokenContext';
-import SafeScreen from '../../components/shared/safeScreen';
-import { Divider, MD2Colors, Menu, Text, Button } from 'react-native-paper';
-import { fonts } from '../../constants/fonts';
-import { flex, flexCenter, flexCol, flexYCenter, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, justifyStart, mLAuto, mRAuto, mXAuto, pAuto, pLAuto, wFull, wHFull } from '../../utils/styles';
-import Colors, { colors } from '../../constants/Colors';
-import { Entypo } from '@expo/vector-icons';
-import Checkbox from 'expo-checkbox';
-import { genders } from '@/constants/gender';
-import PaddedScreen from '@/components/shared/paddedScreen';
-import { pages } from '@/constants/pages';
-
+import { useSignup } from '@/contexts/signupContext'
+import SafeScreen from '@/components/shared/safeScreen'
+import PaddedScreen from '@/components/shared/paddedScreen'
+import { Text, Menu, ActivityIndicator, Snackbar } from 'react-native-paper'
+import { Entypo } from '@expo/vector-icons'
+import Checkbox from 'expo-checkbox'
+import { genders } from '@/constants/gender'
+import { fonts } from '@/constants/fonts'
+import Colors, { colors } from '@/constants/Colors'
+import { bg, flex, flexCenter, flexCol, flexYCenter, gap, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, justifyStart, pt, wFull, wHFull } from '@/utils/styles'
+import { Formik } from 'formik'
+import * as yup from 'yup'
+import { c, colorTextGrey } from '@/utils/fontStyles'
 
 const { signUpTitle, textInput, genderSelectText, genderMenuDropdown, menuItem, form, signUpBtn, signUpText, noAccount, signupLink, invalidEntryText, checkbox } = StyleSheet.create({
     signUpTitle: {
         fontWeight: '500',
         fontSize: 32,
         lineHeight: 32.08,
-        color: MD2Colors.black,
+        color: colors.black,
         fontFamily: fonts.neurialGrotesk,
     },
     form: {
@@ -37,7 +37,6 @@ const { signUpTitle, textInput, genderSelectText, genderMenuDropdown, menuItem, 
         paddingTop: 'auto',
         paddingBottom: 'auto',
         backgroundColor: '#F9F7F8',
-        fontFamily: fonts.neurialGrotesk,
     },
     genderSelectText: {
         textTransform: 'capitalize',
@@ -70,7 +69,6 @@ const { signUpTitle, textInput, genderSelectText, genderMenuDropdown, menuItem, 
         lineHeight: 23.76
     },
     noAccount: {
-        fontFamily: fonts.neurialGrotesk,
         fontWeight: '400',
         fontSize: 14,
         lineHeight: 16.66,
@@ -86,155 +84,188 @@ const { signUpTitle, textInput, genderSelectText, genderMenuDropdown, menuItem, 
         fontWeight: '500',
         fontSize: 14,
         lineHeight: 18.48,
-        fontFamily: fonts.neurialGrotesk
     },
     checkbox: {
         marginRight: 12
     }
 });
 
+const SignupSchema = yup.object().shape({
+    email: yup.string().email('Invalid email').required('Required'),
+    password: yup.string().min(8, 'Password must be at least 8 characters').required('Required'),
+    confirmedPassword: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Required'),
+    gender: yup.string().required('Required'),
+    profileName: yup.string().required('Required'),
+    phoneNumber: yup.string().required('Required'),
+    agree: yup.boolean().oneOf([true], 'You need to accept the terms and conditions'),
+});
+
 export default function signup() {
+    const { signUp, signiningUp, code, msg, snackbarVisible, closeSnackbar } = useSignup()
+    const [secureTextEntry, setSecureTextEntry] = useState(true)
+    const [genderDropDownVisible, setGenderDropDownVisible] = useState(false)
 
-    let [secureTextEntry, setSecureTextEntry] = useState(true);
-    let [invalidEntry, setInvalidEntery] = useState(true);
-    let [agree, setAgree] = useState(true);
-    let [genderDropDownVisible, setGenderDropDownVisible] = useState(false);
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-        gender: '',
-        profileName: '',
-        phoneNumber: '',
-        confirmedPassword: ''
-    })
-    const { email, password, gender, phoneNumber, profileName, confirmedPassword } = formData;
 
-    const toggleMenu = () => setGenderDropDownVisible(prev => (!prev));
-
-    const closeMenu = () => setGenderDropDownVisible(false);
-
-    const onChange = (key: string, value: string) => setFormData((prev) => ({ ...prev, [key]: value }));
+    const toggleMenu = () => setGenderDropDownVisible(prev => (!prev))
+    const closeMenu = () => setGenderDropDownVisible(false)
 
     return (
         <SafeScreen>
             <PaddedScreen styles={wHFull}>
-                <View style={[wFull, hFull, flex, flexCol, itemsStart, justifyEnd, { gap: 40, height: 'auto' }]}>
-                    <View style={[flexCol, { gap: 2 }]}>
-                        <Text style={signUpTitle}>Create a</Text>
-                        <Text style={signUpTitle}>new account</Text>
-                    </View>
+                <Formik
+                    initialValues={{
+                        email: 'adeshinaadam03@gmail.com',
+                        password: 'Yindeish03@',
+                        confirmedPassword: 'Yindeish03@',
+                        gender: 'Male',
+                        profileName: 'Yindeish',
+                        phoneNumber: '0814778236',
+                        agree: true,
+                    }}
+                    validationSchema={SignupSchema}
+                    onSubmit={values => {
+                        signUp(values)
+                    }}
+                >
+                    {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
+                        <View style={[wFull, hFull, flex, flexCol, itemsStart, justifyEnd, pt(70), { gap: 40, height: 'auto' }]}>
+                            <View style={[flexCol, { gap: 2 }]}>
+                                <Text style={signUpTitle}>Create a</Text>
+                                <Text style={signUpTitle}>new account</Text>
+                            </View>
 
-                    <View style={[form, flexYCenter, { gap: 16 }]}>
-                        <TextInput
-                            style={[textInput]}
-                            placeholder='Profile name'
-                            underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={Colors.light.textGrey}
-                            value={profileName}
-                            autoFocus
-                            cursorColor={Colors.light.textGrey}
-                            onChangeText={(text) => onChange('profileName', text)}
-                        />
+                            <View style={[form, flexYCenter, { gap: 16 }]}>
+                                <TextInput
+                                    style={[textInput, (touched as any).profileName && errors.profileName && { borderColor: Colors.light.error }]}
+                                    placeholder='Profile name'
+                                    underlineColorAndroid={colors.transparent}
+                                    placeholderTextColor={Colors.light.textGrey}
+                                    value={values.profileName}
+                                    cursorColor={Colors.light.textGrey}
+                                    onChangeText={handleChange('profileName')}
+                                    onBlur={handleBlur('profileName')}
+                                />
+                                {touched.profileName && errors.profileName && <Text style={invalidEntryText}>{errors.profileName}</Text>}
 
-                        <TextInput
-                            style={[textInput]}
-                            placeholder='Email'
-                            underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={Colors.light.textGrey}
-                            value={email}
-                            cursorColor={Colors.light.textGrey}
-                            onChangeText={(text) => onChange('email', text)}
-                        />
+                                <TextInput
+                                    style={[textInput, (touched as any).email && errors.email && { borderColor: Colors.light.error }]}
+                                    placeholder='Email'
+                                    underlineColorAndroid={colors.transparent}
+                                    placeholderTextColor={Colors.light.textGrey}
+                                    value={values.email}
+                                    cursorColor={Colors.light.textGrey}
+                                    onChangeText={handleChange('email')}
+                                    onBlur={handleBlur('email')}
+                                />
+                                {touched.email && errors.email && <Text style={invalidEntryText}>{errors.email}</Text>}
 
-                        <TextInput
-                            style={[textInput]}
-                            placeholder='Phone number'
-                            underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={Colors.light.textGrey}
-                            value={phoneNumber}
-                            keyboardType='numeric'
-                            cursorColor={Colors.light.textGrey}
-                            onChangeText={(text) => onChange('phoneNumber', text)}
-                        />
+                                <TextInput
+                                    style={[textInput, (touched as any).phoneNumber && errors.phoneNumber && { borderColor: Colors.light.error }]}
+                                    placeholder='Phone number'
+                                    underlineColorAndroid={colors.transparent}
+                                    placeholderTextColor={Colors.light.textGrey}
+                                    value={values.phoneNumber}
+                                    keyboardType='numeric'
+                                    cursorColor={Colors.light.textGrey}
+                                    onChangeText={handleChange('phoneNumber')}
+                                    onBlur={handleBlur('phoneNumber')}
+                                />
+                                {touched.phoneNumber && errors.phoneNumber && <Text style={invalidEntryText}>{errors.phoneNumber}</Text>}
 
-                        <View
-                            style={[wFull, { height: 'auto' }]}
-                        >
-                            <Menu
-                                style={[genderMenuDropdown]}
-                                contentStyle={[genderMenuDropdown, wFull, { marginTop: 0 }]}
-                                visible={genderDropDownVisible}
-                                onDismiss={closeMenu}
-                                anchor={
-                                    <TouchableOpacity onPress={toggleMenu}>
-                                        <View style={[wFull, flex, itemsCenter, justifyBetween, textInput]}>
-                                            <Text style={[genderSelectText]}>
-                                                {gender !== '' ? gender : 'Select Gender'}
-                                            </Text>
+                                <View style={[wFull, { height: 'auto' }]}>
+                                    <Menu
+                                        style={[genderMenuDropdown]}
+                                        contentStyle={[genderMenuDropdown, wFull, { marginTop: 0 }]}
+                                        visible={genderDropDownVisible}
+                                        onDismiss={closeMenu}
+                                        anchor={
+                                            <TouchableOpacity onPress={toggleMenu}>
+                                                <View style={[wFull, flex, itemsCenter, justifyBetween, textInput, (touched as any).gender && errors.gender && { borderColor: Colors.light.error }]}>
+                                                    <Text style={[genderSelectText]}>
+                                                        {values.gender !== '' ? values.gender : 'Select Gender'}
+                                                    </Text>
 
-                                            <Entypo name="chevron-small-down" size={35} color={Colors.light.textGrey} />
-                                        </View>
-                                    </TouchableOpacity>
-                                }>
-                                {genders.map((gender, index) => (
-                                    <Menu.Item style={[menuItem, wFull,]} onPress={() => {
-                                        onChange('gender', gender);
-                                        closeMenu()
-                                    }} title={gender} key={index} />
-                                ))}
-                            </Menu>
+                                                    <Entypo name="chevron-small-down" size={35} color={Colors.light.textGrey} />
+                                                </View>
+                                            </TouchableOpacity>
+                                        }>
+                                        {genders.map((gender, index) => (
+                                            <Menu.Item contentStyle={[colorTextGrey]} style={[menuItem, wFull, colorTextGrey]} onPress={() => {
+                                                setFieldValue('gender', gender)
+                                                closeMenu()
+                                            }} title={<Text style={[menuItem, wFull, colorTextGrey]}>{gender}</Text>} key={index} />
+                                        ))}
+                                    </Menu>
+                                    {touched.gender && errors.gender && <Text style={invalidEntryText}>{errors.gender}</Text>}
+                                </View>
+
+                                <TextInput
+                                    style={[textInput, (touched as any).password && errors.password && { borderColor: Colors.light.error }]}
+                                    placeholder="Password"
+                                    underlineColorAndroid={colors.transparent}
+                                    placeholderTextColor={Colors.light.textGrey}
+                                    value={values.password}
+                                    secureTextEntry={secureTextEntry}
+                                    onChangeText={handleChange('password')}
+                                    onBlur={handleBlur('password')}
+                                />
+                                {touched.password && errors.password && <Text style={invalidEntryText}>{errors.password}</Text>}
+
+                                <TextInput
+                                    style={[textInput, (touched as any).confirmedPassword && errors.confirmedPassword && { borderColor: Colors.light.error }]}
+                                    placeholder="Confirm Password"
+                                    underlineColorAndroid={colors.transparent}
+                                    placeholderTextColor={Colors.light.textGrey}
+                                    value={values.confirmedPassword}
+                                    secureTextEntry={secureTextEntry}
+                                    onChangeText={handleChange('confirmedPassword')}
+                                    onBlur={handleBlur('confirmedPassword')}
+                                />
+                                {touched.confirmedPassword && errors.confirmedPassword && <Text style={invalidEntryText}>{errors.confirmedPassword}</Text>}
+
+                                <View style={[justifyStart, itemsCenter, wFull, flex, { gap: 12 }]}>
+                                    <Checkbox
+                                        style={checkbox}
+                                        value={values.agree}
+                                        onValueChange={() => setFieldValue('agree', !values.agree)}
+                                        color={Colors.light.background}
+                                    />
+
+                                    <View style={[flex, itemsCenter, gap(2)]}>
+                                        <Text style={{ color: colors.black }}>I accept Tfare's</Text>
+                                        <Text style={{ color: Colors.light.background }}>terms and Condition</Text>
+                                    </View>
+                                </View>
+                                {touched.agree && errors.agree && <Text style={invalidEntryText}>{errors.agree}</Text>}
+                            </View>
+
+                            <View style={[wFull, flex, flexCol, justifyCenter, { gap: 16 }]}>
+                                <TouchableOpacity onPress={() => handleSubmit()} style={[signUpBtn, flexCenter]}>
+                                    {signiningUp ? <ActivityIndicator color={colors.white} size={'small'} /> : <Text style={signUpText}>Sign Up</Text>}
+                                </TouchableOpacity>
+                                {code === 400 && <Text style={invalidEntryText}>{msg}</Text>}
+                                <Text style={noAccount}>Already have an account?
+                                    <Text onPress={() => router.push('/signin')} style={[signupLink]}> Sign In</Text>
+                                </Text>
+                            </View>
                         </View>
+                    )}
+                </Formik>
 
-                        <TextInput
-                            style={[textInput, invalidEntry && { borderColor: Colors.light.error }]}
-                            placeholder="Password"
-                            underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={Colors.light.textGrey}
-                            value={password}
-                            secureTextEntry={secureTextEntry}
-                            onChangeText={(text) => onChange('password', text)}
-                        />
-
-                        <TextInput
-                            style={[textInput, invalidEntry && { borderColor: Colors.light.error }]}
-                            placeholder="Confirm Password"
-                            underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={Colors.light.textGrey}
-                            value={confirmedPassword}
-                            secureTextEntry={secureTextEntry}
-                            onChangeText={(text) => onChange('confirmedPassword', text)}
-                        />
-
-                        <View style={[wFull, flex, itemsCenter, justifyStart]}>
-                            {invalidEntry && (<Text style={invalidEntryText}>Passwords don't match</Text>)}
-                        </View>
-
-                        <Text style={[noAccount, mRAuto]}>
-                            <Checkbox
-                                style={checkbox}
-                                value={agree}
-                                onValueChange={setAgree}
-                                color={agree ? Colors.light.background : colors.grey500}
-                            />
-                            I accept Tfare's
-                            <Link href={'/'}>
-                                <Text style={signupLink}>terms and conditions</Text>
-                            </Link>
-                        </Text>
-                    </View>
-
-                    <Pressable onPress={() => router.push(pages.securityQuestion)} style={[wFull, signUpBtn, flex, itemsCenter, justifyCenter]}>
-                        <Text style={[flexCenter, signUpText]}>Create</Text>
-                    </Pressable>
-
-                    <Text style={[noAccount, mXAuto]}>
-                        You have an account?
-                        <Link href={'/signin'}>
-                            <Text style={signupLink}>Sign In</Text>
-                        </Link>
-                    </Text>
-                </View>
+                {/* Snackbar */}
+                <Snackbar
+                    style={[]}
+                    visible={snackbarVisible}
+                    onDismiss={() => closeSnackbar()}
+                    action={{
+                        label: 'close',
+                        onPress: () => {
+                        },
+                    }}>
+                    {msg}
+                </Snackbar>
+                {/* Snackbar */}
             </PaddedScreen>
-        </SafeScreen>
+        </SafeScreen >
     )
 }

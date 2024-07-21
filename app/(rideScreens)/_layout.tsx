@@ -11,19 +11,19 @@ import { images } from '@/constants/images';
 
 
 export default function AppLayout() {
-  const { session, isLoading } = useSession();
+  const { userSession, isLoading } = useSession();
 
   const { width, height } = Dimensions.get('window');
 
   useEffect(() => {
-    console.log({ session })
-  }, [session])
+    console.log({ userSession })
+  }, [userSession])
 
   if (isLoading) {
     return <View style={{ width, height, backgroundColor: '#D8D8D8' }} />;
   }
 
-  if (!session) {
+  if (!userSession) {
     return <Redirect href="/(auth)/signin" />;
   }
 

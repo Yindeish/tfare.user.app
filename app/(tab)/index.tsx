@@ -1,7 +1,5 @@
 import { Text, TouchableOpacity, View, Image, StyleSheet, ScrollView } from 'react-native';
-import { useSession } from '../../contexts/userSignedInContext';
-import { useSession as useTokenSession } from '../../contexts/userTokenContext';
-import React from 'react';
+import React, { useEffect } from 'react';
 import SafeScreen from '@/components/shared/safeScreen';
 import { flex, flexCol, itemsCenter, justifyCenter, wFull, wHFull } from '@/utils/styles';
 import Colors, { colors } from '@/constants/Colors';
@@ -12,11 +10,8 @@ import { images } from '@/constants/images';
 import { fonts } from '@/constants/fonts';
 import TripHistory from '@/components/tab/home/TripHistory';
 import { colorWhite, fs12, fw500, neurialGrotesk } from '@/utils/fontStyles';
-import { router } from 'expo-router';
 import { pages } from '@/constants/pages';
-import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
-import { openBottomSheet, setBottomSheetSnapPoint, setBottomSheetType } from '@/state/slices/layout';
-import { setCurrentRideView } from '@/state/slices/ride';
+import { router } from 'expo-router';
 
 const { orderRideBtn, orderRideText } = StyleSheet.create({
     orderRideBtn: {
@@ -34,9 +29,7 @@ const { orderRideBtn, orderRideText } = StyleSheet.create({
 });
 
 export default function Index() {
-    const { signOut } = useSession();
-    const { signOut: signOutToken } = useTokenSession();
-    const dispatch = useAppDispatch()
+
     return (
         <SafeScreen>
             <ScrollView style={[wHFull, flexCol,]}>
