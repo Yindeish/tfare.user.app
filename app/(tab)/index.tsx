@@ -1,6 +1,4 @@
 import { Text, TouchableOpacity, View, Image, StyleSheet, ScrollView } from 'react-native';
-import { useSession } from '../../contexts/userSignedInContext';
-import { useSession as useTokenSession } from '../../contexts/userTokenContext';
 import React, { useEffect } from 'react';
 import SafeScreen from '@/components/shared/safeScreen';
 import { flex, flexCol, itemsCenter, justifyCenter, wFull, wHFull } from '@/utils/styles';
