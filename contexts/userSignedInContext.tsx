@@ -5,6 +5,7 @@ import URLS from '@/constants/urls';
 import FetchService from '@/services/api/fetch.service';
 import { IUser, IUserAccount } from '@/state/types/account';
 import { useSession as useTokenSession } from './userTokenContext';
+import { Platform, ToastAndroid } from 'react-native';
 
 interface ISignInData {
   email: string, password: string
@@ -21,6 +22,7 @@ interface IRequestState {
   signiningIn: boolean,
   msg: string,
   code: number | null,
+  snackbarVisible: boolean
 }
 
 const SessionContext = React.createContext<{
@@ -31,6 +33,8 @@ const SessionContext = React.createContext<{
   signiningIn: boolean,
   msg: string,
   code: number | null,
+  snackbarVisible: boolean,
+  closeSnackbar: Function
 }>({
   signIn: () => null,
   signOut: () => null,
@@ -39,6 +43,8 @@ const SessionContext = React.createContext<{
   signiningIn: false,
   code: null,
   msg: '',
+  closeSnackbar: () => null,
+  snackbarVisible: false
 });
 
 export function useSession() {
@@ -60,10 +66,25 @@ export function SessionProvider(props: React.PropsWithChildren) {
     signiningIn: false,
     msg: '',
     code: null,
+    snackbarVisible: false
   })
-  const { code, msg, signiningIn } = requestState;
+  const { code, msg, signiningIn, snackbarVisible } = requestState;
 
   const onChange = (key: keyof IRequestState, value: string | number | boolean) => setRequestState((prev) => ({ ...prev, [key]: value }));
+
+  const notify = (timeout: number = 2000) => {
+    onChange('snackbarVisible', true);
+
+    setTimeout(() => {
+      onChange('snackbarVisible', false)
+      onChange('msg', '');
+    }, timeout);
+    if (Platform.OS == 'android') ToastAndroid.show(msg, ToastAndroid.SHORT)
+  }
+
+  const closeSnackbar = () => {
+    onChange('snackbarVisible', false);
+  }
 
   const signIn = async (data: ISignInData) => {
     onChange('signiningIn', true);
@@ -76,6 +97,10 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
     returnedData.user && setSession(JSON.stringify(returnedData.user));
     returnedData.user && signInwithToken(returnedData.token);
+
+    if (!returnedData.user || !returnedData.token) {
+      notify();
+    }
   }
 
   const signOut = () => {
@@ -97,6 +122,8 @@ export function SessionProvider(props: React.PropsWithChildren) {
         signiningIn,
         code,
         msg,
+        closeSnackbar,
+        snackbarVisible
       }}>
       {props.children}
     </SessionContext.Provider>

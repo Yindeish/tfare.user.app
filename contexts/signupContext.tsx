@@ -71,10 +71,12 @@ export function SignupProvider(props: React.PropsWithChildren) {
     const notify = (timeout: number = 2000) => {
         onChange('snackbarVisible', true);
 
-        setTimeout(() => onChange('snackbarVisible', false), timeout);
+        setTimeout(() => {
+            onChange('snackbarVisible', false)
+            onChange('msg', '');
+        }, timeout);
         if (Platform.OS == 'android') ToastAndroid.show(msg, ToastAndroid.SHORT)
     }
-
 
     const closeSnackbar = () => {
         onChange('snackbarVisible', false);

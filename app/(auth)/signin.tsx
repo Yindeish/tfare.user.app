@@ -2,9 +2,8 @@ import { View, Pressable, StyleSheet, TextInput } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Link, Redirect, router } from 'expo-router'
 import { useSession } from '../../contexts/userSignedInContext';
-import { useSession as useTokenSession } from '../../contexts/userTokenContext';
 import SafeScreen from '../../components/shared/safeScreen';
-import { ActivityIndicator, MD2Colors, Text } from 'react-native-paper';
+import { ActivityIndicator, MD2Colors, Snackbar, Text } from 'react-native-paper';
 import { fonts } from '../../constants/fonts';
 import { bg, flex, flexCenter, flexCol, flexYCenter, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, mLAuto, mXAuto, pAuto, pLAuto, wFull, wHFull } from '../../utils/styles';
 import Colors, { colors } from '../../constants/Colors';
@@ -32,7 +31,6 @@ const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noA
         paddingTop: 'auto',
         paddingBottom: 'auto',
         backgroundColor: '#F9F7F8',
-        fontFamily: fonts.neurialGrotesk,
     },
     forgotPassword: {
         fontFamily: fonts.neurialGrotesk,
@@ -55,7 +53,6 @@ const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noA
         lineHeight: 23.76
     },
     noAccount: {
-        fontFamily: fonts.neurialGrotesk,
         fontWeight: '400',
         fontSize: 14,
         lineHeight: 16.66,
@@ -84,8 +81,7 @@ interface ISigninFormData {
 }
 
 export default function signin() {
-    const { signIn, signiningIn, userSession, msg, code, } = useSession();
-    const { signIn: signInwithToken, tokenSession, isLoading: TokenIsLoading } = useTokenSession();
+    const { signIn, signiningIn, userSession, msg, code, closeSnackbar, snackbarVisible } = useSession();
 
     // if there's user
     if (userSession) return <Redirect href="/(tab)/" />;
@@ -184,6 +180,20 @@ export default function signin() {
                         </Link>
                     </Text>
                 </View>
+
+                {/* Snackbar */}
+                <Snackbar
+                    style={[]}
+                    visible={snackbarVisible}
+                    onDismiss={() => closeSnackbar()}
+                    action={{
+                        label: 'close',
+                        onPress: () => {
+                        },
+                    }}>
+                    {msg}
+                </Snackbar>
+                {/* Snackbar */}
             </PaddedScreen>
         </SafeScreen>
     )
