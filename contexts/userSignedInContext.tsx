@@ -11,7 +11,7 @@ interface ISignInData {
 }
 
 interface ISignInResponse {
-  code: 200,
+  code: number,
   msg: string,
   user: Partial<IUser>,
   token: string

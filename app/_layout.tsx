@@ -8,9 +8,9 @@ import React from 'react';
 import { Provider } from 'react-redux'
 import { store } from '@/state/store';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-// import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import * as SplashScreen from 'expo-splash-screen';
 import { BottomSheetProvider } from '@/contexts/useBottomSheetContext';
+import { SignupProvider } from '@/contexts/signupContext';
 
 export default function Root() {
 
@@ -27,17 +27,17 @@ export default function Root() {
   return (
     <Provider store={store}>
       <GestureHandlerRootView>
-        {/* <BottomSheetModalProvider> */}
         <BottomSheetProvider>
           <PaperProvider>
-            <TokenSessionProvider>
-              <SessionProvider>
-                <Slot />
-              </SessionProvider>
-            </TokenSessionProvider>
+            <SignupProvider>
+              <TokenSessionProvider>
+                <SessionProvider>
+                  <Slot />
+                </SessionProvider>
+              </TokenSessionProvider>
+            </SignupProvider>
           </PaperProvider>
         </BottomSheetProvider>
-        {/* </BottomSheetModalProvider> */}
       </GestureHandlerRootView>
     </Provider>
   );
