@@ -20,6 +20,7 @@ interface ISignInResponse {
 
 interface IRequestState {
   signiningIn: boolean,
+  signiningOut: boolean,
   msg: string,
   code: number | null,
   snackbarVisible: boolean
@@ -31,6 +32,7 @@ const SessionContext = React.createContext<{
   userSession?: string | null,
   isLoading: boolean,
   signiningIn: boolean,
+  signiningOut: boolean,
   msg: string,
   code: number | null,
   snackbarVisible: boolean,
@@ -41,6 +43,7 @@ const SessionContext = React.createContext<{
   userSession: null,
   isLoading: false,
   signiningIn: false,
+  signiningOut: false,
   code: null,
   msg: '',
   closeSnackbar: () => null,
@@ -60,15 +63,16 @@ export function useSession() {
 
 export function SessionProvider(props: React.PropsWithChildren) {
   const [[isLoading, session], setSession] = useStorageState('userSignedIn');
-  const { signIn: signInwithToken, tokenSession, isLoading: TokenIsLoading } = useTokenSession();
+  const { signIn: signInwithToken, signOut: signTokenOut, tokenSession } = useTokenSession();
 
   const [requestState, setRequestState] = useState<IRequestState>({
     signiningIn: false,
     msg: '',
     code: null,
-    snackbarVisible: false
+    snackbarVisible: false,
+    signiningOut: false
   })
-  const { code, msg, signiningIn, snackbarVisible } = requestState;
+  const { code, msg, signiningIn, snackbarVisible, signiningOut } = requestState;
 
   const onChange = (key: keyof IRequestState, value: string | number | boolean) => setRequestState((prev) => ({ ...prev, [key]: value }));
 
@@ -103,13 +107,21 @@ export function SessionProvider(props: React.PropsWithChildren) {
     }
   }
 
-  const signOut = () => {
-    // AxiosService.post({
-    //   url: '/auth/signin'
-    // })
+  const signOut = async () => {
+    onChange('signiningOut', true);
 
-    // token is set here
-    setSession(null);
+    const returnedData: ISignInResponse = await FetchService.postWithBearerToken({ url: '/auth/signout', token: tokenSession as string })
+
+    onChange('signiningOut', false);
+    onChange('code', returnedData.code);
+    onChange('msg', returnedData.msg);
+    if (Number(returnedData.code) === 400) {
+      notify();
+    }
+    if (Number(returnedData.code) === 200) {
+      setSession(null);
+      // signTokenOut(); just signout user
+    }
   }
 
   return (
@@ -123,7 +135,8 @@ export function SessionProvider(props: React.PropsWithChildren) {
         code,
         msg,
         closeSnackbar,
-        snackbarVisible
+        snackbarVisible,
+        signiningOut
       }}>
       {props.children}
     </SessionContext.Provider>

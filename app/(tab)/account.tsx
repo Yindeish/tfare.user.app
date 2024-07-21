@@ -1,10 +1,9 @@
 import { Image, View, TouchableOpacity, ScrollView, Pressable } from 'react-native'
-import { Button, Text } from 'react-native-paper'
+import { ActivityIndicator, Button, Snackbar, Text } from 'react-native-paper'
 import React, { useEffect } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import { image, wHFull } from '@/utils/imageStyles'
-import PageFloatingTitle from '@/components/page/pageFloatingTitle'
-import { bg, flex, flexCenter, flexCol, gap, h, itemsCenter, justifyBetween, mr, mt, pb, px, py, relative, rounded, w, wFull } from '@/utils/styles'
+import { bg, flex, flexCenter, flexCol, gap, h, itemsCenter, justifyBetween, mb, mr, mt, pb, px, py, relative, rounded, w, wFull } from '@/utils/styles'
 import Colors, { colors } from '@/constants/Colors'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { images } from '@/constants/images'
@@ -14,11 +13,12 @@ import PageNavigator from '@/components/tab/account/pageNavigator'
 import { pages } from '@/constants/pages'
 import { router } from 'expo-router'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
-import { setUserAccount } from '@/state/slices/account'
 import PageTitle from '@/components/shared/pageTitle'
+import { useSession } from '@/contexts/userSignedInContext'
 
 export default function Account() {
     const dispatch = useAppDispatch()
+    const { signOut, signiningOut, snackbarVisible, closeSnackbar, msg } = useSession()
 
 
     return (
@@ -109,9 +109,30 @@ export default function Account() {
 
                             <PageNavigator navigate={false} title='Rate Us' source={images.rateStarImage} imageStyle={[image.w(18), image.h(17.13)]} />
 
-                            <Button
-                                labelStyle={[neurialGrotesk, fs14, fw500]}
-                                textColor={Colors.light.error}>Logout</Button>
+                            {!signiningOut ?
+                                (<Button
+                                    onPress={() => signOut()}
+                                    labelStyle={[neurialGrotesk, fs14, fw500]}
+                                    textColor={Colors.light.error}
+                                    style={[mb(20)]}
+                                >Logout</Button>)
+                                :
+                                (<ActivityIndicator style={[mb(20)]} color={Colors.light.background} size={'small'} />)
+                            }
+
+                            {/* Snackbar */}
+                            <Snackbar
+                                style={[]}
+                                visible={snackbarVisible}
+                                onDismiss={() => closeSnackbar()}
+                                action={{
+                                    label: 'close',
+                                    onPress: () => {
+                                    },
+                                }}>
+                                {msg}
+                            </Snackbar>
+                            {/* Snackbar */}
                         </View>
                     </View>
                 </PaddedScreen>

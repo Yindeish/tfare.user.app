@@ -97,13 +97,14 @@ const postWithBearerToken = async ({ data: formData, url, token, timeout = 10000
         controller.abort();
     }, timeout);
     try {
-        const response = await fetch(`${baseUrl}/${url}`, {
+        const response = await fetch(`${baseUrl}${url}`, {
+            method: methods.POST,
             headers: {
                 ...headers,
                 Authorization: `Bearer ${token}`
             },
             signal,
-            body: JSON.stringify(formData)
+            body: formData ? JSON.stringify(formData) : null
         });
         clearTimeout(fetchTimeout);
 
