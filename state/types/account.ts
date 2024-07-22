@@ -23,6 +23,7 @@ interface IUser {
     otpExpires: Date,
     gender: string,
     otp: string,
+    email: string,
     password: string,
     phoneNumber: string,
     profileName: string,

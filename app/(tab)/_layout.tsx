@@ -7,6 +7,8 @@ import Colors, { colors } from '@/constants/Colors';
 // import HomeSVG from '@/components/svg/home.svg';
 import TabBartTitle from '@/components/tab/tabTitle';
 import { images } from '@/constants/images';
+import { IUser } from '@/state/types/account';
+import { pages } from '@/constants/pages';
 
 
 export default function AppLayout() {
