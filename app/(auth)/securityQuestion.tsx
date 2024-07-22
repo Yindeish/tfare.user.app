@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import SafeScreen from '../../components/shared/safeScreen';
 import Colors, { colors } from '../../constants/Colors';
 import { fonts } from '../../constants/fonts';
 import { images } from '../../constants/images';
 import { questions } from '../../constants/securityQuestions';
-import { flex, flexCenter, flexCol, flexYCenter, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, mXAuto, pAuto, wFull, wHFull } from '../../utils/styles'
+import { flex, flexCenter, flexCol, flexYCenter, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, mXAuto, mt, pAuto, wFull, wHFull } from '../../utils/styles'
 import { Entypo } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
 import { View, StyleSheet, TextInput, TouchableOpacity, Pressable, Button, Image } from 'react-native'
 import { Menu, Text } from 'react-native-paper'
 import RBSheet from 'react-native-raw-bottom-sheet';
 import PaddedScreen from '@/components/shared/paddedScreen';
+import { c } from '@/utils/fontStyles';
+import { useSignup } from '@/contexts/signupContext';
+import { useBottomSheet } from '@/contexts/useBottomSheetContext';
+import SecurityQuestionSheet from '@/components/page/securityQuestionSheet';
 // import { Image, ImageStyle } from 'expo-image';
 
 const { securityQuestionTitle, textInput, questionSelectText, questionMenuDropdown, menuItem, form, signUpBtn, signUpText, bottomSheetImage, bottomSheetMessage } = StyleSheet.create({
@@ -35,14 +39,12 @@ const { securityQuestionTitle, textInput, questionSelectText, questionMenuDropdo
         paddingTop: 'auto',
         paddingBottom: 'auto',
         backgroundColor: '#F9F7F8',
-        fontFamily: fonts.neurialGrotesk,
     },
     questionSelectText: {
         textTransform: 'capitalize',
         paddingTop: 'auto',
         paddingBottom: 'auto',
         backgroundColor: '#F9F7F8',
-        fontFamily: fonts.neurialGrotesk,
         color: Colors.light.textGrey
     },
     questionMenuDropdown: {
@@ -80,6 +82,15 @@ const { securityQuestionTitle, textInput, questionSelectText, questionMenuDropdo
 });
 
 export default function SecurityQuestion() {
+    const { signedUpUser, setSecurityQuestion } = useSignup() //change the user here to signedup user
+    const { showBottomSheet, hideBottomSheet } = useBottomSheet()
+
+    useEffect(() => {
+        if (signedUpUser?.deactivated) {
+            showBottomSheet([637, 800], <SecurityQuestionSheet />)
+        }
+        showBottomSheet([637, 800], <SecurityQuestionSheet />) // for testing. remove this later
+    }, [signedUpUser])
 
     let [selectedAQuestion, setSelectedAQuestion] = useState(false);
     let [status, setStatus] = useState<'idle' | 'selected' | 'add_question'>('idle')
@@ -98,6 +109,8 @@ export default function SecurityQuestion() {
 
     const onChange = (key: string, value: string) => setFormData((prev) => ({ ...prev, [key]: value }));
 
+
+
     return (
         <SafeScreen>
             <PaddedScreen>
@@ -112,8 +125,8 @@ export default function SecurityQuestion() {
                             style={[wFull, { height: 'auto' }]}
                         >
                             <Menu
-                                style={[questionMenuDropdown]}
-                                contentStyle={[questionMenuDropdown, wFull, { marginTop: 0 }]}
+                                style={[questionMenuDropdown, h('auto')]}
+                                contentStyle={[questionMenuDropdown, wFull, h('auto'), { marginTop: 0, paddingTop: 0 }]}
                                 visible={questionDropDownVisible}
                                 onDismiss={closeMenu}
                                 anchor={
@@ -135,18 +148,13 @@ export default function SecurityQuestion() {
                                     </TouchableOpacity>
                                 }>
                                 {questions.map((question, index) => (
-                                    <Menu.Item style={[menuItem, wFull,]} onPress={() => {
+                                    <Menu.Item style={[menuItem, wFull, index > 0 && mt(-10)]} onPress={() => {
                                         onChange('question', question);
                                         setStatus('selected')
                                         closeMenu()
-                                    }} title={question} key={index} />
+                                    }} title={<Text style={[menuItem, wFull, c(Colors.light.textGrey)]}>{question}</Text>} key={index} />
                                 ))}
-                                <Menu.Item style={[menuItem, wFull,]} onPress={() => {
-                                    onChange('question', '');
-                                    setStatus('add_question')
-                                    closeMenu()
-                                }} title={'Add your Question'} />
-                                <Menu.Item style={[menuItem, wFull,]} onPress={() => {
+                                <Menu.Item style={[menuItem, wFull, mt(-10)]} onPress={() => {
                                     onChange('question', '');
                                     setStatus('add_question')
                                     closeMenu()
@@ -175,106 +183,10 @@ export default function SecurityQuestion() {
                         />
                     </View>
 
-                    <Pressable style={[wFull, flex, itemsCenter, justifyCenter, signUpBtn]}
-                        onPress={() => (refRBSheet?.current as any)?.open()}>
+                    <TouchableOpacity style={[wFull, flex, itemsCenter, justifyCenter, signUpBtn]}
+                        onPress={() => setSecurityQuestion({ email: signedUpUser?.email as string, securityAnswer: answer, securityQuestion: question })}>
                         <Text style={[signUpText]}>Confirm</Text>
-                    </Pressable>
-
-                    <RBSheet
-                        ref={refRBSheet as any}
-                        // useNativeDriver={true}
-                        draggable
-                        closeOnPressBack
-                        height={637}
-                        customStyles={{
-                            wrapper: {
-                                backgroundColor: colors.transparent,
-                            },
-                            draggableIcon: {
-                                backgroundColor: '#D7D7D7',
-                                width: 140,
-                                // height: 4,
-                                borderRadius: 100,
-                                marginTop: 10
-                            },
-                        }}
-                        customModalProps={{
-                            animationType: 'slide',
-                            statusBarTranslucent: true,
-                        }}
-                        customAvoidingViewProps={{
-                            enabled: false,
-                        }}
-                    >
-                        <View style={[wFull, hFull, flexCol, { gap: 38, paddingHorizontal: 20, paddingTop: 45, }]}>
-                            <Image
-                                source={images.robotassistanterror}
-                                style={[mXAuto as any, {
-                                    width: 81,
-                                    height: 117
-                                }]}
-                            />
-
-                            <View style={[flexCol, { gap: 2 }]}>
-                                <Text style={[bottomSheetMessage]}>Your account has been</Text>
-                                <Text style={[bottomSheetMessage]}>deactivated. Enter security</Text>
-                                <Text style={[bottomSheetMessage]}>question to activate</Text>
-                            </View>
-
-                            <View style={[form, flexYCenter, { gap: 16 }]}>
-                                <View
-                                    style={[wFull, { height: 'auto' }]}
-                                >
-                                    <Menu
-                                        style={[questionMenuDropdown]}
-                                        contentStyle={[questionMenuDropdown, wFull, { marginTop: 0 }]}
-                                        visible={questionDropDownVisible}
-                                        onDismiss={closeMenu}
-                                        anchor={
-                                            <TouchableOpacity onPress={toggleMenu}>
-                                                <View style={[wFull, flex, itemsCenter, justifyBetween, textInput]}>
-                                                    <Text style={[questionSelectText]}>
-                                                        {question !== '' ? question : 'Select Question'}
-                                                    </Text>
-
-                                                    <Entypo
-                                                        name="chevron-small-down"
-                                                        size={35}
-                                                        color={Colors.light.textGrey}
-                                                        style={{
-                                                            transform: [{ rotate: !questionDropDownVisible ? '0deg' : '180deg' }]
-                                                        }}
-                                                    />
-                                                </View>
-                                            </TouchableOpacity>
-                                        }>
-                                        {questions.map((question, index) => (
-                                            <Menu.Item style={[menuItem, wFull,]} onPress={() => {
-                                                onChange('question', question);
-                                                closeMenu()
-                                            }} title={question} key={index} />
-                                        ))}
-                                    </Menu>
-                                </View>
-
-                                <TextInput
-                                    style={[textInput]}
-                                    placeholder='Enter Answer'
-                                    underlineColorAndroid={colors.transparent}
-                                    placeholderTextColor={Colors.light.textGrey}
-                                    value={answer}
-                                    cursorColor={Colors.light.textGrey}
-                                    onChangeText={(text) => onChange('answer', text)}
-                                />
-                            </View>
-
-
-                            <Pressable style={[wFull, flex, itemsCenter, justifyCenter, signUpBtn]}
-                                onPress={() => (refRBSheet?.current as any)?.open()}>
-                                <Text style={[signUpText]}>Confirm</Text>
-                            </Pressable>
-                        </View>
-                    </RBSheet>
+                    </TouchableOpacity>
                 </View>
             </PaddedScreen>
         </SafeScreen>

@@ -60,6 +60,7 @@ import greenBgCheckboxImage from '../assets/images/icons/green-bg-checkbox-image
 import whiteBgTicketImage from '../assets/images/icons/white-bg-ticket-image.png';
 import greenBgCheckTripImage from '../assets/images/icons/green-bg-check-trip-image.png';
 import expandImage from '../assets/images/icons/expand-image.png';
+import comingSoonImage from '../assets/images/icons/coming-soon-image.png';
 
 
 const images = {
@@ -125,6 +126,7 @@ const images = {
     whiteBgTicketImage,
     greenBgCheckTripImage,
     expandImage,
+    comingSoonImage,
 }
 
 export { images }

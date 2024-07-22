@@ -1,53 +1,24 @@
 import React, { useState } from 'react';
 import { useStorageState } from '../hooks/useStorageState';
-import AxiosService from '@/services/api/axio.service';
-import URLS from '@/constants/urls';
 import FetchService from '@/services/api/fetch.service';
-import { IUser, IUserAccount } from '@/state/types/account';
 import { useSession as useTokenSession } from './userTokenContext';
 import { Platform, ToastAndroid } from 'react-native';
+import { pages } from '@/constants/pages';
+import { router } from 'expo-router';
+import { IContextState, IRequestData, ISigninContext, ISigninContextState, ISigninResponseData, TSigninLoadingState } from './signin.context.interface';
+import { IResponseData } from './shared.interface';
 
-interface ISignInData {
-  email: string, password: string
-}
-
-interface ISignInResponse {
-  code: number,
-  msg: string,
-  user: Partial<IUser>,
-  token: string
-}
-
-interface IRequestState {
-  signiningIn: boolean,
-  signiningOut: boolean,
-  msg: string,
-  code: number | null,
-  snackbarVisible: boolean
-}
-
-const SessionContext = React.createContext<{
-  signIn: (data: ISignInData) => void;
-  signOut: () => void,
-  userSession?: string | null,
-  isLoading: boolean,
-  signiningIn: boolean,
-  signiningOut: boolean,
-  msg: string,
-  code: number | null,
-  snackbarVisible: boolean,
-  closeSnackbar: Function
-}>({
+const SessionContext = React.createContext<ISigninContext>({
   signIn: () => null,
   signOut: () => null,
   userSession: null,
   isLoading: false,
-  signiningIn: false,
-  signiningOut: false,
   code: null,
   msg: '',
   closeSnackbar: () => null,
-  snackbarVisible: false
+  snackbarVisible: false,
+  user: null,
+  loadingState: 'idle'
 });
 
 export function useSession() {
@@ -65,16 +36,16 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const [[isLoading, session], setSession] = useStorageState('userSignedIn');
   const { signIn: signInwithToken, signOut: signTokenOut, tokenSession } = useTokenSession();
 
-  const [requestState, setRequestState] = useState<IRequestState>({
-    signiningIn: false,
+  const [requestState, setRequestState] = useState<ISigninContextState>({
     msg: '',
     code: null,
     snackbarVisible: false,
-    signiningOut: false
+    user: session ? JSON.parse(session as string) : null,
+    loadingState: 'idle'
   })
-  const { code, msg, signiningIn, snackbarVisible, signiningOut } = requestState;
+  const { code, msg, snackbarVisible, user, loadingState } = requestState;
 
-  const onChange = (key: keyof IRequestState, value: string | number | boolean) => setRequestState((prev) => ({ ...prev, [key]: value }));
+  const onChange = (key: keyof ISigninContextState, value: string | number | boolean | TSigninLoadingState) => setRequestState((prev) => ({ ...prev, [key]: value }));
 
   const notify = (timeout: number = 2000) => {
     onChange('snackbarVisible', true);
@@ -90,17 +61,19 @@ export function SessionProvider(props: React.PropsWithChildren) {
     onChange('snackbarVisible', false);
   }
 
-  const signIn = async (data: ISignInData) => {
-    onChange('signiningIn', true);
+  const signIn = async (data: IRequestData) => {
+    onChange('loadingState', 'signingin' as TSigninLoadingState);
 
-    const returnedData: ISignInResponse = await FetchService.post({ data, url: '/auth/signin' })
+    const returnedData: ISigninResponseData = await FetchService.post({ data, url: '/auth/signin' })
 
-    onChange('signiningIn', false);
-    onChange('code', returnedData.code);
+    onChange('loadingState', 'idle' as TSigninLoadingState);
+    onChange('code', returnedData.code as number);
     onChange('msg', returnedData.msg);
 
-    returnedData.user && setSession(JSON.stringify(returnedData.user));
-    returnedData.user && signInwithToken(returnedData.token);
+    returnedData.user && !returnedData.user.deactivated && setSession(JSON.stringify(returnedData.user));
+    returnedData.user && !returnedData.user.deactivated && signInwithToken(returnedData.token);
+
+    returnedData.user && returnedData.user.deactivated && router.replace(`/(auth)/${pages.securityQuestion}`);
 
     if (!returnedData.user || !returnedData.token) {
       notify();
@@ -108,13 +81,14 @@ export function SessionProvider(props: React.PropsWithChildren) {
   }
 
   const signOut = async () => {
-    onChange('signiningOut', true);
+    onChange('loadingState', 'signingout' as TSigninLoadingState);
 
-    const returnedData: ISignInResponse = await FetchService.postWithBearerToken({ url: '/auth/signout', token: tokenSession as string })
+    const returnedData: IResponseData = await FetchService.postWithBearerToken({ url: '/auth/signout', token: tokenSession as string })
 
-    onChange('signiningOut', false);
-    onChange('code', returnedData.code);
+    onChange('loadingState', 'idle' as TSigninLoadingState);
+    onChange('code', returnedData.code as number);
     onChange('msg', returnedData.msg);
+
     if (Number(returnedData.code) === 400) {
       notify();
     }
@@ -131,12 +105,12 @@ export function SessionProvider(props: React.PropsWithChildren) {
         signOut,
         userSession: session,
         isLoading,
-        signiningIn,
         code,
         msg,
         closeSnackbar,
         snackbarVisible,
-        signiningOut
+        user,
+        loadingState
       }}>
       {props.children}
     </SessionContext.Provider>

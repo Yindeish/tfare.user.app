@@ -18,8 +18,7 @@ import { useSession } from '@/contexts/userSignedInContext'
 
 export default function Account() {
     const dispatch = useAppDispatch()
-    const { signOut, signiningOut, snackbarVisible, closeSnackbar, msg } = useSession()
-
+    const { signOut, loadingState, snackbarVisible, closeSnackbar, msg, } = useSession()
 
     return (
         <SafeScreen>
@@ -109,7 +108,7 @@ export default function Account() {
 
                             <PageNavigator navigate={false} title='Rate Us' source={images.rateStarImage} imageStyle={[image.w(18), image.h(17.13)]} />
 
-                            {!signiningOut ?
+                            {loadingState === 'idle' ?
                                 (<Button
                                     onPress={() => signOut()}
                                     labelStyle={[neurialGrotesk, fs14, fw500]}

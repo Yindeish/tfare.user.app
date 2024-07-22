@@ -6,44 +6,21 @@ import FetchService from '@/services/api/fetch.service';
 import { IUser, IUserAccount } from '@/state/types/account';
 import { useSession as useTokenSession } from './userTokenContext';
 import { Platform, ToastAndroid } from 'react-native';
-import Snackbar from 'react-native-snackbar'
-import Colors from '@/constants/Colors';
+import { router } from 'expo-router';
+import { pages } from '@/constants/pages';
+import { IContextState, ISetSecurityQuestionRequestData, ISignUpRequestData, ISignUpResponseData, ISignupContext, ISignupContextState, TSignupLoadingState } from './signup.context.interface';
+import { IResponseData } from './shared.interface';
 
-interface ISignUpData {
-    email: string,
-    password: string,
-    gender: string,
-    profileName: string,
-    phoneNumber: string,
-    confirmedPassword: string,
-}
 
-interface ISignUpResponse {
-    code: number,
-    msg: string,
-}
-
-interface IRequestState {
-    signiningUp: boolean,
-    msg: string,
-    code: number | null,
-    snackbarVisible: boolean
-}
-
-const SignupContext = React.createContext<{
-    signUp: (data: ISignUpData) => void;
-    signiningUp: boolean,
-    msg: string,
-    code: number | null,
-    snackbarVisible: boolean,
-    closeSnackbar: Function
-}>({
+const SignupContext = React.createContext<ISignupContext>({
     signUp: () => null,
-    signiningUp: false,
+    loadingState: 'idle',
     code: null,
     msg: '',
     snackbarVisible: false,
-    closeSnackbar: () => null
+    closeSnackbar: () => null,
+    signedUpUser: null,
+    setSecurityQuestion: () => { }
 });
 
 export function useSignup() {
@@ -58,15 +35,16 @@ export function useSignup() {
 }
 
 export function SignupProvider(props: React.PropsWithChildren) {
-    const [requestState, setRequestState] = useState<IRequestState>({
-        signiningUp: false,
+    const [requestState, setRequestState] = useState<ISignupContextState>({
+        loadingState: 'idle',
         msg: '',
         code: null,
-        snackbarVisible: false
+        snackbarVisible: false,
+        signedUpUser: null,
     })
-    const { code, msg, signiningUp, snackbarVisible } = requestState;
+    const { code, msg, loadingState, snackbarVisible, signedUpUser } = requestState;
 
-    const onChange = (key: keyof IRequestState, value: string | number | boolean) => setRequestState((prev) => ({ ...prev, [key]: value }));
+    const onChange = (key: keyof ISignupContextState, value: string | number | boolean | IUser) => setRequestState((prev) => ({ ...prev, [key]: value }));
 
     const notify = (timeout: number = 2000) => {
         onChange('snackbarVisible', true);
@@ -82,26 +60,46 @@ export function SignupProvider(props: React.PropsWithChildren) {
         onChange('snackbarVisible', false);
     }
 
-    const signUp = async (data: ISignUpData) => {
-        onChange('signiningUp', true);
+    const signUp = async (data: ISignUpRequestData) => {
+        onChange('loadingState', 'signiningUp' as TSignupLoadingState);
 
-        const returnedData: ISignUpResponse = await FetchService.post({ data, url: '/auth/signup' })
+        const returnedData: ISignUpResponseData = await FetchService.post({ data, url: '/auth/signup' })
 
         notify();
-        onChange('signiningUp', false);
-        onChange('code', returnedData.code);
+        onChange('loadingState', 'idle' as TSignupLoadingState);
+        onChange('code', returnedData.code as number);
         onChange('msg', returnedData.msg);
+        onChange('signedUpUser', returnedData.signedUpUser as IUser);
+
+        if (returnedData.code === 201) router.replace(`/(auth)/${pages.securityQuestion}`);
+    }
+
+    const setSecurityQuestion = async (data: ISetSecurityQuestionRequestData) => {
+        console.log({ data })
+        onChange('loadingState', 'settingQuestion' as TSignupLoadingState);
+        // router.replace(`/(auth)/${pages.securityQuestion}`); // for testing. remove this later
+
+        const returnedData: IResponseData = await FetchService.post({ data, url: '/auth/set-security-question' })
+
+        notify();
+        onChange('loadingState', 'idle' as TSignupLoadingState);
+        onChange('code', returnedData.code as number);
+        onChange('msg', returnedData.msg);
+
+        if (returnedData.code === 200) router.replace(`/(auth)/${pages.securityQuestion}`);// for testing. modify this later
     }
 
     return (
         <SignupContext.Provider
             value={{
-                signiningUp,
+                loadingState,
                 signUp,
                 code,
                 msg,
                 snackbarVisible,
-                closeSnackbar
+                closeSnackbar,
+                signedUpUser,
+                setSecurityQuestion
             }}>
             {props.children}
         </SignupContext.Provider>

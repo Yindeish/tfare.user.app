@@ -81,7 +81,7 @@ interface ISigninFormData {
 }
 
 export default function signin() {
-    const { signIn, signiningIn, userSession, msg, code, closeSnackbar, snackbarVisible } = useSession();
+    const { signIn, loadingState, userSession, msg, code, closeSnackbar, snackbarVisible } = useSession();
 
     // if there's user
     if (userSession) return <Redirect href="/(tab)/" />;
@@ -165,8 +165,8 @@ export default function signin() {
                         </View>
                     </View>
 
-                    <Pressable style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]} disabled={signiningIn} onPress={() => commitSignin()}>
-                        {!signiningIn ?
+                    <Pressable style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]} disabled={loadingState === 'signingin'} onPress={() => commitSignin()}>
+                        {loadingState === 'idle' ?
                             (<Text style={[flex, itemsCenter, justifyCenter, signInText,]}>Sign In</Text>)
                             :
                             (<ActivityIndicator color={colors.white} size={'small'} />)
