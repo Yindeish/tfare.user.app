@@ -21,13 +21,13 @@ function UserBlock() {
         },
         greyText: {
             color: Colors.light.textGrey,
-            fontFamily: fonts.neurialGrotesk,
+            // fontFamily: fonts.neurialGrotesk,
             fontWeight: '400',
             fontSize: 12,
         },
         userNameText: {
             color: colors.black,
-            fontFamily: fonts.neurialGrotesk,
+            // fontFamily: fonts.neurialGrotesk,
             fontWeight: '700',
             fontSize: 14,
         },
@@ -55,7 +55,7 @@ function UserBlock() {
             paddingHorizontal: 16,
         },
         topupText: {
-            fontFamily: fonts.neurialGrotesk,
+            // fontFamily: fonts.neurialGrotesk,
             fontSize: 12,
             fontWeight: '500',
             color: colors.black

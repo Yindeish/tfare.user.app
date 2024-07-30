@@ -37,7 +37,7 @@ export default function Account() {
 
                                 <View style={[flexCol, gap(16)]}>
                                     <Text style={[c(Colors.light.textGrey), fs12, fw400, neurialGrotesk]}>Welcome back</Text>
-                                    <Text style={[colorBlack, neurialGrotesk, fw700, fs14]}>King John</Text>
+                                    <Text style={[colorBlack, fw700, fs14]}>King John</Text>
                                 </View>
                             </View>
 
@@ -57,7 +57,7 @@ export default function Account() {
 
                                 </View>
 
-                                <Text style={[neurialGrotesk, fw700, { fontSize: 22 }]}> ₦{'0000.00'}</Text>
+                                <Text style={[colorBlack, fw700, { fontSize: 22 }]}> ₦{'0000.00'}</Text>
                             </View>
 
                             <TouchableOpacity>

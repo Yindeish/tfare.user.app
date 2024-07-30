@@ -147,7 +147,8 @@ function Ride() {
 
                 {/* MapView */}
 
-                <MapView
+                {/* Disabling map on client for the moment */}
+                {/* <MapView
                     style={[mapView, wHFull]}
                     // customMapStyle={customMapStyle}
                     userInterfaceStyle='dark'
@@ -177,7 +178,9 @@ function Ride() {
                             description={`(${initialRegion?.latitude.toFixed(2)}),(${initialRegion?.longitude.toFixed(2)})`}
                         />
                     )}
-                </MapView>
+                </MapView> */}
+
+                <Image style={[image.w('100%'), image.h('100%'),]} source={images.mapImage} />
 
                 {/* MapView */}
 

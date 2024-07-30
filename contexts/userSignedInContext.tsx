@@ -70,10 +70,8 @@ export function SessionProvider(props: React.PropsWithChildren) {
     onChange('code', returnedData.code as number);
     onChange('msg', returnedData.msg);
 
-    returnedData.user && !returnedData.user.deactivated && setSession(JSON.stringify(returnedData.user));
-    returnedData.user && !returnedData.user.deactivated && signInwithToken(returnedData.token);
-
-    returnedData.user && returnedData.user.deactivated && router.replace(`/(auth)/${pages.securityQuestion}`);
+    returnedData.user && setSession(JSON.stringify(returnedData.user));
+    returnedData.user && signInwithToken(returnedData.token);
 
     if (!returnedData.user || !returnedData.token) {
       notify();

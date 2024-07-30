@@ -61,6 +61,7 @@ import whiteBgTicketImage from '../assets/images/icons/white-bg-ticket-image.png
 import greenBgCheckTripImage from '../assets/images/icons/green-bg-check-trip-image.png';
 import expandImage from '../assets/images/icons/expand-image.png';
 import comingSoonImage from '../assets/images/icons/coming-soon-image.png';
+import mapImage from '../assets/images/icons/map-image.png';
 
 
 const images = {
@@ -127,6 +128,7 @@ const images = {
     greenBgCheckTripImage,
     expandImage,
     comingSoonImage,
+    mapImage,
 }
 
 export { images }

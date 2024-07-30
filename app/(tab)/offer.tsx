@@ -37,7 +37,7 @@ export default function Offer() {
                             <View style={[wFull, h(50), rounded(10), p(16), flex, itemsCenter, gap(10), bg('#F9F7F8')]}>
 
                                 <TextInput
-                                    style={[fs14, fw500, neurialGrotesk, h(20), { color: false ? Colors.light.textGrey : Colors.light.error, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                                    style={[fs14, fw500, h(20), { color: false ? Colors.light.textGrey : Colors.light.error, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                                     keyboardType="number-pad"
                                     placeholderTextColor={Colors.light.textGrey}
                                     cursorColor={Colors.light.textGrey}
@@ -70,7 +70,7 @@ export default function Offer() {
 
                                 <View style={[flexCol, gap(12)]}>
                                     <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>Happy Eid Fitri</Text>
-                                    <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>20% off your rides</Text>
+                                    <Text style={[fw400, fs12, c(Colors.light.textGrey)]}>20% off your rides</Text>
                                 </View>
                             </View>
 
@@ -86,7 +86,7 @@ export default function Offer() {
 
                                 <View style={[flexCol, gap(12)]}>
                                     <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>Happy Eid Fitri</Text>
-                                    <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>20% off your rides</Text>
+                                    <Text style={[fw400, fs12, c(Colors.light.textGrey)]}>20% off your rides</Text>
                                 </View>
                             </View>
 

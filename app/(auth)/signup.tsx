@@ -101,7 +101,7 @@ const SignupSchema = yup.object().shape({
 });
 
 export default function signup() {
-    const { signUp, signiningUp, code, msg, snackbarVisible, closeSnackbar } = useSignup()
+    const { signUp, loadingState, code, msg, snackbarVisible, closeSnackbar } = useSignup()
     const [secureTextEntry, setSecureTextEntry] = useState(true)
     const [genderDropDownVisible, setGenderDropDownVisible] = useState(false)
 
@@ -241,7 +241,7 @@ export default function signup() {
 
                             <View style={[wFull, flex, flexCol, justifyCenter, { gap: 16 }]}>
                                 <TouchableOpacity onPress={() => handleSubmit()} style={[signUpBtn, flexCenter]}>
-                                    {signiningUp ? <ActivityIndicator color={colors.white} size={'small'} /> : <Text style={signUpText}>Sign Up</Text>}
+                                    {loadingState === 'signiningUp' ? <ActivityIndicator color={colors.white} size={'small'} /> : <Text style={signUpText}>Sign Up</Text>}
                                 </TouchableOpacity>
                                 {code === 400 && <Text style={invalidEntryText}>{msg}</Text>}
                                 <Text style={noAccount}>Already have an account?

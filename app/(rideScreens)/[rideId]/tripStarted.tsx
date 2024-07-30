@@ -12,13 +12,12 @@ import { absolute, bg, flex, flexCol, gap, h, itemsCenter, justifyStart, l, px, 
 import { useEffect, useState } from "react";
 import { Image, View } from "react-native";
 import { Text } from "react-native-paper";
-import BottomSheet from '@/components/shared/bottomSheet';
 import MapView, { Marker } from 'react-native-maps';
 import { CancelRide, TripCompletedSheet, TripStartedSheet } from "@/components/page/tripStartedBottomSheetComponents";
-import BottomSheetModal from "@/components/shared/bottomSheetModal";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
 import { closeBottomSheet, closeModal, openBottomSheet, openModal } from "@/state/slices/layout";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
+import PageTitle from "@/components/shared/pageTitle";
 
 type Region = {
     latitude: number;
@@ -31,7 +30,7 @@ function TripStarted() {
     const dispatch = useAppDispatch()
     const { } = LayoutSelectors();
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput } } = RideSelectors()
-    const { showBottomSheet, setBottomSheetType, bottomSheetType } = useBottomSheet()
+    const { showBottomSheet, setBottomSheetType, bottomSheetType, hideBottomSheet } = useBottomSheet()
 
     useEffect(() => {
         showBottomSheet([480], <TripStartedSheet />)
@@ -61,6 +60,14 @@ function TripStarted() {
     return (
         <SafeScreen>
             <View style={[wHFull, bg(colors.transparent), relative]}>
+
+                <PaddedScreen>
+                    <PageTitle
+                        title=""
+                        onPress={hideBottomSheet}
+                    />
+                </PaddedScreen>
+
                 {/* Drop off inputs block */}
 
                 {true
@@ -83,7 +90,8 @@ function TripStarted() {
 
                 {/* MapView */}
 
-                <MapView
+                {/* Disabling map on client for the moment */}
+                {/* <MapView
                     style={[wHFull]}
                     // customMapStyle={customMapStyle}
                     userInterfaceStyle='dark'
@@ -113,7 +121,9 @@ function TripStarted() {
                             description={`(${initialRegion?.latitude.toFixed(2)}),(${initialRegion?.longitude.toFixed(2)})`}
                         />
                     )}
-                </MapView>
+                </MapView> */}
+
+                <Image style={[image.w('100%'), image.h('100%'), image.bg('red'),]} source={images.mapImage} />
 
                 {/* MapView */}
             </View>

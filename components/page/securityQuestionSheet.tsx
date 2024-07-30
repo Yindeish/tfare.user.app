@@ -10,7 +10,6 @@ import { useRef, useState } from 'react';
 import { View, StyleSheet, TextInput, TouchableOpacity, Pressable, Button, Image } from 'react-native'
 import { Menu, Text } from 'react-native-paper'
 import { useBottomSheet } from '@/contexts/useBottomSheetContext';
-// import RBSheet from 'react-native-raw-bottom-sheet';
 
 
 const { securityQuestionTitle, textInput, questionSelectText, questionMenuDropdown, menuItem, form, signUpBtn, signUpText, bottomSheetImage, bottomSheetMessage } = StyleSheet.create({

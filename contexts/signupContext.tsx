@@ -35,16 +35,16 @@ export function useSignup() {
 }
 
 export function SignupProvider(props: React.PropsWithChildren) {
-    const [requestState, setRequestState] = useState<ISignupContextState>({
+    const [contextState, setContextState] = useState<ISignupContextState>({
         loadingState: 'idle',
         msg: '',
         code: null,
         snackbarVisible: false,
         signedUpUser: null,
     })
-    const { code, msg, loadingState, snackbarVisible, signedUpUser } = requestState;
+    const { code, msg, loadingState, snackbarVisible, signedUpUser } = contextState;
 
-    const onChange = (key: keyof ISignupContextState, value: string | number | boolean | IUser) => setRequestState((prev) => ({ ...prev, [key]: value }));
+    const onChange = (key: keyof ISignupContextState, value: string | number | boolean | IUser | TSignupLoadingState) => setContextState((prev) => ({ ...prev, [key]: value }));
 
     const notify = (timeout: number = 2000) => {
         onChange('snackbarVisible', true);
@@ -64,6 +64,7 @@ export function SignupProvider(props: React.PropsWithChildren) {
         onChange('loadingState', 'signiningUp' as TSignupLoadingState);
 
         const returnedData: ISignUpResponseData = await FetchService.post({ data, url: '/auth/signup' })
+        console.log({ returnedData })
 
         notify();
         onChange('loadingState', 'idle' as TSignupLoadingState);
@@ -75,18 +76,17 @@ export function SignupProvider(props: React.PropsWithChildren) {
     }
 
     const setSecurityQuestion = async (data: ISetSecurityQuestionRequestData) => {
-        console.log({ data })
         onChange('loadingState', 'settingQuestion' as TSignupLoadingState);
-        // router.replace(`/(auth)/${pages.securityQuestion}`); // for testing. remove this later
 
         const returnedData: IResponseData = await FetchService.post({ data, url: '/auth/set-security-question' })
+        console.log({ returnedData })
 
         notify();
         onChange('loadingState', 'idle' as TSignupLoadingState);
         onChange('code', returnedData.code as number);
         onChange('msg', returnedData.msg);
 
-        if (returnedData.code === 200) router.replace(`/(auth)/${pages.securityQuestion}`);// for testing. modify this later
+        if (returnedData.code === 200) router.replace(`/(auth)/${pages.signin}`);
     }
 
     return (

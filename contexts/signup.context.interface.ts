@@ -11,7 +11,7 @@ interface ISignUpRequestData extends IRequestData {
 }
 
 interface ISetSecurityQuestionRequestData extends Pick<IRequestData, 'email'> {
-    securityQuestion: string
+    securityQuestion: string,
     securityAnswer: string
 }
 
