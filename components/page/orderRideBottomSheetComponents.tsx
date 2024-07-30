@@ -1,6 +1,6 @@
 import { View, Image, TextInput, TouchableOpacity, ScrollView, FlatList, Pressable, Button, Dimensions, Keyboard } from "react-native";
 import PaddedScreen from "../shared/paddedScreen";
-import { absolute, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsEnd, itemsStart, justifyBetween, justifyCenter, justifyStart, left0, mLAuto, mRAuto, mXAuto, ml, mt, p, pLAuto, pXAuto, pb, pl, px, py, relative, right0, rounded, t, top0, w, wFull, wHFull, zIndex } from "@/utils/styles";
+import { absolute, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsEnd, itemsStart, justifyBetween, justifyCenter, justifyStart, left0, mLAuto, mRAuto, mXAuto, mb, ml, mt, p, pLAuto, pXAuto, pb, pl, px, py, relative, right0, rounded, t, top0, w, wFull, wHFull, zIndex } from "@/utils/styles";
 import { Text, Portal, Dialog, Paragraph } from "react-native-paper";
 import { c, colorBlack, colorBlueBg, colorBorderGrey, colorWhite, fs12, fs14, fs16, fs18, fw400, fw500, fw700, neurialGrotesk } from "@/utils/fontStyles";
 import { images } from "@/constants/images";
@@ -18,32 +18,40 @@ import BottomSheet, { BottomSheetFlatList, BottomSheetView, BottomSheetTextInput
 import BottomSheetTitle from "../shared/bottomSheetTitle";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { pages } from "@/constants/pages";
+import { indices } from "@/constants/zIndices";
+import TextInputSuggestionBlock from "./textInputSuggestionBlock";
+import SavedBusstopListTile from "./savedBusstopListTile";
 
 const RecentLocationsSnippet = () => {
     const dispatch = useDispatch();
     const { showBottomSheet } = useBottomSheet();
     const { stateInput: { dropoffBusstopInput, pickupBusstopInput } } = RideSelectors();
+    // let [inputtingPickupBusstop, setInputtingPickupBusstop] = useState(false);
+    let [inputting, setInputting] = useState({
+        pickupBusstop: false,
+        dropoffBusstop: false,
+    });
 
     const DATA = [
         {
-            id: 0,
-            name: 'Home',
+            _id: '0',
+            busstopTitle: 'Home',
         },
         {
-            id: 1,
-            name: 'Apartment',
+            _id: '1',
+            busstopTitle: 'Apartment',
         },
         {
-            id: 2,
-            name: 'Workplace',
+            _id: '2',
+            busstopTitle: 'Workplace',
         },
         {
-            id: 3,
-            name: 'Workplace',
+            _id: '3',
+            busstopTitle: 'Workplace',
         },
         {
-            id: 4,
-            name: 'Workplace',
+            _id: '4',
+            busstopTitle: 'Workplace',
         },
     ]
 
@@ -53,6 +61,10 @@ const RecentLocationsSnippet = () => {
 
     const openRecentDropoffLocations = () => {
         showBottomSheet([508,], <RecentDropoffLocations />)
+    }
+
+    const searchBusstops = () => {
+
     }
 
     return (
@@ -71,7 +83,9 @@ const RecentLocationsSnippet = () => {
                             <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
                         </TouchableOpacity>
 
-                        <TextInput
+                        <BottomSheetTextInput
+                            onFocus={() => setInputting(prev => ({ ...prev, pickupBusstop: true }))}
+                            onBlur={() => setInputting(prev => ({ ...prev, pickupBusstop: false }))}
                             style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
@@ -87,21 +101,26 @@ const RecentLocationsSnippet = () => {
                         </TouchableOpacity>
                     </View>
 
+                    {/* Suggestion block */}
+                    <TextInputSuggestionBlock
+                        list={{
+                            array: [],
+                        }}
+                        visibilityCondtion={inputting.pickupBusstop}
+                    />
+                    {/* Suggestion block */}
+
                     <FlatList
                         style={[wFull, h(46), flex, gap(16),]}
                         horizontal
                         data={DATA}
                         renderItem={({ item }) => (
-                            <TouchableOpacity onPress={() => dispatch(setStateInputField({ key: 'pickupBusstopInput', value: item.name }))}>
-                                <View style={[w(98), hFull, rounded(100), py(16), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
-                                    <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item.name}</Text>
-                                </View>
-                            </TouchableOpacity>
+                            <SavedBusstopListTile item={item} onPress={() => { }} />
                         )}
                         ItemSeparatorComponent={() => (
                             <View style={[w(16), hFull, bg(colors.transparent)]} />
                         )}
-                        keyExtractor={(({ id }) => id.toString())}
+                        keyExtractor={(({ _id }) => _id)}
                     />
                 </View>
 
@@ -117,6 +136,8 @@ const RecentLocationsSnippet = () => {
                         <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
 
                         <BottomSheetTextInput
+                            onFocus={() => setInputting(prev => ({ ...prev, dropoffBusstop: true }))}
+                            onBlur={() => setInputting(prev => ({ ...prev, dropoffBusstop: false }))}
                             style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
@@ -130,21 +151,26 @@ const RecentLocationsSnippet = () => {
                         <Image style={[image.w(22), image.h(24)]} source={images.dropOffImage} />
                     </View>
 
+                    {/* Suggestion block */}
+                    <TextInputSuggestionBlock
+                        list={{
+                            array: [],
+                        }}
+                        visibilityCondtion={inputting.dropoffBusstop}
+                    />
+                    {/* Suggestion block */}
+
                     <FlatList
                         style={[wFull, h(46), flex, gap(16),]}
                         horizontal
                         data={DATA}
                         renderItem={({ item }) => (
-                            <TouchableOpacity onPress={() => dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: item.name }))}>
-                                <View style={[w(98), hFull, rounded(100), py(16), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
-                                    <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item.name}</Text>
-                                </View>
-                            </TouchableOpacity>
+                            <SavedBusstopListTile item={item} onPress={() => { }} />
                         )}
                         ItemSeparatorComponent={() => (
                             <View style={[w(16), hFull, bg(colors.transparent)]} />
                         )}
-                        keyExtractor={(({ id }) => id.toString())}
+                        keyExtractor={(({ _id }) => _id)}
                     />
                 </View>
 
@@ -209,7 +235,7 @@ const RecentPickupLocations = () => {
     return (
         <PaddedScreen>
             <View style={[flexCol, gap(56), mt(20),]}>
-                <View style={[flexCol, gap(20), relative]}>
+                <View style={[flexCol, gap(20),]}>
                     <BottomSheetTitle title="Pick up bus stop" onPressFn={() => {
                         showBottomSheet([601, 800], <RecentLocationsSnippet />)
                     }} />
@@ -233,15 +259,16 @@ const RecentPickupLocations = () => {
                         <Image style={[image.w(22), image.h(22)]} source={images.pickUpImage} />
                     </View>
 
-                    {inputtingPickupBusstop && <View style={[relative, wFull, h(10), mt(-32)]}>
-                        <ScrollView style={[absolute, top0, left0, zIndex(20), wFull, bg(colors.white), h(176), flexCol, gap(30), py(16), px(24), bg('#F9F7F8'), { borderBottomRightRadius: 10, borderBottomLeftRadius: 10 }]}>
-                            {['', '', '', '', '', '', '', ''].map((_, index) => (
-                                <Text style={[h(30)]} key={index}>meeee</Text>
-                            ))}
-                        </ScrollView>
-                    </View>}
+                    {/* Suggestion block */}
+                    <TextInputSuggestionBlock
+                        list={{
+                            array: [],
+                        }}
+                        visibilityCondtion={inputtingPickupBusstop}
+                    />
+                    {/* Suggestion block */}
 
-                    <View style={[wFull, h(bottomSheet.snapPoint === 5 ? '100%' : 350), flexCol, gap(32)]}>
+                    <View style={[wFull, h(inputtingPickupBusstop ? '40%' : '80%'), flexCol, gap(32), mt(inputtingPickupBusstop ? '40%' : 0)]}>
                         <View style={[wFull, flex, itemsCenter, gap(15)]}>
                             <Image style={[image.w(21.77), image.h(20)]} source={images.recentImage} />
 
@@ -401,15 +428,16 @@ const RecentDropoffLocations = () => {
                         <Image style={[image.w(22), image.h(22)]} source={images.dropOffImage} />
                     </View>
 
-                    {inputtingDropoffBuststop && <View style={[relative, wFull, h(10), mt(-32)]}>
-                        <ScrollView style={[absolute, top0, left0, zIndex(20), wFull, bg(colors.white), h(176), flexCol, gap(30), py(16), px(24), bg('#F9F7F8'), { borderBottomRightRadius: 10, borderBottomLeftRadius: 10 }]}>
-                            {['', '', '', '', '', '', '', ''].map((_, index) => (
-                                <Text style={[h(30)]} key={index}>meeee</Text>
-                            ))}
-                        </ScrollView>
-                    </View>}
+                    {/* Suggestion block */}
+                    <TextInputSuggestionBlock
+                        list={{
+                            array: [],
+                        }}
+                        visibilityCondtion={inputtingDropoffBuststop}
+                    />
+                    {/* Suggestion block */}
 
-                    <View style={[wFull, h(350), flexCol, gap(32)]}>
+                    <View style={[wFull, h(inputtingDropoffBuststop ? '40%' : '80%'), flexCol, gap(32), mt(inputtingDropoffBuststop ? '40%' : 0)]}>
                         <View style={[wFull, flex, itemsCenter, gap(15)]}>
                             <Image style={[image.w(21.77), image.h(20)]} source={images.recentImage} />
 
