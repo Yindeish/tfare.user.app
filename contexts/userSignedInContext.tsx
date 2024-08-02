@@ -94,6 +94,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
       setSession(null);
       // signTokenOut(); just signout user
     }
+
   }
 
   return (

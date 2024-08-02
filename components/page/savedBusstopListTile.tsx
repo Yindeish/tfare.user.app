@@ -16,7 +16,7 @@ const SavedBusstopListTile = ({ onPress, item }: { onPress: Function, item: IIte
     return (
         <TouchableOpacity onPress={() => onPress()}>
             <View style={[w('auto'), hFull, rounded(100), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
-                <Text style={[fw500, fs12, colorBlack]}>{'item.busstopTitle'}</Text>
+                <Text style={[fw500, fs12, colorBlack]}>{item.busstopTitle}</Text>
             </View>
         </TouchableOpacity>
     )

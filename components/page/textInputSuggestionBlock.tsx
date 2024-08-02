@@ -11,7 +11,8 @@ const TextInputSuggestionBlock = ({ visibilityCondtion, fnToRn, children, list }
         <>
             {visibilityCondtion && <View style={[wFull, h('auto'), mt(-32), mb('auto'),]}>
                 <ScrollView style={[wFull, bg(colors.white), h(176), flexCol, gap(30), py(16), px(16), bg('#F9F7F8'), { borderBottomRightRadius: 10, borderBottomLeftRadius: 10 }]}>
-                    {['', '', '', '', '', '', '', ''].map((_, index) => (
+                    {/* {['', '', '', '', '', '', '', ''].map((_, index) => ( */}
+                    {list.array.map((_, index) => (
                         <Text onPress={() => fnToRn && fnToRn()} style={[h(30), bg('#F9F7F8'),]} key={index}>{'meeee'}</Text>
                     ))}
                 </ScrollView>

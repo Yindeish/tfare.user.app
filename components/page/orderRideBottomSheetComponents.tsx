@@ -12,7 +12,7 @@ import { useDispatch } from "react-redux";
 import { } from "@/state/slices/layout";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
 import RideSelectors from "@/state/selectors/ride";
-import { setStateInputField, } from "@/state/slices/ride";
+import { setLoading, setSearchMatchBusstops, setStateInputField, } from "@/state/slices/ride";
 import { router } from "expo-router";
 import BottomSheet, { BottomSheetFlatList, BottomSheetView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import BottomSheetTitle from "../shared/bottomSheetTitle";
@@ -21,11 +21,24 @@ import { pages } from "@/constants/pages";
 import { indices } from "@/constants/zIndices";
 import TextInputSuggestionBlock from "./textInputSuggestionBlock";
 import SavedBusstopListTile from "./savedBusstopListTile";
+import FetchService from "@/services/api/fetch.service";
+import { useSession } from "@/contexts/userTokenContext";
+import { IResponseData } from "@/contexts/shared.interface";
+import { IBusStop } from "@/state/types/ride";
+
+interface ISearchBusstopResponseData extends IResponseData {
+    matchBusStops: IBusStop[]
+}
+
+interface ISearchBusstopRequestData extends IResponseData {
+    matchBusStops: IBusStop[]
+}
 
 const RecentLocationsSnippet = () => {
     const dispatch = useDispatch();
     const { showBottomSheet } = useBottomSheet();
-    const { stateInput: { dropoffBusstopInput, pickupBusstopInput } } = RideSelectors();
+    const { tokenSession } = useSession()
+    const { stateInput: { dropoffBusstopInput, pickupBusstopInput, }, searchMatchBusstops } = RideSelectors();
     // let [inputtingPickupBusstop, setInputtingPickupBusstop] = useState(false);
     let [inputting, setInputting] = useState({
         pickupBusstop: false,
@@ -63,8 +76,24 @@ const RecentLocationsSnippet = () => {
         showBottomSheet([508,], <RecentDropoffLocations />)
     }
 
-    const searchBusstops = () => {
+    const searchBusstops = async (searchValue: string) => {
+        dispatch(setLoading({
+            status: 'pending', type: 'searchingBusstop'
+        }))
 
+        const returnedData: ISearchBusstopResponseData = await FetchService.getWithBearerToken({ url: `/ride/busstop/search?searchValue=${searchValue}`, token: tokenSession as string, })
+
+        if (returnedData.matchBusStops) {
+            dispatch(setLoading({
+                status: 'succeeded', type: 'searchingBusstop'
+            }))
+            dispatch(setSearchMatchBusstops(returnedData.matchBusStops))
+        }
+        else {
+            dispatch(setLoading({
+                status: 'failed', type: 'searchingBusstop'
+            }))
+        }
     }
 
     return (
@@ -86,13 +115,14 @@ const RecentLocationsSnippet = () => {
                         <BottomSheetTextInput
                             onFocus={() => setInputting(prev => ({ ...prev, pickupBusstop: true }))}
                             onBlur={() => setInputting(prev => ({ ...prev, pickupBusstop: false }))}
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            style={[fs14, fw500, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
                             value={pickupBusstopInput}
                             onChangeText={(text) => {
                                 dispatch(setStateInputField({ key: 'pickupBusstopInput', value: text }));
+                                searchBusstops(pickupBusstopInput)
                             }}
                         />
 
@@ -104,7 +134,7 @@ const RecentLocationsSnippet = () => {
                     {/* Suggestion block */}
                     <TextInputSuggestionBlock
                         list={{
-                            array: [],
+                            array: searchMatchBusstops,
                         }}
                         visibilityCondtion={inputting.pickupBusstop}
                     />
@@ -138,13 +168,14 @@ const RecentLocationsSnippet = () => {
                         <BottomSheetTextInput
                             onFocus={() => setInputting(prev => ({ ...prev, dropoffBusstop: true }))}
                             onBlur={() => setInputting(prev => ({ ...prev, dropoffBusstop: false }))}
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            style={[fs14, fw500, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Destination"
                             value={dropoffBusstopInput}
                             onChangeText={(text) => {
                                 dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: text }));
+                                searchBusstops(dropoffBusstopInput)
                             }}
                         />
 
@@ -154,7 +185,7 @@ const RecentLocationsSnippet = () => {
                     {/* Suggestion block */}
                     <TextInputSuggestionBlock
                         list={{
-                            array: [],
+                            array: searchMatchBusstops,
                         }}
                         visibilityCondtion={inputting.dropoffBusstop}
                     />
@@ -248,7 +279,7 @@ const RecentPickupLocations = () => {
                         <BottomSheetTextInput
                             onFocus={() => setInputtingPickupBusstop(true)}
                             onBlur={() => setInputtingPickupBusstop(false)}
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            style={[fs14, fw500, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
@@ -417,7 +448,7 @@ const RecentDropoffLocations = () => {
                         <BottomSheetTextInput
                             onFocus={() => setInputtingDropoffBuststop(true)}
                             onBlur={() => setInputtingDropoffBuststop(false)}
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            style={[fs14, fw500, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
@@ -550,8 +581,8 @@ const FilledForm = () => {
                             <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
                         </TouchableOpacity>
 
-                        <TextInput
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                        <BottomSheetTextInput
+                            style={[fs14, fw500, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
@@ -583,7 +614,7 @@ const FilledForm = () => {
                         </TouchableOpacity>
 
                         <BottomSheetTextInput
-                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            style={[fs14, fw500, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Destination"
@@ -639,11 +670,11 @@ const RideRouteDetails = () => {
                             <View style={[flex, h(14.73), gap(4), itemsCenter]}>
                                 <Image style={[image.w(18), image.h(14.73)]} source={images.passengersImage} />
 
-                                <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.border)]}>4 seats</Text>
+                                <Text style={[fw400, fs12, c(Colors.light.border)]}>4 seats</Text>
                             </View>
                         </View>
 
-                        <Text style={[neurialGrotesk, fw400, fs14, colorBlack]}> ₦600.00</Text>
+                        <Text style={[fw400, fs14, colorBlack]}> ₦600.00</Text>
                     </View>
 
                     <View style={[wFull, py(20), flexCol, gap(16), { borderTopWidth: 0.7, borderTopColor: Colors.light.border, borderBottomWidth: 0.7, borderBottomColor: Colors.light.border, }]}>
@@ -653,7 +684,7 @@ const RideRouteDetails = () => {
                             <Image style={[image.w(14), image.h(10)]} source={images.rideOfferImage} />
 
                             <BottomSheetTextInput
-                                style={[fs14, fw500, neurialGrotesk, h(20), { color: false ? Colors.light.textGrey : Colors.light.error, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                                style={[fs14, fw500, h(20), { color: false ? Colors.light.textGrey : Colors.light.error, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                                 keyboardType="number-pad"
                                 placeholderTextColor={Colors.light.textGrey}
                                 cursorColor={Colors.light.textGrey}
@@ -716,7 +747,6 @@ const SearchingRide = () => {
                 <TouchableOpacity
                     onPress={() => {
                         hideBottomSheet();
-                        // dispatch(closeBottomSheet());
                         router.push(`/(tab)/`);
                     }} style={[bg('#F9F7F8'), wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
                     <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw700, fs16]}>Cancel</Text>

@@ -15,6 +15,11 @@
       "android": {
         "buildType": "apk"
       }
+    },
+    "iosTest": {
+      "ios": {
+        "simulator": true
+      }
     }
   },
   "submit": {

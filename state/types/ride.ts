@@ -1,5 +1,5 @@
 type TBusStop = 'pickupBusstop' | 'dropoffBusstop';
-type TLoadingStatus = 'idle' | 'succeeded' | 'failed';
+type TLoadingStatus = 'idle' | 'succeeded' | 'failed' | 'pending';
 type TLoadingType = string;
 type TCurrentrideView = 'orderRide' | 'availableRides';
 type TActiveTab = 'pending' | 'completed' | 'cancelled';
