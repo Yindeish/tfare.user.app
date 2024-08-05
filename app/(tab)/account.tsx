@@ -1,4 +1,4 @@
-import { Image, View, TouchableOpacity, ScrollView, Pressable } from 'react-native'
+import { Image, View, TouchableOpacity, ScrollView, Pressable, Platform } from 'react-native'
 import { ActivityIndicator, Button, Snackbar, Text } from 'react-native-paper'
 import React, { useEffect } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
@@ -120,7 +120,7 @@ export default function Account() {
                             }
 
                             {/* Snackbar */}
-                            <Snackbar
+                            {Platform.OS === 'ios' && <Snackbar
                                 style={[]}
                                 visible={snackbarVisible}
                                 onDismiss={() => closeSnackbar()}
@@ -130,7 +130,7 @@ export default function Account() {
                                     },
                                 }}>
                                 {msg}
-                            </Snackbar>
+                            </Snackbar>}
                             {/* Snackbar */}
                         </View>
                     </View>

@@ -18,7 +18,6 @@ interface ISigninContext extends ISigninContextState {
     signOut: () => void,
     isLoading: boolean,
     userSession: string | null,
-    closeSnackbar: Function,
 }
 
 // types

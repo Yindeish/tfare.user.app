@@ -9,7 +9,6 @@ interface IResponseData {
 }
 
 interface IContextState extends IResponseData {
-    snackbarVisible: boolean,
 }
 
 // interfaces

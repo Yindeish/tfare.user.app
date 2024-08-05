@@ -26,7 +26,6 @@ interface ISignupContextState extends IContextState {
 
 interface ISignupContext extends ISignupContextState {
     signUp: (data: ISignUpRequestData) => void;
-    closeSnackbar: Function,
     signedUpUser: IUser | null,
     setSecurityQuestion: (data: ISetSecurityQuestionRequestData) => void;
 }
@@ -34,4 +33,4 @@ interface ISignupContext extends ISignupContextState {
 // types
 export { TSignupLoadingState }
 // interfaces
-export type { IContextState, ISignUpRequestData, ISignUpResponseData, ISignupContext, ISignupContextState, ISetSecurityQuestionRequestData }
+export type { ISignUpRequestData, ISignUpResponseData, ISignupContext, ISignupContextState, ISetSecurityQuestionRequestData }

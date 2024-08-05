@@ -1,4 +1,4 @@
-import { View, Pressable, StyleSheet, TextInput } from 'react-native'
+import { View, Pressable, StyleSheet, TextInput, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Link, Redirect, router } from 'expo-router'
 import { useSession } from '../../contexts/userSignedInContext';
@@ -8,6 +8,7 @@ import { fonts } from '../../constants/fonts';
 import { bg, flex, flexCenter, flexCol, flexYCenter, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, mLAuto, mXAuto, pAuto, pLAuto, wFull, wHFull } from '../../utils/styles';
 import Colors, { colors } from '../../constants/Colors';
 import PaddedScreen from '@/components/shared/paddedScreen';
+import { useSnackbar } from '@/contexts/snackbar.context';
 
 const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noAccount, signupLink, invalidEntryText } = StyleSheet.create({
     signInTitle: {
@@ -81,7 +82,8 @@ interface ISigninFormData {
 }
 
 export default function signin() {
-    const { signIn, loadingState, userSession, msg, code, closeSnackbar, snackbarVisible } = useSession();
+    const { signIn, loadingState, userSession, msg, code, } = useSession();
+    const { closeSnackbar, snackbarVisible } = useSnackbar()
 
     // if there's user
     if (userSession) return <Redirect href="/(tab)/" />;
@@ -182,7 +184,7 @@ export default function signin() {
                 </View>
 
                 {/* Snackbar */}
-                <Snackbar
+                {Platform.OS === 'ios' && <Snackbar
                     style={[]}
                     visible={snackbarVisible}
                     onDismiss={() => closeSnackbar()}
@@ -192,7 +194,7 @@ export default function signin() {
                         },
                     }}>
                     {msg}
-                </Snackbar>
+                </Snackbar>}
                 {/* Snackbar */}
             </PaddedScreen>
         </SafeScreen>

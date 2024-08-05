@@ -1,4 +1,4 @@
-import { View, Pressable, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import { View, Pressable, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native'
 import React, { useState } from 'react'
 import { Link, router } from 'expo-router'
 import { useSignup } from '@/contexts/signupContext'
@@ -14,6 +14,7 @@ import { bg, flex, flexCenter, flexCol, flexYCenter, gap, hFull, itemsCenter, it
 import { Formik } from 'formik'
 import * as yup from 'yup'
 import { c, colorTextGrey } from '@/utils/fontStyles'
+import { useSnackbar } from '@/contexts/snackbar.context'
 
 const { signUpTitle, textInput, genderSelectText, genderMenuDropdown, menuItem, form, signUpBtn, signUpText, noAccount, signupLink, invalidEntryText, checkbox } = StyleSheet.create({
     signUpTitle: {
@@ -101,7 +102,9 @@ const SignupSchema = yup.object().shape({
 });
 
 export default function signup() {
-    const { signUp, loadingState, code, msg, snackbarVisible, closeSnackbar } = useSignup()
+    const { signUp, loadingState, code, msg, } = useSignup()
+    const { closeSnackbar, snackbarVisible } = useSnackbar()
+
     const [secureTextEntry, setSecureTextEntry] = useState(true)
     const [genderDropDownVisible, setGenderDropDownVisible] = useState(false)
 
@@ -253,7 +256,7 @@ export default function signup() {
                 </Formik>
 
                 {/* Snackbar */}
-                <Snackbar
+                {Platform.OS === 'ios' && <Snackbar
                     style={[]}
                     visible={snackbarVisible}
                     onDismiss={() => closeSnackbar()}
@@ -263,7 +266,7 @@ export default function signup() {
                         },
                     }}>
                     {msg}
-                </Snackbar>
+                </Snackbar>}
                 {/* Snackbar */}
             </PaddedScreen>
         </SafeScreen >

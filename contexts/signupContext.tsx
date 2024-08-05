@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
-import { useStorageState } from '../hooks/useStorageState';
-import AxiosService from '@/services/api/axio.service';
-import URLS from '@/constants/urls';
 import FetchService from '@/services/api/fetch.service';
-import { IUser, IUserAccount } from '@/state/types/account';
-import { useSession as useTokenSession } from './userTokenContext';
+import { IUser } from '@/state/types/account';
 import { Platform, ToastAndroid } from 'react-native';
 import { router } from 'expo-router';
 import { pages } from '@/constants/pages';
-import { IContextState, ISetSecurityQuestionRequestData, ISignUpRequestData, ISignUpResponseData, ISignupContext, ISignupContextState, TSignupLoadingState } from './signup.context.interface';
+import { ISetSecurityQuestionRequestData, ISignUpRequestData, ISignUpResponseData, ISignupContext, ISignupContextState, TSignupLoadingState } from './signup.context.interface';
 import { IResponseData } from './shared.interface';
+import { useSnackbar } from './snackbar.context';
 
 
 const SignupContext = React.createContext<ISignupContext>({
@@ -17,8 +14,6 @@ const SignupContext = React.createContext<ISignupContext>({
     loadingState: 'idle',
     code: null,
     msg: '',
-    snackbarVisible: false,
-    closeSnackbar: () => null,
     signedUpUser: null,
     setSecurityQuestion: () => { }
 });
@@ -39,25 +34,21 @@ export function SignupProvider(props: React.PropsWithChildren) {
         loadingState: 'idle',
         msg: '',
         code: null,
-        snackbarVisible: false,
         signedUpUser: null,
     })
-    const { code, msg, loadingState, snackbarVisible, signedUpUser } = contextState;
+    const { code, msg, loadingState, signedUpUser } = contextState;
+    const { closeSnackbar, openSnackbar, snackbarVisible } = useSnackbar()
 
     const onChange = (key: keyof ISignupContextState, value: string | number | boolean | IUser | TSignupLoadingState) => setContextState((prev) => ({ ...prev, [key]: value }));
 
     const notify = (timeout: number = 2000) => {
-        onChange('snackbarVisible', true);
+        openSnackbar()
 
         setTimeout(() => {
-            onChange('snackbarVisible', false)
+            closeSnackbar()
             onChange('msg', '');
         }, timeout);
         if (Platform.OS == 'android') ToastAndroid.show(msg, ToastAndroid.SHORT)
-    }
-
-    const closeSnackbar = () => {
-        onChange('snackbarVisible', false);
     }
 
     const signUp = async (data: ISignUpRequestData) => {
@@ -96,8 +87,6 @@ export function SignupProvider(props: React.PropsWithChildren) {
                 signUp,
                 code,
                 msg,
-                snackbarVisible,
-                closeSnackbar,
                 signedUpUser,
                 setSecurityQuestion
             }}>

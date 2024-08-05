@@ -3,10 +3,9 @@ import { useStorageState } from '../hooks/useStorageState';
 import FetchService from '@/services/api/fetch.service';
 import { useSession as useTokenSession } from './userTokenContext';
 import { Platform, ToastAndroid } from 'react-native';
-import { pages } from '@/constants/pages';
-import { router } from 'expo-router';
-import { IContextState, IRequestData, ISigninContext, ISigninContextState, ISigninResponseData, TSigninLoadingState } from './signin.context.interface';
+import { IRequestData, ISigninContext, ISigninContextState, ISigninResponseData, TSigninLoadingState } from './signin.context.interface';
 import { IResponseData } from './shared.interface';
+import { useSnackbar } from './snackbar.context';
 
 const SessionContext = React.createContext<ISigninContext>({
   signIn: () => null,
@@ -15,8 +14,6 @@ const SessionContext = React.createContext<ISigninContext>({
   isLoading: false,
   code: null,
   msg: '',
-  closeSnackbar: () => null,
-  snackbarVisible: false,
   user: null,
   loadingState: 'idle'
 });
@@ -35,30 +32,26 @@ export function useSession() {
 export function SessionProvider(props: React.PropsWithChildren) {
   const [[isLoading, session], setSession] = useStorageState('userSignedIn');
   const { signIn: signInwithToken, signOut: signTokenOut, tokenSession } = useTokenSession();
+  const { closeSnackbar, openSnackbar, snackbarVisible } = useSnackbar()
 
-  const [requestState, setRequestState] = useState<ISigninContextState>({
+  const [contextState, setRequestState] = useState<ISigninContextState>({
     msg: '',
     code: null,
-    snackbarVisible: false,
     user: session ? JSON.parse(session as string) : null,
     loadingState: 'idle'
   })
-  const { code, msg, snackbarVisible, user, loadingState } = requestState;
+  const { code, msg, user, loadingState } = contextState;
 
   const onChange = (key: keyof ISigninContextState, value: string | number | boolean | TSigninLoadingState) => setRequestState((prev) => ({ ...prev, [key]: value }));
 
   const notify = (timeout: number = 2000) => {
-    onChange('snackbarVisible', true);
+    openSnackbar()
 
     setTimeout(() => {
-      onChange('snackbarVisible', false)
+      closeSnackbar()
       onChange('msg', '');
     }, timeout);
     if (Platform.OS == 'android') ToastAndroid.show(msg, ToastAndroid.SHORT)
-  }
-
-  const closeSnackbar = () => {
-    onChange('snackbarVisible', false);
   }
 
   const signIn = async (data: IRequestData) => {
@@ -106,8 +99,6 @@ export function SessionProvider(props: React.PropsWithChildren) {
         isLoading,
         code,
         msg,
-        closeSnackbar,
-        snackbarVisible,
         user,
         loadingState
       }}>

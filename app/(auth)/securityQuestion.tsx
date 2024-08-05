@@ -181,7 +181,7 @@ export default function SecurityQuestion() {
                                     onBlur={handleBlur('answer')}
                                 />
                                 {errors.answer && touched.answer && (
-                                    <Text style={{ color: 'red' }}>{errors.answer}</Text>
+                                    <Text style={{ color: 'red' }}>{errors.answer as string}</Text>
                                 )}
                             </View>
 
