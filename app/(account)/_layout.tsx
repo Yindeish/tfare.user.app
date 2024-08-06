@@ -15,10 +15,6 @@ export default function AppLayout() {
 
   const { width, height } = Dimensions.get('window');
 
-  useEffect(() => {
-    console.log({ userSession })
-  }, [userSession])
-
   if (isLoading) {
     return <View style={{ width, height, backgroundColor: '#D8D8D8' }} />;
   }

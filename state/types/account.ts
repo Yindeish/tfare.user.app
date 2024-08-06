@@ -1,5 +1,5 @@
 import { IFlutterwaveWallet, } from "./flutterwaveWallet";
-import { IBusStop, ILoading } from "./ride";
+import { IBusStop, ILoading, ISavedBusStop } from "./ride";
 
 type TProfileCta = 'edit' | 'save';
 
@@ -14,6 +14,12 @@ interface IUserNotification {
 interface IUserWallet extends Partial<IFlutterwaveWallet> {
 }
 
+interface IRider {
+    notification: IUserNotification,
+    emergencyContactsIds: string[],
+    savedAddresses: ISavedBusStop[]
+}
+
 interface IUser {
     __v: number,
     _id: string,
@@ -22,13 +28,17 @@ interface IUser {
     deleted: boolean,
     otpExpires: Date,
     gender: string,
+    picture: string,
+    avatar: string,
     otp: string,
     email: string,
     password: string,
     phoneNumber: string,
+    fullName: string,
     profileName: string,
     role: string,
     updatedAt: Date,
+    riderProfile?: IRider,
 }
 
 interface IUserAccount {
@@ -80,8 +90,10 @@ interface IStateInputAddNewContact {
     contactWhatsAppInput: string,
 }
 
-interface IStateInputSaveNewAddress extends Pick<IBusStop, 'routeName'> {
-    addressName: string,
+interface IStateInputSaveNewAddress {
+    userIdInput: string,
+    busstopTitleInput: string,
+    busStopInput: IBusStop | null,
 }
 
 interface IStateInputAcountSecurity {

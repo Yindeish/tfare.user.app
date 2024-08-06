@@ -4,16 +4,36 @@ type TLoadingType = string;
 type TCurrentrideView = 'orderRide' | 'availableRides';
 type TActiveTab = 'pending' | 'completed' | 'cancelled';
 type TCounterFareStatus = 'idle' | 'pending' | 'accepted' | 'rejected';
+type TCategoryOrigin = 'ajah' | 'lekki' | 'obalende' | 'cms';
+type TCategoryDestination = 'lekki' | 'obalende' | 'cms' | 'oshodi';
 
-interface IRoute {
-    routeName: string;
-    routeDesc: string;
-    routeDistance: string;
+// interface IRoute {
+//     routeName: string;
+//     routeDesc: string;
+//     routeDistance: string;
+// }
+
+// interface IBusStop extends Partial<IRoute> {
+//     type: TBusStop;
+//     saved?: boolean;
+// }
+
+interface IBusStop {
+    name: string,
+    order?: {
+        forward: { number: number },
+        backward: { number: number }
+    },
+    category?: {
+        origin: TCategoryOrigin,
+        destination: TCategoryDestination,
+    }
 }
 
-interface IBusStop extends Partial<IRoute> {
-    type: TBusStop;
-    saved?: boolean;
+interface ISavedBusStop {
+    userId: string,
+    busstopTitle: string,
+    busStop: IBusStop,
 }
 
 interface ILoading {
@@ -75,4 +95,8 @@ interface IRideState {
     allTicketsFilled: boolean,
 }
 
-export type { TBusStop, TLoadingStatus, IBusStop, ILoading, IRide, IRideState, TLoadingType, TCurrentrideView, ITicket, IRoute, TActiveTab, IStateInput, TCounterFareStatus }
+// Types
+export { TBusStop, TLoadingStatus, TCategoryDestination, TCategoryOrigin, TLoadingType, TCurrentrideView, TActiveTab, TCounterFareStatus }
+
+// Interfaces
+export type { IBusStop, ILoading, IRide, IRideState, ITicket, IStateInput, ISavedBusStop }
