@@ -1,5 +1,5 @@
-import { Image, View, } from 'react-native'
-import { Text } from 'react-native-paper'
+import { View, } from 'react-native'
+import { Text, } from 'react-native-paper'
 import React from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import PaddedScreen from '@/components/shared/paddedScreen'
@@ -17,12 +17,16 @@ import AccountSelectors from '@/state/selectors/account'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import { setProfileCta, setUserProfileInfo, setUserProfileInfoFeild } from '@/state/slices/account'
 import { IStateInputProfile } from '@/state/types/account'
+// import { launchImageLibrary, Asset } from 'react-native-image-picker';
+import { useSession } from '@/contexts/userSignedInContext'
+import { Image } from 'expo-image';
 
 export default function profileInfo() {
     const dispatch = useAppDispatch()
     const { profileCta, stateInput } = AccountSelectors();
+    const { user } = useSession()
 
-    const { emailInput, nameInput, phoneNoInput, userNameInput } = stateInput.profile;
+    const { emailInput, nameInput, phoneNoInput, userNameInput, avatarInput, imageInput } = stateInput.profile;
 
     const editProfile = () => {
         dispatch(setProfileCta('save'));
@@ -31,6 +35,28 @@ export default function profileInfo() {
     const saveProfile = () => {
         dispatch(setProfileCta('edit'));
     }
+
+    const pickImage = async () => {
+        // const result = await launchImageLibrary({
+        //     mediaType: 'photo',
+        //     selectionLimit: 1,
+        // });
+
+        // if (result.assets && result.assets.length > 0) {
+        //     const asset: Asset = result.assets[0];
+
+        //     dispatch(setUserProfileInfoFeild({ key: 'imageInput', value: asset.uri as string }))
+        // }
+    };
+
+    const generateAvatar = () => {
+        const AVATAR_API_URL = 'https://api.multiavatar.com'
+        const userProfileName = user?.profileName;
+        const userAvatar = `${AVATAR_API_URL}/${userProfileName}`;
+
+        dispatch(setUserProfileInfoFeild({ key: 'avatarInput', value: userAvatar }));
+    }
+
 
     return (
         <SafeScreen>
@@ -68,14 +94,14 @@ export default function profileInfo() {
                     {/* User avatar */}
 
                     <View style={[mt(28), flexCol, gap(16), itemsCenter, wFull, h(134)]}>
-                        <Image source={images.userProfileImage} style={[image.w(100), image.h(100), image.rounded(100)]} />
+                        {/* <Image source={imageInput !== '' || avatarInput !== '' ? { uri: imageInput || avatarInput } : images.fallbackAvatar} style={[image.w(100), image.h(100), image.rounded(100)]} /> */}
 
                         {profileCta === 'save' && <View style={[flex, itemsCenter, justifyCenter, gap(20)]}>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => pickImage()}>
                                 <Text style={[neurialGrotesk, fw500, fs14, c(Colors.light.background)]}>Upload picture</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => generateAvatar()}>
                                 <Text style={[neurialGrotesk, fw500, fs14, c(Colors.light.error)]}>Generate Avatar</Text>
                             </TouchableOpacity>
                         </View>}

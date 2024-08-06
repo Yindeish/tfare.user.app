@@ -62,6 +62,7 @@ import greenBgCheckTripImage from '../assets/images/icons/green-bg-check-trip-im
 import expandImage from '../assets/images/icons/expand-image.png';
 import comingSoonImage from '../assets/images/icons/coming-soon-image.png';
 import mapImage from '../assets/images/icons/map-image.png';
+import fallbackAvatar from '../assets/images/fallback_avatar.jpg'
 
 
 const images = {
@@ -129,6 +130,7 @@ const images = {
     expandImage,
     comingSoonImage,
     mapImage,
+    fallbackAvatar,
 }
 
 export { images }

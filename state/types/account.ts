@@ -69,6 +69,8 @@ interface IStateInputProfile {
     userNameInput: string,
     emailInput: string,
     phoneNoInput: string,
+    imageInput: string,
+    avatarInput: string
 }
 
 interface IStateInputAddNewContact {

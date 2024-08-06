@@ -31,6 +31,8 @@ const profile: IStateInputProfile = {
     nameInput: '',
     phoneNoInput: '',
     userNameInput: '',
+    avatarInput: '',
+    imageInput: ''
 };
 
 const saveNewAddress: IStateInputSaveNewAddress = {

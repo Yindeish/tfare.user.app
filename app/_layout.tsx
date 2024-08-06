@@ -12,15 +12,20 @@ import * as SplashScreen from 'expo-splash-screen';
 import { BottomSheetProvider } from '@/contexts/useBottomSheetContext';
 import { SignupProvider } from '@/contexts/signupContext';
 import { SnackbarProvider } from '@/contexts/snackbar.context';
+import { Dimensions, View } from 'react-native';
 
 export default function Root() {
+  const { width, height } = Dimensions.get('window')
 
   const [fontsLoaded] = useFonts({
     [fonts.neurialGrotesk]: require('../assets/fonts/Fontspring-DEMO-neurialgrotesk-bold.otf'),
   });
 
   if (!fontsLoaded) {
-    return null;
+    console.log({ fontsLoaded })
+    // return null;
+    // SplashScreen.preventAutoHideAsync()
+    // return <View style={{ width, height, backgroundColor: '#D7D7D7' }} />;
   }
 
   SplashScreen.hideAsync();
