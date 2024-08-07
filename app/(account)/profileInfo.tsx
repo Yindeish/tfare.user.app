@@ -21,8 +21,8 @@ import { useSession } from '@/contexts/userSignedInContext'
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { UploadApiOptions, upload } from 'cloudinary-react-native'
-import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UNSIGNED_PRESET } from '@/cloudinary/cloudinary.constants'
-import cloudinary from '@/cloudinary/cloudinary.config'
+import CloudinaryServices from '@/cloudinary/cloudinary.services'
+
 
 export default function profileInfo() {
     const dispatch = useAppDispatch()
@@ -39,19 +39,6 @@ export default function profileInfo() {
         dispatch(setProfileCta('edit'));
     }
 
-    const uploadImage = async () => {
-        const options: UploadApiOptions = {
-            upload_preset: CLOUDINARY_UNSIGNED_PRESET,
-            unsigned: true,
-        }
-
-        await upload(cloudinary, {
-            file: imageInput, options: options, callback: (error: any, response: any) => {
-                if (response) dispatch(setUserProfileInfoFeild({ key: 'imageInput', value: response?.secure_url as string }))
-            }
-        });
-    }
-
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -62,7 +49,11 @@ export default function profileInfo() {
 
         if (!result.canceled) {
             dispatch(setUserProfileInfoFeild({ key: 'imageInput', value: result.assets[0].uri as string }))
-            uploadImage()
+            CloudinaryServices.uploadImage({
+                imagePath: imageInput, folderName: 'ridersImages', fnToRn: (value) => {
+                    dispatch(setUserProfileInfoFeild({ key: 'imageInput', value }))
+                }
+            })
         }
     };
 
