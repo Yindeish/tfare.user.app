@@ -1,6 +1,6 @@
 import { View, ImageSourcePropType } from 'react-native'
 import { Text, } from 'react-native-paper'
-import React from 'react'
+import React, { useEffect } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { image, wHFull } from '@/utils/imageStyles'
@@ -20,6 +20,9 @@ import { IStateInputProfile } from '@/state/types/account'
 import { useSession } from '@/contexts/userSignedInContext'
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
+import { UploadApiOptions, upload } from 'cloudinary-react-native'
+import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UNSIGNED_PRESET } from '@/cloudinary/cloudinary.constants'
+import cloudinary from '@/cloudinary/cloudinary.config'
 
 export default function profileInfo() {
     const dispatch = useAppDispatch()
@@ -36,6 +39,19 @@ export default function profileInfo() {
         dispatch(setProfileCta('edit'));
     }
 
+    const uploadImage = async () => {
+        const options: UploadApiOptions = {
+            upload_preset: CLOUDINARY_UNSIGNED_PRESET,
+            unsigned: true,
+        }
+
+        await upload(cloudinary, {
+            file: imageInput, options: options, callback: (error: any, response: any) => {
+                if (response) dispatch(setUserProfileInfoFeild({ key: 'imageInput', value: response?.secure_url as string }))
+            }
+        });
+    }
+
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -46,6 +62,7 @@ export default function profileInfo() {
 
         if (!result.canceled) {
             dispatch(setUserProfileInfoFeild({ key: 'imageInput', value: result.assets[0].uri as string }))
+            uploadImage()
         }
     };
 
@@ -96,13 +113,13 @@ export default function profileInfo() {
                     {/* User avatar */}
 
                     <View style={[mt(28), flexCol, gap(16), itemsCenter, wFull, h(134)]}>
-                        {user ?
-                            (<Image source={imageInput !== '' || avatarInput !== '' ? { uri: imageInput || avatarInput } : images.fallbackAvatar} style={[image.w(100), image.h(100), image.rounded(100)]} />)
+                        {(user?.picture || user?.avatar) ?
+                            (<Image source={user?.picture || user?.avatar} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                             :
                             (<Image source={imageInput !== '' || avatarInput !== '' ? { uri: imageInput || avatarInput } : images.fallbackAvatar} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                         }
 
-                        {profileCta === 'save' && <View style={[flex, itemsCenter, justifyCenter, gap(20)]}>
+                        {profileCta === 'save' && (!user?.picture || !user?.avatar) && <View style={[flex, itemsCenter, justifyCenter, gap(20)]}>
                             <TouchableOpacity onPress={() => pickImage()}>
                                 <Text style={[neurialGrotesk, fw500, fs14, c(Colors.light.background)]}>Upload picture</Text>
                             </TouchableOpacity>
