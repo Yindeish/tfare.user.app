@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, View, Image, StyleSheet, ScrollView } from 'react-native';
+import { Text, TouchableOpacity, View, StyleSheet, ScrollView } from 'react-native';
 import React, { useEffect } from 'react';
 import SafeScreen from '@/components/shared/safeScreen';
 import { flex, flexCol, itemsCenter, justifyCenter, wFull, wHFull } from '@/utils/styles';
@@ -12,9 +12,7 @@ import TripHistory from '@/components/tab/home/TripHistory';
 import { colorWhite, fs12, fw500, neurialGrotesk } from '@/utils/fontStyles';
 import { pages } from '@/constants/pages';
 import { router } from 'expo-router';
-import { useSession } from '@/contexts/userSignedInContext';
-import { useBottomSheet } from '@/contexts/useBottomSheetContext';
-import SecurityQuestionSheet from '@/components/page/securityQuestionSheet';
+import { Image } from 'expo-image';
 
 const { orderRideBtn, orderRideText } = StyleSheet.create({
     orderRideBtn: {

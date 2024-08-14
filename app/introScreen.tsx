@@ -1,17 +1,16 @@
-import { View, StyleSheet, Pressable, Image } from 'react-native'
+import { View, StyleSheet, Pressable, } from 'react-native'
 import { Text, Button, TouchableRipple, MD2Colors } from 'react-native-paper';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Swiper from 'react-native-swiper'
-import { useSession } from '@/contexts/userSignedInContext';
 import { Link, router } from 'expo-router';
 import { images } from '@/constants/images';
 import Colors, { colors } from '@/constants/Colors';
 import { fonts } from '@/constants/fonts';
 import SafeScreen from '@/components/shared/safeScreen';
-import PaddedScreen from '@/components/shared/paddedScreen';
-import { flex, flexCol, itemsCenter, justifyCenter, wFull, wHFull } from '@/utils/styles';
+import { bg, flex, flexCol, itemsCenter, justifyCenter, w, wFull, wHFull } from '@/utils/styles';
 import { colorWhite, fs14, fs18, fw400, fw700, neurialGrotesk } from '@/utils/fontStyles';
 import { pages } from '@/constants/pages';
+import { Image } from 'expo-image';
 
 const { container, containerWrapper, skipLink, skipText, slide, slideImage, slideText, text, wrapper, activeDotStyle, ctaBtn, ctaText } = StyleSheet.create({
     containerWrapper: {
@@ -20,7 +19,7 @@ const { container, containerWrapper, skipLink, skipText, slide, slideImage, slid
     skipLink: {
         marginLeft: 'auto',
         marginRight: 20,
-        marginTop: 102
+        marginTop: 102,
     },
     skipText: {
         lineHeight: 17,
@@ -70,7 +69,6 @@ const { container, containerWrapper, skipLink, skipText, slide, slideImage, slid
 
 export default function IntroScreen() {
 
-    const { signIn } = useSession();
     let [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
     return (
@@ -86,12 +84,16 @@ export default function IntroScreen() {
 
                 <View style={container}>
                     <Swiper
-                        loop={false}
                         style={wrapper}
                         showsButtons={false}
                         dotColor='white'
                         activeDotColor='#EF5DA8'
                         activeDotStyle={activeDotStyle}
+                        scrollEnabled={true}
+                        index={0}
+                        autoplay
+                        autoplayTimeout={1}
+                        loop={false}
                         onIndexChanged={(index) => {
                             setCurrentSlideIndex(index);
                         }}
@@ -120,18 +122,21 @@ export default function IntroScreen() {
                     </Swiper>
                 </View>
 
-                <View style={[flexCol, wFull, {
-                    opacity: currentSlideIndex === 2 ? 1 : 0, gap: 16, paddingHorizontal: 20
-                }]}>
-                    <TouchableRipple onPress={() => router.replace(pages.signup)} rippleColor={Colors.light.tabIconDefault} style={[ctaBtn, flexCol, wFull, itemsCenter, justifyCenter]}>
-                        <Text style={[fw700, fs18, colorWhite, neurialGrotesk,]}>Get Started</Text>
-                    </TouchableRipple>
+                {currentSlideIndex === 2 ?
+                    (<View style={[currentSlideIndex === 2 && flexCol, wFull, {
+                        opacity: currentSlideIndex === 2 ? 1 : 0, gap: 16, paddingHorizontal: 20, display: currentSlideIndex === 2 ? 'flex' : 'none'
+                    }]}>
+                        <TouchableRipple onPress={() => router.replace(`/(auth)/${pages.signup}`)} rippleColor={Colors.light.tabIconDefault} style={[ctaBtn, flexCol, wFull, itemsCenter, justifyCenter]}>
+                            <Text style={[fw700, fs18, colorWhite, neurialGrotesk,]}>Get Started</Text>
+                        </TouchableRipple>
 
-                    <TouchableRipple
-                        onPress={() => router.replace(pages.signin)} rippleColor={colors.white} style={[ctaBtn, flexCol, wFull, itemsCenter, justifyCenter, { backgroundColor: MD2Colors.transparent, borderWidth: 1, borderColor: MD2Colors.white }]}>
-                        <Text style={[fw700, fs18, colorWhite, neurialGrotesk,]}>Sign in</Text>
-                    </TouchableRipple>
-                </View>
+                        <TouchableRipple
+                            onPress={() => router.replace(`/(auth)/${pages.signin}`)} rippleColor={colors.white} style={[ctaBtn, flexCol, wFull, itemsCenter, justifyCenter, { backgroundColor: MD2Colors.transparent, borderWidth: 1, borderColor: MD2Colors.white }]}>
+                            <Text style={[fw700, fs18, colorWhite, neurialGrotesk,]}>Sign in</Text>
+                        </TouchableRipple>
+                    </View>)
+                    :
+                    (<View style={[wFull, bg('transparent'), { flex: 1 }]} />)}
             </View>
         </SafeScreen>
     )

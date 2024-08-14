@@ -7,6 +7,7 @@ import { IRequestData, ISigninContext, ISigninContextState, ISigninResponseData,
 import { IResponseData } from './shared.interface';
 import { useSnackbar } from './snackbar.context';
 import { IUser } from '@/state/types/account';
+import { router } from 'expo-router';
 
 const SessionContext = React.createContext<ISigninContext>({
   signIn: () => null,
@@ -79,11 +80,11 @@ export function SessionProvider(props: React.PropsWithChildren) {
     if (!returnedData.user || !returnedData.token) {
       notify();
     }
+
   }
 
   const signOut = async () => {
     onChange('loadingState', 'signingout' as TSigninLoadingState);
-
     const returnedData: IResponseData = await FetchService.postWithBearerToken({ url: '/auth/signout', token: tokenSession as string })
 
     onChange('loadingState', 'idle' as TSigninLoadingState);
@@ -97,6 +98,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
       setSession(null);
       // signTokenOut(); just signout user
     }
+
 
   }
 
