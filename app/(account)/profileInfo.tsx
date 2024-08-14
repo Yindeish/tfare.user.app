@@ -1,4 +1,4 @@
-import { View, ImageSourcePropType } from 'react-native'
+import { View, ImageSourcePropType, Image } from 'react-native'
 import { Text, } from 'react-native-paper'
 import React, { useEffect } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
@@ -18,7 +18,7 @@ import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import { setProfileCta, setUserProfileInfo, setUserProfileInfoFeild } from '@/state/slices/account'
 import { IStateInputProfile } from '@/state/types/account'
 import { useSession } from '@/contexts/userSignedInContext'
-import { Image } from 'expo-image';
+// import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { UploadApiOptions, upload } from 'cloudinary-react-native'
 import CloudinaryServices from '@/cloudinary/cloudinary.services'
@@ -48,9 +48,8 @@ export default function profileInfo() {
         });
 
         if (!result.canceled) {
-            dispatch(setUserProfileInfoFeild({ key: 'imageInput', value: result.assets[0].uri as string }))
             CloudinaryServices.uploadImage({
-                imagePath: imageInput, folderName: 'ridersImages', fnToRn: (value) => {
+                imagePath: result.assets[0].uri as string, folderName: 'ridersImages', fnToRn: (value) => {
                     dispatch(setUserProfileInfoFeild({ key: 'imageInput', value }))
                 }
             })
@@ -84,13 +83,13 @@ export default function profileInfo() {
 
                         {profileCta === 'edit' ?
                             (<TouchableOpacity onPress={editProfile} style={[flex, rounded(100), gap(10), py(13), px(26), itemsCenter, bg('#F9F7F8'), { borderColor: Colors.light.border, borderWidth: 0.7 }]}>
-                                <Image source={images.editBtnImage} style={[image.w(18), image.h(18),]} />
+                                <Image source={{ uri: images.editBtnImage }} style={[image.w(18), image.h(18),]} />
 
                                 <Text style={[neurialGrotesk, fs12, fw500, colorBlack]}>Edit</Text>
                             </TouchableOpacity>)
                             :
                             (<TouchableOpacity onPress={saveProfile} style={[flex, rounded(100), gap(10), py(13), px(26), itemsCenter, bg(Colors.light.background), { borderColor: Colors.light.border, borderWidth: 0.7 }]}>
-                                <Image source={images.whiteBgEditBtnImage} style={[image.w(18), image.h(18),]} />
+                                <Image source={{ uri: images.whiteBgEditBtnImage }} style={[image.w(18), image.h(18),]} />
 
                                 <Text style={[neurialGrotesk, fs12, fw500, colorWhite]}>Save</Text>
                             </TouchableOpacity>)
@@ -105,9 +104,9 @@ export default function profileInfo() {
 
                     <View style={[mt(28), flexCol, gap(16), itemsCenter, wFull, h(134)]}>
                         {(user?.picture || user?.avatar) ?
-                            (<Image source={user?.picture || user?.avatar} style={[image.w(100), image.h(100), image.rounded(100)]} />)
+                            (<Image source={{ uri: user?.picture || user?.avatar }} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                             :
-                            (<Image source={imageInput !== '' || avatarInput !== '' ? { uri: imageInput || avatarInput } : images.fallbackAvatar} style={[image.w(100), image.h(100), image.rounded(100)]} />)
+                            (<Image source={imageInput !== '' || avatarInput !== '' ? { uri: imageInput || avatarInput } : { uri: images.fallbackAvatar }} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                         }
 
                         {profileCta === 'save' && (!user?.picture || !user?.avatar) && <View style={[flex, itemsCenter, justifyCenter, gap(20)]}>
