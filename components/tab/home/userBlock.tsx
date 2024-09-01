@@ -70,7 +70,8 @@ function UserBlock() {
                         <TouchableOpacity>
                             <Image
                                 style={[{ width: 60, height: 60, objectFit: 'cover' }]}
-                                source={images.userProfileImage}
+                                // source={images.userProfileImage}
+                                source={require('@/assets/images/homeSreen/banner-image.png')}
                             />
                         </TouchableOpacity>
 
