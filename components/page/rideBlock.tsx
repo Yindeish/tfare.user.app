@@ -15,7 +15,7 @@ const RideBlock = ({ bgColor, ctaType, roundedCorners, ride, onPress, touchable 
         <View style={[wFull, h(45), flex, itemsCenter, justifyBetween, gap(14)]}>
             <View style={[flexCol, gap(12), itemsStart]}>
                 <Text style={[colorBlack, fw700, fs14]}>Rider #{ride?.id}</Text>
-                <Text style={[fw400, fs12, c(Colors.light.textGrey)]}>Honda Accord</Text>
+                <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Honda Accord</Text>
             </View>
 
             <View style={[w('auto'), h(45), rounded(100), flex, itemsCenter, gap(16), bg(colors.white), p(16), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
@@ -33,7 +33,7 @@ const RideBlock = ({ bgColor, ctaType, roundedCorners, ride, onPress, touchable 
 
                 <View style={[hFull, flex, itemsCenter, gap(12)]}>
                     <View style={[image.w(5), image.h(5), rounded(5), bg(colors.black)]} />
-                    <Text style={[colorBlack, fw500, fs14]}>{ride?.duration}</Text>
+                    <Text style={[colorBlack, neurialGrotesk, fw500, fs14]}>{ride?.duration}</Text>
                 </View>
             </View>
 

@@ -1,7 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ESlicesNames } from "../enums/slicesNames";
 import { IAccountState, IAddress, IStateInput, IStateInputAcountSecurity, IStateInputAddNewContact, IStateInputDeactivateAccount, IStateInputNotifications, IStateInputProfile, IStateInputSaveNewAddress, IUserAccount, IUserNotification, IUserWallet, TProfileCta } from "../types/account";
-import { IBusStop } from "../types/ride";
 
 
 const accountSecurity: IStateInputAcountSecurity = {
@@ -32,14 +31,11 @@ const profile: IStateInputProfile = {
     nameInput: '',
     phoneNoInput: '',
     userNameInput: '',
-    avatarInput: '',
-    imageInput: ''
 };
 
 const saveNewAddress: IStateInputSaveNewAddress = {
-    busStopInput: null,
-    busstopTitleInput: '',
-    userIdInput: ''
+    addressName: '',
+    routeName: ''
 };
 
 const initialState: IAccountState = {
@@ -66,26 +62,20 @@ const initialState: IAccountState = {
     loading: null,
     savedAddresses: [
         {
-            name: 'ajah',
-            category: {
-                destination: 'lekki',
-                origin: 'ajah'
-            },
-            order: {
-                backward: { number: 2 },
-                forward: { number: 1 }
-            }
+            name: 'badagry',
+            routeDesc: 'badagry desc',
+            routeDistance: '3km',
+            routeName: 'badagry rd',
+            saved: true,
+            type: 'pickupBusstop'
         },
         {
-            name: 'ajah',
-            category: {
-                destination: 'lekki',
-                origin: 'ajah'
-            },
-            order: {
-                backward: { number: 2 },
-                forward: { number: 1 }
-            }
+            name: 'ojo',
+            routeDesc: 'ojo desc',
+            routeDistance: '3km',
+            routeName: 'ojo rd',
+            saved: true,
+            type: 'dropoffBusstop'
         },
     ],
     userAccount: null,
@@ -111,10 +101,9 @@ const accountSlice = createSlice({
 
         seLoading: (state, action) => { },
 
-        setSaveAddressesField: (state, action: PayloadAction<{ key: keyof IStateInputSaveNewAddress, value: string | IBusStop | null }>) => {
+        setSaveAddressesField: (state, action: PayloadAction<{ key: keyof IStateInputSaveNewAddress, value: string }>) => {
             const { key, value } = action.payload;
-            if (key === 'userIdInput' || key === 'busstopTitleInput') state.stateInput.saveNewAddress[key] = value as string;
-            if (key === 'busStopInput') state.stateInput.saveNewAddress[key] = value as IBusStop | null;
+            state.stateInput.saveNewAddress[key] = value;
         },
 
         setSavedAddresses: (state, action: PayloadAction<IAddress[]>) => {

@@ -1,5 +1,5 @@
 import { Redirect, Stack, Tabs } from 'expo-router';
-import { Dimensions, View, Image } from 'react-native';
+import { Dimensions, View, } from 'react-native';
 import { useSession } from '../../contexts/userSignedInContext';
 import { tabs } from '@/constants/tabs';
 import Colors, { colors } from '@/constants/Colors';
@@ -9,6 +9,7 @@ import TabBartTitle from '@/components/tab/tabTitle';
 import { images } from '@/constants/images';
 import { IUser } from '@/state/types/account';
 import { pages } from '@/constants/pages';
+import { Image } from 'expo-image';
 
 
 export default function AppLayout() {
@@ -34,32 +35,34 @@ export default function AppLayout() {
         tabBarLabel: ({ color }) => <TabBartTitle title='Home' color={color} />,
         // tabBarIcon: ({ color }) => <HomeSVG width={20} height={20} />,
         // tabBarIcon: ({ color }) => <HomeSVG color={color} />,
-        //   tabBarIcon: ({ color, focused }) => <Image style={{ width: 18, height: 19.72 }} source={focused ? require('@/assets/images/icons/active-home-image.png') : require('@/assets/images/icons/home-image.png')} />,
+        tabBarIcon: ({ color, focused }) => <Image style={{ width: 18, height: 19.72 }} source={focused ? require('@/assets/images/icons/active-home-image.png') : require('@/assets/images/icons/home-image.png')} />,
         //   tabBarActiveBackgroundColor: colors.white
         // }}
-        tabBarIcon: ({ color, focused }) => <Image style={{ width: 30, height: 50 }} source={focused ? require('@/assets/images/icons/active-home-image.png') : require('@/assets/images/icons/home-image.png')} />,
-        tabBarActiveBackgroundColor: colors.white
+        // tabBarIcon: ({ color, focused }) => <Image style={{ width: 30, height: 50 }} source={focused ? require('@/assets/images/icons/active-home-image.png') : require('@/assets/images/icons/home-image.png')} />,
+        // tabBarActiveBackgroundColor: colors.white
+        // tabBarIcon: ({ color, focused }) => <Image style={{ width: 30, height: 50 }} source={require('@/assets/images/icons/active-home-image.png')} />,
+        // tabBarActiveBackgroundColor: colors.white
       }}
     />
     <Tabs.Screen
       name={tabs.trip}
       options={{
         tabBarLabel: ({ color }) => <TabBartTitle title='Trip' color={color} />,
-        // tabBarIcon: ({ color, focused }) => <Image style={{ width: 22, height: 19 }} source={focused ? images.activeTripImage : images.tripImage} />,
+        tabBarIcon: ({ color, focused }) => <Image style={{ width: 22, height: 19 }} source={focused ? images.activeTripImage : images.tripImage} />,
       }}
     />
     <Tabs.Screen
       name={tabs.offer}
       options={{
         tabBarLabel: ({ color }) => <TabBartTitle title='Offers' color={color} />,
-        // tabBarIcon: ({ color, focused }) => <Image style={{ width: 20.12, height: 19.43 }} source={focused ? images.activeOffersImage : images.offersImage} />,
+        tabBarIcon: ({ color, focused }) => <Image style={{ width: 20.12, height: 19.43 }} source={focused ? images.activeOffersImage : images.offersImage} />,
       }}
     />
     <Tabs.Screen
       name={tabs.account}
       options={{
         tabBarLabel: ({ color }) => <TabBartTitle title='Account' color={color} />,
-        // tabBarIcon: ({ color, focused }) => <Image style={{ width: 15, height: 18 }} source={focused ? images.activeAccountImage : images.accountImage} />,
+        tabBarIcon: ({ color, focused }) => <Image style={{ width: 15, height: 18 }} source={focused ? images.activeAccountImage : images.accountImage} />,
       }}
     />
   </Tabs>

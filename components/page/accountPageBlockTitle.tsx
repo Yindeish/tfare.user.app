@@ -1,6 +1,6 @@
-import Colors from "@/constants/Colors";
-import { colorBlack, fs16, fw700 } from "@/utils/fontStyles";
-import { pb, wFull } from "@/utils/styles";
+import Colors from "../../constants/Colors";
+import { colorBlack, fs16, fw700 } from "../../utils/fontStyles";
+import { pb, wFull } from "../../utils/styles";
 import { View, ViewStyle } from "react-native";
 import { Text } from "react-native-paper";
 

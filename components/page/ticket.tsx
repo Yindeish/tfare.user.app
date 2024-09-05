@@ -38,7 +38,7 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
                         <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Pick up Bus Stop</Text>
                     </View>
 
-                    <Text style={[fw700, fs14, colorBlack]}>{ticket.pickupBusstop?.routeName}</Text>
+                    <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.pickupBusstop?.routeName}</Text>
                 </View>
             </View>
 
@@ -53,7 +53,7 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
                         <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Drop off Bus Stop</Text>
                     </View>
 
-                    <Text style={[fw700, fs14, colorBlack]}>{ticket.dropoffBusstop?.routeName}</Text>
+                    <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.dropoffBusstop?.routeName}</Text>
                 </View>
 
                 <View style={[flexCol, gap(16), justifyStart]}>

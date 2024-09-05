@@ -8,11 +8,11 @@ import { flex, flexCenter, flexCol, flexYCenter, gap, h, hFull, itemsCenter, ite
 import { Entypo } from '@expo/vector-icons';
 import { View, StyleSheet, TextInput, TouchableOpacity, Pressable, Button, Image } from 'react-native'
 import { ActivityIndicator, Menu, Text } from 'react-native-paper'
-import PaddedScreen from '@/components/shared/paddedScreen';
-import { c } from '@/utils/fontStyles';
-import { useSignup } from '@/contexts/signupContext';
-import { useBottomSheet } from '@/contexts/useBottomSheetContext';
-import SecurityQuestionSheet from '@/components/page/securityQuestionSheet';
+import PaddedScreen from '../../components/shared/paddedScreen';
+import { c } from '../../utils/fontStyles';
+import { useSignup } from '../../contexts/signupContext';
+import { useBottomSheet } from '../../contexts/useBottomSheetContext';
+// import SecurityQuestionSheet from '../../components/page/securityQuestionSheet';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import URLS from '@/constants/urls';

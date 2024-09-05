@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useStorageState } from '../hooks/useStorageState';
-import FetchService from '@/services/api/fetch.service';
+import FetchService from '../services/api/fetch.service';
 import { useSession as useTokenSession } from './userTokenContext';
 import { Platform, ToastAndroid } from 'react-native';
 import { IRequestData, ISigninContext, ISigninContextState, ISigninResponseData, TSigninLoadingState } from './signin.context.interface';
 import { IResponseData } from './shared.interface';
 import { useSnackbar } from './snackbar.context';
-import { IUser } from '@/state/types/account';
+import { IUserAccount } from '../state/types/account';
 import { router } from 'expo-router';
 
 const SessionContext = React.createContext<ISigninContext>({
@@ -36,7 +36,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const { signIn: signInwithToken, signOut: signTokenOut, tokenSession } = useTokenSession();
   const { closeSnackbar, openSnackbar, snackbarVisible } = useSnackbar();
 
-  const parsedSession = JSON.parse(session as string) as IUser;
+  const parsedSession = JSON.parse(session as string) as IUserAccount;
 
   const [contextState, setRequestState] = useState<ISigninContextState>({
     msg: '',
@@ -46,7 +46,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
   })
   const { code, msg, user, loadingState } = contextState;
 
-  const onChange = (key: keyof ISigninContextState, value: string | number | boolean | TSigninLoadingState | IUser) => setRequestState((prev) => ({ ...prev, [key]: value }));
+  const onChange = (key: keyof ISigninContextState, value: string | number | boolean | TSigninLoadingState | IUserAccount) => setRequestState((prev) => ({ ...prev, [key]: value }));
 
   useEffect(() => {
     if (parsedSession && !user) {

@@ -2,7 +2,7 @@ import { View, StyleSheet, Pressable, } from 'react-native'
 import { Text, Button, TouchableRipple, MD2Colors } from 'react-native-paper';
 import React, { useEffect, useState } from 'react'
 import Swiper from 'react-native-swiper'
-import { Link, router } from 'expo-router';
+import { Href, Link, router } from 'expo-router';
 import { images } from '@/constants/images';
 import Colors, { colors } from '@/constants/Colors';
 import { fonts } from '@/constants/fonts';
@@ -126,12 +126,12 @@ export default function IntroScreen() {
                     (<View style={[currentSlideIndex === 2 && flexCol, wFull, {
                         opacity: currentSlideIndex === 2 ? 1 : 0, gap: 16, paddingHorizontal: 20, display: currentSlideIndex === 2 ? 'flex' : 'none'
                     }]}>
-                        <TouchableRipple onPress={() => router.replace(`/(auth)/${pages.signup}`)} rippleColor={Colors.light.tabIconDefault} style={[ctaBtn, flexCol, wFull, itemsCenter, justifyCenter]}>
+                        <TouchableRipple onPress={() => router.replace(`/(auth)/${pages.signup}` as Href)} rippleColor={Colors.light.tabIconDefault} style={[ctaBtn, flexCol, wFull, itemsCenter, justifyCenter]}>
                             <Text style={[fw700, fs18, colorWhite, neurialGrotesk,]}>Get Started</Text>
                         </TouchableRipple>
 
                         <TouchableRipple
-                            onPress={() => router.replace(`/(auth)/${pages.signin}`)} rippleColor={colors.white} style={[ctaBtn, flexCol, wFull, itemsCenter, justifyCenter, { backgroundColor: MD2Colors.transparent, borderWidth: 1, borderColor: MD2Colors.white }]}>
+                            onPress={() => router.replace(`/(auth)/${pages.signin}` as Href)} rippleColor={colors.white} style={[ctaBtn, flexCol, wFull, itemsCenter, justifyCenter, { backgroundColor: MD2Colors.transparent, borderWidth: 1, borderColor: MD2Colors.white }]}>
                             <Text style={[fw700, fs18, colorWhite, neurialGrotesk,]}>Sign in</Text>
                         </TouchableRipple>
                     </View>)

@@ -1,6 +1,6 @@
-import { View, Image, TextInput, TouchableOpacity, ScrollView, FlatList, Pressable, Button, Dimensions, Keyboard } from "react-native";
+import { View, Image, TextInput, TouchableOpacity, ScrollView, FlatList, Pressable, Button, Dimensions } from "react-native";
 import PaddedScreen from "../shared/paddedScreen";
-import { absolute, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsEnd, itemsStart, justifyBetween, justifyCenter, justifyStart, left0, mLAuto, mRAuto, mXAuto, mb, ml, mt, p, pLAuto, pXAuto, pb, pl, px, py, relative, right0, rounded, t, top0, w, wFull, wHFull, zIndex } from "@/utils/styles";
+import { absolute, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsEnd, itemsStart, justifyBetween, justifyCenter, justifyStart, left0, mLAuto, mRAuto, mXAuto, ml, mt, p, pLAuto, pXAuto, pb, pl, px, py, relative, right0, rounded, t, top0, w, wFull, wHFull, zIndex } from "@/utils/styles";
 import { Text, Portal, Dialog, Paragraph } from "react-native-paper";
 import { c, colorBlack, colorBlueBg, colorBorderGrey, colorWhite, fs12, fs14, fs16, fs18, fw400, fw500, fw700, neurialGrotesk } from "@/utils/fontStyles";
 import { images } from "@/constants/images";
@@ -12,59 +12,38 @@ import { useDispatch } from "react-redux";
 import { } from "@/state/slices/layout";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
 import RideSelectors from "@/state/selectors/ride";
-import { setLoading, setSearchMatchBusstops, setStateInputField, } from "@/state/slices/ride";
+import { setStateInputField, } from "@/state/slices/ride";
 import { router } from "expo-router";
 import BottomSheet, { BottomSheetFlatList, BottomSheetView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import BottomSheetTitle from "../shared/bottomSheetTitle";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { pages } from "@/constants/pages";
-import { indices } from "@/constants/zIndices";
-import TextInputSuggestionBlock from "./textInputSuggestionBlock";
-import SavedBusstopListTile from "./savedBusstopListTile";
-import FetchService from "@/services/api/fetch.service";
-import { useSession } from "@/contexts/userTokenContext";
-import { IResponseData } from "@/contexts/shared.interface";
-import { IBusStop } from "@/state/types/ride";
-
-interface ISearchBusstopResponseData extends IResponseData {
-    matchBusStops: IBusStop[]
-}
-
-interface ISearchBusstopRequestData extends IResponseData {
-    matchBusStops: IBusStop[]
-}
 
 const RecentLocationsSnippet = () => {
     const dispatch = useDispatch();
     const { showBottomSheet } = useBottomSheet();
-    const { tokenSession } = useSession()
-    const { stateInput: { dropoffBusstopInput, pickupBusstopInput, }, searchMatchBusstops } = RideSelectors();
-    // let [inputtingPickupBusstop, setInputtingPickupBusstop] = useState(false);
-    let [inputting, setInputting] = useState({
-        pickupBusstop: false,
-        dropoffBusstop: false,
-    });
+    const { stateInput: { dropoffBusstopInput, pickupBusstopInput } } = RideSelectors();
 
     const DATA = [
         {
-            _id: '0',
-            busstopTitle: 'Home',
+            id: 0,
+            name: 'Home',
         },
         {
-            _id: '1',
-            busstopTitle: 'Apartment',
+            id: 1,
+            name: 'Apartment',
         },
         {
-            _id: '2',
-            busstopTitle: 'Workplace',
+            id: 2,
+            name: 'Workplace',
         },
         {
-            _id: '3',
-            busstopTitle: 'Workplace',
+            id: 3,
+            name: 'Workplace',
         },
         {
-            _id: '4',
-            busstopTitle: 'Workplace',
+            id: 4,
+            name: 'Workplace',
         },
     ]
 
@@ -74,26 +53,6 @@ const RecentLocationsSnippet = () => {
 
     const openRecentDropoffLocations = () => {
         showBottomSheet([508,], <RecentDropoffLocations />)
-    }
-
-    const searchBusstops = async (searchValue: string) => {
-        dispatch(setLoading({
-            status: 'pending', type: 'searchingBusstop'
-        }))
-
-        const returnedData: ISearchBusstopResponseData = await FetchService.getWithBearerToken({ url: `/ride/busstop/search?searchValue=${searchValue}`, token: tokenSession as string, })
-
-        if (returnedData.matchBusStops) {
-            dispatch(setLoading({
-                status: 'succeeded', type: 'searchingBusstop'
-            }))
-            dispatch(setSearchMatchBusstops(returnedData.matchBusStops))
-        }
-        else {
-            dispatch(setLoading({
-                status: 'failed', type: 'searchingBusstop'
-            }))
-        }
     }
 
     return (
@@ -112,17 +71,14 @@ const RecentLocationsSnippet = () => {
                             <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
                         </TouchableOpacity>
 
-                        <BottomSheetTextInput
-                            onFocus={() => setInputting(prev => ({ ...prev, pickupBusstop: true }))}
-                            onBlur={() => setInputting(prev => ({ ...prev, pickupBusstop: false }))}
-                            style={[fs14, fw500, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                        <TextInput
+                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
                             value={pickupBusstopInput}
                             onChangeText={(text) => {
                                 dispatch(setStateInputField({ key: 'pickupBusstopInput', value: text }));
-                                searchBusstops(pickupBusstopInput)
                             }}
                         />
 
@@ -131,26 +87,21 @@ const RecentLocationsSnippet = () => {
                         </TouchableOpacity>
                     </View>
 
-                    {/* Suggestion block */}
-                    <TextInputSuggestionBlock
-                        list={{
-                            array: searchMatchBusstops,
-                        }}
-                        visibilityCondtion={inputting.pickupBusstop}
-                    />
-                    {/* Suggestion block */}
-
                     <FlatList
                         style={[wFull, h(46), flex, gap(16),]}
                         horizontal
                         data={DATA}
                         renderItem={({ item }) => (
-                            <SavedBusstopListTile item={item} onPress={() => { }} />
+                            <TouchableOpacity onPress={() => dispatch(setStateInputField({ key: 'pickupBusstopInput', value: item.name }))}>
+                                <View style={[w(98), hFull, rounded(100), py(16), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
+                                    <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item.name}</Text>
+                                </View>
+                            </TouchableOpacity>
                         )}
                         ItemSeparatorComponent={() => (
                             <View style={[w(16), hFull, bg(colors.transparent)]} />
                         )}
-                        keyExtractor={(({ _id }) => _id)}
+                        keyExtractor={(({ id }) => id.toString())}
                     />
                 </View>
 
@@ -166,42 +117,34 @@ const RecentLocationsSnippet = () => {
                         <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
 
                         <BottomSheetTextInput
-                            onFocus={() => setInputting(prev => ({ ...prev, dropoffBusstop: true }))}
-                            onBlur={() => setInputting(prev => ({ ...prev, dropoffBusstop: false }))}
-                            style={[fs14, fw500, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Destination"
                             value={dropoffBusstopInput}
                             onChangeText={(text) => {
                                 dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: text }));
-                                searchBusstops(dropoffBusstopInput)
                             }}
                         />
 
                         <Image style={[image.w(22), image.h(24)]} source={images.dropOffImage} />
                     </View>
 
-                    {/* Suggestion block */}
-                    <TextInputSuggestionBlock
-                        list={{
-                            array: searchMatchBusstops,
-                        }}
-                        visibilityCondtion={inputting.dropoffBusstop}
-                    />
-                    {/* Suggestion block */}
-
                     <FlatList
                         style={[wFull, h(46), flex, gap(16),]}
                         horizontal
                         data={DATA}
                         renderItem={({ item }) => (
-                            <SavedBusstopListTile item={item} onPress={() => { }} />
+                            <TouchableOpacity onPress={() => dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: item.name }))}>
+                                <View style={[w(98), hFull, rounded(100), py(16), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
+                                    <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item.name}</Text>
+                                </View>
+                            </TouchableOpacity>
                         )}
                         ItemSeparatorComponent={() => (
                             <View style={[w(16), hFull, bg(colors.transparent)]} />
                         )}
-                        keyExtractor={(({ _id }) => _id)}
+                        keyExtractor={(({ id }) => id.toString())}
                     />
                 </View>
 
@@ -266,7 +209,7 @@ const RecentPickupLocations = () => {
     return (
         <PaddedScreen>
             <View style={[flexCol, gap(56), mt(20),]}>
-                <View style={[flexCol, gap(20),]}>
+                <View style={[flexCol, gap(20), relative]}>
                     <BottomSheetTitle title="Pick up bus stop" onPressFn={() => {
                         showBottomSheet([601, 800], <RecentLocationsSnippet />)
                     }} />
@@ -279,7 +222,7 @@ const RecentPickupLocations = () => {
                         <BottomSheetTextInput
                             onFocus={() => setInputtingPickupBusstop(true)}
                             onBlur={() => setInputtingPickupBusstop(false)}
-                            style={[fs14, fw500, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
@@ -290,16 +233,15 @@ const RecentPickupLocations = () => {
                         <Image style={[image.w(22), image.h(22)]} source={images.pickUpImage} />
                     </View>
 
-                    {/* Suggestion block */}
-                    <TextInputSuggestionBlock
-                        list={{
-                            array: [],
-                        }}
-                        visibilityCondtion={inputtingPickupBusstop}
-                    />
-                    {/* Suggestion block */}
+                    {inputtingPickupBusstop && <View style={[relative, wFull, h(10), mt(-32)]}>
+                        <ScrollView style={[absolute, top0, left0, zIndex(20), wFull, bg(colors.white), h(176), flexCol, gap(30), py(16), px(24), bg('#F9F7F8'), { borderBottomRightRadius: 10, borderBottomLeftRadius: 10 }]}>
+                            {['', '', '', '', '', '', '', ''].map((_, index) => (
+                                <Text style={[h(30)]} key={index}>meeee</Text>
+                            ))}
+                        </ScrollView>
+                    </View>}
 
-                    <View style={[wFull, h(inputtingPickupBusstop ? '40%' : '80%'), flexCol, gap(32), mt(inputtingPickupBusstop ? '40%' : 0)]}>
+                    <View style={[wFull, h(bottomSheet.snapPoint === 5 ? '100%' : 350), flexCol, gap(32)]}>
                         <View style={[wFull, flex, itemsCenter, gap(15)]}>
                             <Image style={[image.w(21.77), image.h(20)]} source={images.recentImage} />
 
@@ -448,7 +390,7 @@ const RecentDropoffLocations = () => {
                         <BottomSheetTextInput
                             onFocus={() => setInputtingDropoffBuststop(true)}
                             onBlur={() => setInputtingDropoffBuststop(false)}
-                            style={[fs14, fw500, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
@@ -459,16 +401,15 @@ const RecentDropoffLocations = () => {
                         <Image style={[image.w(22), image.h(22)]} source={images.dropOffImage} />
                     </View>
 
-                    {/* Suggestion block */}
-                    <TextInputSuggestionBlock
-                        list={{
-                            array: [],
-                        }}
-                        visibilityCondtion={inputtingDropoffBuststop}
-                    />
-                    {/* Suggestion block */}
+                    {inputtingDropoffBuststop && <View style={[relative, wFull, h(10), mt(-32)]}>
+                        <ScrollView style={[absolute, top0, left0, zIndex(20), wFull, bg(colors.white), h(176), flexCol, gap(30), py(16), px(24), bg('#F9F7F8'), { borderBottomRightRadius: 10, borderBottomLeftRadius: 10 }]}>
+                            {['', '', '', '', '', '', '', ''].map((_, index) => (
+                                <Text style={[h(30)]} key={index}>meeee</Text>
+                            ))}
+                        </ScrollView>
+                    </View>}
 
-                    <View style={[wFull, h(inputtingDropoffBuststop ? '40%' : '80%'), flexCol, gap(32), mt(inputtingDropoffBuststop ? '40%' : 0)]}>
+                    <View style={[wFull, h(350), flexCol, gap(32)]}>
                         <View style={[wFull, flex, itemsCenter, gap(15)]}>
                             <Image style={[image.w(21.77), image.h(20)]} source={images.recentImage} />
 
@@ -581,8 +522,8 @@ const FilledForm = () => {
                             <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
                         </TouchableOpacity>
 
-                        <BottomSheetTextInput
-                            style={[fs14, fw500, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                        <TextInput
+                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
@@ -614,7 +555,7 @@ const FilledForm = () => {
                         </TouchableOpacity>
 
                         <BottomSheetTextInput
-                            style={[fs14, fw500, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                            style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Destination"
@@ -670,11 +611,11 @@ const RideRouteDetails = () => {
                             <View style={[flex, h(14.73), gap(4), itemsCenter]}>
                                 <Image style={[image.w(18), image.h(14.73)]} source={images.passengersImage} />
 
-                                <Text style={[fw400, fs12, c(Colors.light.border)]}>4 seats</Text>
+                                <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.border)]}>4 seats</Text>
                             </View>
                         </View>
 
-                        <Text style={[fw400, fs14, colorBlack]}> ₦600.00</Text>
+                        <Text style={[neurialGrotesk, fw400, fs14, colorBlack]}> ₦600.00</Text>
                     </View>
 
                     <View style={[wFull, py(20), flexCol, gap(16), { borderTopWidth: 0.7, borderTopColor: Colors.light.border, borderBottomWidth: 0.7, borderBottomColor: Colors.light.border, }]}>
@@ -684,7 +625,7 @@ const RideRouteDetails = () => {
                             <Image style={[image.w(14), image.h(10)]} source={images.rideOfferImage} />
 
                             <BottomSheetTextInput
-                                style={[fs14, fw500, h(20), { color: false ? Colors.light.textGrey : Colors.light.error, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                                style={[fs14, fw500, neurialGrotesk, h(20), { color: false ? Colors.light.textGrey : Colors.light.error, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                                 keyboardType="number-pad"
                                 placeholderTextColor={Colors.light.textGrey}
                                 cursorColor={Colors.light.textGrey}
@@ -747,6 +688,7 @@ const SearchingRide = () => {
                 <TouchableOpacity
                     onPress={() => {
                         hideBottomSheet();
+                        // dispatch(closeBottomSheet());
                         router.push(`/(tab)/`);
                     }} style={[bg('#F9F7F8'), wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
                     <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw700, fs16]}>Cancel</Text>

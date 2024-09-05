@@ -2,11 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import SafeScreen from "@/components/shared/safeScreen";
 import { absolute, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyStart, l, left0, mXAuto, mb, p, px, py, relative, rounded, t, top0, w, wFull, wHFull, zIndex } from "@/utils/styles";
 import { View, StyleSheet, Alert, Text, TouchableOpacity, Button, Dimensions, ScrollView, Image, FlatList } from "react-native";
-import MapView, { Marker } from 'react-native-maps';
-import * as Location from 'expo-location';
 import Colors, { colors } from '@/constants/Colors';
 import { c, colorBlack, colorWhite, fs12, fs14, fs16, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles';
-import { router } from 'expo-router';
+import { Href, router } from 'expo-router';
 import { FilledForm, RecentDropoffLocations, RecentLocationsSnippet, RecentPickupLocations, RideRouteDetails, SearchingRide } from '@/components/page/orderRideBottomSheetComponents';
 import LayoutSelectors from '@/state/selectors/layout';
 import { closeBottomSheet, closeModal, openBottomSheet, resetBottomSheetState, setBottomSheetSnapPoint, setBottomSheetType, } from '@/state/slices/layout';
@@ -24,10 +22,6 @@ import RideBlock from '@/components/page/rideBlock';
 import { IRide } from '@/state/types/ride';
 import { useBottomSheet } from '@/contexts/useBottomSheetContext';
 
-const { mapView } = StyleSheet.create({
-    mapView: {
-    }
-});
 
 type Region = {
     latitude: number;
@@ -69,7 +63,7 @@ function Ride() {
 
                 {currentRideView === 'orderRide' ?
                     (<PageFloatingTitle view={false} onPress={() => {
-                        router.push(`/(tab)/`)
+                        router.push(`/(tab)/` as Href)
                         hideBottomSheet()
                     }} title='Order a Ride' />) :
                     (<PageFloatingTitle view onPress={() => {
@@ -135,7 +129,7 @@ function Ride() {
                                         tickets: []
                                     }))
 
-                                    router.push(`/${ride.id}/${pages.bookRide}`)
+                                    router.push(`/${ride.id}/${pages.bookRide}` as Href)
                                 }}
                                 key={index}
                             />

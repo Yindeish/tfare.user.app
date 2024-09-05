@@ -1,6 +1,6 @@
-import Colors from "@/constants/Colors";
-import { c, colorBlack, fs12, fs14, fw400, fw700, neurialGrotesk } from "@/utils/fontStyles";
-import { flex, flexCol, gap, h, itemsStart, justifyBetween, mr, pt, w, wFull } from "@/utils/styles";
+import Colors from "../../constants/Colors";
+import { c, colorBlack, fs12, fs14, fw400, fw700, neurialGrotesk } from "../../utils/fontStyles";
+import { flex, flexCol, gap, h, itemsStart, justifyBetween, mr, pt, w, wFull } from "../../utils/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
 import { Text } from "react-native-paper";

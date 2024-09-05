@@ -1,6 +1,6 @@
 import { View, Pressable, StyleSheet, TextInput, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Link, Redirect, router } from 'expo-router'
+import { Href, Link, Redirect, router } from 'expo-router'
 import { useSession } from '../../contexts/userSignedInContext';
 import SafeScreen from '../../components/shared/safeScreen';
 import { ActivityIndicator, MD2Colors, Snackbar, Text } from 'react-native-paper';
@@ -86,7 +86,7 @@ export default function signin() {
     const { closeSnackbar, snackbarVisible } = useSnackbar()
 
     // if there's user
-    if (userSession) return <Redirect href="/(tab)/" />;
+    if (userSession) return <Redirect href={"/(tab)/" as Href} />;
     // if there's user
 
     let [secureTextEntry, setSecureTextEntry] = useState(true);
