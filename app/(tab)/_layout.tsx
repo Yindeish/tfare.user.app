@@ -7,7 +7,7 @@ import Colors, { colors } from '@/constants/Colors';
 // import HomeSVG from '@/components/svg/home.svg';
 import TabBartTitle from '@/components/tab/tabTitle';
 import { images } from '@/constants/images';
-import { IUser } from '@/state/types/account';
+import { IUserAccount } from '@/state/types/account';
 import { pages } from '@/constants/pages';
 import { Image } from 'expo-image';
 
@@ -33,15 +33,7 @@ export default function AppLayout() {
           backgroundColor: colors.white,
         },
         tabBarLabel: ({ color }) => <TabBartTitle title='Home' color={color} />,
-        // tabBarIcon: ({ color }) => <HomeSVG width={20} height={20} />,
-        // tabBarIcon: ({ color }) => <HomeSVG color={color} />,
-        tabBarIcon: ({ color, focused }) => <Image style={{ width: 18, height: 19.72 }} source={focused ? require('@/assets/images/icons/active-home-image.png') : require('@/assets/images/icons/home-image.png')} />,
-        //   tabBarActiveBackgroundColor: colors.white
-        // }}
-        // tabBarIcon: ({ color, focused }) => <Image style={{ width: 30, height: 50 }} source={focused ? require('@/assets/images/icons/active-home-image.png') : require('@/assets/images/icons/home-image.png')} />,
-        // tabBarActiveBackgroundColor: colors.white
-        // tabBarIcon: ({ color, focused }) => <Image style={{ width: 30, height: 50 }} source={require('@/assets/images/icons/active-home-image.png')} />,
-        // tabBarActiveBackgroundColor: colors.white
+        tabBarIcon: ({ color, focused }) => <Image style={{ width: 22, height: 19, objectFit: 'contain' }} source={focused ? images.activeHomeImage : images.homeImage} />,
       }}
     />
     <Tabs.Screen

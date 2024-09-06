@@ -61,6 +61,7 @@ import whiteBgTicketImage from '../assets/images/icons/white-bg-ticket-image.png
 import greenBgCheckTripImage from '../assets/images/icons/green-bg-check-trip-image.png';
 import expandImage from '../assets/images/icons/expand-image.png';
 import mapImage from '../assets/images/rideScreen/map-image.png'
+import fallbackAvatar from '../assets/images/accountScreen/fall_back_avatar.jpeg'
 
 
 const images = {
@@ -127,6 +128,7 @@ const images = {
     greenBgCheckTripImage,
     expandImage,
     mapImage,
+    fallbackAvatar,
 }
 
 export { images }

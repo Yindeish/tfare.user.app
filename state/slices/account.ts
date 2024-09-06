@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ESlicesNames } from "../enums/slicesNames";
-import { IAccountState, IAddress, IStateInput, IStateInputAcountSecurity, IStateInputAddNewContact, IStateInputDeactivateAccount, IStateInputNotifications, IStateInputProfile, IStateInputSaveNewAddress, IUserAccount, IUserNotification, IUserWallet, TProfileCta } from "../types/account";
+import { IAccountState, IAddress, IStateInput, IStateInputAcountSecurity, IStateInputAddNewContact, IStateInputDeactivateAccount, IStateInputNotifications, IStateInputProfile, IStateInputSaveNewAddress, IUserAccount, IUserAccountNotification, IUserAccountWallet, TProfileCta } from "../types/account";
 
 
 const accountSecurity: IStateInputAcountSecurity = {
@@ -114,7 +114,7 @@ const accountSlice = createSlice({
             state.userAccount = action.payload;
         },
 
-        setUserWallet: (state, action: PayloadAction<IUserWallet>) => {
+        setUserWallet: (state, action: PayloadAction<IUserAccountWallet>) => {
             if (state.userAccount) state.userAccount.wallet = action.payload;
         },
 
@@ -149,7 +149,7 @@ const accountSlice = createSlice({
             }
         },
 
-        setUserNotifications: (state, action: PayloadAction<IUserNotification>) => {
+        setUserNotifications: (state, action: PayloadAction<IUserAccountNotification>) => {
             if (state.userAccount) {
                 state.userAccount.notifications = action.payload;
             }

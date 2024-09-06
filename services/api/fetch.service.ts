@@ -2,7 +2,8 @@ import FetchConfig from "./fetch.config";
 
 const { headers, baseUrl, methods } = FetchConfig;
 
-const get = async ({ url, timeout = 10000 }: { url: string, timeout?: number }) => {
+
+const get = async ({ url, timeout = 20000 }: { url: string, timeout?: number }) => {
     const controller = new AbortController();
     const signal = controller.signal;
 
@@ -30,7 +31,7 @@ const get = async ({ url, timeout = 10000 }: { url: string, timeout?: number }) 
     }
 }
 
-const getWithBearerToken = async ({ token, url, timeout = 10000 }: { token: string, url: string, timeout?: number }) => {
+const getWithBearerToken = async ({ token, url, timeout = 20000 }: { token: string, url: string, timeout?: number }) => {
     const controller = new AbortController();
     const signal = controller.signal;
 
@@ -60,7 +61,7 @@ const getWithBearerToken = async ({ token, url, timeout = 10000 }: { token: stri
     }
 }
 
-const post = async ({ data: formData, url, timeout = 10000 }: { data?: object, url: string, timeout?: number }) => {
+const post = async ({ data: formData, url, timeout = 20000 }: { data?: object, url: string, timeout?: number }) => {
     const controller = new AbortController();
     const signal = controller.signal;
 
@@ -89,7 +90,7 @@ const post = async ({ data: formData, url, timeout = 10000 }: { data?: object, u
     }
 }
 
-const postWithBearerToken = async ({ data: formData, url, token, timeout = 10000 }: { token: string, url: string, data?: object, timeout?: number }) => {
+const postWithBearerToken = async ({ data: formData, url, token, timeout = 20000 }: { token: string, url: string, data?: object, timeout?: number }) => {
     const controller = new AbortController();
     const signal = controller.signal;
 

@@ -11,14 +11,16 @@ import { c, colorBlack, fs12, fs14, fw400, fw500, fw700, neurialGrotesk } from '
 import { Ionicons } from '@expo/vector-icons'
 import PageNavigator from '@/components/tab/account/pageNavigator'
 import { pages } from '@/constants/pages'
-import { router } from 'expo-router'
+import { Href, router } from 'expo-router'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import PageTitle from '@/components/shared/pageTitle'
 import { useSession } from '@/contexts/userSignedInContext'
+import { useSnackbar } from '@/contexts/snackbar.context'
 
 export default function Account() {
     const dispatch = useAppDispatch()
-    const { signOut, loadingState, snackbarVisible, closeSnackbar, msg, } = useSession()
+    const { signIn, loadingState, userSession, msg, code, signOut } = useSession();
+    const { closeSnackbar, snackbarVisible } = useSnackbar()
 
     return (
         <SafeScreen>
@@ -31,7 +33,7 @@ export default function Account() {
 
                     <View style={[wFull, flexCol, gap(32),]}>
 
-                        <TouchableOpacity onPress={() => router.push(`/(account)/${pages.profileInfo}`)} style={[wFull, flex, itemsCenter, justifyBetween]}>
+                        <TouchableOpacity onPress={() => router.push(`/(account)/${pages.profileInfo}` as Href)} style={[wFull, flex, itemsCenter, justifyBetween]}>
                             <View style={[flex, gap(14), itemsCenter, { flex: 0.8 }]}>
                                 <Image source={images.userProfileImage} style={[image.w(60), image.h(60),]} />
 
@@ -71,7 +73,7 @@ export default function Account() {
                             </TouchableOpacity>
                         </View>
 
-                        {/* Wallet Block */}
+                        {/* //!Wallet Block */}
 
                         <View style={[wFull, flexCol, gap(16), bg(colors.white), pb(80)]}>
 
@@ -133,6 +135,7 @@ export default function Account() {
                             </Snackbar>}
                             {/* Snackbar */}
                         </View>
+                        {/* //!Wallet Block */}
                     </View>
                 </PaddedScreen>
             </ScrollView>

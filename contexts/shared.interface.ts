@@ -1,6 +1,6 @@
 interface IRequestData {
     email: string,
-    password: string,
+    pin: string,
 }
 
 interface IResponseData {

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import FetchService from '@/services/api/fetch.service';
-import { IUser } from '@/state/types/account';
+import { IUserAccount } from '@/state/types/account';
 import { Platform, ToastAndroid } from 'react-native';
-import { router } from 'expo-router';
+import { Href, router } from 'expo-router';
 import { pages } from '@/constants/pages';
 import { ISetSecurityQuestionRequestData, ISignUpRequestData, ISignUpResponseData, ISignupContext, ISignupContextState, TSignupLoadingState } from './signup.context.interface';
 import { IResponseData } from './shared.interface';
@@ -15,7 +15,9 @@ const SignupContext = React.createContext<ISignupContext>({
     code: null,
     msg: '',
     signedUpUser: null,
-    setSecurityQuestion: () => { }
+    //!Disabling Gender info for now
+    // setSecurityQuestion: () => { }
+    //!Disabling Gender info for now
 });
 
 export function useSignup() {
@@ -39,7 +41,7 @@ export function SignupProvider(props: React.PropsWithChildren) {
     const { code, msg, loadingState, signedUpUser } = contextState;
     const { closeSnackbar, openSnackbar, snackbarVisible } = useSnackbar()
 
-    const onChange = (key: keyof ISignupContextState, value: string | number | boolean | IUser | TSignupLoadingState) => setContextState((prev) => ({ ...prev, [key]: value }));
+    const onChange = (key: keyof ISignupContextState, value: string | number | boolean | IUserAccount | TSignupLoadingState) => setContextState((prev) => ({ ...prev, [key]: value }));
 
     const notify = (timeout: number = 2000) => {
         openSnackbar()
@@ -52,18 +54,25 @@ export function SignupProvider(props: React.PropsWithChildren) {
     }
 
     const signUp = async (data: ISignUpRequestData) => {
-        onChange('loadingState', 'signiningUp' as TSignupLoadingState);
+        console.log('hey')
+        // onChange('loadingState', 'signiningUp' as TSignupLoadingState);
 
-        const returnedData: ISignUpResponseData = await FetchService.post({ data, url: '/auth/signup' })
-        console.log({ returnedData })
+        // const returnedData: ISignUpResponseData = await FetchService.post({ data, url: '/auth/signup' })
+        // console.log({ returnedData })
 
-        notify();
-        onChange('loadingState', 'idle' as TSignupLoadingState);
-        onChange('code', returnedData.code as number);
-        onChange('msg', returnedData.msg);
-        onChange('signedUpUser', returnedData.signedUpUser as IUser);
+        // notify();
+        // onChange('loadingState', 'idle' as TSignupLoadingState);
+        // onChange('code', returnedData.code as number);
+        // onChange('msg', returnedData.msg);
+        // onChange('signedUpUser', returnedData.signedUpUser as IUserAccount);
 
-        if (returnedData.code === 201) router.replace(`/(auth)/${pages.securityQuestion}`);
+        // //!Disabling Security Question info for now
+        // // if (returnedData.code === 201) router.replace(`/(auth)/${pages.securityQuestion}` as Href);
+        // //!Disabling Security Question info for now
+        // if (returnedData.code === 201) router.replace(`/(auth)/${pages.signin}` as Href);
+        console.log('hey')
+
+        router.replace(`/(auth)/${pages.signin}` as Href);//for testing
     }
 
     const setSecurityQuestion = async (data: ISetSecurityQuestionRequestData) => {
@@ -77,7 +86,7 @@ export function SignupProvider(props: React.PropsWithChildren) {
         onChange('code', returnedData.code as number);
         onChange('msg', returnedData.msg);
 
-        if (returnedData.code === 200) router.replace(`/(auth)/${pages.signin}`);
+        if (returnedData.code === 200) router.replace(`/(auth)/${pages.signin}` as Href);
     }
 
     return (
@@ -88,7 +97,9 @@ export function SignupProvider(props: React.PropsWithChildren) {
                 code,
                 msg,
                 signedUpUser,
-                setSecurityQuestion
+                //!Disabling Security Question info for now
+                // setSecurityQuestion
+                //!Disabling Security Question info for now
             }}>
             {props.children}
         </SignupContext.Provider>

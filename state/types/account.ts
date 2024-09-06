@@ -3,7 +3,7 @@ import { IBusStop, ILoading } from "./ride";
 
 type TProfileCta = 'edit' | 'save';
 
-interface IUserNotification {
+interface IUserAccountNotification {
     orderStatus: boolean,
     generalUpdates: boolean,
     promotionalOffers: boolean,
@@ -11,7 +11,7 @@ interface IUserNotification {
     transactionUpdates: boolean,
 }
 
-interface IUserWallet extends Partial<IFlutterwaveWallet> {
+interface IUserAccountWallet extends Partial<IFlutterwaveWallet> {
 }
 
 interface IUserAccount {
@@ -25,8 +25,8 @@ interface IUserAccount {
     },
     status?: 'deactivated' | 'deleted',
     deactivationReason?: string,
-    notifications?: IUserNotification,
-    wallet?: IUserWallet,
+    notifications?: IUserAccountNotification,
+    wallet?: IUserAccountWallet,
 }
 
 interface EmergencyContact extends
@@ -91,7 +91,7 @@ interface IAccountState {
 }
 
 export type {
-    IUserNotification, IUserWallet,
+    IUserAccountNotification, IUserAccountWallet,
     EmergencyContact, IAddress,
     IAccountState, IStateInput,
     IStateInputAcountSecurity,

@@ -1,13 +1,15 @@
-import { IUser } from "@/state/types/account";
+import { IUserAccount } from "@/state/types/account";
 import { IContextState, IRequestData, IResponseData } from "./shared.interface";
 
 type TSignupLoadingState = 'idle' | 'signiningUp' | 'settingQuestion';
 
 interface ISignUpRequestData extends IRequestData {
-    gender: string,
+    //!Disabling Gender info for now
+    // gender: string,
+    //!Disabling Gender info for now
     profileName: string,
     phoneNumber: string,
-    confirmedPassword: string,
+    confirmedPin: string,
 }
 
 interface ISetSecurityQuestionRequestData extends Pick<IRequestData, 'email'> {
@@ -16,18 +18,20 @@ interface ISetSecurityQuestionRequestData extends Pick<IRequestData, 'email'> {
 }
 
 interface ISignUpResponseData extends IResponseData {
-    signedUpUser: IUser | null
+    signedUpUser: IUserAccount | null
 }
 
 interface ISignupContextState extends IContextState {
     loadingState: TSignupLoadingState,
-    signedUpUser: IUser | null
+    signedUpUser: IUserAccount | null
 }
 
 interface ISignupContext extends ISignupContextState {
     signUp: (data: ISignUpRequestData) => void;
-    signedUpUser: IUser | null,
-    setSecurityQuestion: (data: ISetSecurityQuestionRequestData) => void;
+    signedUpUser: IUserAccount | null,
+    //!Disabling Security Question info for now
+    // setSecurityQuestion: (data: ISetSecurityQuestionRequestData) => void;
+    //!Disabling Security Question info for now
 }
 
 // types

@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#5D5FEF"
     },
     "ios": {
       "supportsTablet": true
@@ -29,7 +29,8 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "expo-font"
+      "expo-font",
+       "expo-image-picker"
     ],
     "experiments": {
       "typedRoutes": true

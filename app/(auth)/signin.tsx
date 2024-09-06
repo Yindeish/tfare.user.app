@@ -1,14 +1,17 @@
 import { View, Pressable, StyleSheet, TextInput, Platform } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { Href, Link, Redirect, router } from 'expo-router'
+import React, { useState } from 'react'
+import { Href, Link, Redirect } from 'expo-router'
 import { useSession } from '../../contexts/userSignedInContext';
 import SafeScreen from '../../components/shared/safeScreen';
 import { ActivityIndicator, MD2Colors, Snackbar, Text } from 'react-native-paper';
 import { fonts } from '../../constants/fonts';
-import { bg, flex, flexCenter, flexCol, flexYCenter, itemsCenter, itemsStart, justifyBetween, justifyCenter, justifyEnd, mLAuto, mXAuto, pAuto, pLAuto, wFull, wHFull } from '../../utils/styles';
+import { wFull, wHFull, flexCol, itemsStart, justifyCenter, justifyEnd, flex, itemsCenter, justifyBetween, mXAuto } from '../../utils/styles';
 import Colors, { colors } from '../../constants/Colors';
 import PaddedScreen from '@/components/shared/paddedScreen';
 import { useSnackbar } from '@/contexts/snackbar.context';
+import { useSession as userTokenSession } from '@/contexts/userTokenContext';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noAccount, signupLink, invalidEntryText } = StyleSheet.create({
     signInTitle: {
@@ -29,8 +32,6 @@ const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noA
         width: '100%',
         height: 50,
         paddingHorizontal: 24,
-        paddingTop: 'auto',
-        paddingBottom: 'auto',
         backgroundColor: '#F9F7F8',
     },
     forgotPassword: {
@@ -73,52 +74,33 @@ const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noA
     }
 });
 
-type TSigninFormData = 'idle' | 'invalid' | 'valid'
-
 interface ISigninFormData {
-    email: string,
-    password: string,
-    invalidFeildsStatus: TSigninFormData,
+    email: string;
+    pin: string;
 }
 
-export default function signin() {
-    const { signIn, loadingState, userSession, msg, code, } = useSession();
-    const { closeSnackbar, snackbarVisible } = useSnackbar()
+const SignInSchema = Yup.object().shape({
+    email: Yup.string().email('Invalid email').required('Email is required'),
+    pin: Yup.string().min(4, 'Pin must be at least 4 characters').required('Pin is required'),
+});
 
-    // if there's user
+export default function Signin() {
+    const { signIn, loadingState, userSession, msg, code, signOut } = useSession();
+    const { closeSnackbar, snackbarVisible } = useSnackbar();
+    const { tokenSession } = userTokenSession();
+
     if (userSession) return <Redirect href={"/(tab)/" as Href} />;
-    // if there's user
 
-    let [secureTextEntry, setSecureTextEntry] = useState(true);
-    const [formData, setFormData] = useState<ISigninFormData>({
-        email: 'adeshinaadam03@gmail.com',
-        password: 'Yindeish03@',
-        invalidFeildsStatus: 'idle',
-    })
-    const { email, password, invalidFeildsStatus } = formData;
-
-    const onChange = (key: keyof ISigninFormData, value: string) => setFormData((prev) => ({ ...prev, [key]: value }));
-
-    const validateFields = () => {
-        const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[0-9]).+$/;
-        const passwordValid = passwordRegex.test(password);
-        const emailRegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const emailVaild = emailRegExp.test(email);
-
-        if (!passwordValid || !emailVaild) onChange('invalidFeildsStatus', 'invalid' as TSigninFormData)
-        else onChange('invalidFeildsStatus', 'valid' as TSigninFormData)
-    }
-
-    const commitSignin = () => {
-        validateFields();
-        if (invalidFeildsStatus === 'valid') {
-            signIn({ email, password });
-        }
-        if (invalidFeildsStatus === 'invalid') {
-            return;
-        }
-    }
-
+    const formik = useFormik({
+        initialValues: {
+            email: '',
+            pin: '',
+        },
+        validationSchema: SignInSchema,
+        onSubmit: (values) => {
+            signIn({ email: values.email, pin: values.pin });
+        },
+    });
 
     return (
         <SafeScreen>
@@ -129,50 +111,55 @@ export default function signin() {
                         <Text style={signInTitle}>to continue</Text>
                     </View>
 
-                    <View style={[form, flexYCenter, { gap: 16 }]}>
+                    <View style={[form, { gap: 16 }]}>
                         <TextInput
-                            style={[textInput, invalidFeildsStatus === 'invalid' && { borderColor: Colors.light.error }]}
+                            style={[
+                                textInput,
+                                formik.errors.email && formik.touched.email ? { borderColor: Colors.light.error } : undefined
+                            ]}
                             placeholder='Email Address'
-                            underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={Colors.light.textGrey}
-                            value={email}
+                            keyboardType='email-address'
+                            value={formik.values.email}
+                            onChangeText={formik.handleChange('email')}
+                            onBlur={formik.handleBlur('email')}
                             autoFocus
-                            cursorColor={Colors.light.textGrey}
-                            onChangeText={(text) => {
-                                onChange('email', text)
-                                validateFields();
-                            }}
-                            onBlur={() => validateFields()}
                         />
+
+                        {formik.errors.email && formik.touched.email && (
+                            <Text style={invalidEntryText}>{formik.errors.email}</Text>
+                        )}
 
                         <TextInput
-                            style={[textInput, invalidFeildsStatus === 'invalid' && { borderColor: Colors.light.error }]}
-                            placeholder="Password"
-                            underlineColorAndroid={colors.transparent}
-                            placeholderTextColor={Colors.light.textGrey}
-                            value={password}
-                            secureTextEntry={secureTextEntry}
-                            onChangeText={(text) => {
-                                onChange('password', text)
-                                validateFields();
-                            }}
-                            onBlur={() => validateFields()}
+                            style={[
+                                textInput,
+                                formik.errors.pin && formik.touched.pin ? { borderColor: Colors.light.error } : undefined
+                            ]}
+                            placeholder='4-Digit Pin Code'
+                            keyboardType='number-pad'
+                            value={formik.values.pin}
+                            secureTextEntry
+                            onChangeText={formik.handleChange('pin')}
+                            onBlur={formik.handleBlur('pin')}
                         />
+                        {formik.errors.pin && formik.touched.pin && (
+                            <Text style={invalidEntryText}>{formik.errors.pin}</Text>
+                        )}
 
-                        <View style={[wFull, flex, itemsCenter, invalidFeildsStatus === 'invalid' ? justifyBetween : justifyEnd]}>
-                            {invalidFeildsStatus === 'invalid' && msg === '' && (<Text style={invalidEntryText}>Incorrect email or password</Text>)}
-                            {invalidFeildsStatus === 'valid' && code !== 200 && msg !== '' && (<Text style={invalidEntryText}>{msg}</Text>)}
-
+                        <View style={[wFull, flex, itemsCenter, justifyEnd]}>
                             <Text style={[forgotPassword]}>Forgot Password?</Text>
                         </View>
                     </View>
 
-                    <Pressable style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]} disabled={loadingState === 'signingin'} onPress={() => commitSignin()}>
-                        {loadingState === 'idle' ?
-                            (<Text style={[flex, itemsCenter, justifyCenter, signInText,]}>Sign In</Text>)
-                            :
-                            (<ActivityIndicator color={colors.white} size={'small'} />)
-                        }
+                    <Pressable
+                        style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]}
+                        disabled={loadingState === 'signingin'}
+                        onPress={() => formik.handleSubmit()}
+                    >
+                        {loadingState === 'idle' ? (
+                            <Text style={[signInText]}>Sign In</Text>
+                        ) : (
+                            <ActivityIndicator color={colors.white} size='small' />
+                        )}
                     </Pressable>
 
                     <Text style={[noAccount, mXAuto]}>
@@ -183,20 +170,16 @@ export default function signin() {
                     </Text>
                 </View>
 
-                {/* Snackbar */}
-                {Platform.OS === 'ios' && <Snackbar
-                    style={[]}
-                    visible={snackbarVisible}
-                    onDismiss={() => closeSnackbar()}
-                    action={{
-                        label: 'close',
-                        onPress: () => {
-                        },
-                    }}>
-                    {msg}
-                </Snackbar>}
-                {/* Snackbar */}
+                {Platform.OS === 'ios' && (
+                    <Snackbar
+                        visible={snackbarVisible}
+                        onDismiss={() => closeSnackbar()}
+                        action={{ label: 'close', onPress: () => { } }}
+                    >
+                        {msg}
+                    </Snackbar>
+                )}
             </PaddedScreen>
         </SafeScreen>
-    )
+    );
 }

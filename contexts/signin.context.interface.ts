@@ -1,16 +1,16 @@
-import { IUser } from "@/state/types/account";
+import { IUserAccount } from "@/state/types/account";
 import { IContextState, IRequestData, IResponseData } from "./shared.interface";
 
 type TSigninLoadingState = 'idle' | 'signingin' | 'signingout';
 
 interface ISigninResponseData extends IResponseData {
-    user: IUser,
+    user: IUserAccount,
     token: string
 }
 
 interface ISigninContextState extends IContextState {
     loadingState: TSigninLoadingState,
-    user: IUser | null
+    user: IUserAccount | null
 }
 
 interface ISigninContext extends ISigninContextState {
