@@ -3,15 +3,26 @@
     "version": ">= 10.0.2"
   },
   "build": {
-    "production": {
-      "android": {
-        "buildType": "apk"
-      }
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
     },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {},
     "androidTest": {
       "android": {
         "buildType": "apk"
       }
+    },
+    "iosTest": {
+      "ios": {
+        "simulator": true
+      }
     }
+  },
+  "submit": {
+    "production": {}
   }
 }

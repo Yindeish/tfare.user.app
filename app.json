@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "tfare",
-    "slug": "tfare-tkmnbdtgeiuj-wdmwi2vw",
+    "slug": "tfare-zfpabowhggweqeeun8tx",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -23,7 +23,8 @@
       "permissions": [
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.yindeish.tfare"
+      "package": "com.yindeish.tfare",
+       "versionCode": 1
     },
     "web": {
       "bundler": "metro",
@@ -44,7 +45,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "038b68f2-a0be-4f78-98ed-f60a4f09b847"
+        "projectId": "1fd25656-e6f2-480b-afa3-5002c5ebcff5"
       }
     },
     "owner": "yindeish"
