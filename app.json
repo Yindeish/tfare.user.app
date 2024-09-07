@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "tfare",
-    "slug": "tfare",
+    "slug": "tfare-tkmnbdtgeiuj-wdmwi2vw",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -44,8 +44,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "6210a570-fa7b-4b2f-9985-5545579b0c9a"
+        "projectId": "705d8141-25db-4710-8377-7c489e8804ee"
       }
-    }
+    },
+    "owner": "yindeish"
   }
 }
