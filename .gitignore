@@ -21,3 +21,4 @@ expo-env.d.ts
 
 
 npm install --global eas-cli && npx create-expo-app tfare-tkmnbdtgeiuj-wdmwi2vw && cd tfare-tkmnbdtgeiuj-wdmwi2vw && eas init --id 705d8141-25db-4710-8377-7c489e8804ee
+
