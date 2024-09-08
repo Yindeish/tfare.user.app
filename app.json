@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "tfare",
-    "slug": "tfare-tkmnbdtgeiuj-wdmwi2vw",
+    "slug": "tfare",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#5D5FEF"
+      "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true
@@ -20,9 +20,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ],
       "package": "com.yindeish.tfare"
     },
     "web": {
@@ -31,10 +28,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router",
-      "expo-secure-store",
-      "expo-font",
-      "expo-image-picker"
+      "expo-router"
     ],
     "experiments": {
       "typedRoutes": true
@@ -44,7 +38,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "038b68f2-a0be-4f78-98ed-f60a4f09b847"
+        "projectId": "7d13249e-f8e5-4f7b-b3d2-55675493d127"
       }
     },
     "owner": "yindeish"
