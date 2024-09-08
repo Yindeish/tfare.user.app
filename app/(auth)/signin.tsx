@@ -118,6 +118,7 @@ export default function Signin() {
                                 formik.errors.email && formik.touched.email ? { borderColor: Colors.light.error } : undefined
                             ]}
                             placeholder='Email Address'
+                            placeholderTextColor={Colors.light.textGrey}
                             keyboardType='email-address'
                             value={formik.values.email}
                             onChangeText={formik.handleChange('email')}
@@ -135,6 +136,7 @@ export default function Signin() {
                                 formik.errors.pin && formik.touched.pin ? { borderColor: Colors.light.error } : undefined
                             ]}
                             placeholder='4-Digit Pin Code'
+                            placeholderTextColor={Colors.light.textGrey}
                             keyboardType='number-pad'
                             value={formik.values.pin}
                             secureTextEntry

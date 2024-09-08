@@ -28,12 +28,12 @@ const BannerBlock = () => (
         <View style={[flexCol, justifyCenter, { gap: 12 }]}>
             <Text style={[orderRideText]}>Order a Ride</Text>
             <View style={[flexCol, justifyCenter, { gap: 3 }]}>
-                <Text style={[neurialGrotesk, fw400, fs14, {
+                <Text style={[fw400, fs14, {
                     color: '#2C333C'
                 }]}>
                     Get 15% discount on all your
                 </Text>
-                <Text style={[neurialGrotesk, fw400, fs14, {
+                <Text style={[fw400, fs14, {
                     color: '#2C333C'
                 }]}>rides today!</Text>
             </View>
