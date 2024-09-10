@@ -14,10 +14,13 @@ import PageTitle from '@/components/shared/pageTitle'
 import TripBlock from '@/components/shared/tripBlock';
 import InTripDropoffTile from '@/components/page/inTripDropoffsTile';
 import CtaBtn from '@/components/shared/ctaBtn';
+import { useBottomSheet } from '@/contexts/useBottomSheetContext';
+import BookSeatSheet from '@/components/page/bookSeatSheet';
 
 const { height } = Dimensions.get('window')
 
 function TripDetails() {
+    const { showBottomSheet } = useBottomSheet()
 
 
     return (
@@ -66,7 +69,7 @@ function TripDetails() {
 
                 <CtaBtn
                     img={{ src: images.whiteBgTripImage, w: 20, h: 20 }}
-                    onPress={() => { }}
+                    onPress={() => showBottomSheet([700], <BookSeatSheet />)}
                     text={{ name: 'Book Seat', color: colors.white }}
                     bg={{ color: Colors.light.background }}
                     style={{ container: { width: '90%', marginLeft: '5%', marginTop: 10, marginBottom: 30 } }}

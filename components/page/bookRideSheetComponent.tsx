@@ -18,7 +18,7 @@ import { IRide } from "@/state/types/ride";
 import BuyTicketListTile from "./buyTicketListTile";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { useEffect } from "react";
-import { router } from "expo-router";
+import { Href, router } from "expo-router";
 import { pages } from "@/constants/pages";
 
 
@@ -168,7 +168,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
         // if a signal is recieved from the driver to start the trip
         // for now dummy redirection
         setTimeout(() => {
-            router.push(`/${rideId}/${pages.tripStarted}`)
+            router.push(`/${rideId}/${pages.tripStarted}` as Href)
         }, 3000)
     })
 
@@ -180,7 +180,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
                         <View style={[wFull, flex, gap(10), itemsCenter, justifyCenter]}>
                             <Image style={[image.w(30), image.h(27)]} source={images.greenBgCheckTripImage} />
 
-                            <Text style={[neurialGrotesk, fw700, colorBlack, { fontSize: 22 }]}>Trip Booked</Text>
+                            <Text style={[neurialGrotesk, fw700, colorBlack, { fontSize: 22 }]}>Ride Booked</Text>
                         </View>
 
                         <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey), mXAuto]}>Your Trip has been successfully booked</Text>
@@ -200,7 +200,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
 
                 {/* Driver block */}
 
-                <View style={[wFull, h(144), flex, itemsCenter, justifyCenter, bg(colors.white), rounded(10), gap(16), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
+                <TouchableOpacity onPress={() => router.push(`/(tripScreen)/driverProfile/1` as Href)} style={[wFull, h(144), flex, itemsCenter, justifyCenter, bg(colors.white), rounded(10), gap(16), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
 
                     <Image
                         source={images.userProfileImage}
@@ -231,7 +231,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
 
                         </View>
                     </View>
-                </View>
+                </TouchableOpacity>
 
                 {/* Driver block */}
 
