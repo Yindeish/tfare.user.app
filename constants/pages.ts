@@ -9,18 +9,25 @@ const pages = {
     home: '/',
     // Tab
 
-    // Ride
+    // !Ride
     orderRide: 'orderRide',
     bookRide: 'bookRide',
     availableRides: 'availableRides',
     buyTicket: 'buyTicket',
-    paymentOptions: 'paymentOptions',
     rideBooked: 'rideBooked',
+    rideStarted: 'rideStarted',
+    // !Ride
+
+    // !Trip
+    tripStarted: 'tripStarted',
+    // !Trip
+
+    // !Ride and Trip Shared Screens
+    tripHistory: 'tripHistory',
+    paymentOptions: 'paymentOptions',
     driverProfile: 'driverProfile',
     chat: 'chat',
-    tripStarted: 'tripStarted',
-    tripHistory: 'tripHistory',
-    // Ride
+    // !Ride and Trip Shared Screens
 
     // Account
     profileInfo: 'profileInfo',

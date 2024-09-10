@@ -63,6 +63,19 @@ import expandImage from '../assets/images/icons/expand-image.png';
 import mapImage from '../assets/images/rideScreen/map-image.png'
 import fallbackAvatar from '../assets/images/accountScreen/fall_back_avatar.jpeg'
 
+// !Trip Images
+import settings from '../assets/images/tripScreen/settings.png'
+import activeTrip from '../assets/images/tripScreen/active_trip_image.png'
+import blueBgDropoffLocationImage from '../assets/images/tripScreen/blue_bg_dropoff_location_image.png'
+import orangeBgDropoffLocationImage from '../assets/images/tripScreen/orange_bg_dropoff_location_image.png'
+import search from '../assets/images/tripScreen/search.png'
+import tripDirection from '../assets/images/tripScreen/trip_direction.png'
+import trip from '../assets/images/tripScreen/trip_image.png'
+import whiteBgTripImage from '../assets/images/tripScreen/white_bg_trip_image.png'
+import whiteBgTicket from '../assets/images/tripScreen/white_ticket_image.png'
+import clockImage from '../assets/images/tripScreen/clock-img.png'
+// !Trip Images
+
 
 const images = {
     introScreenImage1,
@@ -129,6 +142,19 @@ const images = {
     expandImage,
     mapImage,
     fallbackAvatar,
+
+    // !Trip Images
+    settings,
+    activeTrip,
+    trip,
+    tripDirection,
+    search,
+    blueBgDropoffLocationImage,
+    orangeBgDropoffLocationImage,
+    whiteBgTicket,
+    whiteBgTripImage,
+    clockImage,
+    // !Trip Images
 }
 
 export { images }

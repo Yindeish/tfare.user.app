@@ -52,7 +52,7 @@ export default function AvailableRide() {
                                             tickets: []
                                         }))
 
-                                        router.push(`/${ride.id}/${pages.bookRide}` as Href)
+                                        router.push(`/${pages.bookRide}/${ride.id}` as Href)
                                     }}
                                     key={index}
                                 />

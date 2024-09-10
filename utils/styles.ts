@@ -1,3 +1,4 @@
+import Colors from "@/constants/Colors";
 import { ViewStyle } from "react-native";
 
 type ViewStyleProp = Record<string, ViewStyle>;
@@ -132,17 +133,27 @@ export const { flexCenter, flexXCenter, flexYCenter, flex, flexCol, itemsCenter,
 // VFS -> View FS
 // VFS -> Text FS
 type VFS = <T extends number | string >(val: T) => ViewStyle;
-type VFSProp = { w: VFS, h: VFS, t: VFS, l: VFS, r: VFS, b: VFS, bg: VFS, zIndex: VFS, gap: VFS, m: VFS, mx: VFS, my: VFS, mt: VFS, mb: VFS, ml: VFS, mr: VFS, p: VFS, px: VFS, py: VFS, pt: VFS, pb: VFS, pl: VFS, pr: VFS, rounded: VFS };
+type VFSProp = { w: VFS, maxw: VFS, h: VFS, maxh: VFS, t: VFS, l: VFS, r: VFS, b: VFS, bg: VFS, zIndex: VFS, gap: VFS, m: VFS, mx: VFS, my: VFS, mt: VFS, mb: VFS, ml: VFS, mr: VFS, p: VFS, px: VFS, py: VFS, pt: VFS, pb: VFS, pl: VFS, pr: VFS, rounded: VFS, borderGrey: VFS, border: (w: number, c: string) => ViewStyle; borderT: (w: number, c: string) => ViewStyle; borderR: (w: number, c: string) => ViewStyle; borderL: (w: number, c: string) => ViewStyle; borderB: (w: number, c: string) => ViewStyle; borderY: (w: number, c: string) => ViewStyle; borderX: (w: number, c: string) => ViewStyle; };
 
-export const { w, h, t, l, r, b, bg, zIndex, gap, m, mx, my, mt, mb, ml, mr, p, px, py, pt, pb, pl, pr, rounded }: VFSProp = {
+export const { w, maxw, h, maxh, t, l, r, b, bg, zIndex, gap, m, mx, my, mt, mb, ml, mr, p, px, py, pt, pb, pl, pr, rounded, border, borderGrey, borderB, borderL, borderR, borderT, borderX, borderY }: VFSProp = {
     w: (val) => {
         return {
             width: val as number
         }
     },
+    maxw: (val) => {
+        return {
+            maxWidth: val as number
+        }
+    },
     h: (val) => {
         return {
             height: val as number
+        }
+    },
+    maxh: (val) => {
+        return {
+            maxHeight: val as number
         }
     },
     t: (val) => {
@@ -257,6 +268,58 @@ export const { w, h, t, l, r, b, bg, zIndex, gap, m, mx, my, mt, mb, ml, mr, p, 
     rounded: (val) => {
         return {
             borderRadius: val as number
+        }
+    },
+    borderGrey: (val: any) => {
+        return {
+            borderColor: Colors.light.border,
+            borderWidth: val ?? 1,
+        }
+    },
+    border: (w, c) => {
+        return {
+            borderColor: c,
+            borderWidth: w,
+        }
+    },
+    borderT: (w, c) => {
+        return {
+            borderTopColor: c,
+            borderTopWidth: w,
+        }
+    },
+    borderR: (w, c) => {
+        return {
+            borderRightColor: c,
+            borderRightWidth: w,
+        }
+    },
+    borderL: (w, c) => {
+        return {
+            borderLeftColor: c,
+            borderLeftWidth: w,
+        }
+    },
+    borderB: (w, c) => {
+        return {
+            borderBottomColor: c,
+            borderBottomWidth: w,
+        }
+    },
+    borderY: (w, c) => {
+        return {
+            borderBottomColor: c,
+            borderBottomWidth: w,
+            borderTopColor: c,
+            borderTopWidth: w,
+        }
+    },
+    borderX: (w, c) => {
+        return {
+            borderRightColor: c,
+            borderRightWidth: w,
+            borderLeftColor: c,
+            borderLeftWidth: w,
         }
     },
 }

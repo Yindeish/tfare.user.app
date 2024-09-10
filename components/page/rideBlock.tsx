@@ -33,7 +33,7 @@ const RideBlock = ({ bgColor, ctaType, roundedCorners, ride, onPress, touchable 
 
                 <View style={[hFull, flex, itemsCenter, gap(12)]}>
                     <View style={[image.w(5), image.h(5), rounded(5), bg(colors.black)]} />
-                    <Text style={[colorBlack, neurialGrotesk, fw500, fs14]}>{ride?.duration}</Text>
+                    <Text style={[colorBlack, fw500, fs14]}>{ride?.duration}</Text>
                 </View>
             </View>
 

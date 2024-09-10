@@ -46,7 +46,7 @@ export default function AppLayout() {
       name={tabs.trip}
       options={{
         tabBarLabel: ({ color }) => <TabBartTitle title='Trip' color={color} />,
-        tabBarIcon: ({ color, focused }) => <Image style={{ width: 22, height: 19 }} source={focused ? images.activeTripImage : images.tripImage} />,
+        tabBarIcon: ({ color, focused }) => <Image style={{ width: 22, height: 19 }} source={focused ? images.activeTrip : images.trip} />,
       }}
     />
     <Tabs.Screen

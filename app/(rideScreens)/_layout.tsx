@@ -34,11 +34,13 @@ export default function AppLayout() {
     }}>
     <Stack.Screen name={pages.orderRide} />
     <Stack.Screen name={pages.availableRides} />
-    <Stack.Screen name={`[rideId]/${pages.bookRide}`} />
-    <Stack.Screen name={`[rideId]/${pages.bookRide}`} />
-    <Stack.Screen name={`[rideId]/${pages.buyTicket}`} />
-    <Stack.Screen name={`[rideId]/${pages.paymentOptions}`} />
-    <Stack.Screen name={`[rideId]/${pages.rideBooked}`} />
+    <Stack.Screen name={`${pages.bookRide}/[rideId]`} />
+    <Stack.Screen name={`${pages.rideBooked}/[rideId]`} />
+    <Stack.Screen name={`${pages.buyTicket}/[rideId]`} />
+    <Stack.Screen name={`${pages.chat}/[rideId]`} />
+    <Stack.Screen name={`${pages.driverProfile}/[rideId]`} />
+    <Stack.Screen name={`${pages.paymentOptions}/[rideId]`} />
+    <Stack.Screen name={`${pages.rideStarted}/[rideId]`} />
   </Stack>
 }
 
