@@ -194,7 +194,7 @@ function BookSeatSheet() {
 
             <TouchableOpacity onPress={() => {
                 hideBottomSheet();
-                router.push('/(tripScreen)/bookTrip/1' as Href);
+                router.push('bookTrip/1' as Href);
             }}>
                 <View style={[wFull, h(50), mt(32), rounded(10), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.banner)]}>
                     <Text style={[neurialGrotesk, fw700, fs18, colorWhite]}>Book Ticket</Text>

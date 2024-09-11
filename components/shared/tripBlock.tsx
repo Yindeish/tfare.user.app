@@ -17,7 +17,7 @@ function TripBlock() {
                 <View style={[flexCol, gap(8)]}>
                     <View style={[flex, gap(8)]}>
                         <Image style={[image.w(14), image.h(20)]} source={images.yellowLocationImage} />
-                        <Text style={[neurialGrotesk, fw400, fs12]}>Take off</Text>
+                        <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Take off</Text>
                     </View>
                     <Text style={[fw700, fs14, c(colors.black)]}>Ojoo Bus Stop</Text>
                 </View>
@@ -27,7 +27,7 @@ function TripBlock() {
                 <View style={[flexCol, gap(8)]}>
                     <View style={[flex, gap(8)]}>
                         <Image style={[image.w(14), image.h(20)]} source={images.blueLocationImage} />
-                        <Text style={[neurialGrotesk, fw400, fs12]}>Drop off</Text>
+                        <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Drop off</Text>
                     </View>
                     <Text style={[fw700, fs14, c(colors.black)]}>Ojoo Bus Stop</Text>
                 </View>
@@ -37,7 +37,7 @@ function TripBlock() {
                 <View style={[flexCol, gap(8)]}>
                     <View style={[flex, gap(8)]}>
                         <Image style={[image.w(18), image.h(18)]} source={images.clockImage} />
-                        <Text style={[fw400, fs12]}>Departure Date &Time</Text>
+                        <Text style={[fw400, fs12, c(Colors.light.textGrey)]}>Departure Date &Time</Text>
                     </View>
                     <Text style={[fw500, fs14, c(colors.black)]}>Apri 14 - 7:30 AM</Text>
                 </View>

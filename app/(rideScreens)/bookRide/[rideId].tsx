@@ -179,7 +179,7 @@ export default function BookRide() {
                             <View style={[wFull, flexCol, gap(16), pb(16), { borderBottomColor: Colors.light.border, borderBottomWidth: 0.7 }]}>
 
                                 <TouchableOpacity
-                                    onPress={() => router.push(`/${rideId}/${pages.paymentOptions}` as Href)}
+                                    onPress={() => router.push(`/(rideScreens)/paymentOptions/1` as Href)}
                                     style={[wFull, flex, justifyBetween, itemsCenter]}>
                                     <Text style={[neurialGrotesk, fs14, fw700, colorBlack]}>Pay with</Text>
 

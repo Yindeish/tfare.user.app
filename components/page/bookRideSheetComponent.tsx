@@ -200,7 +200,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
 
                 {/* Driver block */}
 
-                <TouchableOpacity onPress={() => router.push(`/(tripScreen)/driverProfile/1` as Href)} style={[wFull, h(144), flex, itemsCenter, justifyCenter, bg(colors.white), rounded(10), gap(16), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
+                <TouchableOpacity onPress={() => router.push(`/(sharedScreen)/driverProfile/1` as Href)} style={[wFull, h(144), flex, itemsCenter, justifyCenter, bg(colors.white), rounded(10), gap(16), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
 
                     <Image
                         source={images.userProfileImage}

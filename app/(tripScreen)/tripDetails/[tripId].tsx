@@ -36,7 +36,7 @@ function TripDetails() {
                             />
                         </View>
 
-                        <TouchableOpacity style={[bg('#F9F7F8'), borderGrey(0.7), rounded(10), py(0), px(10), flex, gap(10), itemsCenter, w('auto'), h(45), mt(20)]}>
+                        <TouchableOpacity onPress={() => router.push(`/(sharedScreen)/driverProfile/1` as Href)} style={[bg('#F9F7F8'), borderGrey(0.7), rounded(10), py(0), px(10), flex, gap(10), itemsCenter, w('auto'), h(45), mt(20)]}>
                             <Image style={[image.w(30), image.h(30), image.rounded('100%')]} source={images.userProfileImage} />
 
                             <Text style={[neurialGrotesk, fs12, fw500, c(colors.black)]}>View Driver</Text>

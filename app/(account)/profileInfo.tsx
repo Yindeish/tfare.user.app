@@ -18,7 +18,6 @@ import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import { setProfileCta, setUserProfileInfo, setUserProfileInfoFeild } from '@/state/slices/account'
 import { IStateInputProfile } from '@/state/types/account'
 import { useSession } from '@/contexts/userSignedInContext'
-// import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { UploadApiOptions, upload } from 'cloudinary-react-native'
 import CloudinaryServices from '../../cloudinary/cloudinary.services'
@@ -85,13 +84,13 @@ export default function profileInfo() {
 
                         {profileCta === 'edit' ?
                             (<TouchableOpacity onPress={editProfile} style={[flex, rounded(100), gap(10), py(13), px(26), itemsCenter, bg('#F9F7F8'), { borderColor: Colors.light.border, borderWidth: 0.7 }]}>
-                                <Image source={{ uri: images.editBtnImage }} style={[image.w(18), image.h(18),]} />
+                                <Image source={images.editBtnImage} style={[image.w(18), image.h(18),]} />
 
                                 <Text style={[neurialGrotesk, fs12, fw500, colorBlack]}>Edit</Text>
                             </TouchableOpacity>)
                             :
                             (<TouchableOpacity onPress={saveProfile} style={[flex, rounded(100), gap(10), py(13), px(26), itemsCenter, bg(Colors.light.background), { borderColor: Colors.light.border, borderWidth: 0.7 }]}>
-                                <Image source={{ uri: images.whiteBgEditBtnImage }} style={[image.w(18), image.h(18),]} />
+                                <Image source={images.whiteBgEditBtnImage} style={[image.w(18), image.h(18),]} />
 
                                 <Text style={[neurialGrotesk, fs12, fw500, colorWhite]}>Save</Text>
                             </TouchableOpacity>)
@@ -107,11 +106,10 @@ export default function profileInfo() {
                     <View style={[mt(28), flexCol, gap(16), itemsCenter, wFull, h(134)]}>
                         {/* {(user?.picture || user?.avatar) ? */}
                         {(user?.picture) ?
-                            // (<Image source={{ uri: user?.picture || user?.avatar }} style={[image.w(100), image.h(100), image.rounded(100)]} />)
-                            (<Image source={{ uri: user?.picture as any }} style={[image.w(100), image.h(100), image.rounded(100)]} />)
+                            (<Image source={user?.picture as any} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                             :
                             // (<Image source={imageInput !== '' || avatarInput !== '' ? { uri: imageInput || avatarInput } : { uri: images.fallbackAvatar }} style={[image.w(100), image.h(100), image.rounded(100)]} />)
-                            (<Image source={true ? { uri: '' } : { uri: images.fallbackAvatar }} style={[image.w(100), image.h(100), image.rounded(100)]} />)
+                            (<Image source={false ? {} : images.fallbackAvatar} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                         }
 
                         {/* {profileCta === 'save' && (!user?.picture || !user?.avatar) && <View style={[flex, itemsCenter, justifyCenter, gap(20)]}> */}

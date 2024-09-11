@@ -74,7 +74,7 @@ export default function PaymentOptions() {
                         <CtaBtn
                             img={{ src: images.proceedCheckImage, w: 20, h: 20 }}
                             onPress={() => {
-                                router.push(`/(rideScreens)/bookRide/1` as Href);
+                                router.push(`/(tripScreen)/bookTrip` as Href);
                                 showBottomSheet([800], <RideBookedSheet rideId={rideId as string} />)
                             }}
                             text={{ name: 'Proceed', color: colors.white }}
