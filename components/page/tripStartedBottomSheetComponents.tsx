@@ -15,6 +15,7 @@ import { cancelRideReasons } from "@/constants/cancelRideReasons";
 import RadioBtnListTile from "./RadioBtnListTile";
 import { closeModal } from "@/state/slices/layout";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
+import { Href, router } from "expo-router";
 
 function TripStartedSheet() {
     const { showBottomSheet } = useBottomSheet()
@@ -102,7 +103,7 @@ function TripCompletedSheet() {
 
     const rateDriver = (rating: number) => {
         dispatch(setStateInputField({ key: 'driverRatingInput', value: rating }))
-        hideBottomSheet()
+        // hideBottomSheet()
         // update in DB
     }
 
@@ -123,7 +124,7 @@ function TripCompletedSheet() {
 
                 {/* Driver block */}
 
-                <View style={[wFull, h(144), flex, itemsCenter, justifyCenter, bg(colors.white), rounded(10), gap(16), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
+                <TouchableOpacity onPress={() => router.push(`/(sharedScreens)/driverProfile/1)` as Href)} style={[wFull, h(144), flex, itemsCenter, justifyCenter, bg(colors.white), rounded(10), gap(16), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
 
                     <Image
                         source={images.userProfileImage}
@@ -154,7 +155,7 @@ function TripCompletedSheet() {
 
                         </View>
                     </View>
-                </View>
+                </TouchableOpacity>
 
                 {/* Driver block */}
 

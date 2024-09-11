@@ -168,7 +168,8 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
         // if a signal is recieved from the driver to start the trip
         // for now dummy redirection
         setTimeout(() => {
-            router.push(`/${rideId}/${pages.tripStarted}` as Href)
+            // router.push(`/${rideId}/${pages.tripStarted}` as Href)
+            router.push(`/(rideScreens)/rideStarted/1` as Href)
         }, 3000)
     })
 
