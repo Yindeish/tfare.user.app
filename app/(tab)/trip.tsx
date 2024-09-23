@@ -34,7 +34,7 @@ export default function Trip() {
 
                         <TextInput
                             style={[
-                                wHFull, pl(43), borderGrey(0.7), rounded('100%'), bg('#F9F7F8')
+                                wHFull, pl(43), borderGrey(0.7), rounded(50), bg('#F9F7F8')
                             ]}
                             placeholder='Search Bus stop'
                             placeholderTextColor={Colors.light.textGrey}
