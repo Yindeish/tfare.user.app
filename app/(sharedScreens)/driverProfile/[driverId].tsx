@@ -25,7 +25,7 @@ export default function
 
                     <PageTitle
                         title='Driver Profile'
-                        onPress={() => router.push(`/(tab)/${tabs.offer}` as Href)}
+                        onPress={() => router.push(`/(tab)/trip` as Href)}
                         style={[]}
                     >
                         {/* Report Btn */}
