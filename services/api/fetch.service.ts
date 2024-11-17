@@ -75,18 +75,20 @@ const post = async ({ data: formData, url, timeout = 20000 }: { data?: object, u
             signal,
             body: JSON.stringify(formData)
         });
-        clearTimeout(fetchTimeout);
+        console.log({ response });
+        timeout && clearTimeout(fetchTimeout);
 
         const data = await response.json();
         return data;
     } catch (error) {
-        if ((error as any)?.name === 'AbortError') {
-            console.error('Fetch request timed out');
-            return { code: 400, msg: 'Fetch request timed out' }
-        } else {
-            console.error('Fetch request error:', error);
-            return { code: 500, msg: 'Fetch request errorout' }
-        }
+        console.log({ error })
+        // if ((error as any)?.name === 'AbortError') {
+        //     console.error('Fetch request timed out');
+        //     return { code: 400, msg: 'Fetch request timed out' }
+        // } else {
+        //     console.error('Fetch request error:', error);
+        //     return { code: 500, msg: 'Fetch request errorout' }
+        // }
     }
 }
 

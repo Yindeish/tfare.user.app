@@ -27,12 +27,12 @@ export default function Trip() {
 
                 <View style={[flexCol, gap(32),]}>
                     {/* //!Search Block */}
-                    <View style={[wFull, rounded('100%'), bg(colors.transparent), h(50), relative]}>
+                    <View style={[wFull, rounded(50), bg(colors.transparent), h(50), relative]}>
                         {/* //! */}
                         <Image style={[image.w(20), image.h(20), imgAbsolute, image.t('30%'), image.l(20), image.zIndex(3)]} source={images.search} />
                         {/* //! */}
 
-                        <TextInput
+                        {/* <TextInput
                             style={[
                                 wHFull, pl(43), borderGrey(0.7), rounded(50), bg('#F9F7F8')
                             ]}
@@ -41,7 +41,7 @@ export default function Trip() {
                             value={''}
                             onChangeText={() => { }}
 
-                        />
+                        /> */}
                     </View>
                     {/* //!Search Block */}
 
@@ -82,7 +82,7 @@ export default function Trip() {
                                                     <Image style={[image.w(18), image.h(14.73)]} source={images.passengersImage} />
                                                     <Text style={[fs12, fw500, colorBlack]}>{3} seats Available</Text>
                                                 </View>
-                                                <TouchableOpacity onPress={() => router.push(`/(tripScreen)/tripDetails/${index}` as Href)} style={[w(45), h(45), bg('#5D5FEF'), rounded('100%'), flex, itemsCenter, justifyCenter, ml(-15)]}>
+                                                <TouchableOpacity onPress={() => router.push(`/(tripScreen)/tripDetails/${index}` as Href)} style={[w(45), h(45), bg('#5D5FEF'), rounded(45), flex, itemsCenter, justifyCenter, ml(-15)]}>
                                                     <FontAwesome6 name="arrow-right-long" size={24} color={colors.white} />
                                                 </TouchableOpacity>
                                             </View>
@@ -130,7 +130,7 @@ export default function Trip() {
                                                     <Image style={[image.w(18), image.h(14.73)]} source={images.passengersImage} />
                                                     <Text style={[fs12, fw500, colorBlack]}>{3} seats Available</Text>
                                                 </View>
-                                                <TouchableOpacity onPress={() => router.push(`/(tripScreen)/tripDetails/${index}` as Href)} style={[w(45), h(45), bg('#5D5FEF'), rounded('100%'), flex, itemsCenter, justifyCenter, ml(-15)]}>
+                                                <TouchableOpacity onPress={() => router.push(`/(tripScreen)/tripDetails/${index}` as Href)} style={[w(45), h(45), bg('#5D5FEF'), rounded(45), flex, itemsCenter, justifyCenter, ml(-15)]}>
                                                     <FontAwesome6 name="arrow-right-long" size={24} color={colors.white} />
                                                 </TouchableOpacity>
                                             </View>

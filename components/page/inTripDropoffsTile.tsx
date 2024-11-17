@@ -27,12 +27,12 @@ function InTripDropoffTile() {
 
             <View style={[flex, itemsCenter, justifyBetween]}>
                 <View style={[flex, itemsCenter, gap(10)]}>
-                    <View style={[w(5), h(5), bg(colors.black), rounded('100%')]} />
+                    <View style={[w(5), h(5), bg(colors.black), rounded(5)]} />
                     <Text style={[fs14, fw700, c(colors.black)]}>Orogun Bus Stop</Text>
                 </View>
 
                 <View style={[flex, itemsCenter, gap(10)]}>
-                    <View style={[w(5), h(5), bg(colors.black), rounded('100%')]} />
+                    <View style={[w(5), h(5), bg(colors.black), rounded(5)]} />
                     <Text style={[fs14, fw500, c(colors.black)]}>7:40 AM</Text>
                 </View>
             </View>

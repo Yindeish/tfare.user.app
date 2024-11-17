@@ -59,29 +59,30 @@ export function SessionProvider(props: React.PropsWithChildren) {
     openSnackbar()
 
     setTimeout(() => {
-      closeSnackbar()
+      // closeSnackbar()
       onChange('msg', '');
     }, timeout);
-    if (Platform.OS == 'android') ToastAndroid.show(msg, ToastAndroid.SHORT)
+    // if (Platform.OS == 'android') ToastAndroid.show(msg, ToastAndroid.SHORT)
   }
 
   const signIn = async (data: IRequestData) => {
-    // onChange('loadingState', 'signingin' as TSigninLoadingState);
+    onChange('loadingState', 'signingin' as TSigninLoadingState);
 
-    // const returnedData: ISigninResponseData = await FetchService.post({ data, url: '/auth/signin' })
+    const returnedData: ISigninResponseData = await FetchService.post({ data, url: '/auth/signin' })
+    console.log({ '___returnedData___': returnedData })
 
-    // onChange('loadingState', 'idle' as TSigninLoadingState);
-    // onChange('code', returnedData.code as number);
-    // onChange('msg', returnedData.msg);
+    onChange('loadingState', 'idle' as TSigninLoadingState);
+    onChange('code', returnedData.code as number);
+    onChange('msg', returnedData.msg);
 
-    // returnedData.user && setSession(JSON.stringify(returnedData.user));
-    // returnedData.user && signInwithToken(returnedData.token);
+    returnedData.user && setSession(JSON.stringify(returnedData.user));
+    returnedData.user && signInwithToken(returnedData.token);
 
-    // if (!returnedData.user || !returnedData.token) {
-    //   notify();
-    // }
+    if (!returnedData.user || !returnedData.token) {
+      notify();
+    }
 
-    signInwithToken('token'); setSession(JSON.stringify({ user: 'user' }));  // for testing
+    // signInwithToken('token'); setSession(JSON.stringify({ user: 'user' }));  // for testing
 
   }
 

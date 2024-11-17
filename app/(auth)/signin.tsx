@@ -5,13 +5,15 @@ import { useSession } from '../../contexts/userSignedInContext';
 import SafeScreen from '../../components/shared/safeScreen';
 import { ActivityIndicator, MD2Colors, Snackbar, Text } from 'react-native-paper';
 import { fonts } from '../../constants/fonts';
-import { wFull, wHFull, flexCol, itemsStart, justifyCenter, justifyEnd, flex, itemsCenter, justifyBetween, mXAuto } from '../../utils/styles';
+import { wFull, wHFull, flexCol, itemsStart, justifyCenter, justifyEnd, flex, itemsCenter, justifyBetween, mXAuto, flexCenter } from '../../utils/styles';
 import Colors, { colors } from '../../constants/Colors';
 import PaddedScreen from '@/components/shared/paddedScreen';
 import { useSnackbar } from '@/contexts/snackbar.context';
 import { useSession as userTokenSession } from '@/contexts/userTokenContext';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { ScrollView } from 'react-native-gesture-handler';
+import { c, fs10 } from '@/utils/fontStyles';
 
 const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noAccount, signupLink, invalidEntryText } = StyleSheet.create({
     signInTitle: {
@@ -104,84 +106,89 @@ export default function Signin() {
 
     return (
         <SafeScreen>
-            <PaddedScreen styles={wHFull}>
-                <View style={[wHFull, flexCol, itemsStart, justifyCenter, { gap: 40 }]}>
-                    <View style={[flexCol, wFull, { gap: 2 }]}>
-                        <Text style={signInTitle}>Sign in</Text>
-                        <Text style={signInTitle}>to continue</Text>
-                    </View>
+            <View style={[flexCenter, { flex: 1 }]}>
+                <ScrollView contentContainerStyle={[flexCenter]}>
+                    <PaddedScreen styles={wHFull}>
+                        <View style={[wHFull, flexCol, itemsStart, justifyCenter, { gap: 40 }]}>
+                            <View style={[flexCol, wFull, { gap: 2 }]}>
+                                <Text style={signInTitle}>Sign in</Text>
+                                <Text style={signInTitle}>to continue</Text>
+                            </View>
 
-                    <View style={[form, { gap: 16 }]}>
-                        <TextInput
-                            style={[
-                                textInput,
-                                formik.errors.email && formik.touched.email ? { borderColor: Colors.light.error } : undefined
-                            ]}
-                            placeholder='Email Address'
-                            placeholderTextColor={Colors.light.textGrey}
-                            keyboardType='email-address'
-                            value={formik.values.email}
-                            onChangeText={formik.handleChange('email')}
-                            onBlur={formik.handleBlur('email')}
-                            autoFocus
-                        />
+                            <View style={[form, { gap: 16 }]}>
+                                <TextInput
+                                    style={[
+                                        textInput,
+                                        formik.errors.email && formik.touched.email ? { borderColor: Colors.light.error } : undefined
+                                    ]}
+                                    placeholder='Email Address'
+                                    placeholderTextColor={Colors.light.textGrey}
+                                    keyboardType='email-address'
+                                    value={formik.values.email}
+                                    onChangeText={formik.handleChange('email')}
+                                    onBlur={formik.handleBlur('email')}
+                                    autoFocus
+                                />
 
-                        {formik.errors.email && formik.touched.email && (
-                            <Text style={invalidEntryText}>{formik.errors.email}</Text>
-                        )}
+                                {formik.errors.email && formik.touched.email && (
+                                    <Text style={invalidEntryText}>{formik.errors.email}</Text>
+                                )}
 
-                        <TextInput
-                            style={[
-                                textInput,
-                                formik.errors.pin && formik.touched.pin ? { borderColor: Colors.light.error } : undefined
-                            ]}
-                            placeholder='4-Digit Pin Code'
-                            placeholderTextColor={Colors.light.textGrey}
-                            keyboardType='number-pad'
-                            value={formik.values.pin}
-                            secureTextEntry
-                            onChangeText={formik.handleChange('pin')}
-                            onBlur={formik.handleBlur('pin')}
-                        />
-                        {formik.errors.pin && formik.touched.pin && (
-                            <Text style={invalidEntryText}>{formik.errors.pin}</Text>
-                        )}
+                                <TextInput
+                                    style={[
+                                        textInput,
+                                        formik.errors.pin && formik.touched.pin ? { borderColor: Colors.light.error } : undefined
+                                    ]}
+                                    placeholder='4-Digit Pin Code'
+                                    placeholderTextColor={Colors.light.textGrey}
+                                    keyboardType='number-pad'
+                                    value={formik.values.pin}
+                                    secureTextEntry
+                                    onChangeText={formik.handleChange('pin')}
+                                    onBlur={formik.handleBlur('pin')}
+                                />
+                                {formik.errors.pin && formik.touched.pin && (
+                                    <Text style={invalidEntryText}>{formik.errors.pin}</Text>
+                                )}
 
-                        <View style={[wFull, flex, itemsCenter, justifyEnd]}>
-                            <Text style={[forgotPassword]}>Forgot Password?</Text>
+                                <View style={[wFull, flex, itemsCenter, justifyEnd]}>
+                                    <Text style={[forgotPassword]}>Forgot Password?</Text>
+                                </View>
+                            </View>
+                            <Text style={[fs10, c(colors.red500)]}>{msg}</Text>
+
+                            <Pressable
+                                style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]}
+                                disabled={loadingState === 'signingin'}
+                                onPress={() => formik.handleSubmit()}
+                            >
+                                {loadingState === 'idle' ? (
+                                    <Text style={[signInText]}>Sign In</Text>
+                                ) : (
+                                    <ActivityIndicator color={colors.white} size='small' />
+                                )}
+                            </Pressable>
+
+                            <Text style={[noAccount, mXAuto]}>
+                                Don't have an account?
+                                <Link href={'/signup'}>
+                                    <Text style={signupLink}>Sign Up</Text>
+                                </Link>
+                            </Text>
                         </View>
-                    </View>
 
-                    <Pressable
-                        style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]}
-                        disabled={loadingState === 'signingin'}
-                        onPress={() => formik.handleSubmit()}
-                    >
-                        {loadingState === 'idle' ? (
-                            <Text style={[signInText]}>Sign In</Text>
-                        ) : (
-                            <ActivityIndicator color={colors.white} size='small' />
-                        )}
-                    </Pressable>
-
-                    <Text style={[noAccount, mXAuto]}>
-                        Don't have an account?
-                        <Link href={'/signup'}>
-                            <Text style={signupLink}>Sign Up</Text>
-                        </Link>
-                    </Text>
-                </View>
-
-                {Platform.OS === 'ios' && (
-                    <Snackbar
-                        visible={snackbarVisible}
-                        onDismiss={() => closeSnackbar()}
-                        action={{ label: 'close', onPress: () => { } }}
-                    >
-                        {msg}
-                    </Snackbar>
-                )}
-            </PaddedScreen>
+                        {/* {Platform.OS === 'ios' && (
+                            <Snackbar
+                                visible={snackbarVisible}
+                                onDismiss={() => closeSnackbar()}
+                                action={{ label: 'close', onPress: () => { } }}
+                            >
+                                {msg}
+                            </Snackbar>
+                        )} */}
+                    </PaddedScreen>
+                </ScrollView>
+            </View>
         </SafeScreen>
     );
 }

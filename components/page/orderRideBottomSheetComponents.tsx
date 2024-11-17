@@ -13,7 +13,7 @@ import { } from "@/state/slices/layout";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
 import RideSelectors from "@/state/selectors/ride";
 import { setStateInputField, } from "@/state/slices/ride";
-import { router } from "expo-router";
+import { Href, router } from "expo-router";
 import BottomSheet, { BottomSheetFlatList, BottomSheetView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import BottomSheetTitle from "../shared/bottomSheetTitle";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
@@ -667,7 +667,7 @@ const SearchingRide = () => {
 
     setTimeout(() => {
         hideBottomSheet();
-        router.push(`/${pages.availableRides}`)
+        router.push(`/${pages.availableRides}` as Href)
     }, 3000)
 
     return (

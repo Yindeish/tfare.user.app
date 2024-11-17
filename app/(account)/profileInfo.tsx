@@ -19,8 +19,8 @@ import { setProfileCta, setUserProfileInfo, setUserProfileInfoFeild } from '@/st
 import { IStateInputProfile } from '@/state/types/account'
 import { useSession } from '@/contexts/userSignedInContext'
 import * as ImagePicker from 'expo-image-picker';
-import { UploadApiOptions, upload } from 'cloudinary-react-native'
-import CloudinaryServices from '../../cloudinary/cloudinary.services'
+// import { UploadApiOptions, upload } from 'cloudinary-react-native'
+// import CloudinaryServices from '../../cloudinary/cloudinary.services'
 
 
 export default function profileInfo() {
