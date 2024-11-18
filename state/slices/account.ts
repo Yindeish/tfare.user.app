@@ -42,19 +42,19 @@ const initialState: IAccountState = {
     emergencyContacts: [
         {
             email: 'one@gmail.com',
-            name: 'one',
+            fullName: 'one',
             phoneNo: 8899879,
             whatsAppNo: 9808023,
         },
         {
             email: 'one@gmail.com',
-            name: 'one',
+            fullName: 'one',
             phoneNo: 8899879,
             whatsAppNo: 9808023,
         },
         {
             email: 'one@gmail.com',
-            name: 'one',
+            fullName: 'one',
             phoneNo: 8899879,
             whatsAppNo: 9808023,
         },
@@ -115,7 +115,8 @@ const accountSlice = createSlice({
         },
 
         setUserWallet: (state, action: PayloadAction<IUserAccountWallet>) => {
-            if (state.userAccount) state.userAccount.wallet = action.payload;
+            // if (state.userAccount)
+            (state.userAccount as IUserAccount).wallet = action.payload;
         },
 
         setUserNotificationField: (state, action: PayloadAction<{ key: keyof IStateInputNotifications, value: boolean }>) => {
@@ -142,7 +143,7 @@ const accountSlice = createSlice({
                 const { emailInput, nameInput, phoneNoInput, userNameInput } = state.stateInput.profile;
                 state.userAccount = {
                     email: emailInput,
-                    name: nameInput,
+                    fullName: nameInput,
                     phoneNo: Number(phoneNoInput),
                     userName: userNameInput,
                 }

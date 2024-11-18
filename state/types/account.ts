@@ -11,15 +11,24 @@ interface IUserAccountNotification {
     transactionUpdates: boolean,
 }
 
-interface IUserAccountWallet extends Partial<IFlutterwaveWallet> {
+// interface IUserAccountWallet extends Partial<IFlutterwaveWallet> {
+// }
+interface IUserAccountWallet {
+    userId: string,
+    account_number: string,
+    account_status: string,
+    bank_name: string,
+    expiry_date: string,
+    note: string,
+    balance: string
 }
 
 interface IUserAccount {
-    name: string,
+    fullName: string,
     userName: string,
     email: string,
     phoneNo: number,
-    picture?: Blob,
+    picture?: string,
     auth?: {
         biometricLogin: boolean,
     },
@@ -30,7 +39,7 @@ interface IUserAccount {
 }
 
 interface EmergencyContact extends
-    Pick<IUserAccount, 'name' | 'email' | 'phoneNo'> {
+    Pick<IUserAccount, 'fullName' | 'email' | 'phoneNo'> {
     whatsAppNo: number
 }
 

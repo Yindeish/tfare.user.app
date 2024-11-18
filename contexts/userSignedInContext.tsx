@@ -69,7 +69,6 @@ export function SessionProvider(props: React.PropsWithChildren) {
     onChange('loadingState', 'signingin' as TSigninLoadingState);
 
     const returnedData: ISigninResponseData = await FetchService.post({ data, url: '/auth/signin' })
-    console.log({ '___returnedData___': returnedData })
 
     onChange('loadingState', 'idle' as TSigninLoadingState);
     onChange('code', returnedData.code as number);
@@ -87,22 +86,22 @@ export function SessionProvider(props: React.PropsWithChildren) {
   }
 
   const signOut = async () => {
-    // onChange('loadingState', 'signingout' as TSigninLoadingState);
-    // const returnedData: IResponseData = await FetchService.postWithBearerToken({ url: '/auth/signout', token: tokenSession as string })
+    onChange('loadingState', 'signingout' as TSigninLoadingState);
+    const returnedData: IResponseData = await FetchService.postWithBearerToken({ url: '/auth/signout', token: tokenSession as string })
 
-    // onChange('loadingState', 'idle' as TSigninLoadingState);
-    // onChange('code', returnedData.code as number);
-    // onChange('msg', returnedData.msg);
+    onChange('loadingState', 'idle' as TSigninLoadingState);
+    onChange('code', returnedData.code as number);
+    onChange('msg', returnedData.msg);
 
-    // if (Number(returnedData.code) === 400) {
-    //   notify();
-    // }
-    // if (Number(returnedData.code) === 200) {
-    //   setSession(null);
-    //   // signTokenOut(); //just signout user
-    // }
+    if (Number(returnedData.code) === 400) {
+      notify();
+    }
+    if (Number(returnedData.code) === 200) {
+      setSession(null);
+      // signTokenOut(); //just signout user
+    }
 
-    setSession(null); signTokenOut(); //for testing
+    // setSession(null); signTokenOut(); //for testing
   }
 
   return (

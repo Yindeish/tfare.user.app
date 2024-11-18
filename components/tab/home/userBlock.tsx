@@ -4,7 +4,14 @@ import PaddedScreen from "@/components/shared/paddedScreen";
 import Colors, { colors } from "@/constants/Colors";
 import { fonts } from "@/constants/fonts";
 import { images } from "@/constants/images";
+import { useSession } from "@/contexts/userSignedInContext";
+import { useSession as useTokenSession } from "@/contexts/userTokenContext";
+import FetchService from "@/services/api/fetch.service";
+import { useAppSelector } from "@/state/hooks/useReduxToolkit";
+import AccountSelectors from "@/state/selectors/account";
+import { RootState } from "@/state/store";
 import { flex, flexCol, hFull, itemsCenter, justifyBetween, justifyCenter, wFull } from "@/utils/styles";
+import { useEffect, useState } from "react";
 import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Text } from "react-native-paper";
 
@@ -62,6 +69,9 @@ function UserBlock() {
         }
     });
 
+    const { user } = useSession();
+    const { wallet } = useAppSelector((state: RootState) => state.user);
+
     return (
         <PaddedScreen>
             <View style={[wFull, flexCol, container]}>
@@ -70,13 +80,13 @@ function UserBlock() {
                         <TouchableOpacity>
                             <Image
                                 style={[{ width: 60, height: 60, objectFit: 'cover' }]}
-                                source={images.userProfileImage}
+                                source={user?.picture ? { uri: user?.picture } : images.userProfileImage}
                             />
                         </TouchableOpacity>
 
                         <View style={[hFull, flexCol, justifyBetween]}>
                             <Text style={[greyText,]}>Welcome back</Text>
-                            <Text style={[userNameText]}>King John</Text>
+                            <Text style={[userNameText]}>{user?.fullName}</Text>
                             <Text style={[greyText]}>We are at your service</Text>
                         </View>
                     </View>
@@ -102,7 +112,7 @@ function UserBlock() {
 
                             <Text style={[{ fontFamily: fonts.neurialGrotesk, fontSize: 12, color: Colors.light.textGrey, fontWeight: '400' }]}>wallet balance</Text>
                         </View>
-                        <Text style={[userNameText, { fontSize: 22 }]}> ₦{'0000.00'}</Text>
+                        <Text style={[userNameText, { fontSize: 22 }]}> ₦{wallet?.balance || '0000.00'}</Text>
                     </View>
 
                     <TouchableOpacity>

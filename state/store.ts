@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import layout from './slices/layout';
 import ride from './slices/ride';
 import account from './slices/account';
+import user from './slices/user';
 
 
 export const store = configureStore({
@@ -9,6 +10,7 @@ export const store = configureStore({
         layout,
         ride,
         account,
+        user,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat()

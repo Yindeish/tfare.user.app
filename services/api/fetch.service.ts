@@ -16,7 +16,7 @@ const get = async ({ url, timeout = 20000 }: { url: string, timeout?: number }) 
             signal
         });
 
-        clearTimeout(fetchTimeout);
+        timeout && clearTimeout(fetchTimeout);
 
         const data = await response.json();
         return data;
@@ -39,25 +39,28 @@ const getWithBearerToken = async ({ token, url, timeout = 20000 }: { token: stri
         controller.abort();
     }, timeout);
     try {
-        const response = await fetch(`${baseUrl}/${url}`, {
+        const response = await fetch(`${baseUrl}${url}`, {
             headers: {
                 ...headers,
+                credentials: 'include',
                 Authorization: `Bearer ${token}`
             },
             signal
         });
-        clearTimeout(fetchTimeout);
+
+        timeout && clearTimeout(fetchTimeout);
 
         const data = await response.json();
         return data;
     } catch (error) {
-        if ((error as any)?.name === 'AbortError') {
-            console.error('Fetch request timed out');
-            return { code: 400, msg: 'Fetch request timed out' }
-        } else {
-            console.error('Fetch request error:', error);
-            return { code: 500, msg: 'Fetch request errorout' }
-        }
+        console.log({ error })
+        // if ((error as any)?.name === 'AbortError') {
+        //     console.error('Fetch request timed out');
+        //     return { code: 400, msg: 'Fetch request timed out' }
+        // } else {
+        //     console.error('Fetch request error:', error);
+        //     return { code: 500, msg: 'Fetch request errorout' }
+        // }
     }
 }
 
@@ -75,7 +78,6 @@ const post = async ({ data: formData, url, timeout = 20000 }: { data?: object, u
             signal,
             body: JSON.stringify(formData)
         });
-        console.log({ response });
         timeout && clearTimeout(fetchTimeout);
 
         const data = await response.json();
@@ -96,9 +98,9 @@ const postWithBearerToken = async ({ data: formData, url, token, timeout = 20000
     const controller = new AbortController();
     const signal = controller.signal;
 
-    const fetchTimeout = setTimeout(() => {
-        controller.abort();
-    }, timeout);
+    // const fetchTimeout = setTimeout(() => {
+    //     controller.abort();
+    // }, timeout);
     try {
         const response = await fetch(`${baseUrl}${url}`, {
             method: methods.POST,
@@ -109,18 +111,19 @@ const postWithBearerToken = async ({ data: formData, url, token, timeout = 20000
             signal,
             body: formData ? JSON.stringify(formData) : null
         });
-        clearTimeout(fetchTimeout);
+        // timeout && clearTimeout(fetchTimeout);
 
         const data = await response.json();
         return data;
     } catch (error) {
-        if ((error as any)?.name === 'AbortError') {
-            console.error('Fetch request timed out');
-            return { code: 400, msg: 'Fetch request timed out' }
-        } else {
-            console.error('Fetch request error:', error);
-            return { code: 500, msg: 'Fetch request errorout' }
-        }
+        // if ((error as any)?.name === 'AbortError') {
+        //     console.error('Fetch request timed out');
+        //     return { code: 400, msg: 'Fetch request timed out' }
+        // } else {
+        //     console.error('Fetch request error:', error);
+        //     return { code: 500, msg: 'Fetch request errorout' }
+        // }
+        console.log({ error })
     }
 }
 
