@@ -18,9 +18,13 @@ import BottomSheet, { BottomSheetFlatList, BottomSheetView, BottomSheetTextInput
 import BottomSheetTitle from "../shared/bottomSheetTitle";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { pages } from "@/constants/pages";
+import FetchService from "@/services/api/fetch.service";
+import { useSession } from "@/contexts/userTokenContext";
+import { setSavedAddresses } from "@/state/slices/account";
 
 const RecentLocationsSnippet = () => {
     const dispatch = useDispatch();
+    const { tokenSession } = useSession()
     const { showBottomSheet } = useBottomSheet();
     const { stateInput: { dropoffBusstopInput, pickupBusstopInput } } = RideSelectors();
 
@@ -46,6 +50,31 @@ const RecentLocationsSnippet = () => {
             name: 'Workplace',
         },
     ]
+
+    const [fetchState, setFetchState] = useState({
+        loading: false,
+    })
+    const { loading } = fetchState;
+
+    const getUserWallet = async () => {
+        setFetchState({ loading: true });
+        const returnedData = await FetchService.getWithBearerToken({ url: '/user/me/busstop/saved-busstops', token: tokenSession as string });
+        const wallet = returnedData?.wallet;
+        setFetchState({ loading: false });
+        if (wallet) {
+            const { account_number, account_status,
+                balance, bank_name, expiry_date,
+                note, userId } = wallet;
+            dispatch(setSavedAddresses({
+
+            }))
+        }
+    }
+
+
+    const getSavedBusstops = async () => {
+
+    }
 
     const openRecentPickupLocations = () => {
         showBottomSheet([508,], <RecentPickupLocations />)

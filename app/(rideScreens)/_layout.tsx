@@ -37,8 +37,8 @@ export default function AppLayout() {
     <Stack.Screen name={`${pages.bookRide}/[rideId]`} />
     <Stack.Screen name={`${pages.rideBooked}/[rideId]`} />
     <Stack.Screen name={`${pages.buyTicket}/[rideId]`} />
-    <Stack.Screen name={`${pages.chat}/[rideId]`} />
-    <Stack.Screen name={`${pages.driverProfile}/[rideId]`} />
+    {/* <Stack.Screen name={`${pages.chat}/[rideId]`} /> */}
+    {/* <Stack.Screen name={`(sharedScreens)/${pages.driverProfile}/[rideId]`} /> */}
     <Stack.Screen name={`${pages.paymentOptions}/[rideId]`} />
     <Stack.Screen name={`${pages.rideStarted}/[rideId]`} />
   </Stack>
