@@ -22,6 +22,8 @@ import RideBlock from '@/components/page/rideBlock';
 import { IRide } from '@/state/types/ride';
 import { useBottomSheet } from '@/contexts/useBottomSheetContext';
 import { useGlobalSearchParams } from 'expo-router';
+import { EVENTS, socket } from '@/socket.io/socket.io.config';
+import { IRideAccptedEvent } from '@/socket.io/socket.io.types';
 
 
 type Region = {
@@ -36,6 +38,10 @@ function Ride() {
     const { showBottomSheet, hideBottomSheet, bottomSheetType } = useBottomSheet();
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentRideView, availableRides, } = RideSelectors()
     const { query, riderCounterOffer } = useGlobalSearchParams<{ query?: string, riderCounterOffer?: string }>();
+
+    socket.on(EVENTS.rideRequestAccepted, (data: IRideAccptedEvent) => {
+        console.log("Ride accepted:", data);
+    });
 
     useEffect(() => {
         if (query === 'RecentLocationsSnippet') showBottomSheet([601], <RecentLocationsSnippet />);

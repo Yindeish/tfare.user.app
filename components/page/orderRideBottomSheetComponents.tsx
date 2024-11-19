@@ -27,6 +27,8 @@ import { RootState } from "@/state/store";
 import AccountSelectors from "@/state/selectors/account";
 import { useStorageState } from "@/hooks/useStorageState";
 import { useLocalSearchParams } from 'expo-router';
+import { socket } from "@/socket.io/socket.io.config";
+import { IRideAccptedEvent } from "@/socket.io/socket.io.types";
 
 const RecentLocationsSnippet = () => {
     const dispatch = useDispatch();
@@ -726,6 +728,10 @@ const SearchingRide = ({ riderCounterOffer }: { riderCounterOffer: string }) => 
 
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput, userCounterFareInput } } = RideSelectors()
     const [[isLoading, session], setSession] = useStorageState('token');
+
+    socket.on("rideAccepted", (data: IRideAccptedEvent) => {
+        console.log("Ride accepted:", data);
+    });
 
     const [fetchState, setFetchState] = useState({
         loading: false,
