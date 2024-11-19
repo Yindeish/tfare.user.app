@@ -16,7 +16,7 @@ export default function AppLayout() {
   const { width, height } = Dimensions.get('window');
 
   useEffect(() => {
-    console.log({ userSession })
+    // console.log({ userSession })
   }, [userSession])
 
   if (isLoading) {

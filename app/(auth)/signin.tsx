@@ -155,7 +155,8 @@ export default function Signin() {
                                     <Text style={[forgotPassword]}>Forgot Password?</Text>
                                 </View>
                             </View>
-                            <Text style={[fs10, c(colors.red500)]}>{msg}</Text>
+
+                            {code == 400 && <Text style={[fs10, c(colors.red500)]}>{msg}</Text>}
 
                             <Pressable
                                 style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]}

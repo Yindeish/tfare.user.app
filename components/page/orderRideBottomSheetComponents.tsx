@@ -1,8 +1,8 @@
-import { View, Image, TextInput, TouchableOpacity, ScrollView, FlatList, Pressable, Button, Dimensions } from "react-native";
+import { View, Image, TextInput, TouchableOpacity, ScrollView, FlatList, Pressable, Button, Dimensions, ActivityIndicator } from "react-native";
 import PaddedScreen from "../shared/paddedScreen";
-import { absolute, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsEnd, itemsStart, justifyBetween, justifyCenter, justifyStart, left0, mLAuto, mRAuto, mXAuto, ml, mt, p, pLAuto, pXAuto, pb, pl, px, py, relative, right0, rounded, t, top0, w, wFull, wHFull, zIndex } from "@/utils/styles";
+import { absolute, bg, flex, flexCenter, flexCol, gap, h, hFull, itemsCenter, itemsEnd, itemsStart, justifyBetween, justifyCenter, justifyStart, left0, mLAuto, mRAuto, mXAuto, ml, mt, p, pLAuto, pXAuto, pb, pl, px, py, relative, right0, rounded, t, top0, w, wFull, wHFull, zIndex } from "@/utils/styles";
 import { Text, Portal, Dialog, Paragraph } from "react-native-paper";
-import { c, colorBlack, colorBlueBg, colorBorderGrey, colorWhite, fs12, fs14, fs16, fs18, fw400, fw500, fw700, neurialGrotesk } from "@/utils/fontStyles";
+import { c, colorBlack, colorBlueBg, colorBorderGrey, colorWhite, fs10, fs12, fs14, fs16, fs18, fw400, fw500, fw700, neurialGrotesk } from "@/utils/fontStyles";
 import { images } from "@/constants/images";
 import { image } from "@/utils/imageStyles";
 import Colors, { colors } from "@/constants/Colors";
@@ -10,79 +10,61 @@ import { useEffect, useState } from "react";
 import LayoutSelectors from "@/state/selectors/layout";
 import { useDispatch } from "react-redux";
 import { } from "@/state/slices/layout";
-import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
+import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
 import RideSelectors from "@/state/selectors/ride";
-import { setStateInputField, } from "@/state/slices/ride";
-import { Href, router } from "expo-router";
+import { setState, setStateInputField, } from "@/state/slices/ride";
+import { Href, router, useGlobalSearchParams, usePathname } from "expo-router";
 import BottomSheet, { BottomSheetFlatList, BottomSheetView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import BottomSheetTitle from "../shared/bottomSheetTitle";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { pages } from "@/constants/pages";
 import FetchService from "@/services/api/fetch.service";
 import { useSession } from "@/contexts/userTokenContext";
+import { useSession as UserSession } from "@/contexts/userSignedInContext";
 import { setSavedAddresses } from "@/state/slices/account";
+import { IAddress } from "@/state/types/account";
+import { RootState } from "@/state/store";
+import AccountSelectors from "@/state/selectors/account";
+import { useStorageState } from "@/hooks/useStorageState";
+import { useLocalSearchParams } from 'expo-router';
 
 const RecentLocationsSnippet = () => {
     const dispatch = useDispatch();
-    const { tokenSession } = useSession()
-    const { showBottomSheet } = useBottomSheet();
-    const { stateInput: { dropoffBusstopInput, pickupBusstopInput } } = RideSelectors();
+    const [[isLoading, session], setSession] = useStorageState('token');
+    const { savedAddresses } = AccountSelectors()
 
-    const DATA = [
-        {
-            id: 0,
-            name: 'Home',
-        },
-        {
-            id: 1,
-            name: 'Apartment',
-        },
-        {
-            id: 2,
-            name: 'Workplace',
-        },
-        {
-            id: 3,
-            name: 'Workplace',
-        },
-        {
-            id: 4,
-            name: 'Workplace',
-        },
-    ]
+    const { showBottomSheet } = useBottomSheet();
+    const { stateInput: { dropoffBusstopInput, pickupBusstopInput, }, } = RideSelectors();
 
     const [fetchState, setFetchState] = useState({
         loading: false,
     })
     const { loading } = fetchState;
 
-    const getUserWallet = async () => {
-        setFetchState({ loading: true });
-        const returnedData = await FetchService.getWithBearerToken({ url: '/user/me/busstop/saved-busstops', token: tokenSession as string });
-        const wallet = returnedData?.wallet;
-        setFetchState({ loading: false });
-        if (wallet) {
-            const { account_number, account_status,
-                balance, bank_name, expiry_date,
-                note, userId } = wallet;
-            dispatch(setSavedAddresses({
-
-            }))
-        }
-    }
-
-
     const getSavedBusstops = async () => {
+        setFetchState({ loading: true });
+        const returnedData = await FetchService.getWithBearerToken({ url: '/user/rider/me/busstop/saved-busstops', token: session as string });
+        const allBusStops = returnedData?.allBusStops as IAddress[];
 
+        setFetchState({ loading: false });
+        if (allBusStops) {
+            dispatch(setSavedAddresses(allBusStops));
+        }
     }
 
     const openRecentPickupLocations = () => {
         showBottomSheet([508,], <RecentPickupLocations />)
+        router.setParams({ query: 'RecentPickupLocations' });
     }
 
     const openRecentDropoffLocations = () => {
         showBottomSheet([508,], <RecentDropoffLocations />)
+        router.setParams({ query: 'RecentDropoffLocations' });
     }
+
+    useEffect(() => {
+        session && getSavedBusstops();
+    }, [session])
 
     return (
         <PaddedScreen>
@@ -105,7 +87,7 @@ const RecentLocationsSnippet = () => {
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
-                            value={pickupBusstopInput}
+                            value={pickupBusstopInput?.name || ''}
                             onChangeText={(text) => {
                                 dispatch(setStateInputField({ key: 'pickupBusstopInput', value: text }));
                             }}
@@ -116,22 +98,22 @@ const RecentLocationsSnippet = () => {
                         </TouchableOpacity>
                     </View>
 
-                    <FlatList
+                    {!loading ? (<FlatList
                         style={[wFull, h(46), flex, gap(16),]}
                         horizontal
-                        data={DATA}
+                        data={savedAddresses}
                         renderItem={({ item }) => (
-                            <TouchableOpacity onPress={() => dispatch(setStateInputField({ key: 'pickupBusstopInput', value: item.name }))}>
-                                <View style={[w(98), hFull, rounded(100), py(16), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
-                                    <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item.name}</Text>
+                            <TouchableOpacity onPress={() => dispatch(setStateInputField({ key: 'pickupBusstopInput', value: item?.busStop }))}>
+                                <View style={[w('auto'), hFull, rounded(100), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
+                                    <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item?.busstopTitle}</Text>
                                 </View>
                             </TouchableOpacity>
                         )}
                         ItemSeparatorComponent={() => (
                             <View style={[w(16), hFull, bg(colors.transparent)]} />
                         )}
-                        keyExtractor={(({ id }) => id.toString())}
-                    />
+                        keyExtractor={(({ }) => Math.random().toString())}
+                    />) : (<View style={[wFull, h(50), flexCenter]}><ActivityIndicator style={[w(50), h(50)]} /></View>)}
                 </View>
 
                 <View style={[flexCol, gap(20),]}>
@@ -150,7 +132,7 @@ const RecentLocationsSnippet = () => {
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Destination"
-                            value={dropoffBusstopInput}
+                            value={dropoffBusstopInput?.name || ''}
                             onChangeText={(text) => {
                                 dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: text }));
                             }}
@@ -159,26 +141,27 @@ const RecentLocationsSnippet = () => {
                         <Image style={[image.w(22), image.h(24)]} source={images.dropOffImage} />
                     </View>
 
-                    <FlatList
+                    {!loading ? (<FlatList
                         style={[wFull, h(46), flex, gap(16),]}
                         horizontal
-                        data={DATA}
+                        data={savedAddresses}
                         renderItem={({ item }) => (
-                            <TouchableOpacity onPress={() => dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: item.name }))}>
-                                <View style={[w(98), hFull, rounded(100), py(16), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
-                                    <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item.name}</Text>
+                            <TouchableOpacity onPress={() => dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: item?.busStop }))}>
+                                <View style={[w('auto'), hFull, rounded(100), px(32), gap(10), flex, itemsCenter, justifyCenter, { borderWidth: 1, borderColor: Colors.light.border }]}>
+                                    <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item.busstopTitle}</Text>
                                 </View>
                             </TouchableOpacity>
                         )}
                         ItemSeparatorComponent={() => (
                             <View style={[w(16), hFull, bg(colors.transparent)]} />
                         )}
-                        keyExtractor={(({ id }) => id.toString())}
-                    />
+                        keyExtractor={(({ }) => Math.random().toString())}
+                    />) : (<View style={[wFull, h(50), flexCenter]}><ActivityIndicator style={[w(50), h(50)]} /></View>)}
                 </View>
 
                 <TouchableOpacity onPress={() => {
                     showBottomSheet([436, 601], <FilledForm />)
+                    router.setParams({ query: 'FilledForm' });
                 }}>
                     <View style={[wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.background)]}>
                         <Text style={[neurialGrotesk, fw700, fs18, colorWhite]}>Proceed</Text>
@@ -240,7 +223,8 @@ const RecentPickupLocations = () => {
             <View style={[flexCol, gap(56), mt(20),]}>
                 <View style={[flexCol, gap(20), relative]}>
                     <BottomSheetTitle title="Pick up bus stop" onPressFn={() => {
-                        showBottomSheet([601, 800], <RecentLocationsSnippet />)
+                        showBottomSheet([601, 800], <RecentLocationsSnippet />);
+                        router.setParams({ query: 'RecentLocationsSnippet' });
                     }} />
 
                     <View style={[wFull, h(52), rounded(10), py(16), px(24), bg('#F9F7F8'), flex, gap(10), itemsCenter, justifyCenter]}>
@@ -255,7 +239,7 @@ const RecentPickupLocations = () => {
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
-                            value={pickupBusstopInput}
+                            value={pickupBusstopInput?.name || ''}
                             onChangeText={(text) => dispatch(setStateInputField({ key: 'pickupBusstopInput', value: text }))}
                         />
 
@@ -408,7 +392,8 @@ const RecentDropoffLocations = () => {
             <View style={[flexCol, gap(56), mt(20),]}>
                 <View style={[flexCol, gap(20), relative]}>
                     <BottomSheetTitle title="Drop off bus stop" onPressFn={() => {
-                        showBottomSheet([601], <RecentLocationsSnippet />)
+                        showBottomSheet([601], <RecentLocationsSnippet />);
+                        router.setParams({ query: 'RecentLocationsSnippet' });
                     }} />
 
                     <View style={[wFull, h(52), rounded(10), py(16), px(24), bg('#F9F7F8'), flex, gap(10), itemsCenter, justifyCenter]}>
@@ -423,7 +408,7 @@ const RecentDropoffLocations = () => {
                             placeholderTextColor={Colors.light.textGrey}
                             cursorColor={Colors.light.textGrey}
                             placeholder="Enter Location"
-                            value={dropoffBusstopInput}
+                            value={dropoffBusstopInput?.name || ''}
                             onChangeText={(text) => dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: text }))}
                         />
 
@@ -529,14 +514,48 @@ const RecentDropoffLocations = () => {
 
 const FilledForm = () => {
     const dispatch = useAppDispatch();
+    const [[isLoading, session], setSession] = useStorageState('token');
+    const { } = AccountSelectors()
     const { showBottomSheet } = useBottomSheet();
-    const { stateInput: { pickupBusstopInput, dropoffBusstopInput } } = RideSelectors()
+    const { stateInput: { pickupBusstopInput, dropoffBusstopInput } } = RideSelectors();
+
     let [inputting, setInputting] = useState({
         pickupBusstop: false,
         dropoffpickupBusstop: false,
     })
+    const [fetchState, setFetchState] = useState({
+        loading: false,
+        msg: '',
+        code: null
+    })
+    const { loading, code, msg } = fetchState;
 
     const onChange = (key: string, val: boolean) => setInputting((prev) => ({ ...prev, [key]: val }));
+
+    const findRidePlans = async () => {
+        setFetchState((prev) => ({ ...prev, loading: true }));
+        const returnedData = await FetchService.postWithBearerToken({
+            url: '/user/rider/me/ride-plans', data: {
+                pickupBusstopId: pickupBusstopInput?._id,
+                dropoffBusstopId: dropoffBusstopInput?._id
+            }, token: session as string
+        });
+        const code = returnedData?.code;
+        const msg = returnedData?.msg;
+        const duration = returnedData?.duration;
+        const price = returnedData?.price;
+        const seats = returnedData?.vehicles;
+        setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
+
+        dispatch(setState({ key: 'duration', value: duration }));
+        dispatch(setState({ key: 'price', value: price }));
+        dispatch(setState({ key: 'seats', value: seats }));
+
+        if (code == 200) {
+            showBottomSheet([477, 601], <RideRouteDetails />);
+            router.setParams({ query: 'RideRouteDetails' });
+        }
+    }
 
     return (
         <PaddedScreen>
@@ -558,8 +577,8 @@ const FilledForm = () => {
                             placeholder="Enter Location"
                             onFocus={() => onChange('pickupBusstop', true)}
                             onBlur={() => onChange('pickupBusstop', false)}
-                            value={pickupBusstopInput}
-                            onChangeText={(text) => dispatch(setStateInputField({ key: 'pickupBusstopInput', value: text }))}
+                            value={pickupBusstopInput?.name || ''}
+                        // onChangeText={(text) => dispatch(setStateInputField({ key: 'pickupBusstopInput', value: text }))}
                         />
                     </View>
 
@@ -590,8 +609,8 @@ const FilledForm = () => {
                             placeholder="Enter Destination"
                             onFocus={() => onChange('pickupBusstop', true)}
                             onBlur={() => onChange('pickupBusstop', false)}
-                            value={dropoffBusstopInput}
-                            onChangeText={(text) => dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: text }))}
+                            value={dropoffBusstopInput?.name || ''}
+                        // onChangeText={(text) => dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: text }))}
                         />
                     </View>
 
@@ -604,24 +623,31 @@ const FilledForm = () => {
                     </View>}
                 </View>
 
+                {(msg.length > 0 && (code !== 200 || code != 201)) && <Text style={[fs10, c(colors.red500)]}>{msg}</Text>}
+
                 <TouchableOpacity onPress={() => {
-                    showBottomSheet([477, 601], <RideRouteDetails />)
-                }}>
-                    <View style={[wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.background)]}>
+                    findRidePlans();
+                }} style={[flexCenter]}>
+                    {!loading ? (<View style={[wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.background)]}>
                         <Text style={[neurialGrotesk, fw700, fs18, colorWhite]}>Proceed</Text>
 
                         <Image style={[image.w(20), image.h(20)]} source={images.proceedCheckImage} />
-                    </View>
+                    </View>) : (<ActivityIndicator style={[h(50), w(50)]} />)}
                 </TouchableOpacity>
             </View>
         </PaddedScreen>
     )
 }
 
-const RideRouteDetails = () => {
-    const dispatch = useAppDispatch();
+const RideRouteDetails = ({ code, msg }: { code?: number | null, msg?: string }) => {
     const { showBottomSheet, } = useBottomSheet();
-    const { stateInput: { dropoffBusstopInput, userCounterFareInput } } = RideSelectors()
+    const { stateInput: { pickupBusstopInput, dropoffBusstopInput, userCounterFareInput } } = RideSelectors()
+    const [[isLoading, session], setSession] = useStorageState('token');
+    const [formData, setFormData] = useState({
+        riderCounterOffer: ''
+    })
+    const { riderCounterOffer } = formData;
+    const { price, duration, seats } = useAppSelector((state: RootState) => state.ride)
 
     return (
         <PaddedScreen>
@@ -640,44 +666,47 @@ const RideRouteDetails = () => {
                             <View style={[flex, h(14.73), gap(4), itemsCenter]}>
                                 <Image style={[image.w(18), image.h(14.73)]} source={images.passengersImage} />
 
-                                <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.border)]}>4 seats</Text>
+                                <Text style={[fw400, fs12, c(Colors.light.border)]}>{seats[0]} seats</Text>
                             </View>
                         </View>
 
-                        <Text style={[neurialGrotesk, fw400, fs14, colorBlack]}> ₦600.00</Text>
+                        <Text style={[fw400, fs14, colorBlack]}>₦{price}</Text>
                     </View>
 
                     <View style={[wFull, py(20), flexCol, gap(16), { borderTopWidth: 0.7, borderTopColor: Colors.light.border, borderBottomWidth: 0.7, borderBottomColor: Colors.light.border, }]}>
                         <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.border)]}>Want to send a counter offer?</Text>
 
-                        <View style={[wFull, h(50), rounded(10), p(16), flex, justifyStart, itemsCenter, gap(10), bg(colors.white), { borderWidth: 0.7, borderColor: false ? Colors.light.border : Colors.light.error, }]}>
+                        <View style={[wFull, h(50), rounded(10), p(16), flex, justifyStart, itemsCenter, gap(10), bg(colors.white), { borderWidth: 0.7, borderColor: code == 400 ? Colors.light.error : Colors.light.border, }]}>
                             <Image style={[image.w(14), image.h(10)]} source={images.rideOfferImage} />
 
                             <BottomSheetTextInput
-                                style={[fs14, fw500, neurialGrotesk, h(20), { color: false ? Colors.light.textGrey : Colors.light.error, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                                style={[fs14, fw500, neurialGrotesk, h(20), { color: code == 400 ? Colors.light.error : Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                                 keyboardType="number-pad"
                                 placeholderTextColor={Colors.light.textGrey}
                                 cursorColor={Colors.light.textGrey}
                                 placeholder="Input your offer"
-                                value={userCounterFareInput?.toString()}
+                                value={riderCounterOffer}
                                 onChangeText={(text) => {
-                                    dispatch(setStateInputField({ key: 'userCounterFareInput', value: Number(text) }));
+                                    setFormData(prev => ({ ...prev, riderCounterOffer: text }));
+                                    router.setParams({ riderCounterOffer: text })
                                 }}
                             />
                         </View>
 
-                        <View style={[wFull, flex, itemsCenter, justifyStart, gap(12)]}>
+                        {code == 400 && (<View style={[wFull, flex, itemsCenter, justifyStart, gap(12)]}>
                             <Image style={[image.w(20), image.h(21), { objectFit: 'contain' }]} source={images.cautionImage} />
 
-                            <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.error)]}>
-                                Offer too low to work with
-                            </Text>
-                        </View>
+                            {code == 400 && <Text style={[fw400, fs12, c(Colors.light.error)]}>
+                                {/* Offer too low to work with */}
+                                {msg}
+                            </Text>}
+                        </View>)}
                     </View>
                 </View>
 
                 <TouchableOpacity onPress={() => {
-                    showBottomSheet([400], <SearchingRide />)
+                    showBottomSheet([400], <SearchingRide riderCounterOffer={riderCounterOffer} />);
+                    router.setParams({ query: 'SearchingRide' });
                 }}>
                     <View style={[wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.background)]}>
                         <Text style={[neurialGrotesk, fw700, fs18, colorWhite]}>Find Available Rides</Text>
@@ -690,14 +719,89 @@ const RideRouteDetails = () => {
     )
 }
 
-const SearchingRide = () => {
+const SearchingRide = ({ riderCounterOffer }: { riderCounterOffer: string }) => {
     const dispatch = useAppDispatch();
     const { showBottomSheet, hideBottomSheet, } = useBottomSheet();
+    const { price, duration, seats } = useAppSelector((state: RootState) => state.ride)
 
-    setTimeout(() => {
+    const { stateInput: { pickupBusstopInput, dropoffBusstopInput, userCounterFareInput } } = RideSelectors()
+    const [[isLoading, session], setSession] = useStorageState('token');
+
+    const [fetchState, setFetchState] = useState({
+        loading: false,
+        msg: '',
+        code: null
+    })
+    const { code, msg, loading } = fetchState;
+
+    useEffect(() => {
+        router.setParams({ query: 'SearchingRide', riderCounterOffer });
+    })
+
+    const findAvailableRides = async () => {
+        setFetchState((prev) => ({ ...prev, loading: true }));
+        const returnedData = await FetchService.postWithBearerToken({
+            url: '/user/rider/me/available-rides/find', data: {
+                pickupBusstopId: pickupBusstopInput?._id,
+                dropoffBusstopId: dropoffBusstopInput?._id,
+                ridePlanSeats: seats[0],
+                ridePlanName: 'standard',
+                userCounterOffer: riderCounterOffer
+            }, token: session as string
+        });
+
+        const code = returnedData?.code;
+        const msg = returnedData?.msg;
+
+        setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
+
+        // if (code && code == 201) {
+        //     hideBottomSheet();
+        //     router.push(`/${pages.availableRides}` as Href)
+        //     setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
+        // }
+        // else if (code && code == 400) {
+        //     showBottomSheet([477, 601], <RideRouteDetails code={code} msg={msg} />)
+        //     setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
+        // }
+    }
+
+    const getAvailableRides = async () => {
+        setFetchState((prev) => ({ ...prev, loading: true }));
+        const returnedData = await FetchService.getWithBearerToken({
+            url: '/user/rider/me/available-rides', token: session as string
+        });
+
+        const code = returnedData?.code;
+        const msg = returnedData?.msg;
+        const availableRides = returnedData?.availableRides;
+
+        setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
+
+        if (code && code == 200 && availableRides) {
+            console.log({ '__code && code == 200__': code && code == 200, availableRides })
+            // hideBottomSheet();
+            // router.push(`/${pages.availableRides}` as Href)
+            // setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
+        }
+        else if (code && code == 400) {
+            console.log({ '__code && code == 400__': code && code == 400 })
+            // showBottomSheet([477, 601], <RideRouteDetails code={code} msg={msg} />)
+            // setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
+        }
+    }
+
+    const cancelRide = async () => {
+        // run some async db stuffs
         hideBottomSheet();
-        router.push(`/${pages.availableRides}` as Href)
-    }, 3000)
+        router.push(`/(tab)/`);
+    }
+
+    useEffect(() => {
+        session && findAvailableRides().then(() => {
+            getAvailableRides();
+        })
+    }, [session])
 
     return (
         <PaddedScreen>
@@ -710,16 +814,14 @@ const SearchingRide = () => {
                     </View>
 
                     <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12]}>Searching for nearby available rides</Text>
+
+                    {code == 201 && <Text style={[c(colors.green500), fs10]}>{msg}</Text>}
                 </View>
 
                 <Image style={[image.w(120), image.h(120)]} source={images.searchingRideImage} />
 
                 <TouchableOpacity
-                    onPress={() => {
-                        hideBottomSheet();
-                        // dispatch(closeBottomSheet());
-                        router.push(`/(tab)/`);
-                    }} style={[bg('#F9F7F8'), wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
+                    onPress={cancelRide} style={[bg('#F9F7F8'), wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
                     <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw700, fs16]}>Cancel</Text>
 
                     <Image style={[image.w(20), image.h(20),]} source={images.cancelImage} />

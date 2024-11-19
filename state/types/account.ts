@@ -43,8 +43,10 @@ interface EmergencyContact extends
     whatsAppNo: number
 }
 
-interface IAddress extends Partial<IBusStop> {
-    name: string,
+interface IAddress {
+    userId: string,
+    busstopTitle: string,
+    busStop: IBusStop,
 }
 
 interface IStateInput {
@@ -70,7 +72,7 @@ interface IStateInputAddNewContact {
     contactWhatsAppInput: string,
 }
 
-interface IStateInputSaveNewAddress extends Pick<IBusStop, 'routeName'> {
+interface IStateInputSaveNewAddress extends Pick<IBusStop, 'name'> {
     addressName: string,
 }
 

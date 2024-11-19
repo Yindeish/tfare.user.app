@@ -4,7 +4,7 @@ import { absolute, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, ju
 import { View, StyleSheet, Alert, Text, TouchableOpacity, Button, Dimensions, ScrollView, Image, FlatList } from "react-native";
 import Colors, { colors } from '@/constants/Colors';
 import { c, colorBlack, colorWhite, fs12, fs14, fs16, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles';
-import { Href, router } from 'expo-router';
+import { Href, router, usePathname } from 'expo-router';
 import { FilledForm, RecentDropoffLocations, RecentLocationsSnippet, RecentPickupLocations, RideRouteDetails, SearchingRide } from '@/components/page/orderRideBottomSheetComponents';
 import LayoutSelectors from '@/state/selectors/layout';
 import { closeBottomSheet, closeModal, openBottomSheet, resetBottomSheetState, setBottomSheetSnapPoint, setBottomSheetType, } from '@/state/slices/layout';
@@ -21,6 +21,7 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import RideBlock from '@/components/page/rideBlock';
 import { IRide } from '@/state/types/ride';
 import { useBottomSheet } from '@/contexts/useBottomSheetContext';
+import { useGlobalSearchParams } from 'expo-router';
 
 
 type Region = {
@@ -34,9 +35,21 @@ function Ride() {
     const dispatch = useAppDispatch()
     const { showBottomSheet, hideBottomSheet, bottomSheetType } = useBottomSheet();
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentRideView, availableRides, } = RideSelectors()
+    const { query, riderCounterOffer } = useGlobalSearchParams<{ query?: string, riderCounterOffer?: string }>();
 
     useEffect(() => {
-        showBottomSheet([601], <RecentLocationsSnippet />)
+        if (query === 'RecentLocationsSnippet') showBottomSheet([601], <RecentLocationsSnippet />);
+        if (query === 'RecentPickupLocations') showBottomSheet([508,], <RecentPickupLocations />);
+        if (query === 'RecentDropoffLocations') showBottomSheet([508,], <RecentDropoffLocations />);
+        if (query === 'FilledForm') showBottomSheet([436, 601], <FilledForm />);
+        if (query === 'RideRouteDetails') showBottomSheet([477, 601], <RideRouteDetails />);
+        if (query === 'SearchingRide') showBottomSheet([400], <SearchingRide riderCounterOffer={riderCounterOffer as string} />);
+    }, [query])
+
+
+    useEffect(() => {
+        !query && router.setParams({ query: 'RecentLocationsSnippet' });
+        // showBottomSheet([601], <RecentLocationsSnippet />)
     }, [])
 
     const [locationError, setLocationError] = useState<string | null>(null);
@@ -64,7 +77,8 @@ function Ride() {
                 {currentRideView === 'orderRide' ?
                     (<PageFloatingTitle view={false} onPress={() => {
                         router.push(`/(tab)/` as Href)
-                        hideBottomSheet()
+                        hideBottomSheet();
+                        router.setParams({ query });
                     }} title='Order a Ride' />) :
                     (<PageFloatingTitle view onPress={() => {
                         dispatch(closeBottomSheet());
@@ -78,12 +92,12 @@ function Ride() {
 
                 {/* Pick and drop off inputs block */}
 
-                {(bottomSheetType === EBottomSheetStatus.routeRideDetails || bottomSheetType === EBottomSheetStatus.searchingRides) && (pickupBusstopInput !== '' && dropoffBusstopInput !== '') && <View style={[w('90%'), h(104), bg(colors.white), flexCol, justifyStart, gap(16), absolute, t(77), l(20), zIndex(indices.high), rounded(10), py(16), px(24)]}>
+                {(bottomSheetType === EBottomSheetStatus.routeRideDetails || bottomSheetType === EBottomSheetStatus.searchingRides) && (pickupBusstopInput && dropoffBusstopInput) && <View style={[w('90%'), h(104), bg(colors.white), flexCol, justifyStart, gap(16), absolute, t(77), l(20), zIndex(indices.high), rounded(10), py(16), px(24)]}>
 
                     <View style={[flex, itemsCenter, gap(16), justifyStart]}>
                         <Image style={[image.w(15), image.h(20)]} source={images.yellowLocationImage} />
 
-                        <Text style={[neurialGrotesk, fw500, fs14, colorBlack]}>{pickupBusstopInput}</Text>
+                        <Text style={[neurialGrotesk, fw500, fs14, colorBlack]}>{pickupBusstopInput.name}</Text>
                     </View>
 
                     <View style={[w(289), h(0.7), mXAuto, bg(Colors.light.border)]} />
@@ -91,7 +105,7 @@ function Ride() {
                     <View style={[flex, itemsCenter, gap(16), justifyStart]}>
                         <Image style={[image.w(15), image.h(20)]} source={images.blueLocationImage} />
 
-                        <Text style={[neurialGrotesk, fw500, fs14, colorBlack]}>{dropoffBusstopInput}</Text>
+                        <Text style={[neurialGrotesk, fw500, fs14, colorBlack]}>{dropoffBusstopInput.name}</Text>
                     </View>
                 </View>}
 
@@ -114,20 +128,20 @@ function Ride() {
                                 touchable
                                 roundedCorners
                                 onPress={() => {
-                                    dispatch(setUserRide({
-                                        pickupBusstop: {
-                                            type: 'pickupBusstop',
-                                            routeName: pickupBusstopInput
-                                        },
-                                        dropoffBusstop: {
-                                            type: 'dropoffBusstop',
-                                            routeName: dropoffBusstopInput
-                                        },
-                                        saved: false,
-                                        status: 'idle',
-                                        seats: ride.seats,
-                                        tickets: []
-                                    }))
+                                    // dispatch(setUserRide({
+                                    //     pickupBusstop: {
+                                    //         type: 'pickupBusstop',
+                                    //         routeName: pickupBusstopInput
+                                    //     },
+                                    //     dropoffBusstop: {
+                                    //         type: 'dropoffBusstop',
+                                    //         routeName: dropoffBusstopInput
+                                    //     },
+                                    //     saved: false,
+                                    //     status: 'idle',
+                                    //     seats: ride.seats,
+                                    //     tickets: []
+                                    // }))
 
                                     router.push(`/${ride.id}/${pages.bookRide}` as Href)
                                 }}

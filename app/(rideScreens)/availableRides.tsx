@@ -37,20 +37,20 @@ export default function AvailableRide() {
                                     touchable
                                     roundedCorners
                                     onPress={() => {
-                                        dispatch(setUserRide({
-                                            pickupBusstop: {
-                                                type: 'pickupBusstop',
-                                                routeName: pickupBusstopInput
-                                            },
-                                            dropoffBusstop: {
-                                                type: 'dropoffBusstop',
-                                                routeName: dropoffBusstopInput
-                                            },
-                                            saved: false,
-                                            status: 'idle',
-                                            seats: ride.seats,
-                                            tickets: []
-                                        }))
+                                        // dispatch(setUserRide({
+                                        //     pickupBusstop: {
+                                        //         type: 'pickupBusstop',
+                                        //         routeName: pickupBusstopInput
+                                        //     },
+                                        //     dropoffBusstop: {
+                                        //         type: 'dropoffBusstop',
+                                        //         routeName: dropoffBusstopInput
+                                        //     },
+                                        //     saved: false,
+                                        //     status: 'idle',
+                                        //     seats: ride.seats,
+                                        //     tickets: []
+                                        // }))
 
                                         router.push(`/${pages.bookRide}/${ride.id}` as Href)
                                     }}

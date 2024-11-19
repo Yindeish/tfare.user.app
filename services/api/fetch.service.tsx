@@ -1,4 +1,5 @@
 import FetchConfig from "./fetch.config";
+import { Redirect } from 'expo-router';
 
 const { headers, baseUrl, methods } = FetchConfig;
 
@@ -35,9 +36,9 @@ const getWithBearerToken = async ({ token, url, timeout = 20000 }: { token: stri
     const controller = new AbortController();
     const signal = controller.signal;
 
-    const fetchTimeout = setTimeout(() => {
-        controller.abort();
-    }, timeout);
+    // const fetchTimeout = setTimeout(() => {
+    //     controller.abort();
+    // }, timeout);
     try {
         const response = await fetch(`${baseUrl}${url}`, {
             headers: {
@@ -48,10 +49,16 @@ const getWithBearerToken = async ({ token, url, timeout = 20000 }: { token: stri
             signal
         });
 
-        timeout && clearTimeout(fetchTimeout);
+        // timeout && clearTimeout(fetchTimeout);
 
         const data = await response.json();
-        return data;
+        // console.log({ data })
+
+        if (data?.msg === 'jwt malformed' && data?.code === 401) {
+            // signOut();
+            <Redirect href="/(auth)/signin" />;
+        }
+        else return data;
     } catch (error) {
         console.log({ error })
         // if ((error as any)?.name === 'AbortError') {
@@ -114,7 +121,11 @@ const postWithBearerToken = async ({ data: formData, url, token, timeout = 20000
         // timeout && clearTimeout(fetchTimeout);
 
         const data = await response.json();
-        return data;
+        if (data?.msg === 'jwt malformed' && data?.code === 401) {
+            // signOut();
+            <Redirect href="/(auth)/signin" />;
+        }
+        else return data;
     } catch (error) {
         // if ((error as any)?.name === 'AbortError') {
         //     console.error('Fetch request timed out');

@@ -35,7 +35,7 @@ const profile: IStateInputProfile = {
 
 const saveNewAddress: IStateInputSaveNewAddress = {
     addressName: '',
-    routeName: ''
+    name: ''
 };
 
 const initialState: IAccountState = {
@@ -61,22 +61,7 @@ const initialState: IAccountState = {
     ],
     loading: null,
     savedAddresses: [
-        {
-            name: 'badagry',
-            routeDesc: 'badagry desc',
-            routeDistance: '3km',
-            routeName: 'badagry rd',
-            saved: true,
-            type: 'pickupBusstop'
-        },
-        {
-            name: 'ojo',
-            routeDesc: 'ojo desc',
-            routeDistance: '3km',
-            routeName: 'ojo rd',
-            saved: true,
-            type: 'dropoffBusstop'
-        },
+
     ],
     userAccount: null,
     profileCta: 'edit',

@@ -11,14 +11,15 @@ import { fonts } from '@/constants/fonts';
 import TripHistory from '@/components/tab/home/TripHistory';
 import { colorWhite, fs12, fw500, neurialGrotesk } from '@/utils/fontStyles';
 import { pages } from '@/constants/pages';
-import { Href, router } from 'expo-router';
+import { Href, router, useGlobalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import FetchService from '@/services/api/fetch.service';
 import { useSession } from '@/contexts/userTokenContext';
 import { RefreshControl } from 'react-native-gesture-handler';
 import { setUserWallet } from '@/state/slices/account';
 import { setInputState, setWalletState } from '@/state/slices/user';
-import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
+import { useAppDispatch, useAppSelector } from '@/state/hooks/useReduxToolkit';
+import { RootState } from '@/state/store';
 
 const { orderRideBtn, orderRideText } = StyleSheet.create({
     orderRideBtn: {
@@ -37,16 +38,19 @@ const { orderRideBtn, orderRideText } = StyleSheet.create({
 
 export default function Index() {
     const dispatch = useAppDispatch();
-    const { tokenSession } = useSession()
+    const { tokenSession } = useSession();
+    const { query, riderCounterOffer } = useGlobalSearchParams<{ query?: string, riderCounterOffer?: string }>();
 
     const [fetchState, setFetchState] = useState({
         loading: false,
     })
     const { loading } = fetchState;
+    const { wallet } = useAppSelector((state: RootState) => state.user)
 
     const getUserWallet = async () => {
         setFetchState({ loading: true });
         const returnedData = await FetchService.getWithBearerToken({ url: '/user/me', token: tokenSession as string });
+
         const wallet = returnedData?.wallet;
         setFetchState({ loading: false });
         if (wallet) {
@@ -59,9 +63,8 @@ export default function Index() {
         }
     }
 
-
     useEffect(() => {
-        getUserWallet();
+        !wallet.balance && getUserWallet();
     }, [])
 
     return (
@@ -75,6 +78,7 @@ export default function Index() {
                     <TouchableOpacity
                         onPress={() => {
                             router.push(`/${pages.orderRide}` as Href);
+                            router.setParams({ query });
                         }}
                         style={[orderRideBtn, wFull, flex, itemsCenter, justifyCenter]}>
                         <Image style={{ width: 20, height: 17.27 }} source={images.whiteTripImage} />

@@ -8,6 +8,8 @@ import { IResponseData } from './shared.interface';
 import { useSnackbar } from './snackbar.context';
 import { IUserAccount } from '../state/types/account';
 import { router } from 'expo-router';
+import { setState } from '@/state/slices/user';
+import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
 
 const SessionContext = React.createContext<ISigninContext>({
   signIn: () => null,
@@ -32,6 +34,8 @@ export function useSession() {
 }
 
 export function SessionProvider(props: React.PropsWithChildren) {
+  const dispatch = useAppDispatch();
+
   const [[isLoading, session], setSession] = useStorageState('userSignedIn');
   const { signIn: signInwithToken, signOut: signTokenOut, tokenSession } = useTokenSession();
   const { closeSnackbar, openSnackbar, snackbarVisible } = useSnackbar();
@@ -74,8 +78,13 @@ export function SessionProvider(props: React.PropsWithChildren) {
     onChange('code', returnedData.code as number);
     onChange('msg', returnedData.msg);
 
-    returnedData.user && setSession(JSON.stringify(returnedData.user));
-    returnedData.user && signInwithToken(returnedData.token);
+    if (returnedData.user) {
+      setSession(JSON.stringify(returnedData.user));
+      signInwithToken(returnedData.token);
+
+      dispatch(setState({ key: 'user', value: returnedData.user }));
+      dispatch(setState({ key: 'token', value: returnedData.token }));
+    }
 
     if (!returnedData.user || !returnedData.token) {
       notify();
