@@ -27,7 +27,7 @@ import { RootState } from "@/state/store";
 import AccountSelectors from "@/state/selectors/account";
 import { useStorageState } from "@/hooks/useStorageState";
 import { useLocalSearchParams } from 'expo-router';
-import { socket } from "@/socket.io/socket.io.config";
+import { EVENTS, socket } from "@/socket.io/socket.io.config";
 import { IRideAccptedEvent } from "@/socket.io/socket.io.types";
 
 const RecentLocationsSnippet = () => {
@@ -729,20 +729,12 @@ const SearchingRide = ({ riderCounterOffer }: { riderCounterOffer: string }) => 
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput, userCounterFareInput } } = RideSelectors()
     const [[isLoading, session], setSession] = useStorageState('token');
 
-    socket.on("rideAccepted", (data: IRideAccptedEvent) => {
-        console.log("Ride accepted:", data);
-    });
-
     const [fetchState, setFetchState] = useState({
         loading: false,
         msg: '',
-        code: null
+        code: null,
     })
     const { code, msg, loading } = fetchState;
-
-    useEffect(() => {
-        router.setParams({ query: 'SearchingRide', riderCounterOffer });
-    })
 
     const findAvailableRides = async () => {
         setFetchState((prev) => ({ ...prev, loading: true }));
@@ -786,9 +778,9 @@ const SearchingRide = ({ riderCounterOffer }: { riderCounterOffer: string }) => 
 
         if (code && code == 200 && availableRides) {
             console.log({ '__code && code == 200__': code && code == 200, availableRides })
-            // hideBottomSheet();
-            // router.push(`/${pages.availableRides}` as Href)
-            // setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
+            hideBottomSheet();
+            router.push(`/${pages.availableRides}` as Href)
+            setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
         }
         else if (code && code == 400) {
             console.log({ '__code && code == 400__': code && code == 400 })
@@ -804,9 +796,21 @@ const SearchingRide = ({ riderCounterOffer }: { riderCounterOffer: string }) => 
     }
 
     useEffect(() => {
-        session && findAvailableRides().then(() => {
-            getAvailableRides();
-        })
+        router.setParams({ query: 'SearchingRide', riderCounterOffer });
+    }, [])
+
+    socket.on(EVENTS.connection, () => {
+        // console.log({ '___id___': socket.id });
+        socket.on(EVENTS.rideRequestAccepted, (data: IRideAccptedEvent) => {
+            if (usePathname().endsWith('orderRide')) {
+                hideBottomSheet();
+                getAvailableRides();
+            }
+        });
+    });
+
+    useEffect(() => {
+        session && findAvailableRides();
     }, [session])
 
     return (

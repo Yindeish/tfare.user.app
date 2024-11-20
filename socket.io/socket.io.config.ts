@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 export const socket = io(URLS.SOCKETIO_URL);
 
 export const EVENTS = {
-    connection: 'connection',
+    connection: 'connect',
     disconnect: 'disconnect',
     driverOnline: 'driverOnline',
     rideRequestAccepted: 'rideRequestAccepted',

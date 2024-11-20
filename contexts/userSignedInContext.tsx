@@ -105,6 +105,9 @@ export function SessionProvider(props: React.PropsWithChildren) {
     if (Number(returnedData.code) === 400) {
       notify();
     }
+    if (returnedData.msg === 'Token expired. Signin required!') {
+      setSession(null);
+    }
     if (Number(returnedData.code) === 200) {
       setSession(null);
       // signTokenOut(); //just signout user

@@ -38,10 +38,7 @@ function Ride() {
     const { showBottomSheet, hideBottomSheet, bottomSheetType } = useBottomSheet();
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentRideView, availableRides, } = RideSelectors()
     const { query, riderCounterOffer } = useGlobalSearchParams<{ query?: string, riderCounterOffer?: string }>();
-
-    socket.on(EVENTS.rideRequestAccepted, (data: IRideAccptedEvent) => {
-        console.log("Ride accepted:", data);
-    });
+    console.log({ query });
 
     useEffect(() => {
         if (query === 'RecentLocationsSnippet') showBottomSheet([601], <RecentLocationsSnippet />);

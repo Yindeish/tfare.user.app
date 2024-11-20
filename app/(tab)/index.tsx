@@ -20,6 +20,8 @@ import { setUserWallet } from '@/state/slices/account';
 import { setInputState, setWalletState } from '@/state/slices/user';
 import { useAppDispatch, useAppSelector } from '@/state/hooks/useReduxToolkit';
 import { RootState } from '@/state/store';
+import { EVENTS, socket } from '@/socket.io/socket.io.config';
+import { IRideAccptedEvent } from '@/socket.io/socket.io.types';
 
 const { orderRideBtn, orderRideText } = StyleSheet.create({
     orderRideBtn: {
