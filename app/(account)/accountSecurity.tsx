@@ -1,4 +1,4 @@
-import { View, } from 'react-native'
+import { View, ViewStyle, } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import PaddedScreen from '@/components/shared/paddedScreen'
@@ -21,13 +21,13 @@ export default function accountSecurity() {
     const { showBottomSheet } = useBottomSheet()
 
     useEffect(() => {
-        showBottomSheet([640, 820], <AccountSecuritySheet />)
+        // showBottomSheet([640, 820], <AccountSecuritySheet />)
     }, [])
 
 
     return (
         <SafeScreen>
-            <View style={[wHFull,]}>
+            <View style={[wHFull as ViewStyle,]}>
                 <PaddedScreen>
                     {/* Page Header */}
 
@@ -57,12 +57,12 @@ export default function accountSecurity() {
 
                         <AccountSecurityListTile
                             label='Change Password'
-                            onPress={() => { }}
+                            onPress={() => router.push('/(account)/profileInfo')}
                         />
 
                         <AccountSecurityListTile
                             label='Deactivate Account'
-                            onPress={() => { }}
+                            onPress={() => showBottomSheet([640, 820], <AccountSecuritySheet />)}
                             desc='Deactivate account temporarily. You can always reactivate whenever  you are ready'
                         />
 

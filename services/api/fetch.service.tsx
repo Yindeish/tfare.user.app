@@ -138,11 +138,50 @@ const postWithBearerToken = async ({ data: formData, url, token, timeout = 20000
     }
 }
 
+const patchWithBearerToken = async ({ data: formData, url, token, timeout = 20000 }: { token: string, url: string, data?: object, timeout?: number }) => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    // const fetchTimeout = setTimeout(() => {
+    //     controller.abort();
+    // }, timeout);
+    try {
+        const response = await fetch(`${baseUrl}${url}`, {
+            method: methods.PATCH,
+            headers: {
+                ...headers,
+                Authorization: `Bearer ${token}`
+            },
+            // signal,
+            body: formData ? JSON.stringify(formData) : null
+        });
+        // timeout && clearTimeout(fetchTimeout);
+
+        const data = await response.json();
+        // if (data?.msg === 'jwt malformed' && data?.code === 401) {
+        //     // signOut();
+        //     <Redirect href="/(auth)/signin" />;
+        // }
+        // else
+        return data;
+    } catch (error) {
+        // if ((error as any)?.name === 'AbortError') {
+        //     console.error('Fetch request timed out');
+        //     return { code: 400, msg: 'Fetch request timed out' }
+        // } else {
+        //     console.error('Fetch request error:', error);
+        //     return { code: 500, msg: 'Fetch request errorout' }
+        // }
+        console.log({ error })
+    }
+}
+
 
 const FetchService = {
     post, get,
     getWithBearerToken,
     postWithBearerToken,
+    patchWithBearerToken
 }
 
 export default FetchService;

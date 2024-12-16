@@ -1,10 +1,10 @@
-import { View, ImageSourcePropType, Image } from 'react-native'
+import { View, ImageSourcePropType, Image, ViewStyle, TextInput, TextStyle, ActivityIndicator } from 'react-native'
 import { Text, } from 'react-native-paper'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { image, wHFull } from '@/utils/imageStyles'
-import { bg, flex, flexCol, gap, h, itemsCenter, justifyBetween, justifyCenter, mt, px, py, relative, rounded, wFull } from '@/utils/styles'
+import { bg, border, flex, flexCol, gap, h, itemsCenter, justifyBetween, justifyCenter, mt, px, py, relative, rounded, wFull } from '@/utils/styles'
 import Colors, { colors } from '@/constants/Colors'
 import { images } from '@/constants/images'
 import { c, colorBlack, colorWhite, fs12, fs14, fw500, neurialGrotesk } from '@/utils/fontStyles'
@@ -19,8 +19,13 @@ import { setProfileCta, setUserProfileInfo, setUserProfileInfoFeild } from '@/st
 import { IStateInputProfile } from '@/state/types/account'
 import { useSession } from '@/contexts/userSignedInContext'
 import * as ImagePicker from 'expo-image-picker';
+import { useFormik } from 'formik'
+import { number, ObjectSchema, string } from 'yup'
 // import { UploadApiOptions, upload } from 'cloudinary-react-native'
 // import CloudinaryServices from '../../cloudinary/cloudinary.services'
+import { useSession as useTokenSession } from '@/contexts/userTokenContext'
+import FetchService from '@/services/api/fetch.service'
+import ErrorMsg from '@/components/shared/error_msg'
 
 
 export default function profileInfo() {
@@ -28,16 +33,59 @@ export default function profileInfo() {
     const { profileCta, stateInput, } = AccountSelectors();
     const { user } = useSession()
 
-    // const { emailInput, nameInput, phoneNoInput, userNameInput, avatarInput, imageInput } = stateInput.profile;
-    const { emailInput, nameInput, phoneNoInput, userNameInput, } = stateInput.profile;
-    const { } = stateInput.profile;
+    const { tokenSession } = useTokenSession()
+
+    const [state, setState] = useState({
+        msg: '',
+        code: null,
+        loading: false
+    })
+    const { code, msg, loading } = state;
+
+    const { values, errors, touched, handleChange, handleBlur, handleSubmit, setValues } = useFormik({
+        initialValues: {
+            fullName: '',
+            userName: '',
+            email: '',
+            phoneNumber: '',
+        },
+        validationSchema: new ObjectSchema({
+            fullName: string(),
+            userName: string(),
+            email: string(),
+            phoneNumber: number(),
+        }),
+        onSubmit: async ({ email, fullName, phoneNumber, userName }) => {
+
+            onChange({ key: 'loading', value: true });
+            onChange({ key: 'msg', value: '' });
+
+            const returnedData = await FetchService.patchWithBearerToken({
+                token: tokenSession as string,
+                url: '/user/account/user/edit',
+                data: { email, fullName, phoneNumber, userName }
+            })
+
+            onChange({ key: 'loading', value: false });
+            onChange({ key: 'code', value: returnedData?.code });
+            onChange({ key: 'msg', value: returnedData?.msg });
+
+            if (returnedData?.code == 200 || returnedData?.code == 201) {
+                setValues({
+                    fullName: '',
+                    userName: '',
+                    email: '',
+                    phoneNumber: '',
+                })
+                dispatch(setProfileCta('edit'));
+            }
+        }
+    })
+
+    const onChange = ({ key, value }: { key: 'code' | 'msg' | 'loading', value: string | number | boolean }) => setState((prev) => ({ ...prev, [key]: value }));
 
     const editProfile = () => {
         dispatch(setProfileCta('save'));
-    }
-
-    const saveProfile = () => {
-        dispatch(setProfileCta('edit'));
     }
 
     const pickImage = async () => {
@@ -60,17 +108,26 @@ export default function profileInfo() {
     const generateAvatar = () => {
         const AVATAR_API_URL = 'https://api.multiavatar.com'
 
-        const userProfileName = user?.name;
+        const userProfileName = user?.userName;
         const userAvatar = `${AVATAR_API_URL}/${userProfileName}`;
 
         // dispatch(setUserProfileInfoFeild({ key: 'avatarInput', value: userAvatar }));
         // console.log({ avatarInput })
     }
 
+    useEffect(() => {
+        setValues({
+            fullName: user?.fullName as string,
+            userName: user?.userName as string,
+            email: user?.email as string,
+            phoneNumber: String(user?.phoneNumber as number),
+        })
+    }, [])
+
 
     return (
         <SafeScreen>
-            <View style={[wHFull,]}>
+            <View style={[wHFull as ViewStyle,]}>
                 <PaddedScreen>
 
                     {/* Page Header */}
@@ -89,7 +146,7 @@ export default function profileInfo() {
                                 <Text style={[neurialGrotesk, fs12, fw500, colorBlack]}>Edit</Text>
                             </TouchableOpacity>)
                             :
-                            (<TouchableOpacity onPress={saveProfile} style={[flex, rounded(100), gap(10), py(13), px(26), itemsCenter, bg(Colors.light.background), { borderColor: Colors.light.border, borderWidth: 0.7 }]}>
+                            (<TouchableOpacity onPress={() => handleSubmit()} style={[flex, rounded(100), gap(10), py(13), px(26), itemsCenter, bg(Colors.light.background), { borderColor: Colors.light.border, borderWidth: 0.7 }]}>
                                 <Image source={images.whiteBgEditBtnImage} style={[image.w(18), image.h(18),]} />
 
                                 <Text style={[neurialGrotesk, fs12, fw500, colorWhite]}>Save</Text>
@@ -100,6 +157,8 @@ export default function profileInfo() {
                     </AccountPageTitle>
 
                     {/* Page Header */}
+
+                    {loading && <ActivityIndicator />}
 
                     {/* User avatar */}
 
@@ -128,58 +187,61 @@ export default function profileInfo() {
 
                     <View style={[wFull, flexCol, gap(16), mt(60)]}>
 
-                        <AccountTextField
-                            input={{
-                                fieldKey: 'nameInput',
-                                onChangeText: (key, value) => {
-                                    dispatch(setUserProfileInfoFeild({ key: key as unknown as keyof IStateInputProfile, value }))
-                                },
-                                palceHolder: '',
-                                value: nameInput,
-                                editing: profileCta === 'save'
-                            }}
-                            label={{ text: 'Name' }}
+                        <TextInput
+                            style={[
+                                border(0.7, '#D7D7D7') as TextStyle, rounded(10) as TextStyle, wFull as TextStyle, h(50) as TextStyle, px(24) as TextStyle, bg('#F9F7F8') as TextStyle,
+                                errors.email && touched.email ? { borderColor: Colors.light.error } : undefined
+                            ]}
+                            placeholderTextColor={Colors.light.textGrey}
+                            placeholder='Full Name'
+                            keyboardType='default'
+                            value={values.fullName}
+                            onChangeText={handleChange('fullName')}
+                            onBlur={handleBlur('fullName')}
                         />
 
-                        <AccountTextField
-                            input={{
-                                fieldKey: 'userNameInput',
-                                onChangeText: (key, value) => {
-                                    dispatch(setUserProfileInfoFeild({ key: key as unknown as keyof IStateInputProfile, value }))
-                                },
-                                palceHolder: '',
-                                value: userNameInput,
-                                editing: profileCta === 'save'
-                            }}
-                            label={{ text: 'Username' }}
+                        <TextInput
+                            style={[
+                                border(0.7, '#D7D7D7') as TextStyle, rounded(10) as TextStyle, wFull as TextStyle, h(50) as TextStyle, px(24) as TextStyle, bg('#F9F7F8') as TextStyle,
+                                errors.email && touched.email ? { borderColor: Colors.light.error } : undefined
+                            ]}
+                            placeholderTextColor={Colors.light.textGrey}
+                            placeholder='User Name'
+                            keyboardType='default'
+                            value={values.userName}
+                            onChangeText={handleChange('userName')}
+                            onBlur={handleBlur('userName')}
                         />
 
-                        <AccountTextField
-                            input={{
-                                fieldKey: 'emailInput',
-                                onChangeText: (key, value) => {
-                                    dispatch(setUserProfileInfoFeild({ key: key as unknown as keyof IStateInputProfile, value }))
-                                },
-                                palceHolder: '',
-                                value: emailInput,
-                                editing: profileCta === 'save',
-                                keyboardType: 'email-address'
-                            }}
-                            label={{ text: 'Email' }}
+                        <TextInput
+                            style={[
+                                border(0.7, '#D7D7D7') as TextStyle, rounded(10) as TextStyle, wFull as TextStyle, h(50) as TextStyle, px(24) as TextStyle, bg('#F9F7F8') as TextStyle,
+                                errors.email && touched.email ? { borderColor: Colors.light.error } : undefined
+                            ]}
+                            placeholderTextColor={Colors.light.textGrey}
+                            placeholder='Email Address'
+                            keyboardType='email-address'
+                            value={values.email}
+                            onChangeText={handleChange('email')}
+                            onBlur={handleBlur('email')}
                         />
-                        <AccountTextField
-                            input={{
-                                fieldKey: 'phoneNoInput',
-                                onChangeText: (key, value) => {
-                                    dispatch(setUserProfileInfoFeild({ key: key as unknown as keyof IStateInputProfile, value }))
-                                },
-                                palceHolder: '',
-                                value: phoneNoInput,
-                                editing: profileCta === 'save',
-                                keyboardType: 'numeric'
-                            }}
-                            label={{ text: 'Phone number' }}
+
+                        <TextInput
+                            style={[
+                                border(0.7, '#D7D7D7') as TextStyle, rounded(10) as TextStyle, wFull as TextStyle, h(50) as TextStyle, px(24) as TextStyle, bg('#F9F7F8') as TextStyle,
+                                errors.email && touched.email ? { borderColor: Colors.light.error } : undefined
+                            ]}
+                            placeholderTextColor={Colors.light.textGrey}
+                            placeholder='Phone Number'
+                            keyboardType='numeric'
+                            value={values.phoneNumber}
+                            onChangeText={handleChange('phoneNumber')}
+                            onBlur={handleBlur('phoneNumber')}
                         />
+                    </View>
+
+                    <View style={{ marginTop: 20 }}>
+                        <ErrorMsg msg={msg} code={code} />
                     </View>
 
                 </PaddedScreen>
