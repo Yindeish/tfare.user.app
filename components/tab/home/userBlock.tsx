@@ -11,6 +11,7 @@ import { useAppSelector } from "@/state/hooks/useReduxToolkit";
 import AccountSelectors from "@/state/selectors/account";
 import { RootState } from "@/state/store";
 import { IUserAccount } from "@/state/types/account";
+import { image } from "@/utils/imageStyles";
 import { flex, flexCol, hFull, itemsCenter, justifyBetween, justifyCenter, wFull } from "@/utils/styles";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -82,8 +83,8 @@ function UserBlock() {
                     <View style={[flex, justifyBetween, { gap: 14 }]}>
                         <TouchableOpacity>
                             <Image
-                                style={[{ width: 60, height: 60, objectFit: 'cover' }]}
-                                source={(user?.picture || user?.avatar) ? { uri: user?.picture || user?.avatar } : images.userProfileImage}
+                                style={[{ width: 60, height: 60, objectFit: 'cover' }, image.rounded('100%')]}
+                                source={(user?.picture || user?.avatar) ? { uri: user?.picture || user?.avatar } : images.fallbackAvatar}
                             />
                         </TouchableOpacity>
 

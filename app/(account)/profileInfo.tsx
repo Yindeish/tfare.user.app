@@ -36,6 +36,8 @@ export default function profileInfo() {
     const user = JSON.parse(userSession as string) as IUserAccount;
     const [[_, __], updateUserSession] = useStorageState('user');
 
+    console.log({ user })
+
     const { tokenSession } = useTokenSession()
 
     const [state, setState] = useState({
@@ -131,8 +133,9 @@ export default function profileInfo() {
     const generateAvatar = () => {
         const AVATAR_API_URL = 'https://api.multiavatar.com'
 
-        const userProfileName = user?.userName;
+        const userProfileName = user?.fullName;
         const userAvatar = `${AVATAR_API_URL}/${userProfileName}`;
+        console.log({ userAvatar })
 
         setImgUploadState((prev) => ({ ...prev, avatar: userAvatar as any }))
     }
@@ -156,7 +159,10 @@ export default function profileInfo() {
 
                     <AccountPageTitle
                         title='Profile Information'
-                        onPress={() => router.push(`/(tab)/${tabs.account}` as Href)}
+                        onPress={() => {
+                            dispatch(setProfileCta('edit'));
+                            router.push(`/(tab)/${tabs.account}` as Href)
+                        }}
                         style={[]}
                     >
                         {/* Edit / Save profile Btn */}
@@ -189,7 +195,7 @@ export default function profileInfo() {
                         {(user?.picture || user?.avatar) ?
                             (<Image source={{ uri: user?.picture as any || user?.avatar }} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                             :
-                            (<Image source={imgUploadState.img ? { uri: imgUploadState.img } : images.fallbackAvatar} style={[image.w(100), image.h(100), image.rounded(100)]} />)
+                            (<Image source={(imgUploadState.img || imgUploadState.avatar) ? { uri: imgUploadState.img || imgUploadState.avatar } : images.fallbackAvatar} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                         }
 
                         {/* {profileCta === 'save' && (!user?.picture || !user?.avatar) && <View style={[flex, itemsCenter, justifyCenter, gap(20)]}> */}
