@@ -26,12 +26,14 @@ import { useSession as useTokenSession } from '@/contexts/userTokenContext'
 import FetchService from '@/services/api/fetch.service'
 import ErrorMsg from '@/components/shared/error_msg'
 import CloudinaryServices from '@/cloudinary/cloudinary.services'
+import { useStorageState } from '@/hooks/useStorageState'
 
 
 export default function profileInfo() {
     const dispatch = useAppDispatch()
     const { profileCta, stateInput, } = AccountSelectors();
-    const { user } = useSession()
+    const { user, } = useSession();
+    const [[_, __], updateUserSession] = useStorageState('user');
 
     const { tokenSession } = useTokenSession()
 
@@ -71,6 +73,8 @@ export default function profileInfo() {
             onChange({ key: 'msg', value: returnedData?.msg });
 
             if (returnedData?.code == 200 || returnedData?.code == 201) {
+                updateUserSession(JSON.stringify(returnedData?.userProfileUpdated));
+                console.log({ 'user_new': returnedData?.userProfileUpdated })
                 setValues({
                     fullName: '',
                     userName: '',
@@ -119,10 +123,6 @@ export default function profileInfo() {
 
         if (!result.canceled) {
             const uri = result.assets[0].uri as string;
-            console.log({ uri });
-
-            setImgUploadState((prev) => ({ ...prev, img: uri as any }));
-
             uploadImgToCloudinary({ folderName: 'ridersImages', imagePath: uri })
 
         }
