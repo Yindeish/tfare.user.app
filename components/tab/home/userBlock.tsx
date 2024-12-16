@@ -83,7 +83,7 @@ function UserBlock() {
                         <TouchableOpacity>
                             <Image
                                 style={[{ width: 60, height: 60, objectFit: 'cover' }]}
-                                source={user?.picture ? { uri: user?.picture } : images.userProfileImage}
+                                source={(user?.picture || user?.avatar) ? { uri: user?.picture || user?.avatar } : images.userProfileImage}
                             />
                         </TouchableOpacity>
 
