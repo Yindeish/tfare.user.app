@@ -19,10 +19,10 @@ function SavedAddressListTile({ address }: { address: IAddress }) {
                 <View style={[flex, itemsCenter, gap(16)]}>
                     <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
 
-                    <Text style={[colorBlack, fw700, fs16]}>{address?.name}</Text>
+                    <Text style={[colorBlack, fw700, fs16]}>{address?.busstopTitle}</Text>
                 </View>
 
-                <Text style={[c(Colors.light.textGrey), fw400, fs12]}>{address?.routeDesc}</Text>
+                <Text style={[c(Colors.light.textGrey), fw400, fs12]}>{address?.busStop?.name}</Text>
             </View>
 
             <TouchableOpacity>
