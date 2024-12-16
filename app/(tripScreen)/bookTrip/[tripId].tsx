@@ -63,16 +63,16 @@ function BookTrip() {
     }
 
     // check if all tickets have been filled
-    useEffect(() => {
-        if (userRide && userRide?.tickets) {
-            const allTciketsFilled = userRide?.tickets.every(ticket =>
-                ticket.dropoffBusstop && ticket.dropoffBusstop &&
-                ticket.dropoffBusstop.routeName !== '' && ticket.dropoffBusstop.routeName !== '');
+    // useEffect(() => {
+    //     if (userRide && userRide?.ticket) {
+    //         const allTciketsFilled = userRide?.tickets.every(ticket =>
+    //             ticket.dropoffBusstop && ticket.dropoffBusstop &&
+    //             ticket.dropoffBusstop.routeName !== '' && ticket.dropoffBusstop.routeName !== '');
 
-            if (allTciketsFilled) dispatch(setAllTicketsFilled(true))
-            else dispatch(setAllTicketsFilled(false))
-        }
-    }, [userRide?.tickets])
+    //         if (allTciketsFilled) dispatch(setAllTicketsFilled(true))
+    //         else dispatch(setAllTicketsFilled(false))
+    //     }
+    // }, [userRide?.tickets])
     // check if all tickets have been filled
 
 
@@ -99,7 +99,8 @@ function BookTrip() {
 
                     <FlatList
                         horizontal={false}
-                        data={userRide?.tickets}
+                        // data={userRide?.tickets}
+                        data={[]}
                         renderItem={({ index, item: ticket }) => (
                             <Ticket ticket={ticket} index={index} key={index} />
                         )}

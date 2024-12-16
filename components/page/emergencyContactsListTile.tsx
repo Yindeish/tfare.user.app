@@ -8,7 +8,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { Text } from "react-native-paper";
 
 
-function EmergencyContactListTile({ email, name, phoneNo }: { email: string, phoneNo: string, name: string, }) {
+function EmergencyContactListTile({ email, name, phoneNumber }: { email: string, phoneNumber: string, name: string, }) {
 
 
     return (
@@ -18,10 +18,10 @@ function EmergencyContactListTile({ email, name, phoneNo }: { email: string, pho
                 <View style={[flex, itemsCenter, gap(16)]}>
                     <Image style={[image.w(16), image.h(20)]} source={images.profileImage} />
 
-                    <Text style={[colorBlack, fw700, fs16]}>Mom</Text>
+                    <Text style={[colorBlack, fw700, fs16]}>{name}</Text>
                 </View>
 
-                <Text style={[c(Colors.light.textGrey), fw400, fs12]}>{`${email},${phoneNo}`}</Text>
+                <Text style={[c(Colors.light.textGrey), fw400, fs12]}>{`${email},${phoneNumber}`}</Text>
             </View>
 
             <TouchableOpacity>

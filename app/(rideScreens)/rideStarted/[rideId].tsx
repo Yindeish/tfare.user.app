@@ -8,7 +8,7 @@ import LayoutSelectors from "@/state/selectors/layout";
 import RideSelectors from "@/state/selectors/ride";
 import { colorBlack, fs14, fw500, fw700, neurialGrotesk } from "@/utils/fontStyles";
 import { image, mXAuto, wHFull } from "@/utils/imageStyles";
-import { absolute, bg, flex, flexCol, gap, h, itemsCenter, justifyStart, l, px, py, relative, rounded, t, w, wFull, zIndex } from "@/utils/styles";
+import { absolute, bg, flex, flexCol, gap, h, itemsCenter, justifyStart, l, mx, px, py, relative, rounded, t, w, wFull, zIndex } from "@/utils/styles";
 import { useEffect, useState } from "react";
 import { Image, View } from "react-native";
 import { Text } from "react-native-paper";
@@ -59,7 +59,7 @@ function TripStarted() {
 
     return (
         <SafeScreen>
-            <View style={[wHFull, bg(colors.transparent), relative]}>
+            <View style={[{ width: '100%' }, bg(colors.transparent), relative]}>
 
                 <PaddedScreen>
                     <PageTitle
@@ -81,9 +81,9 @@ function TripStarted() {
                             <Text style={[fw700, fs14, colorBlack, neurialGrotesk,]}>Destination</Text>
                         </View>
 
-                        <View style={[wFull, h(0.7), mXAuto, bg(Colors.light.border)]} />
+                        <View style={[wFull, h(0.7), bg(Colors.light.border), mx('auto')]} />
 
-                        <Text style={[fw500, fs14, colorBlack]}>{dropoffBusstopInput}</Text>
+                        <Text style={[fw500, fs14, colorBlack]}>{dropoffBusstopInput?.name}</Text>
                     </View>}
 
                 {/* Drop off inputs block */}

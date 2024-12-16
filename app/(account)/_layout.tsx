@@ -28,13 +28,13 @@ export default function AppLayout() {
       animation: 'slide_from_left',
       headerShown: false
     }}>
-    <Stack.Screen name={pages.profileInfo} />
-    <Stack.Screen name={pages.emergencyContacts} />
-    <Stack.Screen name={pages.savedAddresses} />
-    <Stack.Screen name={pages.paymentInfo} />
-    <Stack.Screen name={pages.accountSecurity} />
-    <Stack.Screen name={pages.notifications} />
-    <Stack.Screen name={pages.contactSupport} />
+    <Stack.Screen name={'profileInfo'} />
+    <Stack.Screen name={'emergencyContacts'} />
+    <Stack.Screen name={'savedAddresses'} />
+    <Stack.Screen name={'paymentInfo'} />
+    <Stack.Screen name={'accountSecurity'} />
+    <Stack.Screen name={'notifications'} />
+    <Stack.Screen name={'contactSupport'} />
     {/* <Stack.Screen name={pages.deactivateAccount} */}
     {/* options={{
         presentation: 'modal',

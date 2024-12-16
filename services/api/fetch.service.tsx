@@ -14,7 +14,7 @@ const get = async ({ url, timeout = 20000 }: { url: string, timeout?: number }) 
     try {
         const response = await fetch(`${baseUrl}/${url}`, {
             headers,
-            signal
+            // signal
         });
 
         timeout && clearTimeout(fetchTimeout);
@@ -46,13 +46,12 @@ const getWithBearerToken = async ({ token, url, timeout = 20000 }: { token: stri
                 credentials: 'include',
                 Authorization: `Bearer ${token}`
             },
-            signal
+            // signal
         });
 
         // timeout && clearTimeout(fetchTimeout);
 
         const data = await response.json();
-        // console.log({ data })
 
         if (data?.msg === 'jwt malformed' && data?.code === 401) {
             // signOut();
@@ -82,10 +81,10 @@ const post = async ({ data: formData, url, timeout = 20000 }: { data?: object, u
         const response = await fetch(`${baseUrl}${url}`, {
             method: methods.POST,
             headers,
-            signal,
+            // signal,
             body: JSON.stringify(formData)
         });
-        timeout && clearTimeout(fetchTimeout);
+        // timeout && clearTimeout(fetchTimeout);
 
         const data = await response.json();
         return data;
@@ -115,7 +114,7 @@ const postWithBearerToken = async ({ data: formData, url, token, timeout = 20000
                 ...headers,
                 Authorization: `Bearer ${token}`
             },
-            signal,
+            // signal,
             body: formData ? JSON.stringify(formData) : null
         });
         // timeout && clearTimeout(fetchTimeout);

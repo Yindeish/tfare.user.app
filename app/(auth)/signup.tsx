@@ -16,6 +16,9 @@ import * as yup from 'yup'
 import { c, colorTextGrey } from '@/utils/fontStyles'
 import { useSnackbar } from '@/contexts/snackbar.context'
 import { pages } from '@/constants/pages'
+import { KeyboardAvoidingView } from 'react-native'
+import { ViewStyle } from 'react-native'
+import { TextStyle } from 'react-native'
 
 const { signUpTitle, textInput, genderSelectText, genderMenuDropdown, menuItem, form, signUpBtn, signUpText, noAccount, signupLink, invalidEntryText, checkbox } = StyleSheet.create({
     signUpTitle: {
@@ -128,13 +131,14 @@ export default function Signup() {
             <PaddedScreen styles={wHFull}>
                 <View style={[wFull, hFull, flex, flexCol, itemsStart, justifyEnd, pt(70), { gap: 40, height: 'auto' }]}>
                     <View style={[flexCol, { gap: 2 }]}>
-                        <Text style={signUpTitle}>Create a</Text>
-                        <Text style={signUpTitle}>new account</Text>
+                        <Text style={signUpTitle as TextStyle}>Create a</Text>
+                        <Text style={signUpTitle as TextStyle}>new account</Text>
                     </View>
 
-                    <View style={[form, flexYCenter, { gap: 16 }]}>
+                    {/* <KeyboardAvoidingView style={[form as ViewStyle, { gap: 16 }]}> */}
+                    <View style={[form as ViewStyle, flexYCenter, { gap: 16 }]}>
                         <TextInput
-                            style={[textInput, formik.touched.profileName && formik.errors.profileName ? { borderColor: Colors.light.error } : undefined]}
+                            style={[textInput as TextStyle, formik.touched.profileName && formik.errors.profileName ? { borderColor: Colors.light.error } : undefined]}
                             placeholder='Profile name'
                             underlineColorAndroid={colors.transparent}
                             placeholderTextColor={Colors.light.textGrey}
@@ -143,10 +147,10 @@ export default function Signup() {
                             onChangeText={formik.handleChange('profileName')}
                             onBlur={formik.handleBlur('profileName')}
                         />
-                        {formik.touched.profileName && formik.errors.profileName && <Text style={invalidEntryText}>{formik.errors.profileName}</Text>}
+                        {formik.touched.profileName && formik.errors.profileName && <Text style={invalidEntryText as TextStyle}>{formik.errors.profileName}</Text>}
 
                         <TextInput
-                            style={[textInput, formik.touched.email && formik.errors.email ? { borderColor: Colors.light.error } : undefined]}
+                            style={[textInput as TextStyle, formik.touched.email && formik.errors.email ? { borderColor: Colors.light.error } : undefined]}
                             placeholder='Email'
                             underlineColorAndroid={colors.transparent}
                             placeholderTextColor={Colors.light.textGrey}
@@ -155,10 +159,10 @@ export default function Signup() {
                             onChangeText={formik.handleChange('email')}
                             onBlur={formik.handleBlur('email')}
                         />
-                        {formik.touched.email && formik.errors.email && <Text style={invalidEntryText}>{formik.errors.email}</Text>}
+                        {formik.touched.email && formik.errors.email && <Text style={invalidEntryText as TextStyle}>{formik.errors.email}</Text>}
 
                         <TextInput
-                            style={[textInput, formik.touched.phoneNumber && formik.errors.phoneNumber ? { borderColor: Colors.light.error } : undefined]}
+                            style={[textInput as TextStyle, formik.touched.phoneNumber && formik.errors.phoneNumber ? { borderColor: Colors.light.error } : undefined]}
                             placeholder='Phone number'
                             underlineColorAndroid={colors.transparent}
                             placeholderTextColor={Colors.light.textGrey}
@@ -168,10 +172,10 @@ export default function Signup() {
                             onChangeText={formik.handleChange('phoneNumber')}
                             onBlur={formik.handleBlur('phoneNumber')}
                         />
-                        {formik.touched.phoneNumber && formik.errors.phoneNumber && <Text style={invalidEntryText}>{formik.errors.phoneNumber}</Text>}
+                        {formik.touched.phoneNumber && formik.errors.phoneNumber && <Text style={invalidEntryText as TextStyle}>{formik.errors.phoneNumber}</Text>}
 
                         <TextInput
-                            style={[textInput, formik.touched.pin && formik.errors.pin ? { borderColor: Colors.light.error } : undefined]}
+                            style={[textInput as TextStyle, formik.touched.pin && formik.errors.pin ? { borderColor: Colors.light.error } : undefined]}
                             placeholder="4-Digit Pin Code"
                             keyboardType='number-pad'
                             underlineColorAndroid={colors.transparent}
@@ -181,10 +185,10 @@ export default function Signup() {
                             onChangeText={formik.handleChange('pin')}
                             onBlur={formik.handleBlur('pin')}
                         />
-                        {formik.touched.pin && formik.errors.pin && <Text style={invalidEntryText}>{formik.errors.pin}</Text>}
+                        {formik.touched.pin && formik.errors.pin && <Text style={invalidEntryText as TextStyle}>{formik.errors.pin}</Text>}
 
                         <TextInput
-                            style={[textInput, formik.touched.confirmedPin && formik.errors.confirmedPin ? { borderColor: Colors.light.error } : undefined]}
+                            style={[textInput as TextStyle, formik.touched.confirmedPin && formik.errors.confirmedPin ? { borderColor: Colors.light.error } : undefined]}
                             placeholder="Confirm 4-Digit Pin Code"
                             keyboardType='number-pad'
                             underlineColorAndroid={colors.transparent}
@@ -194,11 +198,11 @@ export default function Signup() {
                             onChangeText={formik.handleChange('confirmedPin')}
                             onBlur={formik.handleBlur('confirmedPin')}
                         />
-                        {formik.touched.confirmedPin && formik.errors.confirmedPin && <Text style={invalidEntryText}>{formik.errors.confirmedPin}</Text>}
+                        {formik.touched.confirmedPin && formik.errors.confirmedPin && <Text style={invalidEntryText as TextStyle}>{formik.errors.confirmedPin}</Text>}
 
                         <View style={[justifyStart, itemsCenter, wFull, flex, { gap: 12 }]}>
                             <Checkbox
-                                style={checkbox}
+                                style={checkbox as ViewStyle}
                                 value={formik.values.agree}
                                 onValueChange={() => formik.setFieldValue('agree', !formik.values.agree)}
                                 color={Colors.light.background}
@@ -209,26 +213,27 @@ export default function Signup() {
                                 <Text style={{ color: Colors.light.background }}>terms and Condition</Text>
                             </View>
                         </View>
-                        {formik.touched.agree && formik.errors.agree && <Text style={invalidEntryText}>{formik.errors.agree}</Text>}
+                        {formik.touched.agree && formik.errors.agree && <Text style={invalidEntryText as TextStyle}>{formik.errors.agree}</Text>}
 
                         <Pressable
-                            style={[wFull, signUpBtn, flex, itemsCenter, justifyCenter, mt(30)]}
+                            style={[wFull, signUpBtn as ViewStyle, flex, itemsCenter, justifyCenter, mt(30)]}
                             disabled={loadingState === 'signiningUp'}
                             onPress={() => formik.handleSubmit()}
                         >
                             {loadingState === 'idle' ? (
-                                <Text style={[signUpText,]}>Create</Text>
+                                <Text style={[signUpText as TextStyle,]}>Create</Text>
                             ) : (
                                 <ActivityIndicator color={colors.white} size='small' />
                             )}
                         </Pressable>
                     </View>
+                    {/* </KeyboardAvoidingView> */}
 
                     <View style={[wFull, flex, justifyCenter, itemsCenter, { gap: 8 }]}>
-                        <Text style={noAccount}>Already have an account?</Text>
+                        <Text style={noAccount as TextStyle}>Already have an account?</Text>
                         <Link href={'/(auth)/signin' as Href} asChild>
                             <Pressable>
-                                <Text style={signupLink}>Sign in</Text>
+                                <Text style={signupLink as TextStyle}>Sign in</Text>
                             </Pressable>
                         </Link>
                     </View>

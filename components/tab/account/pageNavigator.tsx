@@ -1,4 +1,4 @@
-import { Image, View, TouchableOpacity, ImageSourcePropType, ImageStyle } from 'react-native'
+import { Image, View, TouchableOpacity, ImageSourcePropType, ImageStyle, TextStyle } from 'react-native'
 import { Text } from 'react-native-paper'
 import React from 'react'
 import { image, wHFull } from '@/utils/imageStyles'
@@ -23,7 +23,7 @@ function PageNavigator({ title, source, imageStyle, page, navigate }: { title: s
                 <Text style={[neurialGrotesk, fw500, fs14, colorBlack]}>{title}</Text>
             </View>
 
-            <Ionicons style={[mr(16)]} name="chevron-forward" size={20} color={Colors.light.textGrey} />
+            <Ionicons style={[mr(16) as TextStyle]} name="chevron-forward" size={20} color={Colors.light.textGrey} />
         </TouchableOpacity>
     )
 }

@@ -1,4 +1,4 @@
-import { View, Pressable, StyleSheet, TextInput, Platform } from 'react-native'
+import { View, Pressable, StyleSheet, TextInput, Platform, TextStyle, ViewStyle, KeyboardAvoidingView } from 'react-native'
 import React, { useState } from 'react'
 import { Href, Link, Redirect } from 'expo-router'
 import { useSession } from '../../contexts/userSignedInContext';
@@ -72,7 +72,6 @@ const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noA
         fontWeight: '500',
         fontSize: 14,
         lineHeight: 18.48,
-        fontFamily: fonts.neurialGrotesk
     }
 });
 
@@ -111,14 +110,15 @@ export default function Signin() {
                     <PaddedScreen styles={wHFull}>
                         <View style={[wHFull, flexCol, itemsStart, justifyCenter, { gap: 40 }]}>
                             <View style={[flexCol, wFull, { gap: 2 }]}>
-                                <Text style={signInTitle}>Sign in</Text>
-                                <Text style={signInTitle}>to continue</Text>
+                                <Text style={signInTitle as TextStyle}>Sign in</Text>
+                                <Text style={signInTitle as TextStyle}>to continue</Text>
                             </View>
 
-                            <View style={[form, { gap: 16 }]}>
+                            {/* <KeyboardAvoidingView style={[form as ViewStyle, { gap: 16 }]}> */}
+                            <View style={[form as ViewStyle, { gap: 16 }]}>
                                 <TextInput
                                     style={[
-                                        textInput,
+                                        textInput as TextStyle,
                                         formik.errors.email && formik.touched.email ? { borderColor: Colors.light.error } : undefined
                                     ]}
                                     placeholder='Email Address'
@@ -131,12 +131,12 @@ export default function Signin() {
                                 />
 
                                 {formik.errors.email && formik.touched.email && (
-                                    <Text style={invalidEntryText}>{formik.errors.email}</Text>
+                                    <Text style={invalidEntryText as TextStyle}>{formik.errors.email}</Text>
                                 )}
 
                                 <TextInput
                                     style={[
-                                        textInput,
+                                        textInput as TextStyle,
                                         formik.errors.pin && formik.touched.pin ? { borderColor: Colors.light.error } : undefined
                                     ]}
                                     placeholder='4-Digit Pin Code'
@@ -148,32 +148,33 @@ export default function Signin() {
                                     onBlur={formik.handleBlur('pin')}
                                 />
                                 {formik.errors.pin && formik.touched.pin && (
-                                    <Text style={invalidEntryText}>{formik.errors.pin}</Text>
+                                    <Text style={invalidEntryText as TextStyle}>{formik.errors.pin}</Text>
                                 )}
 
                                 <View style={[wFull, flex, itemsCenter, justifyEnd]}>
-                                    <Text style={[forgotPassword]}>Forgot Password?</Text>
+                                    <Text style={[forgotPassword as TextStyle]}>Forgot Password?</Text>
                                 </View>
                             </View>
+                            {/* </KeyboardAvoidingView> */}
 
                             {code == 400 && <Text style={[fs10, c(colors.red500)]}>{msg}</Text>}
 
                             <Pressable
-                                style={[wFull, signInBtn, flex, itemsCenter, justifyCenter]}
+                                style={[wFull, signInBtn as ViewStyle, flex, itemsCenter, justifyCenter]}
                                 disabled={loadingState === 'signingin'}
                                 onPress={() => formik.handleSubmit()}
                             >
                                 {loadingState === 'idle' ? (
-                                    <Text style={[signInText]}>Sign In</Text>
+                                    <Text style={[signInText as TextStyle]}>Sign In</Text>
                                 ) : (
                                     <ActivityIndicator color={colors.white} size='small' />
                                 )}
                             </Pressable>
 
-                            <Text style={[noAccount, mXAuto]}>
+                            <Text style={[noAccount as TextStyle, mXAuto as TextStyle]}>
                                 Don't have an account?
                                 <Link href={'/signup'}>
-                                    <Text style={signupLink}>Sign Up</Text>
+                                    <Text style={signupLink as TextStyle}>Sign Up</Text>
                                 </Link>
                             </Text>
                         </View>

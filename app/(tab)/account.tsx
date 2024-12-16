@@ -1,4 +1,4 @@
-import { Image, View, TouchableOpacity, ScrollView, Pressable, Platform } from 'react-native'
+import { Image, View, TouchableOpacity, ScrollView, Pressable, Platform, ViewStyle, TextStyle } from 'react-native'
 import { ActivityIndicator, Button, Snackbar, Text } from 'react-native-paper'
 import React, { useEffect } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
@@ -16,15 +16,17 @@ import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import PageTitle from '@/components/shared/pageTitle'
 import { useSession } from '@/contexts/userSignedInContext'
 import { useSnackbar } from '@/contexts/snackbar.context'
+import { IUserAccount } from '@/state/types/account'
 
 export default function Account() {
     const dispatch = useAppDispatch()
     const { signIn, loadingState, userSession, msg, code, signOut } = useSession();
-    const { closeSnackbar, snackbarVisible } = useSnackbar()
+    const { closeSnackbar, snackbarVisible } = useSnackbar();
+    const user = JSON.parse(userSession as string) as IUserAccount;
 
     return (
         <SafeScreen>
-            <ScrollView style={[wHFull, relative]}>
+            <ScrollView style={[wHFull as ViewStyle, relative]}>
                 <PaddedScreen>
                     <PageTitle
                         title='Account'
@@ -39,11 +41,11 @@ export default function Account() {
 
                                 <View style={[flexCol, gap(16)]}>
                                     <Text style={[c(Colors.light.textGrey), fs12, fw400, neurialGrotesk]}>Welcome back</Text>
-                                    <Text style={[colorBlack, fw700, fs14]}>King John</Text>
+                                    <Text style={[colorBlack, fw700, fs14]}>{user?.fullName}</Text>
                                 </View>
                             </View>
 
-                            <Ionicons style={[mr(16)]} name="chevron-forward" size={20} color={Colors.light.textGrey} />
+                            <Ionicons style={[mr(16) as TextStyle]} name="chevron-forward" size={20} color={Colors.light.textGrey} />
                         </TouchableOpacity>
 
                         {/* Wallet Block */}
@@ -73,39 +75,39 @@ export default function Account() {
                             </TouchableOpacity>
                         </View>
 
-                        {/* //!Wallet Block */}
+                        {/* //!Link Tiles */}
 
                         <View style={[wFull, flexCol, gap(16), bg(colors.white), pb(80)]}>
 
                             <PageNavigator
                                 title='Emergency Contacts'
                                 navigate
-                                page={`/(account)/${pages.emergencyContacts}`}
+                                page={`(account)/${pages.emergencyContacts}`}
                                 source={images.emergencyContactsImage} imageStyle={[image.w(18), image.h(16.36)]} />
 
                             <PageNavigator
                                 navigate
-                                page={`/(account)/${pages.savedAddresses}`}
+                                page={`(account)/${pages.savedAddresses}`}
                                 title='Saved Addresses' source={images.locationImage} imageStyle={[image.w(15), image.h(20)]} />
 
                             <PageNavigator
                                 navigate
-                                page={`/(account)/${pages.paymentInfo}`}
+                                page={`(account)/${pages.paymentInfo}`}
                                 title='Payment Infomation' source={images.paymentCardImage} imageStyle={[image.w(18), image.h(14)]} />
 
                             <PageNavigator
                                 navigate
-                                page={`/(account)/${pages.accountSecurity}`}
+                                page={`(account)/${pages.accountSecurity}`}
                                 title='Account Security' source={images.securityImage} imageStyle={[image.w(18), image.h(22)]} />
 
                             <PageNavigator
                                 navigate
-                                page={`/(account)/${pages.notifications}`}
+                                page={`(account)/${pages.notifications}`}
                                 title='Notifications' source={images.notificationImage} imageStyle={[image.w(18), image.h(19)]} />
 
                             <PageNavigator
                                 navigate
-                                page={`/(account)/${pages.contactSupport}`}
+                                page={`(account)/${pages.contactSupport}`}
                                 title='Contact Support' source={images.headPhoneImage} imageStyle={[image.w(18), image.h(14.73)]} />
 
                             <PageNavigator navigate={false} title='Rate Us' source={images.rateStarImage} imageStyle={[image.w(18), image.h(17.13)]} />
@@ -135,7 +137,7 @@ export default function Account() {
                             </Snackbar>}
                             {/* Snackbar */}
                         </View>
-                        {/* //!Wallet Block */}
+                        {/* //!Link Tiles */}
                     </View>
                 </PaddedScreen>
             </ScrollView>

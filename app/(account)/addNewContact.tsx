@@ -1,5 +1,5 @@
-import { View, Text, Image } from 'react-native'
-import React from 'react'
+import { View, Text, Image, ViewStyle } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { image, wHFull } from '@/utils/imageStyles'
@@ -18,15 +18,39 @@ import AddNewContactListTile from '@/components/page/AddNewContactListTile'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import { setEmergencyContactField } from '@/state/slices/account'
 import { IStateInputAddNewContact } from '@/state/types/account'
+import { useSession } from '@/contexts/userTokenContext'
+import FetchService from '@/services/api/fetch.service'
 
 export default function addNewContact() {
     const dispatch = useAppDispatch()
     const { stateInput } = AccountSelectors();
     const { contactEmailInput, contactNameInput, contactPhoneNumberInput, contactWhatsAppInput } = stateInput.addNewContact;
 
+    const { tokenSession } = useSession()
+
+    const [state, setState] = useState({
+        msg: '',
+        code: null,
+        loading: false
+    })
+    const { code, msg, loading } = state;
+
+    const onChange = ({ key, value }: { key: 'code' | 'msg' | 'loading', value: string | number | boolean }) => setState((prev) => ({ ...prev, [key]: value }));
+
+    const addNewContact = async () => {
+        onChange({ key: 'loading', value: true });
+
+        const returnedData = await FetchService.postWithBearerToken({ token: tokenSession as string, url: '/user/rider/me/account/emergency-contacts/add' })
+        console.log({ returnedData })
+
+        onChange({ key: 'loading', value: false });
+        onChange({ key: 'code', value: returnedData.code });
+        onChange({ key: 'msg', value: returnedData.msg });
+    }
+
     return (
         <SafeScreen>
-            <View style={[wHFull,]}>
+            <View style={[wHFull as ViewStyle,]}>
                 <PaddedScreen>
                     {/* Page Header */}
 

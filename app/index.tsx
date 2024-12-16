@@ -1,3 +1,4 @@
+import 'expo-dev-client';
 import { View, Text, Dimensions } from 'react-native'
 import React, { useEffect } from 'react'
 import { Redirect } from 'expo-router';
@@ -23,7 +24,7 @@ export default function Index() {
         }
     }
 
-    useEffect(() => { checkUserSessionExpiry() }, []);
+    // useEffect(() => { checkUserSessionExpiry() }, []);
 
     useEffect(() => {
         // console.log({ tokenSession })

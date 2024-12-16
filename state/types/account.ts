@@ -27,7 +27,7 @@ interface IUserAccount {
     fullName: string,
     userName: string,
     email: string,
-    phoneNo: number,
+    phoneNumber: number,
     picture?: string,
     auth?: {
         biometricLogin: boolean,
@@ -38,8 +38,9 @@ interface IUserAccount {
     wallet?: IUserAccountWallet,
 }
 
-interface EmergencyContact extends
-    Pick<IUserAccount, 'fullName' | 'email' | 'phoneNo'> {
+interface IEmergencyContact extends
+    Pick<IUserAccount, 'email' | 'phoneNumber'> {
+    name: string,
     whatsAppNo: number
 }
 
@@ -96,14 +97,14 @@ interface IAccountState {
     loading: ILoading | null,
     stateInput: IStateInput,
     userAccount: IUserAccount | null,
-    emergencyContacts: EmergencyContact[] | [],
+    emergencyContacts: IEmergencyContact[] | [],
     savedAddresses: IAddress[] | [],
     profileCta: TProfileCta,
 }
 
 export type {
     IUserAccountNotification, IUserAccountWallet,
-    EmergencyContact, IAddress,
+    IEmergencyContact, IAddress,
     IAccountState, IStateInput,
     IStateInputAcountSecurity,
     IStateInputAddNewContact,
