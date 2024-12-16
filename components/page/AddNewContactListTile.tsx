@@ -2,14 +2,17 @@ import Colors, { colors } from "@/constants/Colors";
 import { colorBlack } from "@/utils/fontStyles";
 import { image, wHFull } from "@/utils/imageStyles";
 import { bg, flex, gap, h, px, py, rounded, wFull } from "@/utils/styles";
-import { Image, ImageSourcePropType, ImageStyle, TextInput, View } from "react-native";
+import { TextInputFocusEventData } from "react-native";
+import { Image, ImageSourcePropType, ImageStyle, NativeSyntheticEvent, TextInput, TextStyle, View } from "react-native";
 
 
 interface IInput {
     value: string,
     palceHolder: string,
     fieldKey: string,
-    onChangeText: (key: string, value: string) => void,
+    onChange?: (key: string, value: string) => void,
+    onChangeText: ((text: string) => void) | undefined,
+    onBlur?: ((e: NativeSyntheticEvent<TextInputFocusEventData>) => void) | undefined,
     keyboardType?: 'numeric' | 'default' | 'email-address',
 }
 
@@ -26,16 +29,17 @@ function AddNewContactListTile({ icon, input }: { icon: IIcon, input: IInput }) 
             {icon.present && <Image style={[image.w(icon.w as number), image.h(icon.h as number)]} source={icon.src} />}
 
             <TextInput
-                onChangeText={(text) => input.onChangeText(input.fieldKey, text)}
-
+                // onChangeText={input.onChangeText()}
+                onChangeText={input.onChangeText}
+                onBlur={input.onBlur}
                 value={input.value} placeholder={input.palceHolder}
 
-                style={[!icon.present ? wHFull : { flex: 0.8 }, { borderWidth: 0 }]}
+                style={[!icon.present ? wHFull as TextStyle : { flex: 0.8 }, { borderWidth: 0 }]}
 
                 // others
                 cursorColor={Colors.light.background}
                 selectionColor={colors.transparent}
-                keyboardType={'' || input.keyboardType}
+                keyboardType={input.keyboardType}
                 underlineColorAndroid={colors.transparent}
                 placeholderTextColor={Colors.light.textGrey}
             />

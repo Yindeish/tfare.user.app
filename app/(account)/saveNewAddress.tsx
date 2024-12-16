@@ -1,5 +1,5 @@
-import { View, Text, Image, TextInput } from 'react-native'
-import React from 'react'
+import { View, Text, Image, TextInput, ViewStyle, TextStyle } from 'react-native'
+import React, { useState } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { image, wHFull } from '@/utils/imageStyles'
@@ -18,15 +18,63 @@ import AddNewContactListTile from '@/components/page/AddNewContactListTile'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import { setEmergencyContactField, setSaveAddressesField } from '@/state/slices/account'
 import { IStateInputAddNewContact, IStateInputSaveNewAddress } from '@/state/types/account'
+import { number, ObjectSchema, string } from 'yup'
+import { useSession } from '@/contexts/userTokenContext'
+import { useFormik } from 'formik'
+import FetchService from '@/services/api/fetch.service'
+import ErrorMsg from '@/components/shared/error_msg'
+import { ActivityIndicator } from 'react-native'
 
 export default function SaveNewAddress() {
     const dispatch = useAppDispatch()
-    const { stateInput } = AccountSelectors();
-    const { addressName, routeName } = stateInput.saveNewAddress;
+    const { } = AccountSelectors();
+
+    const { tokenSession } = useSession()
+
+    const [state, setState] = useState({
+        msg: '',
+        code: null,
+        loading: false
+    })
+    const { code, msg, loading } = state;
+
+    const { values, errors, touched, handleChange, handleBlur, handleSubmit, setValues } = useFormik({
+        initialValues: {
+            busstopName: '',
+            busstopTitle: ''
+        },
+        validationSchema: new ObjectSchema({
+            busstopName: string().required(),
+            busstopTitle: string().required()
+        }),
+        onSubmit: async ({ busstopName, busstopTitle }) => {
+            onChange({ key: 'loading', value: true });
+            onChange({ key: 'msg', value: '' });
+
+            const returnedData = await FetchService.postWithBearerToken({
+                token: tokenSession as string,
+                url: '/user/rider/me/busstop/save',
+                data: { busstopName, busstopTitle }
+            })
+
+            onChange({ key: 'loading', value: false });
+            onChange({ key: 'code', value: returnedData.code });
+            onChange({ key: 'msg', value: returnedData.msg });
+
+            if (returnedData?.code == 200 || returnedData?.code == 201) {
+                setValues({
+                    busstopName: '', busstopTitle: ''
+                })
+                router.push('/(account)/savedAddresses')
+            }
+        }
+    })
+
+    const onChange = ({ key, value }: { key: 'code' | 'msg' | 'loading', value: string | number | boolean }) => setState((prev) => ({ ...prev, [key]: value }));
 
     return (
         <SafeScreen>
-            <View style={[wHFull,]}>
+            <View style={[wHFull as ViewStyle,]}>
                 <PaddedScreen>
                     {/* Page Header */}
 
@@ -41,19 +89,19 @@ export default function SaveNewAddress() {
 
                     {/* Page Header */}
 
+                    {loading && <ActivityIndicator />}
+
                     <View style={[wFull, flexCol, gap(40), mt(28)]}>
                         <View style={[wFull, flexCol, gap(16)]}>
 
                             <View style={[wFull, h(50), rounded(10), py(16), px(24), flex, gap(10), bg('#F9F7F8')]}>
 
                                 <TextInput
-                                    onChangeText={(text) => {
-                                        dispatch(setSaveAddressesField({ key: 'addressName', value: text }));
-                                    }}
+                                    onChangeText={handleChange('busstopTitle')}
+                                    onBlur={handleBlur('busstopTitle')}
+                                    value={values.busstopTitle} placeholder={'Enter Address Name'}
 
-                                    value={addressName} placeholder={'Enter Address Name'}
-
-                                    style={[wHFull, { borderWidth: 0 }]}
+                                    style={[wHFull as TextStyle, { borderWidth: 0 }]}
 
                                     // others
                                     cursorColor={Colors.light.background}
@@ -69,14 +117,13 @@ export default function SaveNewAddress() {
                                 </TouchableOpacity>
 
                                 <TextInput
-                                    style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                                    onChangeText={handleChange('busstopName')}
+                                    onBlur={handleBlur('busstopName')}
+                                    value={values.busstopName}
+                                    style={[fs14, fw500, neurialGrotesk, h(20) as TextStyle, { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
                                     placeholderTextColor={Colors.light.textGrey}
                                     cursorColor={Colors.light.textGrey}
                                     placeholder="Enter Location"
-                                    value={routeName}
-                                    onChangeText={(text) => {
-                                        dispatch(setSaveAddressesField({ key: 'routeName', value: text }));
-                                    }}
                                 />
 
                                 <TouchableOpacity>
@@ -86,7 +133,11 @@ export default function SaveNewAddress() {
 
                         </View>
 
-                        <TouchableOpacity onPress={() => { }}>
+                        <ErrorMsg msg={msg} code={code} />
+
+                        <TouchableOpacity
+                            disabled={loading}
+                            onPress={() => handleSubmit()}>
                             <View style={[wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.background)]}>
                                 <Text style={[neurialGrotesk, fw700, fs18, colorWhite]}>Save</Text>
 

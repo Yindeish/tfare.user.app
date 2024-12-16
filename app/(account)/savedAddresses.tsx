@@ -1,5 +1,5 @@
-import { View, Text, Image } from 'react-native'
-import React from 'react'
+import { View, Text, Image, ViewStyle, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { image, wHFull } from '@/utils/imageStyles'
@@ -10,7 +10,7 @@ import { c, colorBlack, colorWhite, fs12, fs14, fs18, fw500, fw700, neurialGrote
 import AccountPageTitle from '@/components/shared/pageTitle'
 import { Href, router } from 'expo-router'
 import { tabs } from '@/constants/tabs'
-import { TouchableOpacity } from 'react-native-gesture-handler'
+import { RefreshControl, ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import EmergencyContactListTile from '@/components/page/emergencyContactsListTile'
 import AccountSelectors from '@/state/selectors/account'
 import { pages } from '@/constants/pages'
@@ -19,15 +19,54 @@ import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import { setEmergencyContactField } from '@/state/slices/account'
 import { IStateInputAddNewContact } from '@/state/types/account'
 import SavedAddressListTile from '@/components/page/SavedAddressesListTile'
+import { useSession } from '@/contexts/userTokenContext'
+import FetchService from '@/services/api/fetch.service'
+import { ISavedBusStop } from '@/state/types/ride'
 
 export default function SavedAddresses() {
     const dispatch = useAppDispatch()
-    const { stateInput, savedAddresses } = AccountSelectors();
-    const { contactEmailInput, contactNameInput, contactPhoneNumberInput, contactWhatsAppInput } = stateInput.addNewContact;
+    const { } = AccountSelectors();
+
+    const { tokenSession } = useSession()
+
+    const [state, setState] = useState({
+        msg: '',
+        code: null,
+        savedAddresses: [],
+        loading: false
+    })
+    const { code, msg, savedAddresses, loading } = state;
+
+    const onChange = ({ key, value }: { key: 'code' | 'msg' | 'savedAddresses' | 'loading', value: string | number | boolean | ISavedBusStop[] }) => setState((prev) => ({ ...prev, [key]: value }));
+
+    const getSavedAddresses = async () => {
+        onChange({ key: 'loading', value: true });
+        onChange({ key: 'msg', value: '' });
+
+        const returnedData = await FetchService.getWithBearerToken({ token: tokenSession as string, url: '/user/rider/me/account/saved-addresses', timeout: 1000 })
+        console.log({ returnedData })
+
+        onChange({ key: 'loading', value: false });
+        onChange({ key: 'code', value: returnedData.code });
+        onChange({ key: 'msg', value: returnedData.msg });
+
+        if (returnedData?.riderSavedAddresses) {
+            onChange({ key: 'savedAddresses', value: returnedData.riderSavedAddresses });
+        }
+    }
+
+    useEffect(() => {
+        getSavedAddresses();
+    }, [])
 
     return (
         <SafeScreen>
-            <View style={[wHFull,]}>
+            <ScrollView
+                refreshControl={<RefreshControl
+                    refreshing={loading} onRefresh={() => {
+                        savedAddresses.length == 0 && getSavedAddresses()
+                    }} />}
+                style={[wHFull as ViewStyle,]}>
                 <PaddedScreen>
                     {/* Page Header */}
 
@@ -40,7 +79,7 @@ export default function SavedAddresses() {
                     {/* Page Header */}
 
                     <View style={[wFull, flexCol, gap(40), mt(28)]}>
-                        <View style={[wFull, flexCol, gap(16)]}>
+                        {!loading ? (<View style={[wFull, flexCol, gap(16)]}>
 
                             {savedAddresses.map((address, index) => (
                                 <SavedAddressListTile
@@ -48,7 +87,7 @@ export default function SavedAddresses() {
                                     key={index}
                                 />
                             ))}
-                        </View>
+                        </View>) : <ActivityIndicator />}
 
                         <TouchableOpacity
                             onPress={() => router.push(`/(account)/${pages.saveNewAddress}` as Href)}
@@ -59,7 +98,7 @@ export default function SavedAddresses() {
                         </TouchableOpacity>
                     </View>
                 </PaddedScreen>
-            </View>
+            </ScrollView>
         </SafeScreen>
     )
 }

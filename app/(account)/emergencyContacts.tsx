@@ -18,6 +18,7 @@ import { IEmergencyContact } from '@/state/types/account'
 import FetchService from '@/services/api/fetch.service'
 import { useSession } from '@/contexts/userTokenContext'
 import { ScrollView } from 'react-native'
+import ErrorMsg from '@/components/shared/error_msg'
 
 export default function emergencyContacts() {
     const { } = AccountSelectors();
@@ -35,9 +36,9 @@ export default function emergencyContacts() {
 
     const getContacts = async () => {
         onChange({ key: 'loading', value: true });
+        onChange({ key: 'msg', value: '' });
 
-        const returnedData = await FetchService.getWithBearerToken({ token: tokenSession as string, url: '/user/rider/me/account/emergency-contacts' })
-        console.log({ returnedData })
+        const returnedData = await FetchService.getWithBearerToken({ token: tokenSession as string, url: '/user/rider/me/account/emergency-contacts', timeout: 1000 })
 
         onChange({ key: 'loading', value: false });
         onChange({ key: 'code', value: returnedData.code });
@@ -45,7 +46,6 @@ export default function emergencyContacts() {
 
         if (returnedData?.riderEmergencyContacts) {
             onChange({ key: 'emergencyContacts', value: returnedData.riderEmergencyContacts });
-            console.log({ one: emergencyContacts[0] })
         }
     }
 
@@ -72,8 +72,8 @@ export default function emergencyContacts() {
 
                     {/* Page Header */}
 
-                    {!loading ? (<View style={[wFull, flexCol, gap(40), mt(28)]}>
-                        <View style={[wFull, flexCol, gap(16)]}>
+                    <View style={[wFull, flexCol, gap(40), mt(28)]}>
+                        {!loading ? (<View style={[wFull, flexCol, gap(16)]}>
 
                             {(emergencyContacts as IEmergencyContact[])?.map((contact, index) => (
                                 <EmergencyContactListTile
@@ -84,7 +84,7 @@ export default function emergencyContacts() {
                                 />
                             ))}
 
-                        </View>
+                        </View>) : <ActivityIndicator />}
 
                         <TouchableOpacity
                             onPress={() => router.push(`/(account)/${pages.addNewContact}` as Href)}
@@ -93,7 +93,7 @@ export default function emergencyContacts() {
 
                             <Text style={[colorBlack, fs12, neurialGrotesk, fw500]}>Add New Contact</Text>
                         </TouchableOpacity>
-                    </View>) : <ActivityIndicator />}
+                    </View>
                 </PaddedScreen>
             </ScrollView>
         </SafeScreen>
