@@ -29,6 +29,7 @@ interface IUserAccount {
     email: string,
     phoneNumber: number,
     picture?: string,
+    avatar?: string,
     auth?: {
         biometricLogin: boolean,
     },

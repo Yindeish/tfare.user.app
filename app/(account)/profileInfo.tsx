@@ -1,4 +1,4 @@
-import { View, ImageSourcePropType, Image, ViewStyle, TextInput, TextStyle, ActivityIndicator } from 'react-native'
+import { View, ImageSourcePropType, Image, ViewStyle, TextInput, TextStyle, ActivityIndicator, TouchableOpacity } from 'react-native'
 import { Text, } from 'react-native-paper'
 import React, { useEffect, useState } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
@@ -11,7 +11,6 @@ import { c, colorBlack, colorWhite, fs12, fs14, fw500, neurialGrotesk } from '@/
 import AccountPageTitle from '@/components/shared/pageTitle'
 import { Href, router } from 'expo-router'
 import { tabs } from '@/constants/tabs'
-import { TouchableOpacity } from 'react-native-gesture-handler'
 import AccountTextField from '@/components/page/accountTextFeild'
 import AccountSelectors from '@/state/selectors/account'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
@@ -26,6 +25,7 @@ import { number, ObjectSchema, string } from 'yup'
 import { useSession as useTokenSession } from '@/contexts/userTokenContext'
 import FetchService from '@/services/api/fetch.service'
 import ErrorMsg from '@/components/shared/error_msg'
+import CloudinaryServices from '@/cloudinary/cloudinary.services'
 
 
 export default function profileInfo() {
@@ -63,7 +63,7 @@ export default function profileInfo() {
             const returnedData = await FetchService.patchWithBearerToken({
                 token: tokenSession as string,
                 url: '/user/account/user/edit',
-                data: { email, fullName, phoneNumber, userName }
+                data: { email, fullName, phoneNumber, userName, picture: imgUploadState.img || user?.picture, avatar: user?.avatar }
             })
 
             onChange({ key: 'loading', value: false });
@@ -82,26 +82,49 @@ export default function profileInfo() {
         }
     })
 
+    const [imgUploadState, setImgUploadState] = useState({
+        msg: '',
+        loading: false,
+        img: null,
+        avatar: null,
+    })
+
     const onChange = ({ key, value }: { key: 'code' | 'msg' | 'loading', value: string | number | boolean }) => setState((prev) => ({ ...prev, [key]: value }));
 
     const editProfile = () => {
         dispatch(setProfileCta('save'));
     }
 
+    const uploadImgToCloudinary = async ({ folderName, imagePath }: {
+        imagePath: string;
+        folderName: string;
+    }) => {
+        setImgUploadState((prev) => ({ ...prev, loading: true }))
+
+        CloudinaryServices.uploadImage({
+            imagePath, folderName, fnToRn: (value) => {
+
+                setImgUploadState((prev) => ({ ...prev, loading: false, img: value as any }))
+            }
+        })
+    }
+
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
+            mediaTypes: 'images',
+            allowsEditing: false,
             aspect: [4, 3],
             quality: 1,
         });
 
         if (!result.canceled) {
-            // CloudinaryServices.uploadImage({
-            //     // imagePath: result.assets[0].uri as string, folderName: 'ridersImages', fnToRn: (value) => {
-            //     //     dispatch(setUserProfileInfoFeild({ key: 'imageInput', value }))
-            //     // }
-            // })
+            const uri = result.assets[0].uri as string;
+            console.log({ uri });
+
+            setImgUploadState((prev) => ({ ...prev, img: uri as any }));
+
+            uploadImgToCloudinary({ folderName: 'ridersImages', imagePath: uri })
+
         }
     };
 
@@ -165,16 +188,17 @@ export default function profileInfo() {
                     <View style={[mt(28), flexCol, gap(16), itemsCenter, wFull, h(134)]}>
                         {/* {(user?.picture || user?.avatar) ? */}
                         {(user?.picture) ?
-                            (<Image source={user?.picture as any} style={[image.w(100), image.h(100), image.rounded(100)]} />)
+                            (<Image source={{ uri: user?.picture as any }} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                             :
                             // (<Image source={imageInput !== '' || avatarInput !== '' ? { uri: imageInput || avatarInput } : { uri: images.fallbackAvatar }} style={[image.w(100), image.h(100), image.rounded(100)]} />)
-                            (<Image source={false ? {} : images.fallbackAvatar} style={[image.w(100), image.h(100), image.rounded(100)]} />)
+                            (<Image source={imgUploadState.img ? { uri: imgUploadState.img } : images.fallbackAvatar} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                         }
 
                         {/* {profileCta === 'save' && (!user?.picture || !user?.avatar) && <View style={[flex, itemsCenter, justifyCenter, gap(20)]}> */}
-                        {profileCta === 'save' && (!user?.picture) && <View style={[flex, itemsCenter, justifyCenter, gap(20)]}>
-                            <TouchableOpacity onPress={() => pickImage()}>
+                        {(profileCta === 'save' && (!user?.picture)) && <View style={[flex, itemsCenter, justifyCenter, gap(20)]}>
+                            <TouchableOpacity onPress={pickImage} style={{ display: 'flex', flexDirection: 'row', gap: 5, alignItems: 'center' }}>
                                 <Text style={[neurialGrotesk, fw500, fs14, c(Colors.light.background)]}>Upload picture</Text>
+                                {imgUploadState.loading && <ActivityIndicator size={10} />}
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => generateAvatar()}>
@@ -185,6 +209,7 @@ export default function profileInfo() {
 
                     {/* User avatar */}
 
+                    {/* Form */}
                     <View style={[wFull, flexCol, gap(16), mt(60)]}>
 
                         <TextInput
@@ -243,6 +268,7 @@ export default function profileInfo() {
                     <View style={{ marginTop: 20 }}>
                         <ErrorMsg msg={msg} code={code} />
                     </View>
+                    {/* Form */}
 
                 </PaddedScreen>
             </View>
