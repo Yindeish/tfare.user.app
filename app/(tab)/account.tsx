@@ -37,7 +37,7 @@ export default function Account() {
 
                         <TouchableOpacity onPress={() => router.push(`/(account)/${pages.profileInfo}` as Href)} style={[wFull, flex, itemsCenter, justifyBetween]}>
                             <View style={[flex, gap(14), itemsCenter, { flex: 0.8 }]}>
-                                <Image source={images.userProfileImage} style={[image.w(60), image.h(60),]} />
+                                <Image source={user?.picture ? { uri: user?.picture } : images.fallbackAvatar} style={[image.w(60), image.h(60), image.rounded('100%')]} />
 
                                 <View style={[flexCol, gap(16)]}>
                                     <Text style={[c(Colors.light.textGrey), fs12, fw400, neurialGrotesk]}>Welcome back</Text>

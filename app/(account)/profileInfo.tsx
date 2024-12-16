@@ -15,7 +15,7 @@ import AccountTextField from '@/components/page/accountTextFeild'
 import AccountSelectors from '@/state/selectors/account'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import { setProfileCta, setUserProfileInfo, setUserProfileInfoFeild } from '@/state/slices/account'
-import { IStateInputProfile } from '@/state/types/account'
+import { IStateInputProfile, IUserAccount } from '@/state/types/account'
 import { useSession } from '@/contexts/userSignedInContext'
 import * as ImagePicker from 'expo-image-picker';
 import { useFormik } from 'formik'
@@ -32,7 +32,8 @@ import { useStorageState } from '@/hooks/useStorageState'
 export default function profileInfo() {
     const dispatch = useAppDispatch()
     const { profileCta, stateInput, } = AccountSelectors();
-    const { user, } = useSession();
+    const { userSession } = useSession();
+    const user = JSON.parse(userSession as string) as IUserAccount;
     const [[_, __], updateUserSession] = useStorageState('user');
 
     const { tokenSession } = useTokenSession()
@@ -65,7 +66,7 @@ export default function profileInfo() {
             const returnedData = await FetchService.patchWithBearerToken({
                 token: tokenSession as string,
                 url: '/user/account/user/edit',
-                data: { email, fullName, phoneNumber, userName, picture: imgUploadState.img || user?.picture, avatar: user?.avatar }
+                data: { email, fullName, phoneNumber, profileName: userName, picture: imgUploadState.img || user?.picture, avatar: imgUploadState.avatar || user?.avatar }
             })
 
             onChange({ key: 'loading', value: false });
@@ -74,7 +75,6 @@ export default function profileInfo() {
 
             if (returnedData?.code == 200 || returnedData?.code == 201) {
                 updateUserSession(JSON.stringify(returnedData?.userProfileUpdated));
-                console.log({ 'user_new': returnedData?.userProfileUpdated })
                 setValues({
                     fullName: '',
                     userName: '',
@@ -134,14 +134,13 @@ export default function profileInfo() {
         const userProfileName = user?.userName;
         const userAvatar = `${AVATAR_API_URL}/${userProfileName}`;
 
-        // dispatch(setUserProfileInfoFeild({ key: 'avatarInput', value: userAvatar }));
-        // console.log({ avatarInput })
+        setImgUploadState((prev) => ({ ...prev, avatar: userAvatar as any }))
     }
 
     useEffect(() => {
         setValues({
             fullName: user?.fullName as string,
-            userName: user?.userName as string,
+            userName: (user as any)?.profileName || user?.userName as string,
             email: user?.email as string,
             phoneNumber: String(user?.phoneNumber as number),
         })
@@ -187,10 +186,9 @@ export default function profileInfo() {
 
                     <View style={[mt(28), flexCol, gap(16), itemsCenter, wFull, h(134)]}>
                         {/* {(user?.picture || user?.avatar) ? */}
-                        {(user?.picture) ?
-                            (<Image source={{ uri: user?.picture as any }} style={[image.w(100), image.h(100), image.rounded(100)]} />)
+                        {(user?.picture || user?.avatar) ?
+                            (<Image source={{ uri: user?.picture as any || user?.avatar }} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                             :
-                            // (<Image source={imageInput !== '' || avatarInput !== '' ? { uri: imageInput || avatarInput } : { uri: images.fallbackAvatar }} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                             (<Image source={imgUploadState.img ? { uri: imgUploadState.img } : images.fallbackAvatar} style={[image.w(100), image.h(100), image.rounded(100)]} />)
                         }
 

@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, View, StyleSheet, ScrollView } from 'react-native';
+import { Text, TouchableOpacity, View, StyleSheet, ScrollView, ViewStyle } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import SafeScreen from '@/components/shared/safeScreen';
 import { flex, flexCol, itemsCenter, justifyCenter, wFull, wHFull } from '@/utils/styles';
@@ -82,7 +82,7 @@ export default function Index() {
                             router.push(`/${pages.orderRide}` as Href);
                             router.setParams({ query });
                         }}
-                        style={[orderRideBtn, wFull, flex, itemsCenter, justifyCenter]}>
+                        style={[orderRideBtn as ViewStyle, wFull, flex, itemsCenter, justifyCenter]}>
                         <Image style={{ width: 20, height: 17.27 }} source={images.whiteTripImage} />
 
                         <Text style={[neurialGrotesk, fw500, fs12, colorWhite]}>Order Ride</Text>

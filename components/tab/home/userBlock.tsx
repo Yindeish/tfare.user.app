@@ -10,9 +10,11 @@ import FetchService from "@/services/api/fetch.service";
 import { useAppSelector } from "@/state/hooks/useReduxToolkit";
 import AccountSelectors from "@/state/selectors/account";
 import { RootState } from "@/state/store";
+import { IUserAccount } from "@/state/types/account";
 import { flex, flexCol, hFull, itemsCenter, justifyBetween, justifyCenter, wFull } from "@/utils/styles";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Image, TouchableOpacity, ViewStyle, TextStyle } from "react-native";
 import { Text } from "react-native-paper";
 
 
@@ -69,12 +71,13 @@ function UserBlock() {
         }
     });
 
-    const { user } = useSession();
+    const { signIn, loadingState, userSession, msg, code, signOut } = useSession();
+    const user = JSON.parse(userSession as string) as IUserAccount;
     const { wallet } = useAppSelector((state: RootState) => state.user);
 
     return (
         <PaddedScreen>
-            <View style={[wFull, flexCol, container]}>
+            <View style={[wFull, flexCol, container as ViewStyle]}>
                 <View style={[wFull, flex, justifyBetween, itemsCenter, { height: 61, }]}>
                     <View style={[flex, justifyBetween, { gap: 14 }]}>
                         <TouchableOpacity>
@@ -85,42 +88,42 @@ function UserBlock() {
                         </TouchableOpacity>
 
                         <View style={[hFull, flexCol, justifyBetween]}>
-                            <Text style={[greyText,]}>Welcome back</Text>
-                            <Text style={[userNameText]}>{user?.fullName}</Text>
-                            <Text style={[greyText]}>We are at your service</Text>
+                            <Text style={[greyText as TextStyle,]}>Welcome back</Text>
+                            <Text style={[userNameText as TextStyle]}>{user?.fullName}</Text>
+                            <Text style={[greyText as TextStyle]}>We are at your service</Text>
                         </View>
                     </View>
 
                     <View style={[flex, justifyBetween, { gap: 16, height: 45 }]}>
                         <TouchableOpacity>
-                            <View style={[iconImageWrapper, flex, itemsCenter, justifyCenter]}>
+                            <View style={[iconImageWrapper as ViewStyle, flex, itemsCenter, justifyCenter]}>
                                 <Image style={[{ width: 18, height: 19 }]} source={images.notificationImage} />
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity>
-                            <View style={[iconImageWrapper, flex, itemsCenter, justifyCenter]}>
+                            <View style={[iconImageWrapper as ViewStyle, flex, itemsCenter, justifyCenter]}>
                                 <Image style={[{ width: 23.22, height: 19 }]} source={images.headPhoneImage} />
                             </View>
                         </TouchableOpacity>
                     </View>
                 </View>
 
-                <View style={[walletBlock, wFull, flex, justifyBetween, itemsCenter,]}>
+                <View style={[walletBlock as ViewStyle, wFull, flex, justifyBetween, itemsCenter,]}>
                     <View style={[{ width: 126, height: 60, gap: 16 }, flexCol]}>
                         <View style={[flex, { gap: 16 }]}>
                             <Image style={[{ width: 19, height: 18 }]} source={images.walletImage} />
 
                             <Text style={[{ fontFamily: fonts.neurialGrotesk, fontSize: 12, color: Colors.light.textGrey, fontWeight: '400' }]}>wallet balance</Text>
                         </View>
-                        <Text style={[userNameText, { fontSize: 22 }]}> ₦{wallet?.balance || '0000.00'}</Text>
+                        <Text style={[userNameText as TextStyle, { fontSize: 22 }]}> ₦{wallet?.balance || '0000.00'}</Text>
                     </View>
 
-                    <TouchableOpacity>
-                        <View style={[topUpBlock, flex, itemsCenter, justifyBetween]}>
+                    <TouchableOpacity onPress={() => router.push('/(account)/paymentInfo')}>
+                        <View style={[topUpBlock as ViewStyle, flex, itemsCenter, justifyBetween]}>
 
                             <Image style={[{ width: 19, height: 19 }]} source={images.topupImage} />
 
-                            <Text style={[topupText]}>Top Up</Text>
+                            <Text style={[topupText as TextStyle]}>Top Up</Text>
                         </View>
                     </TouchableOpacity>
                 </View>

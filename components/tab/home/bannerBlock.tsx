@@ -3,7 +3,7 @@ import { fonts } from "@/constants/fonts";
 import { images } from "@/constants/images";
 import { fs14, fw400, neurialGrotesk } from "@/utils/fontStyles";
 import { flex, flexCol, itemsCenter, justifyCenter, wFull } from "@/utils/styles";
-import { Image, View, StyleSheet } from "react-native";
+import { Image, View, StyleSheet, TextStyle } from "react-native";
 import { Text } from "react-native-paper";
 
 const { discountText, orderRideText } = StyleSheet.create({
@@ -26,7 +26,7 @@ const BannerBlock = () => (
         <Image style={[{ width: 90.42, height: 78.1 }]} source={images.bannerImage} />
 
         <View style={[flexCol, justifyCenter, { gap: 12 }]}>
-            <Text style={[orderRideText]}>Order a Ride</Text>
+            <Text style={[orderRideText as TextStyle]}>Order a Ride</Text>
             <View style={[flexCol, justifyCenter, { gap: 3 }]}>
                 <Text style={[fw400, fs14, {
                     color: '#2C333C'
