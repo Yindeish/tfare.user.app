@@ -6,10 +6,12 @@ import { useSession } from '../contexts/userTokenContext';
 import { useSession as userSession } from '../contexts/userSignedInContext';
 import { pages } from '../constants/pages';
 import FetchService from '@/services/api/fetch.service';
+import { useAppSelector } from '@/state/hooks/useReduxToolkit';
 
 export default function Index() {
     const { tokenSession, isLoading } = useSession();
     const { signOut } = userSession()
+    const {token} = useAppSelector(state => state.user);
 
     const { width, height } = Dimensions.get('window');
 
@@ -26,15 +28,11 @@ export default function Index() {
 
     // useEffect(() => { checkUserSessionExpiry() }, []);
 
-    useEffect(() => {
-        // console.log({ tokenSession })
-    }, [tokenSession])
-
     if (isLoading) {
         return <View style={{ width, height, backgroundColor: '#D7D7D7' }} />;
     }
 
-    if (!tokenSession) {
+    if (!token) {
         return <Redirect href="/introScreen" />;
     }
 

@@ -73,7 +73,8 @@ function UserBlock() {
     });
 
     const { signIn, loadingState, userSession, msg, code, signOut } = useSession();
-    const user = JSON.parse(userSession as string) as IUserAccount;
+    // const user = JSON.parse(userSession as string) as IUserAccount;
+    const {user} = useAppSelector((state: RootState) => state.user);
     const { wallet } = useAppSelector((state: RootState) => state.user);
 
     return (
@@ -83,7 +84,7 @@ function UserBlock() {
                     <View style={[flex, justifyBetween, { gap: 14 }]}>
                         <TouchableOpacity>
                             <Image
-                                style={[{ width: 60, height: 60, objectFit: 'cover' }, image.rounded('100%')]}
+                                style={[{ width: 60, height: 60, objectFit: 'cover' }, image.rounded(60)]}
                                 source={(user?.picture || user?.avatar) ? { uri: user?.picture || user?.avatar } : images.fallbackAvatar}
                             />
                         </TouchableOpacity>

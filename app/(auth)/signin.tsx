@@ -14,6 +14,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { ScrollView } from 'react-native-gesture-handler';
 import { c, fs10 } from '@/utils/fontStyles';
+import { useAppSelector } from '@/state/hooks/useReduxToolkit';
 
 const { signInTitle, textInput, form, forgotPassword, signInBtn, signInText, noAccount, signupLink, invalidEntryText } = StyleSheet.create({
     signInTitle: {
@@ -86,11 +87,12 @@ const SignInSchema = Yup.object().shape({
 });
 
 export default function Signin() {
-    const { signIn, loadingState, userSession, msg, code, signOut } = useSession();
+    const { signIn, loadingState, userSession, msg, code, signOut, testSignIn } = useSession();
     const { closeSnackbar, snackbarVisible } = useSnackbar();
     const { tokenSession } = userTokenSession();
+    const {user} = useAppSelector(state => state.user);
 
-    if (userSession) return <Redirect href={"/(tab)/" as Href} />;
+    if (user) return <Redirect href={"/(tab)/" as Href} />;
 
     const formik = useFormik({
         initialValues: {
@@ -100,6 +102,7 @@ export default function Signin() {
         validationSchema: SignInSchema,
         onSubmit: (values) => {
             signIn({ email: values.email, pin: values.pin });
+            // testSignIn({ email: values.email, pin: values.pin });
         },
     });
 

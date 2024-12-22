@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons'
 import PageNavigator from '@/components/tab/account/pageNavigator'
 import { pages } from '@/constants/pages'
 import { Href, router } from 'expo-router'
-import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
+import { useAppDispatch, useAppSelector } from '@/state/hooks/useReduxToolkit'
 import PageTitle from '@/components/shared/pageTitle'
 import { useSession } from '@/contexts/userSignedInContext'
 import { useSnackbar } from '@/contexts/snackbar.context'
@@ -22,7 +22,8 @@ export default function Account() {
     const dispatch = useAppDispatch()
     const { signIn, loadingState, userSession, msg, code, signOut } = useSession();
     const { closeSnackbar, snackbarVisible } = useSnackbar();
-    const user = JSON.parse(userSession as string) as IUserAccount;
+    // const user = JSON.parse(userSession as string) as IUserAccount;
+    const {user} = useAppSelector(state => state.user)
 
     return (
         <SafeScreen>
@@ -37,7 +38,7 @@ export default function Account() {
 
                         <TouchableOpacity onPress={() => router.push(`/(account)/${pages.profileInfo}` as Href)} style={[wFull, flex, itemsCenter, justifyBetween]}>
                             <View style={[flex, gap(14), itemsCenter, { flex: 0.8 }]}>
-                                <Image source={(user?.picture || user?.avatar) ? { uri: user?.picture || user?.avatar } : images.fallbackAvatar} style={[image.w(60), image.h(60), image.rounded('100%')]} />
+                                <Image source={(user?.picture || user?.avatar) ? { uri: user?.picture || user?.avatar } : images.fallbackAvatar} style={[image.w(60), image.h(60), image.rounded(60)]} />
 
                                 <View style={[flexCol, gap(16)]}>
                                     <Text style={[c(Colors.light.textGrey), fs12, fw400, neurialGrotesk]}>Welcome back</Text>
