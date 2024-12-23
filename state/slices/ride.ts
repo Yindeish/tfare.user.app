@@ -77,20 +77,38 @@ const RideSlice = createSlice({
 
             // if (state.stateInput.userRideInput && state.stateInput.userRideInput?.tickets) {
                 // Reset user tickets list
+                
                 state.stateInput.userRideInput.tickets = []; //pop and push later; this is a bad practice. Having to refres te list
 
-                for (let val = 0; val < currentNumberOfTickets; val++) {
+                // console.log({'state.userRide': state.userRide})
+                // for (let val = 0; val < currentNumberOfTickets; val++) {
+                //     const newTicket: ITicket = {
+                //         dropoffBusstop: (val + 1) === 1 ? state.stateInput.dropoffBusstopInput : null, // setting the first ticket to use the underlying credentials
+                //         pickupBusstop: (val + 1) === 1 ? state.stateInput.pickupBusstopInput : null, // setting the first ticket to use the underlying credentials
+                //         owner: {},
+                //         sameAsFirstTicket: (val + 1) === 1 ? true : false, // setting the first ticket to use the underlying credentials
+                //         number: val + 1,
+                //         userCounterFare: (val + 1) === 1 ? state.stateInput.userCounterFareInput : null,
+                //         rideFee: currentNumberOfTickets === 1 ? Number(state.userRide?.riderRideDetails?.riderCounterOffer) : null as never,
+                //     }
+
+                //     state.stateInput.userRideInput.tickets = [...state.stateInput.userRideInput?.tickets || [], newTicket];
+                // }
+
+                state.stateInput.userRideInput.tickets = []; //pop and push later; this is a bad practice. Having to refres te list
+
+                for (let val = 0; val < (currentNumberOfTickets); val++) {
                     const newTicket: ITicket = {
                         dropoffBusstop: (val + 1) === 1 ? state.stateInput.dropoffBusstopInput : null, // setting the first ticket to use the underlying credentials
                         pickupBusstop: (val + 1) === 1 ? state.stateInput.pickupBusstopInput : null, // setting the first ticket to use the underlying credentials
                         owner: {},
                         sameAsFirstTicket: (val + 1) === 1 ? true : false, // setting the first ticket to use the underlying credentials
                         number: val + 1,
-                        userCounterFare: (val + 1) === 1 ? state.stateInput.userCounterFareInput : null
+                        userCounterFare: (val + 1) === 1 ? state.stateInput.userCounterFareInput : null,
+                        rideFee: (val + 1) === 1 ? Number(state.userRide?.riderRideDetails?.riderCounterOffer) : null as never,
                     }
 
                     state.stateInput.userRideInput.tickets = [...state.stateInput.userRideInput?.tickets || [], newTicket];
-                    console.log({ '___newTicket___': newTicket, 'tickets':state.stateInput.userRideInput.tickets })
                 }
             // } else return;
         },
@@ -99,6 +117,7 @@ const RideSlice = createSlice({
 
             if (state.userRide && state.stateInput.userRideInput.tickets) {
                 const firstTicket = state.stateInput.userRideInput.tickets.find(ticket => Number(ticket.number) === 1);
+                console.log({ '___firstTicket___': firstTicket })
 
                 const ticket = state.stateInput.userRideInput.tickets.find(ticket => Number(ticket.number) === Number(currentNumberOfTickets));
 

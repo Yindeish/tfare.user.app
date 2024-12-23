@@ -19,7 +19,7 @@ import { TicketDetailsSheet } from './bookRideSheetComponent'
 function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
     const dispatch = useAppDispatch();
     const { showBottomSheet } = useBottomSheet()
-    const { currentTicket, stateInput: { pickupBusstopInput, dropoffBusstopInput, userCounterFareInput }, currentNumberOfTickets } = RideSelectors()
+    const { currentTicket, userRide, stateInput: { pickupBusstopInput, dropoffBusstopInput, userCounterFareInput }, currentNumberOfTickets } = RideSelectors()
 
 
     // If ticket number is 1
@@ -64,7 +64,7 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
                         <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12]}>Ticket fee</Text>
                     </View>
 
-                    <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}> ₦ 550.00</Text>
+                    <Text style={[colorBlack, fw700, fs14]}>₦ {ticket?.rideFee}</Text>
                 </View>
             </View>
 
@@ -78,7 +78,7 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
             <View style={[wFull, flexCol, gap(32), itemsStart, mt(40)]}>
 
                 <View style={[flex, itemsCenter, gap(4)]}>
-                    <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}>{`Ticket ${ticket?.number}`}</Text>
+                    <Text style={[colorBlack, fw700, fs14,]}>{`Ticket ${ticket?.number}`}</Text>
 
                     <Text style={[fw400, fs12, c(Colors.light.textGrey)]}>(You have selected more than 1 seat)</Text>
                 </View>
@@ -159,7 +159,7 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
                                     <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12]}>Ticket fee</Text>
                                 </View>
 
-                                <Text style={[colorBlack, fw700, fs14, neurialGrotesk]}> ₦ 550.00</Text>
+                                <Text style={[colorBlack, fw700, fs14,]}>₦ {ticket.rideFee}</Text>
                             </View>
                         </View>
 
@@ -167,7 +167,7 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
 
                         {/* Counter fare block */}
 
-                        <View style={[wFull, flexCol, gap(16), pb(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
+                       {!ticket.sameAsFirstTicket && <View style={[wFull, flexCol, gap(16), pb(16), { borderBottomWidth: 0.7, borderBottomColor: Colors.light.border }]}>
 
                             <Text style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12,]}>Want to send a counter offer? </Text>
 
@@ -210,7 +210,7 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
                                     Offer too low to work with
                                 </Text>
                             </View>}
-                        </View>
+                        </View>}
 
                         {/* Counter fare block */}
                     </>)}
