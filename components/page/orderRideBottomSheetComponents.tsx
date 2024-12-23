@@ -104,6 +104,7 @@ import CustomModal from "../shared/modal";
 import { AntDesign } from "@expo/vector-icons";
 import tw from "@/constants/tw";
 import { IBusStop } from "@/state/types/ride";
+import ScaleUpDown from "../shared/scale_animator";
 
 const RecentLocationsSnippet = () => {
   const dispatch = useDispatch();
@@ -129,7 +130,13 @@ const RecentLocationsSnippet = () => {
     pickupSearchText: "",
     dropoffSearchText: "",
   });
-  const { busstops, inputtingPickup, inputtingDropoff, dropoffSearchText, pickupSearchText } = searchState;
+  const {
+    busstops,
+    inputtingPickup,
+    inputtingDropoff,
+    dropoffSearchText,
+    pickupSearchText,
+  } = searchState;
 
   const searchBusstops = async (query: string) => {
     setSearchState((prev) => ({ ...prev, loading: true }));
@@ -253,14 +260,13 @@ const RecentLocationsSnippet = () => {
               value={values.pickupBusstop}
               // onChangeText={handleChange("pickupBusstop")}
               // onBlur={handleBlur("pickupBusstop")}
-              onChangeText={(text)=> {
+              onChangeText={(text) => {
                 searchBusstops(text);
                 setFieldValue("pickupBusstop", text);
               }}
-              onFocus={() =>
-                {setSearchState((prev) => ({ ...prev, inputtingPickup: true }));
-                }
-              }
+              onFocus={() => {
+                setSearchState((prev) => ({ ...prev, inputtingPickup: true }));
+              }}
             />
 
             <TouchableOpacity>
@@ -272,38 +278,53 @@ const RecentLocationsSnippet = () => {
           </View>
 
           {/* Pickup Suggestion Dropodwon */}
-          {(inputtingPickup) && (
-            <View style={[relative, wFull, h(10),]}>
-              {!searchState.loading?(<ScrollView
-                style={[
-                  absolute,
-                  top0,
-                  left0,
-                  zIndex(20),
-                  wFull,
-                  bg(colors.white),
-                  h(176),
-                  flexCol,
-                  gap(30),
-                  py(16),
-                  px(24),
-                  bg("#F9F7F8"),
-                  { borderBottomRightRadius: 10, borderBottomLeftRadius: 10 },
-                ]}
-              >
-                {(busstops as IBusStop[])?.map((busstop, index) => (
-                  <Text onPress={
-                    () => {
-                      setFieldValue("pickupBusstop", busstop?.name);
-                      dispatch(setStateInputField({ key: "pickupBusstopInput", value: busstop }))
-                      setSearchState((prev) => ({ ...prev, inputtingPickup: false , pickupSearchText: busstop.name}));
-                      console.log({busstop, pickupBusstopInput})
-                    }
-                    } style={[h(30) as TextStyle]} key={index}>
-                    {busstop?.name}
-                  </Text>
-                ))}
-              </ScrollView>):(<ActivityIndicator />)}
+          {inputtingPickup && (
+            <View style={[relative, wFull, h(10)]}>
+              {!searchState.loading ? (
+                <ScrollView
+                  style={[
+                    absolute,
+                    top0,
+                    left0,
+                    zIndex(20),
+                    wFull,
+                    bg(colors.white),
+                    h(176),
+                    flexCol,
+                    gap(30),
+                    py(16),
+                    px(24),
+                    bg("#F9F7F8"),
+                    { borderBottomRightRadius: 10, borderBottomLeftRadius: 10 },
+                  ]}
+                >
+                  {(busstops as IBusStop[])?.map((busstop, index) => (
+                    <Text
+                      onPress={() => {
+                        setFieldValue("pickupBusstop", busstop?.name);
+                        dispatch(
+                          setStateInputField({
+                            key: "pickupBusstopInput",
+                            value: busstop,
+                          })
+                        );
+                        setSearchState((prev) => ({
+                          ...prev,
+                          inputtingPickup: false,
+                          pickupSearchText: busstop.name,
+                        }));
+                        console.log({ busstop, pickupBusstopInput });
+                      }}
+                      style={[h(30) as TextStyle]}
+                      key={index}
+                    >
+                      {busstop?.name}
+                    </Text>
+                  ))}
+                </ScrollView>
+              ) : (
+                <ActivityIndicator />
+              )}
             </View>
           )}
           {/* Pickup Suggestion Dropodwon */}
@@ -320,7 +341,7 @@ const RecentLocationsSnippet = () => {
                     dispatch(
                       setStateInputField({
                         key: "pickupBusstopInput",
-                        value: item?.busStop?.name,
+                        value: item?.busStop,
                       })
                     );
                     setFieldValue("pickupBusstop", item?.busStop?.name);
@@ -405,14 +426,13 @@ const RecentLocationsSnippet = () => {
               cursorColor={Colors.light.textGrey}
               placeholder="Enter Destination"
               value={values.dropoffBusstop}
-              onChangeText={(text)=> {
+              onChangeText={(text) => {
                 searchBusstops(text);
                 setFieldValue("dropoffBusstop", text);
               }}
-              onFocus={() =>
-                {setSearchState((prev) => ({ ...prev, inputtingDropoff: true }));
-                }
-              }
+              onFocus={() => {
+                setSearchState((prev) => ({ ...prev, inputtingDropoff: true }));
+              }}
             />
 
             <Image
@@ -422,37 +442,52 @@ const RecentLocationsSnippet = () => {
           </View>
 
           {/* Dropoff Suggestion Dropodwon */}
-          {(inputtingDropoff) && (
+          {inputtingDropoff && (
             <View style={[relative, wFull, h(10), mt(-32)]}>
-              {!searchState.loading?(<ScrollView
-                style={[
-                  absolute,
-                  top0,
-                  left0,
-                  zIndex(20),
-                  wFull,
-                  bg(colors.white),
-                  h(176),
-                  flexCol,
-                  gap(30),
-                  py(16),
-                  px(24),
-                  bg("#F9F7F8"),
-                  { borderBottomRightRadius: 10, borderBottomLeftRadius: 10 },
-                ]}
-              >
-                {(busstops as IBusStop[])?.map((busstop, index) => (
-                  <Text onPress={
-                    () => {
-                      setFieldValue("dropoffBusstop", busstop?.name);
-                      dispatch(setStateInputField({ key: "dropoffBusstopInput", value: busstop }))
-                      setSearchState((prev) => ({ ...prev, inputtingDropoff: false , dropoffSearchText: busstop.name}));
-                    }
-                    } style={[h(30) as TextStyle]} key={index}>
-                    {busstop?.name}
-                  </Text>
-                ))}
-              </ScrollView>):(<ActivityIndicator />)}
+              {!searchState.loading ? (
+                <ScrollView
+                  style={[
+                    absolute,
+                    top0,
+                    left0,
+                    zIndex(20),
+                    wFull,
+                    bg(colors.white),
+                    h(176),
+                    flexCol,
+                    gap(30),
+                    py(16),
+                    px(24),
+                    bg("#F9F7F8"),
+                    { borderBottomRightRadius: 10, borderBottomLeftRadius: 10 },
+                  ]}
+                >
+                  {(busstops as IBusStop[])?.map((busstop, index) => (
+                    <Text
+                      onPress={() => {
+                        setFieldValue("dropoffBusstop", busstop?.name);
+                        dispatch(
+                          setStateInputField({
+                            key: "dropoffBusstopInput",
+                            value: busstop,
+                          })
+                        );
+                        setSearchState((prev) => ({
+                          ...prev,
+                          inputtingDropoff: false,
+                          dropoffSearchText: busstop.name,
+                        }));
+                      }}
+                      style={[h(30) as TextStyle]}
+                      key={index}
+                    >
+                      {busstop?.name}
+                    </Text>
+                  ))}
+                </ScrollView>
+              ) : (
+                <ActivityIndicator />
+              )}
             </View>
           )}
           {/* Dropoff Suggestion Dropodwon */}
@@ -468,7 +503,7 @@ const RecentLocationsSnippet = () => {
                     dispatch(
                       setStateInputField({
                         key: "dropoffBusstopInput",
-                        value: item?.busStop?.name,
+                        value: item?.busStop,
                       })
                     );
                     setFieldValue("dropoffBusstop", item?.busStop?.name);
@@ -1289,7 +1324,6 @@ const FilledForm = () => {
   const {
     stateInput: { pickupBusstopInput, dropoffBusstopInput },
   } = RideSelectors();
-  console.log({pickupBusstopInput, dropoffBusstopInput})
 
   let [inputting, setInputting] = useState({
     pickupBusstop: false,
@@ -1383,11 +1417,10 @@ const FilledForm = () => {
               // onFocus={() => onChange("pickupBusstop", true)}
               // onBlur={() => onChange("pickupBusstop", false)}
               // value={pickupBusstopInput?.name}
-              value={!pickupBusstopInput?.name ? pickupBusstopInput : pickupBusstopInput?.name}
+              value={pickupBusstopInput?.name}
               // onChangeText={(text) => dispatch(setStateInputField({ key: 'pickupBusstopInput', value: text }))}
             />
           </View>
-
         </View>
 
         <View style={[flexCol, gap(20)]}>
@@ -1437,11 +1470,11 @@ const FilledForm = () => {
               // onFocus={() => onChange("pickupBusstop", true)}
               // onBlur={() => onChange("pickupBusstop", false)}
               // value={dropoffBusstopInput?.name}
-              value={!dropoffBusstopInput?.name ? dropoffBusstopInput : dropoffBusstopInput?.name}
+              value={dropoffBusstopInput?.name}
               // onChangeText={(text) => dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: text }))}
             />
           </View>
-{/* 
+          {/* 
           {inputting.dropoffpickupBusstop && (
             <View style={[relative, wFull, h(10), mt(-32)]}>
               <ScrollView
@@ -1770,15 +1803,11 @@ const SearchingRide = ({
 
     const code = returnedData?.code;
     const msg = returnedData?.msg;
-    const availableRides = returnedData?.availableRides;
+    const availableRides = returnedData?.availableRides.length >= 1;
 
     setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
 
     if (code && code == 200 && availableRides) {
-      console.log({
-        "__code && code == 200__": code && code == 200,
-        availableRides,
-      });
       hideBottomSheet();
       router.push(`/${pages.availableRides}` as Href);
       setFetchState((prev) => ({
@@ -1788,7 +1817,6 @@ const SearchingRide = ({
         code: null,
       }));
     } else if (code && code == 400) {
-      console.log({ "__code && code == 400__": code && code == 400 });
       // showBottomSheet([477, 601], <RideRouteDetails code={code} msg={msg} />)
       // setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
     }
@@ -1805,14 +1833,25 @@ const SearchingRide = ({
   }, []);
 
   socket.on(EVENTS.connection, () => {
-    // console.log({ '___id___': socket.id });
+    console.log({ ___id___: socket.id });
     socket.on(EVENTS.rideRequestAccepted, (data: IRideAccptedEvent) => {
+      console.log({ data });
       if (usePathname().endsWith("orderRide")) {
         hideBottomSheet();
         getAvailableRides();
       }
     });
   });
+
+  useEffect(() => {
+    if (session) {
+      const intervalId = setInterval(() => {
+        getAvailableRides();
+      }, 3000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [session]);
 
   useEffect(() => {
     session && findAvailableRides();
@@ -1840,10 +1879,12 @@ const SearchingRide = ({
           {code == 201 && <Text style={[c(colors.green500), fs10]}>{msg}</Text>}
         </View>
 
-        <Image
-          style={[image.w(120), image.h(120)]}
-          source={images.searchingRideImage}
-        />
+        <ScaleUpDown>
+          <Image
+            style={[image.w(120), image.h(120)]}
+            source={images.searchingRideImage}
+          />
+        </ScaleUpDown>
 
         <TouchableOpacity
           onPress={cancelRide}
