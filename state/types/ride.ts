@@ -1,3 +1,5 @@
+import { IDriverDetails } from "./driver";
+
 type TLoadingStatus = 'idle' | 'succeeded' | 'failed';
 type TLoadingType = string;
 type TCurrentrideView = 'orderRide' | 'availableRides';
@@ -66,10 +68,7 @@ export interface ITicket {
     rideFee?: number
 }
 
-export interface IDriverDetails {
-    // vehiccle info
-    // driver info
-}
+
 
 export interface IStateInput {
     pickupBusstopInput: IBusStop | null,
@@ -78,6 +77,7 @@ export interface IStateInput {
     driverRatingInput: number | null,
     driverRatingCommentInput: string,
     cancelRideReasonInput: string,
+    userRideInput: Partial<IRide>,
 }
 // ? Ride
 
@@ -93,6 +93,7 @@ export interface IPlan {
 }
 
 export interface ICurrentRide {
+    _id: string,
     driverId: string,
     availableSeats: number,
     vehicleName: string,
@@ -114,7 +115,7 @@ export interface IRiderRideDetails {
 }
 
 export interface IRide {
-    id?: string,
+    _id?: string,
     pickupBusstop: IBusStop,
     dropoffBusstop: IBusStop,
     saved: boolean,
@@ -131,8 +132,9 @@ export interface IRideState {
     loading: ILoading,
     searchMatchBusstops: IBusStop[] | [],
     currentRideView: TCurrentrideView,
-    userRide: IRiderRideDetails | null,
-    availableRides: IRide[] | [],
+    // userRide: IRiderRideDetails | null,
+    userRide: {riderRideDetails: IRiderRideDetails, currentRide: ICurrentRide} | null,
+    availableRides: {riderRideDetails: IRiderRideDetails, currentRide: ICurrentRide}[] | [],
     currentNumberOfTickets: number,
     activeTab: TActiveTab
     stateInput: IStateInput,

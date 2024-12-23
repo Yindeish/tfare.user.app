@@ -16,7 +16,7 @@ import { FlatList } from 'react-native-gesture-handler'
 import RideSelectors from '@/state/selectors/ride'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
 import { createTicket, setAllTicketsFilled, setCurrentNumberOfTickets, } from '@/state/slices/ride'
-import { IRide, } from '@/state/types/ride'
+import { IRide, IRiderRideDetails, } from '@/state/types/ride'
 import Ticket from '@/components/page/ticket'
 import CtaBtn from '@/components/shared/ctaBtn'
 import { indices } from '@/constants/zIndices'
@@ -61,15 +61,17 @@ export default function BookRide() {
 
     // check if all tickets have been filled
     useEffect(() => {
-        if (userRide && userRide?.tickets) {
-            const allTciketsFilled = userRide?.tickets.every(ticket =>
-                ticket.dropoffBusstop && ticket.dropoffBusstop &&
-                ticket.dropoffBusstop.routeName !== '' && ticket.dropoffBusstop.routeName !== '');
+        if (userRide && userRide?.ticketsIds.length > 0) {
+            const allTciketsFilled = userRide?.ticketsIds.every(ticketId =>
+                // ticket.dropoffBusstop && ticket.dropoffBusstop &&
+                // ticket.dropoffBusstop.routeName !== '' && ticket.dropoffBusstop.routeName !== '')
+                true)
+                ;
 
             if (allTciketsFilled) dispatch(setAllTicketsFilled(true))
             else dispatch(setAllTicketsFilled(false))
         }
-    }, [userRide?.tickets])
+    }, [userRide?.ticketsIds])
     // check if all tickets have been filled
 
     return (
@@ -88,7 +90,7 @@ export default function BookRide() {
                 <View style={[wHFull, mt(120), flexCol, gap(32), mb(32)]}>
 
                     <RideBlock
-                        ride={userRide as IRide}
+                        ride={userRide as IRiderRideDetails}
                         bgColor='#FFF7E6'
                         ctaType='trackRide'
                         touchable
@@ -127,9 +129,9 @@ export default function BookRide() {
 
                         <FlatList
                             horizontal={false}
-                            data={userRide?.tickets}
-                            renderItem={({ index, item: ticket }) => (
-                                <Ticket ticket={ticket} index={index} key={index} />
+                            data={userRide?.ticketsIds}
+                            renderItem={({ index, item: ticketId }) => (
+                                <Ticket ticket={ticketId} index={index} key={index} />
                             )}
                         />
 

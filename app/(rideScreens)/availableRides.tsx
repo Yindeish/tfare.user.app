@@ -4,10 +4,10 @@ import PaddedScreen from '@/components/shared/paddedScreen'
 import SafeScreen from '@/components/shared/safeScreen'
 import { bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, mb, mt, p, pb, px, py, relative, rounded, w, wFull, wHFull } from '@/utils/styles'
 import PageFloatingTitle from '@/components/page/pageFloatingTitle'
-import { router, useGlobalSearchParams } from 'expo-router'
+import { router, useGlobalSearchParams, usePathname, useRouter } from 'expo-router'
 import Colors, { colors } from '@/constants/Colors'
 import { pages } from '@/constants/pages'
-import { setCurrentRideView, setUserRide } from '@/state/slices/ride'
+import { setCurrentRideView, setState, setUserRide } from '@/state/slices/ride'
 import RideBlock from '@/components/page/rideBlock'
 import RideSelectors from '@/state/selectors/ride'
 import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
@@ -17,6 +17,12 @@ import { IRideAccptedEvent } from '@/socket.io/socket.io.types'
 import { EVENTS, socket } from '@/socket.io/socket.io.config'
 import { useStorageState } from '@/hooks/useStorageState'
 import { useBottomSheet } from '@/contexts/useBottomSheetContext'
+import { ICurrentRide, IRide, IRiderRideDetails } from '@/state/types/ride'
+import { c, colorBlack, colorWhite, fs12, fs14, fs16, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles';
+import { images } from '@/constants/images';
+import { image } from '@/utils/imageStyles';
+import { FontAwesome6 } from '@expo/vector-icons';
+import { RefreshControl } from 'react-native-gesture-handler'
 
 export default function AvailableRide() {
     const dispatch = useAppDispatch()
@@ -24,18 +30,19 @@ export default function AvailableRide() {
     const [[isLoading, session], setSession] = useStorageState('token');
     const { showBottomSheet, hideBottomSheet, bottomSheetType } = useBottomSheet();
     const { query, } = useGlobalSearchParams<{ query?: string, riderCounterOffer?: string }>();
+    const route  = usePathname();
 
     useEffect(() => {
         hideBottomSheet();
     }, [query])
-    console.log({ 'ccgg': 'jkhjg', query })
+    // console.log({ 'ccgg': 'jkhjg', query })
 
     const [fetchState, setFetchState] = useState({
         loading: false,
         msg: '',
-        code: null
+        code: null,
     })
-    const { code, msg, loading } = fetchState;
+    const { code, msg, loading, } = fetchState;
 
     const getAvailableRides = async () => {
         setFetchState((prev) => ({ ...prev, loading: true }));
@@ -45,13 +52,15 @@ export default function AvailableRide() {
 
         const code = returnedData?.code;
         const msg = returnedData?.msg;
-        const availableRides = returnedData?.availableRides;
+        const availableRidesTotal = returnedData?.availableRides.length;
+        const availableRidesRequests = returnedData?.availableRides;
 
         setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
 
-        if (code && code == 200 && availableRides) {
-            console.log({ '__code && code == 200__': code && code == 200, availableRides: availableRides[0] })
+        if (code && code == 200 && availableRidesRequests) {
             setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
+            if(availableRidesTotal != availableRides.length) {}
+            dispatch(setState({ key:'availableRides', value: availableRidesRequests }));
         }
         else if (code && code == 400) {
             console.log({ '__code && code == 400__': code && code == 400 })
@@ -67,9 +76,29 @@ export default function AvailableRide() {
         });
     });
 
+    useEffect(() => {
+        if (session && route == 'availableRides') {
+          const intervalId = setInterval(() => {
+            getAvailableRides();
+          }, 3000);
+    
+        //   return () => clearInterval(intervalId);
+        }
+      }, [session]);
+
     return (
         <SafeScreen>
-            <ScrollView style={[wHFull, relative, { overflow: 'scroll' }]}>
+            <ScrollView 
+            style={[wHFull, relative, { overflow: 'scroll' }]}
+            refreshControl={
+                <RefreshControl
+                    refreshing={loading}
+                    onRefresh={getAvailableRides}
+                    tintColor={Colors.light.textGrey}
+                    colors={[Colors.light.textGrey]}
+                />
+            }
+            >
 
                 <PageFloatingTitle title='Available Rides' color={{ icon: Colors.light.textGrey, text: colors.black }} view onPress={() => {
                     router.push(`/${pages.orderRide}` as Href);
@@ -87,22 +116,9 @@ export default function AvailableRide() {
                                     touchable
                                     roundedCorners
                                     onPress={() => {
-                                        // dispatch(setUserRide({
-                                        //     pickupBusstop: {
-                                        //         type: 'pickupBusstop',
-                                        //         routeName: pickupBusstopInput
-                                        //     },
-                                        //     dropoffBusstop: {
-                                        //         type: 'dropoffBusstop',
-                                        //         routeName: dropoffBusstopInput
-                                        //     },
-                                        //     saved: false,
-                                        //     status: 'idle',
-                                        //     seats: ride.seats,
-                                        //     tickets: []
-                                        // }))
+                                        dispatch(setUserRide({riderRideDetails: ride?.riderRideDetails as IRiderRideDetails, currentRide: ride?.currentRide as ICurrentRide}));
 
-                                        router.push(`/${pages.bookRide}/${ride.id}` as Href)
+                                        router.push(`/bookRide?rideId=${ride?.riderRideDetails?._id}&currentRideId=${ride?.currentRide?._id}` as Href)
                                     }}
                                     key={index}
                                 />

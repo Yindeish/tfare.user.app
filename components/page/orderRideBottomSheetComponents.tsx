@@ -1803,11 +1803,13 @@ const SearchingRide = ({
 
     const code = returnedData?.code;
     const msg = returnedData?.msg;
-    const availableRides = returnedData?.availableRides.length >= 1;
+    const availableRidesTotal = returnedData?.availableRides.length;
+    const availableRidesRequests = returnedData?.availableRides;
 
     setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
 
-    if (code && code == 200 && availableRides) {
+    if (code && code == 200 && availableRidesTotal >= 1) {
+      dispatch(setState({ key: "availableRides", value: availableRidesRequests }));
       hideBottomSheet();
       router.push(`/${pages.availableRides}` as Href);
       setFetchState((prev) => ({

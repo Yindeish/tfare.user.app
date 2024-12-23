@@ -38,7 +38,8 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
                         <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Pick up Bus Stop</Text>
                     </View>
 
-                    <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.pickupBusstop?.routeName}</Text>
+                    {/* <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.pickupBusstop?.routeName}</Text> */}
+                    <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.pickupBusstop?.name}</Text>
                 </View>
             </View>
 
@@ -53,7 +54,8 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
                         <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Drop off Bus Stop</Text>
                     </View>
 
-                    <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.dropoffBusstop?.routeName}</Text>
+                    {/* <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.dropoffBusstop?.routeName}</Text> */}
+                    <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.dropoffBusstop?.name}</Text>
                 </View>
 
                 <View style={[flexCol, gap(16), justifyStart]}>
@@ -131,7 +133,8 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
                                     <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Pick up Bus Stop</Text>
                                 </View>
 
-                                <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.pickupBusstop.routeName}</Text>
+                                {/* <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.pickupBusstop.routeName}</Text> */}
+                                <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.pickupBusstop.name}</Text>
                             </View>
                         </View>
 
@@ -146,7 +149,8 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
                                     <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>Drop off Bus Stop</Text>
                                 </View>
 
-                                <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.dropoffBusstop.routeName}</Text>
+                                {/* <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.dropoffBusstop.routeName}</Text> */}
+                                <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.dropoffBusstop.name}</Text>
                             </View>
 
                             <View style={[flexCol, gap(16), justifyStart]}>
@@ -184,7 +188,7 @@ function Ticket({ index, ticket }: { index: number, ticket: ITicket }) {
                                             }}
                                             value={userCounterFareInput?.toString()}
                                             placeholder={'Negotiate fare'}
-                                            style={[py(16), pr(10), , bg(colors.transparent), c(Colors.light.textGrey), fs14, fw500, h(50), { borderWidth: 0, borderColor: colors.transparent, flex: 0.9 }]}
+                                            style={[py(16) as TextStyle, pr(10) as TextStyle, , bg(colors.transparent) as TextStyle, c(Colors.light.textGrey), fs14, fw500, h(50) as TextStyle, { borderWidth: 0, borderColor: colors.transparent, flex: 0.9 }]}
 
                                             cursorColor={Colors.light.background}
                                             selectionColor={colors.transparent}
