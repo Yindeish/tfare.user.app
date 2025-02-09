@@ -101,6 +101,7 @@ const post = async ({ data: formData, url, timeout = 20000 }: { data?: object, u
 }
 
 const postWithBearerToken = async ({ data: formData, url, token, timeout = 20000 }: { token: string, url: string, data?: object, timeout?: number }) => {
+    console.log({ formData })
     const controller = new AbortController();
     const signal = controller.signal;
 
@@ -115,7 +116,7 @@ const postWithBearerToken = async ({ data: formData, url, token, timeout = 20000
                 Authorization: `Bearer ${token}`
             },
             // signal,
-            body: formData ? JSON.stringify(formData) : null
+            body: JSON.stringify(formData)
         });
         // timeout && clearTimeout(fetchTimeout);
 

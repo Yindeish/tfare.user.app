@@ -24,6 +24,7 @@ const initialState: IRideState = {
         dropoffBusstopInput: null,
         pickupBusstopInput: null,
         userCounterFareInput: null,
+        paymentOptionInput: '',
         userRideInput: {
 
         }
@@ -33,6 +34,8 @@ const initialState: IRideState = {
     duration: null,
     price: '',
     seats: [],
+    ridePlans: [],
+    paymentOptionsVisible: false,
 }
 
 const RideSlice = createSlice({
@@ -46,6 +49,9 @@ const RideSlice = createSlice({
         setStateInputField: (state, action: PayloadAction<{ key: keyof IStateInput, value: any }>) => {
             const { key, value } = action.payload;
             state.stateInput[key] = value as never;
+        },
+        setPaymentOptionsVisible: (state, action: PayloadAction<boolean>) => {
+            state.paymentOptionsVisible = action.payload;
         },
         setUserRideInput: (state, action: PayloadAction<IRide>) => {
             state.stateInput.userRideInput = action.payload;
@@ -211,7 +217,7 @@ const RideSlice = createSlice({
 })
 
 export const {
-    setState,
+    setState, setPaymentOptionsVisible,
     setLoading, setCurrentRideView,
     setAvailableRides, setUserRideInput,
     setUserRide, setSearchMatchBusstops,

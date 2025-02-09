@@ -17,7 +17,9 @@ import { Href, router } from "expo-router";
 import { setState } from "@/state/slices/user";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
 
-const SessionContext = React.createContext<ISigninContext &{testSignIn:(data: IRequestData) => void;}>({
+const SessionContext = React.createContext<
+  ISigninContext & { testSignIn: (data: IRequestData) => void }
+>({
   signIn: () => null,
   testSignIn: () => null,
   signOut: () => null,
@@ -43,7 +45,10 @@ export function useSession() {
 export function SessionProvider(props: React.PropsWithChildren) {
   const dispatch = useAppDispatch();
 
-  const [[isLoading, session], setSession] = useStorageState("userSignedIn");
+  const [[isLoading, userSession], setSession] = useStorageState("user");
+  const [[signedinTimeLoading, signedinTimeSession], setSignedinTimeSession] =
+    useStorageState("signedinTime");
+
   const {
     signIn: signInwithToken,
     signOut: signTokenOut,
@@ -51,12 +56,13 @@ export function SessionProvider(props: React.PropsWithChildren) {
   } = useTokenSession();
   const { closeSnackbar, openSnackbar, snackbarVisible } = useSnackbar();
 
-  const parsedSession = JSON.parse(session as string) as IUserAccount;
+
+  const parsedSession = JSON.parse(userSession as string) as IUserAccount;
 
   const [contextState, setRequestState] = useState<ISigninContextState>({
     msg: "",
     code: null,
-    user: session ? parsedSession : null,
+    user: userSession ? parsedSession : null,
     loadingState: "idle",
   });
   const { code, msg, user, loadingState } = contextState;
@@ -86,7 +92,10 @@ export function SessionProvider(props: React.PropsWithChildren) {
     onChange("loadingState", "signingin" as TSigninLoadingState);
 
     const returnedData: ISigninResponseData = await FetchService.post({
-      data,
+      data: {
+        ...data,
+        role: "rider",
+      },
       url: "/auth/signin",
     });
 
@@ -100,6 +109,9 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
       dispatch(setState({ key: "user", value: returnedData.user }));
       dispatch(setState({ key: "token", value: returnedData.token }));
+
+      const signedinTime = new Date();
+      setSignedinTimeSession(JSON.stringify(signedinTime));
       router.replace("/(tab)/" as Href);
     }
 
@@ -114,28 +126,40 @@ export function SessionProvider(props: React.PropsWithChildren) {
     onChange("loadingState", "signingin" as TSigninLoadingState);
 
     onChange("loadingState", "idle" as TSigninLoadingState);
-  
-    dispatch(setState({ key: "user", value: {
-      phoneNumber: 89878977826,
-        profileName: "Rider00",
-        fullName: "Rider00",
-        email: "rider00@gmail.com",
-        role: "rider",
-        createdAt: "2024-11-09T21:57:01.240Z",
-        updatedAt: "2024-12-16T18:29:06.361Z",
-        __v: 0,
-        picture: "https://res.cloudinary.com/dg46gpi4v/image/upload/v1734373524/ridersImages/kd1ajulsz7ujaazgvy6l.png",
-        accountSecurity: {
+
+    dispatch(
+      setState({
+        key: "user",
+        value: {
+          phoneNumber: 89878977826,
+          profileName: "Rider00",
+          fullName: "Rider00",
+          email: "rider00@gmail.com",
+          role: "rider",
+          createdAt: "2024-11-09T21:57:01.240Z",
+          updatedAt: "2024-12-16T18:29:06.361Z",
+          __v: 0,
+          picture:
+            "https://res.cloudinary.com/dg46gpi4v/image/upload/v1734373524/ridersImages/kd1ajulsz7ujaazgvy6l.png",
+          accountSecurity: {
             pin: "$2b$10$7AZVbVYBSc8tYmeUe7C0ZukjMPH/Ch5dbuMg6HYbIwEkE.wRe/bxS",
             deactivated: false,
             deleted: false,
-            biometricLogin: false
+            biometricLogin: false,
+          },
+          _id: "672fdaad44ada8750bec6856",
+          riderProfile: {},
         },
-        _id: "672fdaad44ada8750bec6856",
-        riderProfile:{}
-    }}));
-      dispatch(setState({ key: "token", value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzJmZGFhZDQ0YWRhODc1MGJlYzY4NTYiLCJpYXQiOjE3MzQ4NTY4NzQsImV4cCI6MTczNDk0MzI3NH0.XUqVEizFfFosxTjLR1CDG6WtE-y2jvQqNx5mUne3cBk' }));
-      router.replace("/(tab)/" as Href);
+      })
+    );
+    dispatch(
+      setState({
+        key: "token",
+        value:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzJmZGFhZDQ0YWRhODc1MGJlYzY4NTYiLCJpYXQiOjE3MzQ4NTY4NzQsImV4cCI6MTczNDk0MzI3NH0.XUqVEizFfFosxTjLR1CDG6WtE-y2jvQqNx5mUne3cBk",
+      })
+    );
+    router.replace("/(tab)/" as Href);
 
     // signInwithToken('token'); setSession(JSON.stringify({ user: 'user' }));  // for testing
   };
@@ -173,7 +197,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
         signIn,
         testSignIn,
         signOut,
-        userSession: session,
+        userSession: userSession,
         isLoading,
         code,
         msg,

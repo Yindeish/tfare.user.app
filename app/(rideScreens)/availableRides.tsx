@@ -117,8 +117,9 @@ export default function AvailableRide() {
                                     roundedCorners
                                     onPress={() => {
                                         dispatch(setUserRide({riderRideDetails: ride?.riderRideDetails as IRiderRideDetails, currentRide: ride?.currentRide as ICurrentRide}));
-
-                                        router.push(`/bookRide?rideId=${ride?.riderRideDetails?._id}&currentRideId=${ride?.currentRide?._id}` as Href)
+                                        
+                                        router.push(`/(rideScreens)/bookRide?rideId=${ride?.riderRideDetails?._id}&currentRideId=${ride?.currentRide?._id}` as Href)
+                                        // router.push('/(rideScreens)/bookRide')
                                     }}
                                     key={index}
                                 />

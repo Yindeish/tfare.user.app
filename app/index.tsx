@@ -1,45 +1,101 @@
 import 'expo-dev-client';
 import { View, Text, Dimensions } from 'react-native'
-import React, { useEffect } from 'react'
-import { Redirect } from 'expo-router';
+import React, { useEffect, useState } from 'react'
+import { Href, Redirect, SplashScreen } from 'expo-router';
 import { useSession } from '../contexts/userTokenContext';
 import { useSession as userSession } from '../contexts/userSignedInContext';
 import { pages } from '../constants/pages';
 import FetchService from '@/services/api/fetch.service';
-import { useAppSelector } from '@/state/hooks/useReduxToolkit';
+import { useAppDispatch, useAppSelector } from '@/state/hooks/useReduxToolkit';
+import * as SecureStore from 'expo-secure-store';
+import { setState } from '@/state/slices/user';
 
 export default function Index() {
-    const { tokenSession, isLoading } = useSession();
-    const { signOut } = userSession()
+    const dispatch = useAppDispatch();
     const {token} = useAppSelector(state => state.user);
+
+    const { user } = useAppSelector(state => state.user);
+  
+    const [userLoading, setUserLoading] = useState(true);
+    const [userSession, setUserSession] = useState<string | null>(null);
+    const [tokenSession, setTokenSession] = useState<string | null>(null);
+    const [signedinTimeSession, setSignedinTimeSession] = useState<string | null>(null);
 
     const { width, height } = Dimensions.get('window');
 
-    const checkUserSessionExpiry = async () => {
-        const returnedData = await FetchService.getWithBearerToken({ url: '/user/me', token: tokenSession as string });
-        const msg = returnedData?.msg;
-        const code = returnedData?.code;
+    console.log({user, token,})
 
-        if (msg === 'Token expired. Signin required!' && code === 401) {
-            signOut();
-            // <Redirect href="/(auth)/signin" />;
+    useEffect(() => {
+        // Prevent the splash screen from auto-hiding
+        SplashScreen.preventAutoHideAsync();
+    
+        // Fetch user data and signed in time from SecureStore asynchronously
+        const loadUserData = async () => {
+          try {
+            const user = await SecureStore.getItemAsync('user');
+            const signedinTime = await SecureStore.getItemAsync('signedinTime');
+            const token = await SecureStore.getItemAsync('token');
+            
+            setUserSession(user);
+            setTokenSession(token);
+            setSignedinTimeSession(signedinTime);
+            setUserLoading(false); // Data is loaded, hide loading state
+          } catch (error) {
+            console.error('Error fetching data from SecureStore:', error);
+            setUserLoading(false);
+          }
+        };
+    
+        loadUserData();
+      }, []);
+    
+      // Check session validity and update Redux state
+      useEffect(() => {
+        if (userSession && signedinTimeSession) {
+          const parsedUser = JSON.parse(userSession);
+          const parsedSigninTime = JSON.parse(signedinTimeSession);
+          
+          const signedinTime = new Date(parsedSigninTime);
+          const currentTime = new Date();
+          const maxSessionDuration = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    
+          if (!isNaN(signedinTime.getTime()) && currentTime.getTime() - signedinTime.getTime() <= maxSessionDuration) {
+            console.log('setting state')
+            dispatch(setState({ key: 'user', value: parsedUser as never }));
+            dispatch(setState({ key: 'token', value: tokenSession as never }));
+          } else {
+            dispatch(setState({ key: 'user', value: null as never }));
+          }
+        } else {
+          dispatch(setState({ key: 'user', value: null as never }));
         }
-    }
+      }, [userSession, signedinTimeSession, dispatch]);
+    
+      // Loading state
+      useEffect(() => {
+        if (!userLoading) {
+          // Hide splash screen after data is loaded
+          SplashScreen.hideAsync();
+        }
+      }, [userLoading]);
+    
+      // If user is still loading
+      if (userLoading) {
+        return null; // Don't render anything while loading; splash screen will remain
+      }
 
-    // useEffect(() => { checkUserSessionExpiry() }, []);
-
-    if (isLoading) {
-        return <View style={{ width, height, backgroundColor: '#D7D7D7' }} />;
-    }
-
-    if (!token) {
+    if (userSession == null && !token) {
         return <Redirect href="/introScreen" />;
     }
 
-    else {
+    if (userSession != null) return <Redirect href={"/(tab)/" as Href} />;
+
+    if(userSession == null && token) {
         return <Redirect href="/(auth)/signin" />; // uncomment after testing
         // return <Redirect href={`/(rideScreens)/1/${pages.tripHistory}`} />; // part of testing
         // return <Redirect href={`/(rideScreens)/${pages.tripHistory}`} />; // part of testing
 
     }
+
+    return null;
 }

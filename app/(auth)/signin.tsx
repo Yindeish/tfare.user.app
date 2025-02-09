@@ -160,7 +160,7 @@ export default function Signin() {
                             </View>
                             {/* </KeyboardAvoidingView> */}
 
-                            {code == 400 && <Text style={[fs10, c(colors.red500)]}>{msg}</Text>}
+                            <Text style={[fs10, c(colors.red500)]}>{msg}</Text>
 
                             <Pressable
                                 style={[wFull, signInBtn as ViewStyle, flex, itemsCenter, justifyCenter]}

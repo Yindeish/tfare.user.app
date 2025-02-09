@@ -105,6 +105,7 @@ import { AntDesign } from "@expo/vector-icons";
 import tw from "@/constants/tw";
 import { IBusStop } from "@/state/types/ride";
 import ScaleUpDown from "../shared/scale_animator";
+import URLS from "@/constants/urls";
 
 const RecentLocationsSnippet = () => {
   const dispatch = useDispatch();
@@ -149,6 +150,7 @@ const RecentLocationsSnippet = () => {
     setSearchState((prev) => ({ ...prev, loading: false }));
 
     const busstops = returnedData?.matchSearchBusStops as IAddress[];
+    console.log({ busstops });
     if (busstops) {
       setSearchState((prev) => ({ ...prev, busstops: busstops as never[] }));
       dispatch(setSavedAddresses(busstops));
@@ -185,6 +187,7 @@ const RecentLocationsSnippet = () => {
       token: session as string,
     });
     const allBusStops = returnedData?.allBusStops as IAddress[];
+    console.log({ allBusStops });
 
     setFetchState({ loading: false });
     if (allBusStops) {
@@ -1340,29 +1343,42 @@ const FilledForm = () => {
     setInputting((prev) => ({ ...prev, [key]: val }));
 
   const findRidePlans = async () => {
-    setFetchState((prev) => ({ ...prev, loading: true }));
-    const returnedData = await FetchService.postWithBearerToken({
-      url: "/user/rider/me/ride-plans",
-      data: {
-        pickupBusstopId: pickupBusstopInput?._id,
-        dropoffBusstopId: dropoffBusstopInput?._id,
-      },
-      token: session as string,
-    });
-    const code = returnedData?.code;
-    const msg = returnedData?.msg;
-    const duration = returnedData?.duration;
-    const price = returnedData?.price;
-    const seats = returnedData?.vehicles;
-    setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
+    try {
+      setFetchState((prev) => ({ ...prev, loading: true }));
+      await fetch(`${URLS.baseUrl}/user/rider/me/ride-plans` , {
+        method: 'POST',
+        body: JSON.stringify({
+          pickupBusstopId: pickupBusstopInput?._id,
+          dropoffBusstopId: dropoffBusstopInput?._id,
+        }),
+        headers: {
+          Authorization: `Bearer ${session}`,
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(async (res) => {
+          const data = res?.body ? await res.json() : res;
+          console.log({ data, res });
 
-    dispatch(setState({ key: "duration", value: duration }));
-    dispatch(setState({ key: "price", value: price }));
-    dispatch(setState({ key: "seats", value: seats }));
+          const code = data?.code;
+          setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
+          const ridePlans = data?.ridePlans;
+          console.log({ ridePlans });
 
-    if (code == 200) {
-      showBottomSheet([477, 601], <RideRouteDetails />);
-      router.setParams({ query: "RideRouteDetails" });
+          dispatch(setState({ key: "ridePlans", value: ridePlans }));
+
+          if (code == 200) {
+            console.log('success')
+            showBottomSheet([477, 601], <RideRouteDetails />);
+            router.setParams({ query: "RideRouteDetails" });
+          }
+        })
+        .catch((err) => {
+          setFetchState((prev) => ({ ...prev, loading: false, }));
+          console.log({ err });
+        });
+    } catch (error) {
+      console.log({ error });
     }
   };
 
@@ -1402,7 +1418,6 @@ const FilledForm = () => {
               style={[
                 fs14,
                 fw500,
-                neurialGrotesk,
                 h(20) as TextStyle,
                 {
                   color: Colors.light.textGrey,
@@ -1455,7 +1470,6 @@ const FilledForm = () => {
               style={[
                 fs14,
                 fw500,
-                neurialGrotesk,
                 h(20) as TextStyle,
                 {
                   color: Colors.light.textGrey,
@@ -1504,7 +1518,7 @@ const FilledForm = () => {
           )} */}
         </View>
 
-        {msg.length > 0 && (code !== 200 || code != 201) && (
+        {msg?.length > 0 && (code !== 200 || code != 201) && (
           <Text style={[fs10, c(colors.red500)]}>{msg}</Text>
         )}
 
@@ -1809,7 +1823,9 @@ const SearchingRide = ({
     setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
 
     if (code && code == 200 && availableRidesTotal >= 1) {
-      dispatch(setState({ key: "availableRides", value: availableRidesRequests }));
+      dispatch(
+        setState({ key: "availableRides", value: availableRidesRequests })
+      );
       hideBottomSheet();
       router.push(`/${pages.availableRides}` as Href);
       setFetchState((prev) => ({
