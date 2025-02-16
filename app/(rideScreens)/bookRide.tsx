@@ -39,7 +39,7 @@ import {
   zIndex,
 } from "@/utils/styles";
 import PageFloatingTitle from "@/components/page/pageFloatingTitle";
-import { Href, router, useLocalSearchParams } from "expo-router";
+import { Href, router, useLocalSearchParams, usePathname } from "expo-router";
 import Colors, { colors } from "@/constants/Colors";
 import {
   c,
@@ -66,6 +66,7 @@ import {
   setAllTicketsFilled,
   setCurrentNumberOfTickets,
   setPaymentOptionsVisible,
+  setState,
 } from "@/state/slices/ride";
 import { ICurrentRide, IRide, IRiderRideDetails } from "@/state/types/ride";
 import Ticket from "@/components/page/ticket";
@@ -77,7 +78,10 @@ import FetchService from "@/services/api/fetch.service";
 import { RootState } from "@/state/store";
 import Spinner from "@/components/shared/spinner";
 // import {toast} from "burnt";
+import * as Linking from 'expo-linking';
 import Toast from 'react-native-toast-message'
+import { useGlobalSearchParams } from "expo-router";
+import tw from "@/constants/tw";
 
 
 
@@ -109,8 +113,8 @@ const {
 });
 
 export default function BookRide() {
-  const { rideId, currentRideId } = useLocalSearchParams();
-  const { token } = useAppSelector((state: RootState) => state.user);
+  const { rideId, currentRideId, selectedAvailableRideId } = useGlobalSearchParams();
+  const { token, user } = useAppSelector((state: RootState) => state.user);
 
   const dispatch = useAppDispatch();
   const {
@@ -120,6 +124,8 @@ export default function BookRide() {
     currentNumberOfTickets,
     paymentOptionsVisible,
   } = RideSelectors();
+  const {selectedAvailableRide, stateInput:{paymentOptionInput}} = useAppSelector((state: RootState) => state.ride);
+  const path = usePathname();
 
   const [fetchState, setFetchState] = useState({
     loading: false,
@@ -216,6 +222,28 @@ export default function BookRide() {
     }
   };
 
+  const openMap = () => {
+    const riderRide = selectedAvailableRide?.ridersRides.find((ride) => String(ride?.riderId) == String(user?._id));
+    const location = riderRide?.dropoffBusstop?.name || selectedAvailableRide?.inRideDropoffs[selectedAvailableRide?.inRideDropoffs.length-1]?.name;
+    const mapLink = `https://www.google.com/maps?q=${location}`;
+  
+    Linking.openURL(mapLink).catch((err) => console.error('Failed to open map:', err));
+  };
+
+  useEffect(() => {
+    dispatch(setState({key:'selectedAvailableRideId', value: selectedAvailableRideId}))
+  }, [selectedAvailableRideId])
+
+  // Updating buy Ticket btn with allTicketsFilled
+  useEffect(() => {
+    dispatch(setState({key:'booking', value: allTicketsFilled && path === '/(rideScreens)/bookRide' as Href ?true:false}))
+  }, [allTicketsFilled, path])
+  // Updating buy Ticket btn with allTicketsFilled
+
+  useEffect(() => {
+    if(!selectedAvailableRide) router.back()
+  }, [selectedAvailableRide])
+
   //   const getRideDetails = async () => {
   //     const url = `user/rider/me/ride/${currentRideId}/ride-details`;
 
@@ -266,8 +294,14 @@ export default function BookRide() {
         (ticket) => ticket.dropoffBusstop && ticket.dropoffBusstop
         // &&  ticket.dropoffBusstop.routeName !== '' && ticket.dropoffBusstop.routeName !== '')
       );
-      if (allTciketsFilled) dispatch(setAllTicketsFilled(true));
-      else dispatch(setAllTicketsFilled(false));
+      if (allTciketsFilled) {
+        dispatch(setAllTicketsFilled(true));
+        dispatch(setState({key:'booking', value: true}));
+      }
+      else {
+        dispatch(setAllTicketsFilled(false));
+        dispatch(setState({key:'booking', value: false}));
+      }
     }
   }, [userRideInput?.tickets]);
   // check if all tickets have been filled
@@ -286,17 +320,14 @@ export default function BookRide() {
 
         <View style={[wHFull, mt(120), flexCol, gap(32), mb(32)]}>
           <RideBlock
-            ride={
-              userRide as {
-                riderRideDetails: IRiderRideDetails;
-                currentRide: ICurrentRide;
-              }
-            }
+            ride={selectedAvailableRide as ICurrentRide}
             bgColor="#FFF7E6"
             ctaType="trackRide"
             touchable
             roundedCorners={false}
-            onPress={() => {}}
+            onPress={() => {
+              openMap()
+            }}
           />
 
           <PaddedScreen>
@@ -334,10 +365,10 @@ export default function BookRide() {
               <ScrollView>
                 <View style={[wFull, flex, gap(16)]}>
                   {/* 5 is the seats (total) and 3 is the available seats */}
-                  {Array.from({ length: 5 }).map((_, index) => (
+                  {Array.from({ length: 4 }).map((_, index) => (
                     <>
                       {index + 1 <=
-                      Number(userRide?.currentRide?.availableSeats) ? (
+                      Number(selectedAvailableRide?.availableSeats) ? (
                         <TouchableOpacity
                           onPress={() => selectNumberOfTickets(index + 1)}
                           style={[
@@ -448,7 +479,7 @@ export default function BookRide() {
             {/* Shows when all the tickets have been filled (counter fare are optional) */}
             {/* Buy Ticket Btn */}
 
-            {allTicketsFilled && (
+            {/* {allTicketsFilled && (
               <View
                 style={[
                   absolute,
@@ -474,7 +505,7 @@ export default function BookRide() {
                   }}
                 />
               </View>
-            )}
+            )} */}
 
             {/* Buy Ticket Btn */}
 
@@ -498,7 +529,7 @@ export default function BookRide() {
                 >
                   <TouchableOpacity
                     onPress={() =>
-                      router.push(`/(rideScreens)/paymentOptions/1` as Href)
+                      router.push(`/(rideScreens)/paymentOptions` as Href)
                     }
                     style={[wFull, flex, justifyBetween, itemsCenter]}
                   >
@@ -507,8 +538,8 @@ export default function BookRide() {
                     </Text>
 
                     <View style={[flex, gap(16), itemsCenter]}>
-                      <Text style={[neurialGrotesk, fw400, fs14, colorBlack]}>
-                        Wallet
+                      <Text style={[neurialGrotesk, fw400, fs14, colorBlack, tw `capitalize`]}>
+                        {paymentOptionInput}
                       </Text>
 
                       <Ionicons
@@ -569,19 +600,19 @@ export default function BookRide() {
                   <BuyTicketListTile
                     leadingText="Trip ID"
                     trailing={{
-                      text: "#1234567ABC",
+                      text: selectedAvailableRideId as string,
                     }}
                   />
                   <BuyTicketListTile
                     leadingText="Trip Cost"
                     trailing={{
-                      text: " ₦ 500.00",
+                      text: `₦ `,
                     }}
                   />
                   <BuyTicketListTile
-                    leadingText="Discount"
+                    leadingText="Service Fee"
                     trailing={{
-                      text: " ₦ 0000.00",
+                      text: " ₦ 20",
                     }}
                   />
                 </View>
@@ -589,7 +620,7 @@ export default function BookRide() {
                 <BuyTicketListTile
                   leadingText="Total"
                   trailing={{
-                    text: " ₦ 500.00",
+                    text: " ₦ ",
                   }}
                 />
               </View>
@@ -618,10 +649,11 @@ function RideBlock({
   ctaType: "trackRide" | "bookRide";
   bgColor: "#F9F7F8" | "#FFF7E6";
   roundedCorners: boolean;
-  ride?: { riderRideDetails: IRiderRideDetails; currentRide: ICurrentRide };
+  ride?: ICurrentRide;
   onPress?: () => void;
   touchable?: boolean;
 }) {
+
   return (
     <View
       style={[
@@ -639,10 +671,10 @@ function RideBlock({
       <View style={[wFull, h(45), flex, itemsCenter, justifyBetween, gap(14)]}>
         <View style={[flexCol, gap(12), itemsStart]}>
           <Text style={[colorBlack, fw700, fs14]}>
-            Rider #{ride?.riderRideDetails?._id.slice(0, 10)}
+            Ride #{ride?._id.slice(0, 10)}
           </Text>
           <Text style={[fw400, fs12, c(Colors.light.textGrey)]}>
-            {ride?.currentRide?.vehicleName}
+            {ride?.vehicleName}
           </Text>
         </View>
 
@@ -664,7 +696,7 @@ function RideBlock({
             source={images.passengersImage}
           />
           <Text style={[fs12, fw500, colorBlack]}>
-            {ride?.currentRide?.availableSeats} seats Available
+            {ride?.availableSeats} seats Available
           </Text>
         </View>
       </View>

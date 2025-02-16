@@ -1,4 +1,5 @@
 import { IDriverDetails } from "./driver";
+import { IUser } from "./user";
 
 type TLoadingStatus = "idle" | "succeeded" | "failed";
 type TLoadingType = string;
@@ -84,10 +85,14 @@ export interface IStateInput {
   cancelRideReasonInput: string;
   userRideInput: Partial<IRide>;
   paymentOptionInput: string;
+
+//   
+selectedPlan: IPlan | null
 }
 // ? Ride
 
 export interface IPlan {
+    routeId: string;
   planName: TPlanName;
   vehicleSeats: number;
   ride?: {
@@ -103,14 +108,14 @@ export interface ICurrentRide {
   driverId: string;
   availableSeats: number;
   vehicleName: string;
-  inRideDropoffsIds: string[];
-  ridersRidesIds: string[];
+  inRideDropoffs: IBusStop[];
+  ridersRides: IRiderRideDetails[];
 }
 
 export interface IRiderRideDetails {
   _id: string;
-  pickupBusstopId: string;
-  dropoffBusstopId: string;
+  pickupBusstop: IBusStop;
+  dropoffBusstop: IBusStop;
   riderId: string;
   ticketsIds: string[];
   duration: string;
@@ -151,22 +156,30 @@ export interface IPlan {
 
 export interface IRideState {
   loading: ILoading;
+  booking: boolean;
   searchMatchBusstops: IBusStop[] | [];
   currentRideView: TCurrentrideView;
   // userRide: IRiderRideDetails | null,
+  riderRideDetails: IRiderRideDetails | null;
+  paidTickets: ITicket[],
+  driverDetails: IUser | null,
   userRide: {
     riderRideDetails: IRiderRideDetails;
     currentRide: ICurrentRide;
   } | null;
-  availableRides:
-    | { riderRideDetails: IRiderRideDetails; currentRide: ICurrentRide }[]
-    | [];
+//   availableRides:
+//     | { riderRideDetails: IRiderRideDetails; currentRide: ICurrentRide }[]
+//     | [];
+  availableRides: ICurrentRide[] | [];
+  selectedAvailableRide: ICurrentRide | null;
+  selectedAvailableRideId: string | null;
   currentNumberOfTickets: number;
   activeTab: TActiveTab;
   stateInput: IStateInput;
   currentTicket: ITicket | null;
   counterFareStatus: TCounterFareStatus;
   allTicketsFilled: boolean;
+  ticketDetailsShown: boolean,
   duration: { text: string; value: string } | null;
   price: string;
   seats: number[];

@@ -1,4 +1,4 @@
-import { Image, ScrollView, TouchableOpacity, View, } from 'react-native'
+import { ActivityIndicator, Image, ScrollView, TouchableOpacity, View, } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import SafeScreen from '@/components/shared/safeScreen'
@@ -10,7 +10,7 @@ import { pages } from '@/constants/pages'
 import { setCurrentRideView, setState, setUserRide } from '@/state/slices/ride'
 import RideBlock from '@/components/page/rideBlock'
 import RideSelectors from '@/state/selectors/ride'
-import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
+import { useAppDispatch, useAppSelector } from '@/state/hooks/useReduxToolkit'
 import { Href } from 'expo-router'
 import FetchService from '@/services/api/fetch.service'
 import { IRideAccptedEvent } from '@/socket.io/socket.io.types'
@@ -23,19 +23,26 @@ import { images } from '@/constants/images';
 import { image } from '@/utils/imageStyles';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { RefreshControl } from 'react-native-gesture-handler'
+import { RootState } from '@/state/store'
 
 export default function AvailableRide() {
     const dispatch = useAppDispatch()
     const { availableRides, stateInput: { pickupBusstopInput, dropoffBusstopInput } } = RideSelectors()
     const [[isLoading, session], setSession] = useStorageState('token');
     const { showBottomSheet, hideBottomSheet, bottomSheetType } = useBottomSheet();
-    const { query, } = useGlobalSearchParams<{ query?: string, riderCounterOffer?: string }>();
+    const { query,requestId} = useGlobalSearchParams<{ query?: string, riderCounterOffer?: string, requestId?: string }>();
     const route  = usePathname();
+    
+
+    console.log({requestId})
+
+    useEffect(() => {
+        if(!requestId) router.back()
+    }, [])
 
     useEffect(() => {
         hideBottomSheet();
     }, [query])
-    // console.log({ 'ccgg': 'jkhjg', query })
 
     const [fetchState, setFetchState] = useState({
         loading: false,
@@ -47,13 +54,14 @@ export default function AvailableRide() {
     const getAvailableRides = async () => {
         setFetchState((prev) => ({ ...prev, loading: true }));
         const returnedData = await FetchService.getWithBearerToken({
-            url: '/user/rider/me/available-rides', token: session as string
+            url: `/user/rider/me/available-rides/${requestId}`, token: session as string
         });
 
         const code = returnedData?.code;
         const msg = returnedData?.msg;
         const availableRidesTotal = returnedData?.availableRides.length;
         const availableRidesRequests = returnedData?.availableRides;
+        console.log({returnedData, availableRidesRequests})
 
         setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
 
@@ -77,14 +85,16 @@ export default function AvailableRide() {
     });
 
     useEffect(() => {
-        if (session && route == 'availableRides') {
+        if (session && requestId && route == 'availableRides') {
+            getAvailableRides();
           const intervalId = setInterval(() => {
             getAvailableRides();
           }, 3000);
     
         //   return () => clearInterval(intervalId);
         }
-      }, [session]);
+    //   }, [session, userRide?.riderRideDetails]);
+      }, []);
 
     return (
         <SafeScreen>
@@ -93,7 +103,10 @@ export default function AvailableRide() {
             refreshControl={
                 <RefreshControl
                     refreshing={loading}
-                    onRefresh={getAvailableRides}
+                    onRefresh={() => {
+                        // userRide?.riderRideDetails && 
+                        getAvailableRides()
+                    }}
                     tintColor={Colors.light.textGrey}
                     colors={[Colors.light.textGrey]}
                 />
@@ -107,7 +120,7 @@ export default function AvailableRide() {
 
                 <PaddedScreen>
                     <View style={[wFull, mt(130), { overflow: 'scroll', }]}>
-                        <View style={[wFull, flexCol, gap(26),]}>
+                        {loading?(<ActivityIndicator />):(<View style={[wFull, flexCol, gap(26),]}>
                             {availableRides.map((ride, index) => (
                                 <RideBlock
                                     bgColor='#F9F7F8'
@@ -116,15 +129,17 @@ export default function AvailableRide() {
                                     touchable
                                     roundedCorners
                                     onPress={() => {
-                                        dispatch(setUserRide({riderRideDetails: ride?.riderRideDetails as IRiderRideDetails, currentRide: ride?.currentRide as ICurrentRide}));
+                                        // dispatch(setUserRide({riderRideDetails: null as any, currentRide: ride as ICurrentRide}));
+                                        dispatch(setState({key:'selectedAvailableRide', value: ride}))
                                         
-                                        router.push(`/(rideScreens)/bookRide?rideId=${ride?.riderRideDetails?._id}&currentRideId=${ride?.currentRide?._id}` as Href)
+                                        // router.push(`/(rideScreens)/bookRide?rideId=${''}&currentRideId=${ride?._id}` as Href)
+                                        router.push(`/(rideScreens)/bookRide?selectedAvailableRideId=${ride?._id}` as Href)
                                         // router.push('/(rideScreens)/bookRide')
                                     }}
                                     key={index}
                                 />
                             ))}
-                        </View>
+                        </View>)}
                     </View>
                 </PaddedScreen>
             </ScrollView>

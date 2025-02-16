@@ -57,7 +57,7 @@ export default function Index() {
           
           const signedinTime = new Date(parsedSigninTime);
           const currentTime = new Date();
-          const maxSessionDuration = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+          const maxSessionDuration = 23 * 60 * 60 * 1000; // 23 hours in milliseconds
     
           if (!isNaN(signedinTime.getTime()) && currentTime.getTime() - signedinTime.getTime() <= maxSessionDuration) {
             console.log('setting state')

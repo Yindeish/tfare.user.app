@@ -65,7 +65,7 @@ export default function Account() {
                                 <Text style={[colorBlack, fw700, { fontSize: 22 }]}> ₦{'0000.00'}</Text>
                             </View>
 
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => router.push('/(account)/paymentInfo')}>
                                 <View style={[flex, itemsCenter, justifyBetween, w(124), h(45), px(16), rounded(100), bg(colors.white), {
                                     borderWidth: 0.7, borderColor: '#D7D7D7',
                                 }]}>

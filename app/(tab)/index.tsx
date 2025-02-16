@@ -17,7 +17,7 @@ import FetchService from '@/services/api/fetch.service';
 import { useSession } from '@/contexts/userTokenContext';
 import { RefreshControl } from 'react-native-gesture-handler';
 import { setUserWallet } from '@/state/slices/account';
-import { setInputState, setWalletState } from '@/state/slices/user';
+import { setInputState, setState, setWalletState } from '@/state/slices/user';
 import { useAppDispatch, useAppSelector } from '@/state/hooks/useReduxToolkit';
 import { RootState } from '@/state/store';
 import { EVENTS, socket } from '@/socket.io/socket.io.config';
@@ -56,18 +56,17 @@ export default function Index() {
         const wallet = returnedData?.wallet;
         setFetchState({ loading: false });
         if (wallet) {
-            const { account_number, account_status,
-                balance, bank_name, expiry_date,
-                note, userId } = wallet;
-            dispatch(setWalletState({
-                key: 'balance', value: balance
+            console.log({wallet})
+            
+            dispatch(setState({
+                key: 'wallet', value: wallet?.riderWallet
             }))
         }
     }
 
     useEffect(() => {
-        !wallet.balance && getUserWallet();
-    }, [])
+        !wallet && getUserWallet();
+    }, [wallet])
 
     return (
         <SafeScreen>

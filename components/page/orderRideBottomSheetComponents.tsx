@@ -15,7 +15,9 @@ import {
 import PaddedScreen from "../shared/paddedScreen";
 import {
   absolute,
+  b,
   bg,
+  border,
   flex,
   flexCenter,
   flexCol,
@@ -77,7 +79,7 @@ import { useDispatch } from "react-redux";
 import {} from "@/state/slices/layout";
 import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
 import RideSelectors from "@/state/selectors/ride";
-import { setState, setStateInputField } from "@/state/slices/ride";
+import { setState, setStateInputField, setUserRide, setUserRideInput } from "@/state/slices/ride";
 import { Href, router, useGlobalSearchParams, usePathname } from "expo-router";
 import BottomSheet, {
   BottomSheetFlatList,
@@ -103,7 +105,7 @@ import { ObjectSchema, string } from "yup";
 import CustomModal from "../shared/modal";
 import { AntDesign } from "@expo/vector-icons";
 import tw from "@/constants/tw";
-import { IBusStop } from "@/state/types/ride";
+import { IBusStop, IRiderRideDetails } from "@/state/types/ride";
 import ScaleUpDown from "../shared/scale_animator";
 import URLS from "@/constants/urls";
 
@@ -1357,8 +1359,7 @@ const FilledForm = () => {
         }
       })
         .then(async (res) => {
-          const data = res?.body ? await res.json() : res;
-          console.log({ data, res });
+          const data = await res.json();
 
           const code = data?.code;
           setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
@@ -1574,14 +1575,30 @@ const RideRouteDetails = ({
       userCounterFareInput,
     },
   } = RideSelectors();
+  const dispatch = useAppDispatch();
+
   const [[isLoading, session], setSession] = useStorageState("token");
   const [formData, setFormData] = useState({
     riderCounterOffer: "",
   });
   const { riderCounterOffer } = formData;
-  const { price, duration, seats } = useAppSelector(
+  const { ridePlans } = useAppSelector(
     (state: RootState) => state.ride
   );
+
+  const [plans, setPlans] = useState(ridePlans.map((plan, index) => ({...plan, selected: false, id: index})));
+
+  const selectPlan = (id: number) => {
+    const newPlans = plans.map((plan) => plan.id == id? ({...plan, selected: plan?.selected == true?false: true}):plan);
+
+    setPlans(newPlans);
+
+    // const selectedPlan = plans.find((plan) => plan.id == id && plan.selected == true);
+    const selectedPlan = plans.find((plan) => plan.id == id);
+    console.log({selectedPlan})
+
+    dispatch(setStateInputField({key:'selectedPlan', value: selectedPlan}));
+  }
 
   return (
     <PaddedScreen>
@@ -1594,7 +1611,9 @@ const RideRouteDetails = ({
             }}
           />
 
-          <View
+          {plans?.map((plan, index) => (
+            <TouchableOpacity
+            onPress={() => selectPlan(plan.id)}
             style={[
               wFull,
               flex,
@@ -1603,7 +1622,9 @@ const RideRouteDetails = ({
               py(17),
               px(9),
               bg("#F9F7F8"),
+              plan?.selected == true? border(0.7, Colors.light.background): border(0.7, 'transparent')
             ]}
+            key={index}
           >
             <Image
               style={[image.w(50), image.h(18)]}
@@ -1622,13 +1643,14 @@ const RideRouteDetails = ({
                 />
 
                 <Text style={[fw400, fs12, c(Colors.light.border)]}>
-                  {seats[0]} seats
+                  {plan?.plan?.vehicleSeats} seats
                 </Text>
               </View>
             </View>
 
-            <Text style={[fw400, fs14, colorBlack]}>₦{price}</Text>
-          </View>
+            <Text style={[fw400, fs14, colorBlack]}>₦{plan?.plan?.ride?.rideFee}</Text>
+          </TouchableOpacity>
+          ))}
 
           <View
             style={[
@@ -1767,6 +1789,7 @@ const SearchingRide = ({
       pickupBusstopInput,
       dropoffBusstopInput,
       userCounterFareInput,
+      selectedPlan
     },
   } = RideSelectors();
   const [[isLoading, session], setSession] = useStorageState("token");
@@ -1779,33 +1802,43 @@ const SearchingRide = ({
   const { code, msg, loading } = fetchState;
 
   const findAvailableRides = async () => {
+
     setFetchState((prev) => ({ ...prev, loading: true }));
     const returnedData = await FetchService.postWithBearerToken({
       url: "/user/rider/me/available-rides/find",
       data: {
         pickupBusstopId: pickupBusstopInput?._id,
         dropoffBusstopId: dropoffBusstopInput?._id,
-        ridePlanSeats: seats[0],
-        ridePlanName: "standard",
         userCounterOffer: riderCounterOffer,
+        ridePlan: selectedPlan?.plan,
+        routeId: selectedPlan?.routeId
       },
       token: session as string,
     });
 
     const code = returnedData?.code;
     const msg = returnedData?.msg;
+    const userRideSaved = returnedData?.userRideSaved;
+    const requestUpdated = returnedData?.requestUpdated;
 
     setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
 
-    // if (code && code == 201) {
-    //     hideBottomSheet();
-    //     router.push(`/${pages.availableRides}` as Href)
-    //     setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
-    // }
-    // else if (code && code == 400) {
-    //     showBottomSheet([477, 601], <RideRouteDetails code={code} msg={msg} />)
-    //     setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
-    // }
+    if (((code && code == 201) && userRideSaved)|| ((code && code == 201) && requestUpdated)) {
+      console.log({userRideSaved, requestUpdated})
+
+        hideBottomSheet();
+        // dispatch(setUserRide({riderRideDetails: userRideSaved as IRiderRideDetails, currentRide:null as any}))
+        // dispatch(setUserRide({riderRideDetails: requestUpdated as IRiderRideDetails, currentRide:null as any}))
+        console.log(`/${pages.availableRides}?requestId=${userRideSaved?._id || requestUpdated?._id}`);
+        dispatch(setState({key:'riderRideDetails', value: userRideSaved || requestUpdated}));
+
+        router.push(`/${pages.availableRides}?requestId=${userRideSaved?._id || requestUpdated?._id}` as Href)
+        setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
+    }
+    else if (code && code == 400) {
+        showBottomSheet([477, 601], <RideRouteDetails code={code} msg={msg} />)
+        setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
+    }
   };
 
   const getAvailableRides = async () => {
@@ -1861,15 +1894,15 @@ const SearchingRide = ({
     });
   });
 
-  useEffect(() => {
-    if (session) {
-      const intervalId = setInterval(() => {
-        getAvailableRides();
-      }, 3000);
+  // useEffect(() => {
+  //   if (session) {
+  //     const intervalId = setInterval(() => {
+  //       getAvailableRides();
+  //     }, 3000);
 
-      return () => clearInterval(intervalId);
-    }
-  }, [session]);
+  //     return () => clearInterval(intervalId);
+  //   }
+  // }, [session]);
 
   useEffect(() => {
     session && findAvailableRides();

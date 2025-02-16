@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Image } from 'react-native'
+import { View, TouchableOpacity, Image, ViewStyle, TextStyle } from 'react-native'
 import React from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import { image, mXAuto, wHFull } from '@/utils/imageStyles'
@@ -18,7 +18,7 @@ export default function
     DriverProfile() {
     return (
         <SafeScreen>
-            <View style={[wHFull]}>
+            <View style={[wHFull as ViewStyle]}>
                 <PaddedScreen>
 
                     {/* Page Header */}
@@ -49,9 +49,9 @@ export default function
                                 style={[image.w(90), image.h(90), image.rounded(90), image.mx('auto')]}
                             />
 
-                            <Text style={[mXAuto, fw700, fs16, colorBlack]}>Tom Hawkins</Text>
+                            <Text style={[mXAuto as TextStyle, fw700, fs16, colorBlack]}>Tom Hawkins</Text>
 
-                            <View style={[flex, gap(32), itemsCenter, mXAuto]}>
+                            <View style={[flex, gap(32), itemsCenter, mXAuto as ViewStyle]}>
                                 <View style={[flex, itemsCenter, gap(12)]}>
                                     <Image
                                         source={images.startRatingImage}
@@ -72,7 +72,7 @@ export default function
 
                             </View>
 
-                            <View style={[flex, itemsCenter, gap(20), mXAuto]}>
+                            <View style={[flex, itemsCenter, gap(20), mXAuto as ViewStyle]}>
                                 <TouchableOpacity onPress={() => { }} style={[flex, rounded(100), gap(10), py(13), px(26), itemsCenter, bg('#F9F7F8'), { borderColor: Colors.light.border, borderWidth: 0.7 }]}>
                                     <Image source={images.chatImage} style={[image.w(18), image.h(18),]} />
 

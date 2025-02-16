@@ -8,10 +8,17 @@ const initialState: IRideState = {
         status: 'idle',
         type: ''
     },
+    booking: false,
     searchMatchBusstops: [],
     currentRideView: 'orderRide',
+    riderRideDetails: null,
     availableRides: [
     ],
+    selectedAvailableRide: null,
+    selectedAvailableRideId: null,
+    paidTickets:[],
+    driverDetails: null,
+    ticketDetailsShown: false,
     // userRide: null,
     userRide: null,
     currentNumberOfTickets: 1,
@@ -27,7 +34,10 @@ const initialState: IRideState = {
         paymentOptionInput: '',
         userRideInput: {
 
-        }
+        },
+
+        // 
+        selectedPlan: null
     },
     counterFareStatus: 'idle',
     allTicketsFilled: false,
@@ -110,8 +120,8 @@ const RideSlice = createSlice({
                         owner: {},
                         sameAsFirstTicket: (val + 1) === 1 ? true : false, // setting the first ticket to use the underlying credentials
                         number: val + 1,
-                        userCounterFare: (val + 1) === 1 ? state.stateInput.userCounterFareInput : null,
-                        rideFee: (val + 1) === 1 ? Number(state.userRide?.riderRideDetails?.riderCounterOffer) : null as never,
+                        userCounterFare: (val + 1) === 1 ? state?.riderRideDetails?.riderCounterOffer : null,
+                        rideFee: (val + 1) === 1 ? Number(state?.riderRideDetails?.ridePlan?.plan?.ride?.rideFee) : null as never,
                     }
 
                     state.stateInput.userRideInput.tickets = [...state.stateInput.userRideInput?.tickets || [], newTicket];
@@ -121,7 +131,9 @@ const RideSlice = createSlice({
         toggleTicketAsFirstTicket: (state, action: PayloadAction<{ currentNumberOfTickets: number }>) => {
             const { currentNumberOfTickets } = action.payload;
 
-            if (state.userRide && state.stateInput.userRideInput.tickets) {
+            // if (state.userRide && state.stateInput.userRideInput.tickets) {
+            if (state.stateInput.userRideInput.tickets) {
+                console.log('condition met!')
                 const firstTicket = state.stateInput.userRideInput.tickets.find(ticket => Number(ticket.number) === 1);
                 console.log({ '___firstTicket___': firstTicket })
 

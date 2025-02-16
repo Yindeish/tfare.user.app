@@ -76,6 +76,7 @@ function UserBlock() {
     // const user = JSON.parse(userSession as string) as IUserAccount;
     const {user} = useAppSelector((state: RootState) => state.user);
     const { wallet } = useAppSelector((state: RootState) => state.user);
+    console.log({wallet})
 
     return (
         <PaddedScreen>

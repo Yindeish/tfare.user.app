@@ -97,7 +97,7 @@ const { signUpTitle, textInput, genderSelectText, genderMenuDropdown, menuItem, 
 
 const SignupSchema = yup.object().shape({
     email: yup.string().email('Invalid email').required('Required'),
-    pin: yup.string().min(8, 'Password must be at least 8 characters').required('Required'),
+    pin: yup.string().min(4, 'Password must be at least 4 characters').required('Required'),
     confirmedPin: yup.string().oneOf([yup.ref('pin')], 'Passwords must match').required('Required'),
     profileName: yup.string().required('Required'),
     phoneNumber: yup.string().required('Required'),

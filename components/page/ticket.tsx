@@ -81,6 +81,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicket }) {
       pickupBusstopInput,
       dropoffBusstopInput,
       userCounterFareInput,
+      userRideInput
     },
     currentNumberOfTickets,
   } = RideSelectors();

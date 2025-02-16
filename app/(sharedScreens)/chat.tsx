@@ -1,7 +1,7 @@
 import PaddedScreen from "@/components/shared/paddedScreen";
 import SafeScreen from "@/components/shared/safeScreen";
 import { wHFull } from "@/utils/imageStyles";
-import { FlatList, View } from "react-native";
+import { FlatList, View, ViewStyle } from "react-native";
 
 
 
@@ -11,7 +11,7 @@ function Chat() {
     return (
         <SafeScreen>
             <PaddedScreen>
-                <View style={[wHFull]}>
+                <View style={[wHFull as ViewStyle]}>
 
                 </View>
             </PaddedScreen>

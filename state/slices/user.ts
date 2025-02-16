@@ -4,19 +4,22 @@ import { IAccountState, IAddress, IStateInput, IStateInputAcountSecurity, IState
 import { IUser } from "../types/user";
 
 
+export interface IWallet {
+    balance: number,
+    bank_name: string,
+    account_number: number,
+    user_id: string,
+}
+
 interface IState {
-    wallet: {
-        balance: null | number
-    },
+    wallet: IWallet | null,
     user: IUser | null,
     token: string,
     inputState: {},
 }
 
 const initialState: IState = {
-    wallet: {
-        balance: null
-    },
+    wallet: null,
     user: null,
     token: '',
     inputState: {}
@@ -27,8 +30,8 @@ const accountSlice = createSlice({
     initialState,
     reducers: {
         setWalletState: (state, action: PayloadAction<{ key: keyof IState['wallet'], value: any }>) => {
-            const { key, value } = action.payload;
-            state.wallet[key] = value;
+            // const { key, value } = action.payload;
+            // state.wallet[key] = value;
         },
         setInputState: (state, action: PayloadAction<{ key: keyof IState['inputState'], value: any }>) => {
             const { key, value } = action.payload;

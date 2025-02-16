@@ -5,7 +5,7 @@ import { TouchableOpacity, View } from "react-native";
 import { RadioButton, Text } from "react-native-paper";
 
 
-function PaymentOptionsListTile({ subTitle, title, input }: { title: string, subTitle: string, input: { onChange: Function, value: string } }) {
+function PaymentOptionsListTile({ subTitle, title, input }: { title: string, subTitle: string, input: { onChange: Function, value: string, condition?: boolean } }) {
 
 
     return (
@@ -20,7 +20,8 @@ function PaymentOptionsListTile({ subTitle, title, input }: { title: string, sub
 
             <RadioButton
                 value={(input.value)}
-                status={input.value.toLowerCase() === title.toLowerCase() ? 'checked' : 'unchecked'}
+                // status={input?.condition ? input.condition : input.value.toLowerCase() === title.toLowerCase() ? 'checked' : 'unchecked'}
+                status={input?.condition ? 'checked' : 'unchecked'}
                 onPress={() => input.onChange(title.toLowerCase())}
                 color={Colors.light.background}
             />

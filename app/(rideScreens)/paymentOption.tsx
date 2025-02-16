@@ -9,7 +9,7 @@ import { c, colorBlack, colorWhite, fs12, fs14, fs16, fs18, fw400, fw500, fw700,
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { image } from '@/utils/imageStyles'
 import { images } from '@/constants/images'
-import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
+import { useAppDispatch, useAppSelector } from '@/state/hooks/useReduxToolkit'
 import PageFloatingTitle from '@/components/page/pageFloatingTitle'
 import PageTitle from '@/components/shared/pageTitle'
 import PaymentOptionsListTile from '@/components/page/paymentOptionsListTile'
@@ -20,12 +20,16 @@ import { openBottomSheet, setBottomSheetSnapPoint, setBottomSheetType } from '@/
 import LayoutSelectors from '@/state/selectors/layout'
 import { useBottomSheet } from '@/contexts/useBottomSheetContext'
 import { RideBookedSheet } from '@/components/page/bookRideSheetComponent'
+import { RootState } from '@/state/store'
+import { setStateInputField } from '@/state/slices/ride'
 
 
 export default function PaymentOptions() {
     const dispatch = useAppDispatch()
     const { rideId } = useLocalSearchParams();
-    const { showBottomSheet } = useBottomSheet()
+    const { showBottomSheet } = useBottomSheet();
+    const {wallet} = useAppSelector((state: RootState) => state.user)
+    const {stateInput:{paymentOptionInput}} = useAppSelector((state: RootState) => state.ride)
 
 
     return (
@@ -39,20 +43,22 @@ export default function PaymentOptions() {
                         <PaymentOptionsListTile
                             input={{
                                 onChange: (val: string) => {
-
+                                    dispatch(setStateInputField({key:'paymentOptionInput', value: 'wallet'}))
                                 },
-                                value: 'waLLet'
+                                value: 'wallet',
+                                condition: paymentOptionInput == 'wallet'
                             }}
                             title='Wallet'
-                            subTitle={`Balance: ₦${'0000.00'}`}
+                            subTitle={`Balance: ₦${wallet?.balance || '0000.00'}`}
                         />
 
                         <PaymentOptionsListTile
                             input={{
                                 onChange: (val: string) => {
-
+                                    dispatch(setStateInputField({key:'paymentOptionInput', value: 'cash'}))
                                 },
-                                value: 'waLLet'
+                                value: 'cash',
+                                condition: paymentOptionInput == 'cash'
                             }}
                             title='Cash'
                             subTitle={`Pay driver with cash`}
@@ -61,21 +67,22 @@ export default function PaymentOptions() {
                         <PaymentOptionsListTile
                             input={{
                                 onChange: (val: string) => {
-
+                                    dispatch(setStateInputField({key:'paymentOptionInput', value: 'bank-transfer'}))
                                 },
-                                value: 'waLLet'
+                                value: 'bank-transfer',
+                                condition: paymentOptionInput == 'bank-transfer'
                             }}
                             title='Pay online'
                             subTitle={`Pay with third party`}
                         />
                     </View>
 
-                    <View style={[wFull, mt('97%')]}>
+                    <View style={[wFull, mt('97%'), {opacity: paymentOptionInput != ''?1:0.5}]}>
                         <CtaBtn
                             img={{ src: images.proceedCheckImage, w: 20, h: 20 }}
                             onPress={() => {
-                                router.push(`/(rideScreens)/bookRide/1` as Href);
-                                showBottomSheet([800], <RideBookedSheet rideId={rideId as string} />)
+                                paymentOptionInput != '' && router.push(`/(rideScreens)/bookRide` as Href);
+                                // showBottomSheet([800], <RideBookedSheet rideId={rideId as string} />)
                             }}
                             text={{ name: 'Proceed', color: colors.white }}
                             bg={{ color: Colors.light.background }}

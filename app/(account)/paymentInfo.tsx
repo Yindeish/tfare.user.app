@@ -1,5 +1,5 @@
-import { View, Text, Image } from 'react-native'
-import React from 'react'
+import { View, Text, Image, ViewStyle, RefreshControl } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import { image, wHFull } from '@/utils/imageStyles'
@@ -15,16 +15,45 @@ import EmergencyContactListTile from '@/components/page/emergencyContactsListTil
 import AccountSelectors from '@/state/selectors/account'
 import { pages } from '@/constants/pages'
 import AddNewContactListTile from '@/components/page/AddNewContactListTile'
-import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
+import { useAppDispatch, useAppSelector } from '@/state/hooks/useReduxToolkit'
 import { setEmergencyContactField } from '@/state/slices/account'
 import { IStateInputAddNewContact } from '@/state/types/account'
 import SavedAddressListTile from '@/components/page/SavedAddressesListTile'
 import AccountPageBlockTitle from '@/components/page/accountPageBlockTitle'
+import { setState } from '@/state/slices/user'
+import FetchService from '@/services/api/fetch.service'
+import { RootState } from '@/state/store'
+import tw from '@/constants/tw'
 
 export default function PaymentInfo() {
     const dispatch = useAppDispatch()
     const { stateInput, savedAddresses } = AccountSelectors();
     const { contactEmailInput, contactNameInput, contactPhoneNumberInput, contactWhatsAppInput } = stateInput.addNewContact;
+
+    const [fetchState, setFetchState] = useState({
+        loading: false,
+    })
+    const { loading } = fetchState;
+    const { wallet, token } = useAppSelector((state: RootState) => state.user)
+
+    const getUserWallet = async () => {
+        setFetchState({ loading: true });
+        const returnedData = await FetchService.getWithBearerToken({ url: '/user/me', token: token as string });
+
+        const wallet = returnedData?.wallet;
+        setFetchState({ loading: false });
+        if (wallet) {
+            console.log({wallet})
+            
+            dispatch(setState({
+                key: 'wallet', value: wallet?.riderWallet
+            }))
+        }
+    }
+
+    useEffect(() => {
+        getUserWallet();
+    }, [])
 
     interface IItem {
         type: string,
@@ -56,7 +85,12 @@ export default function PaymentInfo() {
 
     return (
         <SafeScreen>
-            <ScrollView style={[wHFull,]}>
+            <ScrollView style={[wHFull as ViewStyle,]}
+            refreshControl={<RefreshControl
+                onRefresh={getUserWallet}
+                refreshing={loading}
+                />}
+            >
                 <PaddedScreen>
                     {/* Page Header */}
 
@@ -83,7 +117,7 @@ export default function PaymentInfo() {
 
                                 </View>
 
-                                <Text style={[neurialGrotesk, fw700, { fontSize: 22 }]}> ₦{'0000.00'}</Text>
+                                <Text style={[neurialGrotesk, fw700, { fontSize: 22 }]}> ₦{wallet?.balance || '0000.00'}</Text>
                             </View>
 
                             <TouchableOpacity>
@@ -105,10 +139,10 @@ export default function PaymentInfo() {
                             <AccountPageBlockTitle title='Virtual Account' />
 
                             <View style={[flexCol, gap(8)]}>
-                                <Text style={[fs12, fw400, colorBlack]}>Paystack Titan</Text>
+                                <Text style={[fs12, fw400, colorBlack, tw `capitalize`]}>{wallet?.bank_name}</Text>
 
                                 <TouchableOpacity style={[bg('#F9F7F8'), h(70), px(37), flex, itemsCenter, gap(10), rounded(50)]}>
-                                    <Text style={[colorBlack, fw700, { fontSize: 22 }]}>9882910472</Text>
+                                    <Text style={[colorBlack, fw700, { fontSize: 22 }]}>{wallet?.account_number}</Text>
 
                                     <Image style={[image.w(20), image.h(20)]} source={images.copyImage} />
                                 </TouchableOpacity>
