@@ -23,7 +23,7 @@ export default function Account() {
     const { signIn, loadingState, userSession, msg, code, signOut } = useSession();
     const { closeSnackbar, snackbarVisible } = useSnackbar();
     // const user = JSON.parse(userSession as string) as IUserAccount;
-    const {user} = useAppSelector(state => state.user)
+    const {user, wallet} = useAppSelector(state => state.user)
 
     return (
         <SafeScreen>
@@ -62,7 +62,7 @@ export default function Account() {
 
                                 </View>
 
-                                <Text style={[colorBlack, fw700, { fontSize: 22 }]}> ₦{'0000.00'}</Text>
+                                <Text style={[colorBlack, fw700, { fontSize: 22 }]}> ₦{wallet?.balance || '0000.00'}</Text>
                             </View>
 
                             <TouchableOpacity onPress={() => router.push('/(account)/paymentInfo')}>

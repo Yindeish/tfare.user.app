@@ -55,24 +55,24 @@ export function SignupProvider(props: React.PropsWithChildren) {
 
     const signUp = async (data: ISignUpRequestData) => {
         console.log('hey')
-        // onChange('loadingState', 'signiningUp' as TSignupLoadingState);
+        onChange('loadingState', 'signiningUp' as TSignupLoadingState);
 
-        // const returnedData: ISignUpResponseData = await FetchService.post({ data, url: '/auth/signup' })
-        // console.log({ returnedData })
+        const returnedData: ISignUpResponseData = await FetchService.post({ data: {...data, role: 'rider'}, url: '/auth/signup' })
+        console.log({ returnedData })
 
-        // notify();
-        // onChange('loadingState', 'idle' as TSignupLoadingState);
-        // onChange('code', returnedData.code as number);
-        // onChange('msg', returnedData.msg);
-        // onChange('signedUpUser', returnedData.signedUpUser as IUserAccount);
+        notify();
+        onChange('loadingState', 'idle' as TSignupLoadingState);
+        onChange('code', returnedData.code as number);
+        onChange('msg', returnedData.msg);
+        onChange('signedUpUser', returnedData.signedUpUser as IUserAccount);
 
-        // //!Disabling Security Question info for now
-        // // if (returnedData.code === 201) router.replace(`/(auth)/${pages.securityQuestion}` as Href);
-        // //!Disabling Security Question info for now
-        // if (returnedData.code === 201) router.replace(`/(auth)/${pages.signin}` as Href);
+        //!Disabling Security Question info for now
+        // if (returnedData.code === 201) router.replace(`/(auth)/${pages.securityQuestion}` as Href);
+        //!Disabling Security Question info for now
+        if (returnedData.code === 201) router.replace(`/(auth)/${pages.signin}` as Href);
         console.log('hey')
 
-        router.replace(`/(auth)/${pages.signin}` as Href);//for testing
+        // router.replace(`/(auth)/${pages.signin}` as Href);//for testing
     }
 
     const setSecurityQuestion = async (data: ISetSecurityQuestionRequestData) => {

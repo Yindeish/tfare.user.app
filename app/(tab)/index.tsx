@@ -59,7 +59,7 @@ export default function Index() {
             console.log({wallet})
             
             dispatch(setState({
-                key: 'wallet', value: wallet?.riderWallet
+                key: 'wallet', value: wallet
             }))
         }
     }

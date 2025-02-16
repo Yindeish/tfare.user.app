@@ -46,7 +46,7 @@ export default function PaymentInfo() {
             console.log({wallet})
             
             dispatch(setState({
-                key: 'wallet', value: wallet?.riderWallet
+                key: 'wallet', value: wallet
             }))
         }
     }

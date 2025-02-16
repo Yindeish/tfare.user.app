@@ -12,6 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as SplashScreen from 'expo-splash-screen';
 import { BottomSheetProvider } from '../contexts/useBottomSheetContext';
 import * as Updates from 'expo-updates';
+import { SnackbarProvider } from '@/contexts/snackbar.context';
 
 export default function Root() {
 
@@ -50,11 +51,13 @@ export default function Root() {
         {/* <BottomSheetModalProvider> */}
         <BottomSheetProvider>
           <PaperProvider>
-            <TokenSessionProvider>
-              <SessionProvider>
+            <SnackbarProvider>
+            {/* <TokenSessionProvider> */}
+              {/* <SessionProvider> */}
                 <Slot />
-              </SessionProvider>
-            </TokenSessionProvider>
+                </SnackbarProvider>
+              {/* </SessionProvider> */}
+            {/* </TokenSessionProvider> */}
           </PaperProvider>
         </BottomSheetProvider>
         {/* </BottomSheetModalProvider> */}

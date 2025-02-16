@@ -40,24 +40,6 @@ const saveNewAddress: IStateInputSaveNewAddress = {
 
 const initialState: IAccountState = {
     emergencyContacts: [
-        {
-            email: 'one@gmail.com',
-            fullName: 'one',
-            phoneNo: 8899879,
-            whatsAppNo: 9808023,
-        },
-        {
-            email: 'one@gmail.com',
-            fullName: 'one',
-            phoneNo: 8899879,
-            whatsAppNo: 9808023,
-        },
-        {
-            email: 'one@gmail.com',
-            fullName: 'one',
-            phoneNo: 8899879,
-            whatsAppNo: 9808023,
-        },
     ],
     loading: null,
     savedAddresses: [
@@ -129,7 +111,7 @@ const accountSlice = createSlice({
                 state.userAccount = {
                     email: emailInput,
                     fullName: nameInput,
-                    phoneNo: Number(phoneNoInput),
+                    phoneNumber: Number(phoneNoInput),
                     userName: userNameInput,
                 }
             }

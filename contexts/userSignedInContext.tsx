@@ -185,9 +185,15 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
     dispatch(setState({ key: "user", value: null }));
     dispatch(setState({ key: "token", value: null }));
+    setSession(null);
+
     onChange("loadingState", "idle" as TSigninLoadingState);
 
-    router.replace("/(auth)/signin" as Href);
+    if(!user) {
+      setTimeout(() => {
+        router.replace("/(auth)/signin" as Href);
+      }, 1500)
+    }
     // setSession(null); signTokenOut(); //for testing
   };
 
