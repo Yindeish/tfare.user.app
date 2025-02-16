@@ -44,6 +44,16 @@
         "projectId": "f205daa0-7af7-404b-8c14-0b508f1afbbc"
       }
     },
-    "owner": "yindeish"
+    "owner": "yindeish",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f205daa0-7af7-404b-8c14-0b508f1afbbc",
+      "enabled": true,
+      "requestHeaders": {
+        "expo-channel-name": "androidUpdate"
+      }
+    }
   }
 }
