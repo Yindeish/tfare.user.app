@@ -22,6 +22,7 @@ import { useAppDispatch, useAppSelector } from '@/state/hooks/useReduxToolkit';
 import { RootState } from '@/state/store';
 import { EVENTS, socket } from '@/socket.io/socket.io.config';
 import { IRideAccptedEvent } from '@/socket.io/socket.io.types';
+import { getItemAsync } from 'expo-secure-store';
 
 const { orderRideBtn, orderRideText } = StyleSheet.create({
     orderRideBtn: {
@@ -51,7 +52,7 @@ export default function Index() {
 
     const getUserWallet = async () => {
         setFetchState({ loading: true });
-        const returnedData = await FetchService.getWithBearerToken({ url: '/user/me', token: tokenSession as string });
+        const returnedData = await FetchService.getWithBearerToken({ url: '/user/me', token: await getItemAsync('token') as string });
 
         const wallet = returnedData?.wallet;
         setFetchState({ loading: false });

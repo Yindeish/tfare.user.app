@@ -41,9 +41,12 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { ScrollView } from "react-native-gesture-handler";
 import { c, fs10 } from "@/utils/fontStyles";
-import { useAppSelector } from "@/state/hooks/useReduxToolkit";
+import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
 import FetchService from "@/services/api/fetch.service";
 import { pages } from "@/constants/pages";
+import * as SecureStore from 'expo-secure-store';
+import { setState } from "@/state/slices/user";
+
 
 const {
   signInTitle,
@@ -131,9 +134,7 @@ export default function Signin() {
   // const { signIn, loadingState, userSession, msg, code, signOut, testSignIn } = useSession();
   const { closeSnackbar, snackbarVisible, Snackbar, notify } = useSnackbar();
   const { tokenSession } = userTokenSession();
-  const { user } = useAppSelector((state) => state.user);
-
-  if (user) return <Redirect href={"/(tab)/" as Href} />;
+  const dispatch = useAppDispatch()
 
   const [fetchState, setFetchState] = useState({
     msg: "",
@@ -169,7 +170,25 @@ export default function Signin() {
           loading: false,
         }));
         if (returnedData.code === 200 || returnedData.code === 201)
+        {
+          const signedinTime = new Date();
+          const user = returnedData?.user;
+          const token = returnedData?.token;
+
+          try {
+            await SecureStore.setItemAsync('user', JSON.stringify(user));
+            await SecureStore.setItemAsync('token', token);
+            await SecureStore.setItemAsync('signedinTime', JSON.stringify(signedinTime));
+
+            dispatch(setState({key:'user', value: user}));
+            dispatch(setState({key:'token', value: token}));
+            router.replace('/(tab)')
+          } catch (error: any) {
+            throw new Error(error?.message)
+          }
+
           router.replace(`/(tab)` as Href);
+        }
       } catch (error: any) {
         console.log({ error });
         setFetchState((prev) => ({

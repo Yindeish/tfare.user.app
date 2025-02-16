@@ -60,7 +60,7 @@ import {
   setBottomSheetSnapPoint,
   setBottomSheetType,
 } from "@/state/slices/layout";
-import { ITicket } from "@/state/types/ride";
+import { ITicketInput } from "@/state/types/ride";
 import {
   editTicketCounterFare,
   setCurrentTicket,
@@ -71,7 +71,7 @@ import CounterFareCtaBtn from "./counterFareCtaBtn";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { TicketDetailsSheet } from "./bookRideSheetComponent";
 
-function Ticket({ index, ticket }: { index: number; ticket: ITicket }) {
+function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
   const dispatch = useAppDispatch();
   const { showBottomSheet } = useBottomSheet();
   const {

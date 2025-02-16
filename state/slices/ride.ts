@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ESlicesNames } from "../enums/slicesNames";
-import { IBusStop, ICurrentRide, ILoading, IRide, IRiderRideDetails, IRideState, IStateInput, ITicket, TActiveTab, TCounterFareStatus, TCurrentrideView, } from "../types/ride";
+import { IBusStop, ICurrentRide, ILoading, IRide, IRiderRideDetails, IRideState, IStateInput, ITicketInput, TActiveTab, TCounterFareStatus, TCurrentrideView, } from "../types/ride";
 
 
 const initialState: IRideState = {
@@ -24,6 +24,9 @@ const initialState: IRideState = {
     currentNumberOfTickets: 1,
     activeTab: 'completed',
     currentTicket: null,
+    differentTickets: [],
+    sameTickets: null,
+    tripId: '',
     stateInput: {
         cancelRideReasonInput: '',
         driverRatingCommentInput: '',
@@ -31,7 +34,7 @@ const initialState: IRideState = {
         dropoffBusstopInput: null,
         pickupBusstopInput: null,
         userCounterFareInput: null,
-        paymentOptionInput: '',
+        paymentOptionInput: 'wallet',
         userRideInput: {
 
         },
@@ -46,6 +49,7 @@ const initialState: IRideState = {
     seats: [],
     ridePlans: [],
     paymentOptionsVisible: false,
+
 }
 
 const RideSlice = createSlice({
@@ -85,7 +89,7 @@ const RideSlice = createSlice({
         setCurrentNumberOfTickets: (state, action: PayloadAction<number>) => {
             state.currentNumberOfTickets = action.payload;
         },
-        setCurrentTicket: (state, action: PayloadAction<ITicket>) => {
+        setCurrentTicket: (state, action: PayloadAction<ITicketInput>) => {
             state.currentTicket = action.payload;
         },
         createTicket: (state, action: PayloadAction<{ currentNumberOfTickets: number }>) => {
@@ -98,7 +102,7 @@ const RideSlice = createSlice({
 
                 // console.log({'state.userRide': state.userRide})
                 // for (let val = 0; val < currentNumberOfTickets; val++) {
-                //     const newTicket: ITicket = {
+                //     const newTicket: ITicketInput = {
                 //         dropoffBusstop: (val + 1) === 1 ? state.stateInput.dropoffBusstopInput : null, // setting the first ticket to use the underlying credentials
                 //         pickupBusstop: (val + 1) === 1 ? state.stateInput.pickupBusstopInput : null, // setting the first ticket to use the underlying credentials
                 //         owner: {},
@@ -114,10 +118,11 @@ const RideSlice = createSlice({
                 state.stateInput.userRideInput.tickets = []; //pop and push later; this is a bad practice. Having to refres te list
 
                 for (let val = 0; val < (currentNumberOfTickets); val++) {
-                    const newTicket: ITicket = {
+                    const newTicket: ITicketInput = {
                         dropoffBusstop: (val + 1) === 1 ? state.stateInput.dropoffBusstopInput : null, // setting the first ticket to use the underlying credentials
                         pickupBusstop: (val + 1) === 1 ? state.stateInput.pickupBusstopInput : null, // setting the first ticket to use the underlying credentials
                         owner: {},
+                        ticketOtp: '',
                         sameAsFirstTicket: (val + 1) === 1 ? true : false, // setting the first ticket to use the underlying credentials
                         number: val + 1,
                         userCounterFare: (val + 1) === 1 ? state?.riderRideDetails?.riderCounterOffer : null,
@@ -159,7 +164,7 @@ const RideSlice = createSlice({
                             }
                         } else return ticket
                     }
-                    ) as ITicket[];
+                    ) as ITicketInput[];
                 }
             }
         },
@@ -188,7 +193,7 @@ const RideSlice = createSlice({
             //                 }
             //             } else return ticket
             //         }
-            //         ) as ITicket[];
+            //         ) as ITicketInput[];
             //     } else return;
             // } else return;
         },
@@ -209,7 +214,7 @@ const RideSlice = createSlice({
             //                 }
             //             } else return ticket
             //         }
-            //         ) as ITicket[];
+            //         ) as ITicketInput[];
             //     } else return;
             // } else return;
         },

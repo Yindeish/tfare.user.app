@@ -1697,7 +1697,6 @@ const RideRouteDetails = ({
                 style={[
                   fs14,
                   fw500,
-                  neurialGrotesk,
                   h(20) as TextStyle,
                   {
                     color:
@@ -1836,7 +1835,7 @@ const SearchingRide = ({
         setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
     }
     else if (code && code == 400) {
-        showBottomSheet([477, 601], <RideRouteDetails code={code} msg={msg} />)
+        showBottomSheet([477, 601, 800], <RideRouteDetails code={code} msg={msg} />)
         setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
     }
   };

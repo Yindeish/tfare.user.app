@@ -113,7 +113,7 @@ const {
 });
 
 export default function BookRide() {
-  const { rideId, currentRideId, selectedAvailableRideId } = useGlobalSearchParams();
+  const { rideId, currentRideId, selectedAvailableRideId, requestId } = useGlobalSearchParams();
   const { token, user } = useAppSelector((state: RootState) => state.user);
 
   const dispatch = useAppDispatch();
@@ -153,9 +153,11 @@ export default function BookRide() {
       const returnedData = await FetchService.postWithBearerToken({
         data: {
           numberOfTickets: Number(currentNumberOfTickets),
+          paymentOption: paymentOptionInput,
+          requestId
         },
         token: token as string,
-        url: `/user/rider/me/ride/${userRide?.currentRide?._id}/book`,
+        url: `/user/rider/me/ride/${selectedAvailableRideId || userRide?.currentRide?._id}/book`,
       });
       console.log({ returnedData });
 

@@ -1,21 +1,20 @@
-import { Slot, Stack } from 'expo-router';
-import { SessionProvider } from '../contexts/userSignedInContext';
-import { SessionProvider as TokenSessionProvider } from '../contexts/userTokenContext';
-import { PaperProvider } from 'react-native-paper';
-import { useFonts } from 'expo-font';
-import { fonts } from '../constants/fonts';
-import React, { useEffect } from 'react';
-import { Provider } from 'react-redux'
-import { store } from '../state/store';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Slot, Stack } from "expo-router";
+import { SessionProvider } from "../contexts/userSignedInContext";
+import { SessionProvider as TokenSessionProvider } from "../contexts/userTokenContext";
+import { PaperProvider } from "react-native-paper";
+import { useFonts } from "expo-font";
+import { fonts } from "../constants/fonts";
+import React, { useEffect } from "react";
+import { Provider } from "react-redux";
+import { store } from "../state/store";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 // import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import * as SplashScreen from 'expo-splash-screen';
-import { BottomSheetProvider } from '../contexts/useBottomSheetContext';
-import * as Updates from 'expo-updates';
-import { SnackbarProvider } from '@/contexts/snackbar.context';
+import * as SplashScreen from "expo-splash-screen";
+import { BottomSheetProvider } from "../contexts/useBottomSheetContext";
+import * as Updates from "expo-updates";
+import { SnackbarProvider } from "@/contexts/snackbar.context";
 
 export default function Root() {
-
   async function onFetchUpdateAsync() {
     try {
       const update = await Updates.checkForUpdateAsync();
@@ -32,11 +31,10 @@ export default function Root() {
 
   useEffect(() => {
     onFetchUpdateAsync();
-  }, [])
-
+  }, []);
 
   const [fontsLoaded] = useFonts({
-    [fonts.neurialGrotesk]: require('../assets/fonts/Fontspring-DEMO-neurialgrotesk-bold.otf'),
+    [fonts.neurialGrotesk]: require("../assets/fonts/Fontspring-DEMO-neurialgrotesk-bold.otf"),
   });
 
   if (!fontsLoaded) {
@@ -52,11 +50,11 @@ export default function Root() {
         <BottomSheetProvider>
           <PaperProvider>
             <SnackbarProvider>
-            {/* <TokenSessionProvider> */}
+              {/* <TokenSessionProvider> */}
               {/* <SessionProvider> */}
-                <Slot />
-                </SnackbarProvider>
-              {/* </SessionProvider> */}
+              <Slot />
+            </SnackbarProvider>
+            {/* </SessionProvider> */}
             {/* </TokenSessionProvider> */}
           </PaperProvider>
         </BottomSheetProvider>

@@ -32,9 +32,9 @@ import { useStorageState } from '@/hooks/useStorageState'
 export default function profileInfo() {
     const dispatch = useAppDispatch()
     const { profileCta, stateInput, } = AccountSelectors();
-    const { userSession } = useSession();
+    // const [[_, userSession],] = useSession();
+    const [[_, userSession], updateUserSession] = useStorageState('user');
     const user = JSON.parse(userSession as string) as IUserAccount;
-    const [[_, __], updateUserSession] = useStorageState('user');
 
     console.log({ user })
 
@@ -49,10 +49,10 @@ export default function profileInfo() {
 
     const { values, errors, touched, handleChange, handleBlur, handleSubmit, setValues } = useFormik({
         initialValues: {
-            fullName: '',
-            userName: '',
-            email: '',
-            phoneNumber: '',
+            fullName: user?.fullName || '',
+            userName: user?.fullName || '',
+            email: user?.email || '',
+            phoneNumber: String(user?.phoneNumber)|| '',
         },
         validationSchema: new ObjectSchema({
             fullName: string(),
@@ -92,7 +92,9 @@ export default function profileInfo() {
         msg: '',
         loading: false,
         img: null,
-        avatar: null,
+        avatar: null
+        // img: user?.picture,
+        // avatar: user?.avatar,
     })
 
     const onChange = ({ key, value }: { key: 'code' | 'msg' | 'loading', value: string | number | boolean }) => setState((prev) => ({ ...prev, [key]: value }));
@@ -258,7 +260,7 @@ export default function profileInfo() {
                         <TextInput
                             style={[
                                 border(0.7, '#D7D7D7') as TextStyle, rounded(10) as TextStyle, wFull as TextStyle, h(50) as TextStyle, px(24) as TextStyle, bg('#F9F7F8') as TextStyle,
-                                errors.email && touched.email ? { borderColor: Colors.light.error } : undefined
+                                errors.phoneNumber && touched.phoneNumber ? { borderColor: Colors.light.error } : undefined
                             ]}
                             placeholderTextColor={Colors.light.textGrey}
                             placeholder='Phone Number'

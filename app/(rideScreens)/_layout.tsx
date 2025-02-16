@@ -1,10 +1,17 @@
-import { Href, Redirect, Stack, Tabs } from "expo-router";
+import {
+  Href,
+  Redirect,
+  Stack,
+  Tabs,
+  useGlobalSearchParams,
+} from "expo-router";
 import {
   Dimensions,
   View,
   Image,
   TouchableOpacity,
-  TextStyle, Text
+  TextStyle,
+  Text,
 } from "react-native";
 import { useSession } from "../../contexts/userSignedInContext";
 import { useEffect, useState } from "react";
@@ -33,10 +40,11 @@ import CtaBtn from "@/components/shared/ctaBtn";
 import { indices } from "@/constants/zIndices";
 import Toast from "react-native-toast-message";
 import FetchService from "@/services/api/fetch.service";
-import { setPaymentOptionsVisible } from "@/state/slices/ride";
+import { setPaymentOptionsVisible, setState } from "@/state/slices/ride";
 import { ActivityIndicator } from "react-native";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
+import { useSnackbar } from "@/contexts/snackbar.context";
 
 export default function AppLayout() {
   const { userSession, isLoading } = useSession();
@@ -45,13 +53,15 @@ export default function AppLayout() {
     allTicketsFilled,
     currentNumberOfTickets,
     userRide,
-    selectedAvailableRideId,
+    // selectedAvailableRideId,
     riderRideDetails,
     stateInput: { userRideInput, paymentOptionInput },
   } = useAppSelector((state: RootState) => state.ride);
   const { token } = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
-  const {showBottomSheet} = useBottomSheet()
+  const { showBottomSheet } = useBottomSheet();
+  const { selectedAvailableRideId } = useGlobalSearchParams();
+  const { notify, Snackbar, closeSnackbar, snackbarVisible } = useSnackbar();
 
   const { width, height } = Dimensions.get("window");
 
@@ -60,10 +70,10 @@ export default function AppLayout() {
     msg: "",
     code: null,
   });
-  const {loading} = fetchState;
+  const { loading, msg } = fetchState;
 
   const buyTickets = async () => {
-    if(!allTicketsFilled) return;
+    if (!allTicketsFilled) return;
 
     const sameTickets = userRideInput?.tickets?.every(
       (ticket) => ticket?.sameAsFirstTicket === true
@@ -72,41 +82,77 @@ export default function AppLayout() {
     setFetchState((prev) => ({ ...prev, loading: true }));
 
     if (sameTickets) {
-      const returnedData = await FetchService.postWithBearerToken({
-        data: {
-          numberOfTickets: Number(currentNumberOfTickets),
-          requestId: riderRideDetails?._id,
-          paymentOption: paymentOptionInput
-        },
-        token: token as string,
-        url: `/user/rider/me/ride/${selectedAvailableRideId}/book`,
-      });
-      console.log({ returnedData });
+      try {
+        const returnedData = await FetchService.postWithBearerToken({
+          data: {
+            numberOfTickets: Number(currentNumberOfTickets),
+            requestId: riderRideDetails?._id,
+            paymentOption: paymentOptionInput,
+          },
+          token: token as string,
+          url: `/user/rider/me/ride/${selectedAvailableRideId}/book`,
+        });
 
-      setFetchState((prev) => ({
-        ...prev,
-        loading: false,
-        code: returnedData?.code,
-        msg: returnedData?.msg,
-      }));
+        setFetchState((prev) => ({
+          ...prev,
+          loading: false,
+          code: returnedData?.code,
+          msg: returnedData?.msg,
+        }));
 
-      //   toast({
-      //     title: "Ticket Booking",
-      //     // preset: "done",
-      //     message: returnedData?.msg,
-      //   });
-      Toast.show({
-        type: "info",
-        text1: returnedData?.msg,
-        position: "bottom",
-      });
+        //   toast({
+        //     title: "Ticket Booking",
+        //     // preset: "done",
+        //     message: returnedData?.msg,
+        //   });
+        // Toast.show({
+        //   type: "info",
+        //   text1: returnedData?.msg,
+        //   position: "bottom",
+        // });
+        const code = returnedData?.code;
+        const msg = returnedData?.msg;
+        const ticketPaid = returnedData?.ticketPaid;
+        const tickets = returnedData?.tickets;
 
-      const rides = [returnedData?.ticketUnderBooking];
-      if (rides) {
-        setFetchState((prev) => ({ ...prev, rides: rides as any }));
+        if (code && (code != 200 || code != 201)) {
+          notify({ msg: returnedData?.msg });
+          setFetchState((prev) => ({ ...prev, msg: msg }));
+          return;
+        }
+
+        if (ticketPaid) {
+          dispatch(setState({key:'sameTickets', value: ticketPaid}))
+          // dispatch(setPaymentOptionsVisible(true));
+          showBottomSheet(
+            [800],
+            <RideBookedSheet rideId={selectedAvailableRideId as string} />
+          );
+          return;
+        }
+        if (tickets) {
+          dispatch(setState({key:'differentTickets', value: tickets}))
+          // dispatch(setPaymentOptionsVisible(true));
+          showBottomSheet(
+            [800],
+            <RideBookedSheet rideId={selectedAvailableRideId as string} />
+          );
+          return;
+        }
+
+        // const rides = [returnedData?.ticketUnderBooking];
+        // if (rides) {
+        //   setFetchState((prev) => ({ ...prev, rides: rides as any }));
+        // }
+      } catch (error: any) {
+        console.log({ error });
+
+        setFetchState((prev) => ({
+          ...prev,
+          loading: false,
+          msg: error?.message,
+        }));
       }
-      // dispatch(setPaymentOptionsVisible(true));
-      showBottomSheet([800], <RideBookedSheet rideId={selectedAvailableRideId as string} />)
     } else {
       const subsequentTickets = userRideInput?.tickets?.map((ticket) => ({
         pickupBusstopId: ticket?.pickupBusstop?._id,
@@ -147,63 +193,75 @@ export default function AppLayout() {
     }
   };
 
+  // if (isLoading) {
+  //   return <View style={{ width, height, backgroundColor: "#D8D8D8" }} />;
+  // }
 
-  if (isLoading) {
-    return <View style={{ width, height, backgroundColor: "#D8D8D8" }} />;
-  }
+  // if (!userSession) {
+  //   return <Redirect href="/(auth)/signin" />;
+  // } else
+  return (
+    <View style={tw`w-full h-full flex flex-col relative`}>
+      {/* Shows when all the tickets have been filled (counter fare are optional) */}
+      {/* Buy Ticket Btn */}
 
-  if (!userSession) {
-    return <Redirect href="/(auth)/signin" />;
-  } else
-    return (
-      <View style={tw`w-full h-full flex flex-col relative`}>
-       
-        {/* Shows when all the tickets have been filled (counter fare are optional) */}
-        {/* Buy Ticket Btn */}
-
-        {(booking || allTicketsFilled) && (
-          <View
-             style={[tw`w-full absolute bottom-[30px] left-[0] p-2`,
-              { zIndex: 100000000, opacity: allTicketsFilled?1:0.5 },]}
-          >
-            <CtaBtn
-              img={{
-                src: images.whiteBgTicketImage,
-                w: 22,
-                h: 14,
-              }}
-              onPress={buyTickets}
-              text={{
-                name: "Buy Ticket",
-                color: colors.white,
-              }}
-              bg={{
-                color: Colors.light.background,
-              }}
-            />
-          </View>
-        )}
-
-        {loading && <View style={tw `w-full h-[35px] flex items-center justify-center absolute top-1/2 z-10`}><ActivityIndicator /></View>}
-
-        {/* Buy Ticket Btn */}
-        <Stack
-          screenOptions={{
-            animation: "slide_from_left",
-            headerShown: false,
-          }}
+      {(booking || allTicketsFilled) && (
+        <View
+          style={[
+            tw`w-full absolute bottom-[30px] left-[0] p-2`,
+            { zIndex: 100000000, opacity: allTicketsFilled ? 1 : 0.5 },
+          ]}
         >
-          <Stack.Screen name={pages.orderRide} />
-          <Stack.Screen name={pages.availableRides} />
-          <Stack.Screen name={"bookRide"} />
-          {/* <Stack.Screen name={`${pages.bookRide}/[rideId]`} /> */}
-          {/* <Stack.Screen name={`${pages.rideBooked}/[rideId]`} /> */}
-          {/* <Stack.Screen name={`${pages.buyTicket}/[rideId]`} /> */}
-          {/* <Stack.Screen name={`${pages.chat}/[rideId]`} /> */}
-          {/* <Stack.Screen name={`(sharedScreens)/${pages.driverProfile}/[rideId]`} /> */}
-          <Stack.Screen name={`${pages.paymentOptions}`} />
-          {/* <Stack.Screen name={`${pages.rideStarted}/[rideId]`} /> */}
-        </Stack>
-      </View>
-    );
+          <CtaBtn
+            img={{
+              src: images.whiteBgTicketImage,
+              w: 22,
+              h: 14,
+            }}
+            onPress={buyTickets}
+            text={{
+              name: "Buy Ticket",
+              color: colors.white,
+            }}
+            bg={{
+              color: Colors.light.background,
+            }}
+          />
+        </View>
+      )}
+
+      {loading && (
+        <View
+          style={tw`w-full h-[35px] flex items-center justify-center absolute top-1/2 z-10`}
+        >
+          <ActivityIndicator />
+        </View>
+      )}
+
+      {/* Buy Ticket Btn */}
+      <Stack
+        screenOptions={{
+          animation: "slide_from_left",
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name={pages.orderRide} />
+        <Stack.Screen name={pages.availableRides} />
+        <Stack.Screen name={"bookRide"} />
+        {/* <Stack.Screen name={`${pages.bookRide}/[rideId]`} /> */}
+        {/* <Stack.Screen name={`${pages.rideBooked}/[rideId]`} /> */}
+        {/* <Stack.Screen name={`${pages.buyTicket}/[rideId]`} /> */}
+        {/* <Stack.Screen name={`${pages.chat}/[rideId]`} /> */}
+        {/* <Stack.Screen name={`(sharedScreens)/${pages.driverProfile}/[rideId]`} /> */}
+        <Stack.Screen name={`${pages.paymentOptions}`} />
+        {/* <Stack.Screen name={`${pages.rideStarted}/[rideId]`} /> */}
+      </Stack>
+
+      <Snackbar
+        msg={msg}
+        onDismiss={() => closeSnackbar()}
+        snackbarVisible={snackbarVisible}
+      />
+    </View>
+  );
 }

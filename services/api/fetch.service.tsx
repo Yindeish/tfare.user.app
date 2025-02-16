@@ -1,3 +1,4 @@
+import { getItemAsync } from "expo-secure-store";
 import FetchConfig from "./fetch.config";
 import { Redirect } from 'expo-router';
 
@@ -32,9 +33,10 @@ const get = async ({ url, timeout }: { url: string, timeout?: number }) => {
     }
 }
 
-const getWithBearerToken = async ({ token, url, timeout = 20000 }: { token: string, url: string, timeout?: number }) => {
+const getWithBearerToken = async ({ url, timeout = 20000 }: { token: string, url: string, timeout?: number }) => {
     const controller = new AbortController();
     const signal = controller.signal;
+    const token = await getItemAsync('token')
 
     // const fetchTimeout = setTimeout(() => {
     //     controller.abort();
@@ -100,10 +102,11 @@ const post = async ({ data: formData, url, timeout = 20000 }: { data?: object, u
     }
 }
 
-const postWithBearerToken = async ({ data: formData, url, token, timeout = 20000 }: { token: string, url: string, data?: object, timeout?: number }) => {
+const postWithBearerToken = async ({ data: formData, url,  timeout = 20000 }: { token: string, url: string, data?: object, timeout?: number }) => {
     console.log({ formData })
     const controller = new AbortController();
     const signal = controller.signal;
+    const token = await getItemAsync('token')
 
     // const fetchTimeout = setTimeout(() => {
     //     controller.abort();
@@ -139,9 +142,10 @@ const postWithBearerToken = async ({ data: formData, url, token, timeout = 20000
     }
 }
 
-const patchWithBearerToken = async ({ data: formData, url, token, timeout = 20000 }: { token: string, url: string, data?: object, timeout?: number }) => {
+const patchWithBearerToken = async ({ data: formData, url, timeout = 20000 }: { token: string, url: string, data?: object, timeout?: number }) => {
     const controller = new AbortController();
     const signal = controller.signal;
+    const token = await getItemAsync('token')
 
     // const fetchTimeout = setTimeout(() => {
     //     controller.abort();

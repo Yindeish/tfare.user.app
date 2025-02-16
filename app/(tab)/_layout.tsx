@@ -13,19 +13,20 @@ import { Image } from 'expo-image';
 
 
 export default function AppLayout() {
-  const { userSession, isLoading, } = useSession();
+  // const { userSession, isLoading, } = useSession();
 
   const { width, height } = Dimensions.get('window');
 
-  if (isLoading) {
-    return <View style={{ width, height, backgroundColor: '#D8D8D8' }} />;
-  }
+  // if (isLoading) {
+  //   return <View style={{ width, height, backgroundColor: '#D8D8D8' }} />;
+  // }
 
-  if (!userSession) {
-    return <Redirect href="/(auth)/signin" />;
-  }
+  // if (!userSession) {
+  //   return <Redirect href="/(auth)/signin" />;
+  // }
 
-  else return <Tabs screenOptions={{
+  // else 
+  return <Tabs screenOptions={{
     tabBarActiveTintColor: Colors.light.background, headerShown: false, tabBarStyle: {
       backgroundColor: colors.white,
       paddingTop: 10

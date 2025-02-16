@@ -64,9 +64,10 @@ export interface ILoading {
   type: TLoadingType;
 }
 
-export interface ITicket {
+export interface ITicketInput {
   id?: string;
   owner?: {};
+  ticketOtp: string;
   pickupBusstop?: IBusStop | null;
   dropoffBusstop?: IBusStop | null;
   time?: string;
@@ -74,6 +75,18 @@ export interface ITicket {
   number: number;
   userCounterFare?: number | null;
   rideFee?: number;
+}
+
+export interface ITicket {
+  createdAt: Date,
+  quantity: string,
+  ride: string,
+  riderCounterOffer: string,
+  riderId: string,
+  ticketOtp: string,
+  ticketStatus: string,
+  updatedAt: string,
+  _id: string,
 }
 
 export interface IStateInput {
@@ -86,13 +99,13 @@ export interface IStateInput {
   userRideInput: Partial<IRide>;
   paymentOptionInput: string;
 
-//   
-selectedPlan: IPlan | null
+  //
+  selectedPlan: IPlan | null;
 }
 // ? Ride
 
 export interface IPlan {
-    routeId: string;
+  routeId: string;
   planName: TPlanName;
   vehicleSeats: number;
   ride?: {
@@ -130,7 +143,7 @@ export interface IRide {
   pickupBusstop: IBusStop;
   dropoffBusstop: IBusStop;
   saved: boolean;
-  tickets?: ITicket[] | [];
+  tickets?: ITicketInput[] | [];
   status: "idle" | "cancelled" | "accepted" | "started";
   duration?: string;
   availableSeats?: number;
@@ -161,25 +174,28 @@ export interface IRideState {
   currentRideView: TCurrentrideView;
   // userRide: IRiderRideDetails | null,
   riderRideDetails: IRiderRideDetails | null;
-  paidTickets: ITicket[],
-  driverDetails: IUser | null,
+  paidTickets: ITicketInput[];
+  driverDetails: IUser | null;
   userRide: {
     riderRideDetails: IRiderRideDetails;
     currentRide: ICurrentRide;
   } | null;
-//   availableRides:
-//     | { riderRideDetails: IRiderRideDetails; currentRide: ICurrentRide }[]
-//     | [];
+  tripId: string;
+  differentTickets: ITicket[];
+  sameTickets: ITicket | null;
+  //   availableRides:
+  //     | { riderRideDetails: IRiderRideDetails; currentRide: ICurrentRide }[]
+  //     | [];
   availableRides: ICurrentRide[] | [];
   selectedAvailableRide: ICurrentRide | null;
   selectedAvailableRideId: string | null;
   currentNumberOfTickets: number;
   activeTab: TActiveTab;
   stateInput: IStateInput;
-  currentTicket: ITicket | null;
+  currentTicket: ITicketInput | null;
   counterFareStatus: TCounterFareStatus;
   allTicketsFilled: boolean;
-  ticketDetailsShown: boolean,
+  ticketDetailsShown: boolean;
   duration: { text: string; value: string } | null;
   price: string;
   seats: number[];
