@@ -7,20 +7,24 @@ import Colors, { colors } from "@/constants/Colors";
 import tw from "@/constants/tw";
 
 function SnackbarComponent({
-  onDismiss,
-  snackbarVisible,
+  onDismiss = () => null,
+  // snackbarVisible,
   msg,
 }: {
-  snackbarVisible: boolean;
-  onDismiss: () => void;
+  snackbarVisible?: boolean;
+  onDismiss?: () => void;
   msg: string;
 }) {
   const { width } = Dimensions.get("window");
+  const {snackbarVisible, closeSnackbar, msg: message} = useSnackbar();
 
   return (
     <Snackbar
       visible={snackbarVisible}
-      onDismiss={onDismiss}
+      onDismiss={() => {
+        closeSnackbar();
+        onDismiss();
+      }}
       duration={4000}
       style={{ backgroundColor: Colors.light.border }}
       wrapperStyle={{ backgroundColor: colors.transparent, width }}
@@ -32,7 +36,7 @@ function SnackbarComponent({
       //     },
       //   }}
     >
-      <Text style={tw`text-[10px] font-medium text-red-500`}>{msg}</Text>
+      <Text style={tw`text-[10px] font-medium text-red-00`}>{message || msg}</Text>
     </Snackbar>
   );
 }
@@ -43,6 +47,9 @@ const SnackbarContext = React.createContext<ISnackbarContext>({
   snackbarVisible: false,
   Snackbar: SnackbarComponent,
   notify: () => null,
+  msg: '',
+  code: null,
+  loading: false,
 });
 
 export function useSnackbar() {
@@ -59,8 +66,11 @@ export function useSnackbar() {
 export function SnackbarProvider(props: React.PropsWithChildren) {
   const [snackbarState, setSnackbarState] = useState<ISnackbarContextState>({
     snackbarVisible: false,
+    msg: "",
+    code: null,
+    loading: false,
   });
-  const { snackbarVisible } = snackbarState;
+  const { snackbarVisible,code, loading, msg: message } = snackbarState;
 
   const onChange = (key: keyof ISnackbarContextState, value: boolean) =>
     setSnackbarState((prev) => ({ ...prev, [key]: value }));
@@ -74,12 +84,13 @@ export function SnackbarProvider(props: React.PropsWithChildren) {
   };
 
   const notify = ({
-    msg,
+    msg = message,
     timeout = 2000,
   }: {
     timeout?: number;
-    msg: string;
+    msg?: string;
   }) => {
+    setSnackbarState((prev) => ({ ...prev, msg: msg as any }));
     openSnackbar();
 
     setTimeout(() => {
@@ -95,7 +106,10 @@ export function SnackbarProvider(props: React.PropsWithChildren) {
         closeSnackbar,
         snackbarVisible,
         Snackbar: SnackbarComponent,
-        notify
+        notify,
+        code,
+        loading,
+        msg: message,
       }}
     >
       {props.children}

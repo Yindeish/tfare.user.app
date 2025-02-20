@@ -150,16 +150,17 @@ export default function AvailableRide() {
 
   useEffect(() => {
     // if (session && requestId && route == 'availableRides') {
-    if (requestId && route == "availableRides") {
-      getAvailableRides();
-      const intervalId = setInterval(() => {
+    if (requestId && route == "/availableRides" && query == 'SearchingRide' && loading == false) {
+      // getAvailableRides();
+      // const intervalId = 
+      setInterval(() => {
         getAvailableRides();
-      }, 3000);
+      }, 5000);
 
       //   return () => clearInterval(intervalId);
     }
     //   }, [session, userRide?.riderRideDetails]);
-  }, []);
+  }, [route, requestId, router]);
 
   return (
     <SafeScreen>

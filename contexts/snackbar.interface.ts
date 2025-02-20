@@ -2,6 +2,9 @@ import React, { ReactNode } from "react"
 
 interface ISnackbarContextState {
     snackbarVisible: boolean,
+    msg: '',
+    code: null,
+    loading: false,
 }
 
 interface ISnackbarContext extends ISnackbarContextState {
@@ -10,8 +13,11 @@ interface ISnackbarContext extends ISnackbarContextState {
     notify: ({
       }: {
         timeout?: number;
-        msg: string;
+        msg?: string;
       }) => void,
+      // msg?: string,
+      // code?: number | null,
+      // loading?: boolean,
     Snackbar: ({ onDismiss, snackbarVisible, msg }: { snackbarVisible: boolean; onDismiss: () => void; msg: string; }) => React.JSX.Element
 }
 

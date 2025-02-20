@@ -1,4 +1,4 @@
-import { View, Image, TextInput, TouchableOpacity, ScrollView, FlatList, Pressable, Button, Dimensions } from "react-native";
+import { View, Image, TextInput, TouchableOpacity, ScrollView, FlatList, Pressable, Button, Dimensions, TextStyle } from "react-native";
 import PaddedScreen from "../shared/paddedScreen";
 import { absolute, bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsEnd, itemsStart, justifyBetween, justifyCenter, justifyStart, left0, mLAuto, mRAuto, mXAuto, mb, ml, mt, p, pLAuto, pXAuto, pb, pl, pt, px, py, relative, right0, rounded, t, top0, w, wFull, wHFull, zIndex } from "@/utils/styles";
 import { Text, Portal, Dialog, Paragraph } from "react-native-paper";
@@ -8,7 +8,7 @@ import { image } from "@/utils/imageStyles";
 import Colors, { colors } from "@/constants/Colors";
 import { useEffect, useState } from "react";
 import CtaBtn from "../shared/ctaBtn";
-import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
+import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
 import { setStateInputField } from "@/state/slices/ride";
 import RideSelectors from "@/state/selectors/ride";
 import { cancelRideReasons } from "@/constants/cancelRideReasons";
@@ -16,36 +16,42 @@ import RadioBtnListTile from "./RadioBtnListTile";
 import { closeModal } from "@/state/slices/layout";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { Href, router } from "expo-router";
+import tw from "@/constants/tw";
+import { RootState } from "@/state/store";
 
 function TripStartedSheet() {
-    const { showBottomSheet } = useBottomSheet()
+    const { showBottomSheet } = useBottomSheet();
+    const {riderRideDetails, driverDetails} = useAppSelector((state: RootState) => state.ride);
 
     return (
         <PaddedScreen>
-            <View style={[flexCol, gap(32), mt(20),]}>
+            <View style={[flexCol, gap(32), mt(20), tw `w-full`]}>
                 <PaddedScreen>
-                    <View style={[flexCol, gap(20),]}>
+                    <View style={[flexCol, gap(20), tw `items-center`]}>
                         <View style={[wFull, flex, gap(10), itemsCenter, justifyCenter]}>
                             <Image style={[image.w(30), image.h(27)]} source={images.tripChargeImage} />
 
                             <Text style={[neurialGrotesk, fw700, colorBlack, { fontSize: 22 }]}>Trip Started</Text>
                         </View>
 
-                        <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Driver has started the trip. You should arrive in 15 minutes</Text>
+                        {/* <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Driver has started the trip. You should arrive in 15 minutes</Text> */}
+                        <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Driver has started the trip. You should soon</Text>
                     </View>
                 </PaddedScreen>
 
                 {/* Driver block */}
 
-                <View style={[wFull, h(144), flex, itemsCenter, justifyCenter, bg(colors.white), rounded(10), gap(16), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
+                <TouchableOpacity 
+                onPress={() => router.push(`/(sharedScreens)/driverProfile?currentRideId=${riderRideDetails?.currentRideId})` as Href)}
+                style={[wFull, h(144), flex, itemsCenter, justifyCenter, bg(colors.white), rounded(10), gap(16), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
 
                     <Image
-                        source={images.userProfileImage}
+                        source={{uri: driverDetails?.picture}}
                         style={[image.w(70), image.h(70), image.rounded(70)]}
                     />
 
                     <View style={[flexCol, itemsStart, gap(20)]}>
-                        <Text style={[fw700, fs16, colorBlack]}>Tom Hawkins</Text>
+                        <Text style={[fw700, fs16, colorBlack]}>{driverDetails?.fullName}</Text>
 
                         <View style={[flex, gap(32), itemsCenter, mXAuto]}>
                             <View style={[flex, itemsCenter, gap(12)]}>
@@ -63,12 +69,12 @@ function TripStartedSheet() {
                                     style={[image.w(18), image.h(17),]}
                                 />
 
-                                <Text style={[fw400, fs14, c(Colors.light.textGrey)]}>ABJ-123-XY</Text>
+                                <Text style={[fw400, fs14, c(Colors.light.textGrey)]}>{driverDetails?.driverProfile?.vehicle?.plateNumber}</Text>
                             </View>
 
                         </View>
                     </View>
-                </View>
+                </TouchableOpacity>
 
                 {/* Driver block */}
 
@@ -186,7 +192,7 @@ function TripCompletedSheet() {
                     multiline
                     numberOfLines={4}
 
-                    style={[py(16), px(24), rounded(10), bg(colors.transparent), colorBlack, fs14, fw500, wFull, { borderWidth: 0.7, borderColor: Colors.light.border }]}
+                    style={[py(16), px(24), rounded(10), bg(colors.transparent), colorBlack, fs14, fw500, wFull, { borderWidth: 0.7, borderColor: Colors.light.border }] as TextStyle[]}
 
                     selectionColor={colors.transparent}
                     underlineColorAndroid={colors.transparent}
@@ -280,7 +286,7 @@ function CancelRide() {
                     multiline
                     numberOfLines={4}
 
-                    style={[py(16), px(24), rounded(10), bg(colors.transparent), colorBlack, fs14, fw500, wFull, { borderWidth: 0.7, borderColor: Colors.light.border }]}
+                    style={[py(16), px(24), rounded(10), bg(colors.transparent), colorBlack, fs14, fw500, wFull, { borderWidth: 0.7, borderColor: Colors.light.border }] as TextStyle[]}
 
                     selectionColor={colors.transparent}
                     underlineColorAndroid={colors.transparent}

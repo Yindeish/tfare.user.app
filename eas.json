@@ -9,6 +9,12 @@
       "distribution": "internal",
       "channel": "development"
     },
+    "ios": {
+      "resourceClass": "medium"
+    },
+    "android": {
+      "resourceClass": "medium"
+    },
     "apk": {
       "android": {
         "buildType": "apk"

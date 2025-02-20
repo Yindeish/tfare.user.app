@@ -118,26 +118,26 @@ export default function AppLayout() {
         if (code && (code != 200 || code != 201)) {
           notify({ msg: returnedData?.msg });
           setFetchState((prev) => ({ ...prev, msg: msg }));
-          return;
-        }
+          // return;
 
-        if (ticketPaid) {
-          dispatch(setState({key:'sameTickets', value: ticketPaid}))
-          // dispatch(setPaymentOptionsVisible(true));
-          showBottomSheet(
-            [800],
-            <RideBookedSheet rideId={selectedAvailableRideId as string} />
-          );
-          return;
-        }
-        if (tickets) {
-          dispatch(setState({key:'differentTickets', value: tickets}))
-          // dispatch(setPaymentOptionsVisible(true));
-          showBottomSheet(
-            [800],
-            <RideBookedSheet rideId={selectedAvailableRideId as string} />
-          );
-          return;
+          if (ticketPaid) {
+            dispatch(setState({key:'sameTickets', value: ticketPaid}))
+            // dispatch(setPaymentOptionsVisible(true));
+            showBottomSheet(
+              [800],
+              <RideBookedSheet rideId={selectedAvailableRideId as string} />, true
+            );
+            return;
+          }
+          if (tickets) {
+            dispatch(setState({key:'differentTickets', value: tickets}))
+            // dispatch(setPaymentOptionsVisible(true));
+            showBottomSheet(
+              [800],
+              <RideBookedSheet rideId={selectedAvailableRideId as string} />
+            );
+            return;
+          }
         }
 
         // const rides = [returnedData?.ticketUnderBooking];

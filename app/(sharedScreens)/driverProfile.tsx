@@ -1,10 +1,10 @@
 import { View, TouchableOpacity, Image, ViewStyle, TextStyle } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import { image, mXAuto, wHFull } from '@/utils/imageStyles'
 import PaddedScreen from '@/components/shared/paddedScreen'
 import PageTitle from '@/components/shared/pageTitle'
-import { Href, router } from 'expo-router'
+import { Href, router, useGlobalSearchParams } from 'expo-router'
 import { bg, flex, flexCol, gap, h, itemsCenter, itemsStart, mr, pt, px, py, rounded, w, wFull } from '@/utils/styles'
 import { images } from '@/constants/images'
 import { c, colorBlack, fs12, fs14, fs16, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles'
@@ -13,9 +13,72 @@ import Colors from '@/constants/Colors'
 import { Text } from 'react-native-paper'
 import DriverProfileListTile from '@/components/page/driverProfileListTile'
 import { FlatList } from 'react-native-gesture-handler'
+import FetchService from '@/services/api/fetch.service'
+import { useAppSelector } from '@/state/hooks/useReduxToolkit'
+import { RootState } from '@/state/store'
+import { useSnackbar } from '@/contexts/snackbar.context'
+import { IDriver, IUser } from '@/state/types/user'
 
 export default function
     DriverProfile() {
+        const {token} = useAppSelector((state: RootState) => state.user );
+        const {Snackbar, snackbarVisible, closeSnackbar, notify} = useSnackbar();
+        const {currentRideId} = useGlobalSearchParams();
+        const {driverDetails} = useAppSelector((state: RootState) => state.ride);
+        console.log({driverDetails})
+
+
+        const [fetchState, setFetchState] = React.useState<{
+            loading: boolean,
+            code: number | null,
+            msg: string,
+            driver: IUser | null
+        }>({
+            loading: false,
+            code: null,
+            msg: '',
+            driver: driverDetails
+        })   
+        const {loading, code, msg, driver} = fetchState;
+
+        const vehicle = driver?.driverProfile?.vehicle;
+
+        const getDriverDetails = async () => {
+            setFetchState({ ...fetchState, loading: true });
+            try {
+                await FetchService.getWithBearerToken({
+                    url: `/user/rider/me/ride/${currentRideId}/driver-details`,
+                    token: token
+                }).then(async (res) => {
+                    setFetchState({ ...fetchState, loading: false });
+                    console.log({res});
+
+                    const data = res?.body? await res.json(): res;
+                    const code = data?.code;
+                    const msg = data?.message;
+                    const driver = data?.driverProfile;
+
+                    if(code && code == 200 && driver){
+                        setFetchState({ ...fetchState, code, msg, driver });
+                    }else{
+                        setFetchState({ ...fetchState, code, msg });
+                        notify({msg});
+                    }
+                })
+                .catch((err: any) => {
+                    setFetchState({ ...fetchState, loading: false });
+                    console.log({err});
+                })
+                
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        useEffect(() => {
+            !driverDetails && getDriverDetails();
+        }, [])
+
     return (
         <SafeScreen>
             <View style={[wHFull as ViewStyle]}>
@@ -25,7 +88,11 @@ export default function
 
                     <PageTitle
                         title='Driver Profile'
-                        onPress={() => router.push(`/(tab)/trip` as Href)}
+                        onPress={() => {
+                            
+                            // router.push(`/(tab)/trip` as Href)
+                            router.push(`/(rideScreens)/bookRide` as Href)
+                        }}
                         style={[]}
                     >
                         {/* Report Btn */}
@@ -45,11 +112,11 @@ export default function
                     <View style={[flexCol, gap(32)]}>
                         <View style={[w('auto'), flexCol, gap(32)]}>
                             <Image
-                                source={images.userProfileImage}
+                                source={{uri: driver?.picture || driver?.avatar}}
                                 style={[image.w(90), image.h(90), image.rounded(90), image.mx('auto')]}
                             />
 
-                            <Text style={[mXAuto as TextStyle, fw700, fs16, colorBlack]}>Tom Hawkins</Text>
+                            <Text style={[mXAuto as TextStyle, fw700, fs16, colorBlack]}>{driver?.fullName}</Text>
 
                             <View style={[flex, gap(32), itemsCenter, mXAuto as ViewStyle]}>
                                 <View style={[flex, itemsCenter, gap(12)]}>
@@ -89,15 +156,15 @@ export default function
 
                         <View style={[wFull, flexCol, gap(32), pt(32), { borderTopColor: Colors.light.border, borderTopWidth: 0.7 }]}>
 
-                            <DriverProfileListTile text={{ leading: 'Car Model', trailing: 'Honda Accord' }} />
+                            <DriverProfileListTile text={{ leading: 'Car Model', trailing: vehicle?.vehicleModel as string }} />
 
-                            <DriverProfileListTile text={{ leading: 'Car Package', trailing: 'Premium Ride' }} />
+                            <DriverProfileListTile text={{ leading: 'Car Package', trailing: 'Standard Ride' }} />
 
-                            <DriverProfileListTile text={{ leading: 'Plate Number', trailing: 'ABJ-123-XY' }} />
+                            <DriverProfileListTile text={{ leading: 'Plate Number', trailing: vehicle?.plateNumber as string }} />
 
-                            <DriverProfileListTile text={{ leading: 'Color', trailing: 'Red' }} />
+                            <DriverProfileListTile text={{ leading: 'Color', trailing: vehicle?.vehicleColor as string }} />
 
-                            <DriverProfileListTile text={{ leading: 'Phone Number', trailing: '+2347012345678' }} />
+                            <DriverProfileListTile text={{ leading: 'Phone Number', trailing: String(driver?.phoneNumber) }} />
 
                             <View style={[wFull, flexCol, itemsStart, gap(20), mr(28)]}>
 
@@ -105,9 +172,9 @@ export default function
 
                                 <FlatList
                                     contentContainerStyle={[h(100)]}
-                                    data={[images.bannerImage, images.bannerImage, images.bannerImage]}
+                                    data={[vehicle?.vehicleImages?.frontViewImage, vehicle?.vehicleImages?.sideViewImage, vehicle?.vehicleImages?.backViewImage,vehicle?.vehicleImages?.interiorImage]}
                                     renderItem={({ index, item }) => (
-                                        <Image style={[image.w(100), image.h(100)]} source={item} />
+                                        <Image style={[image.w(100), image.h(100)]} source={{uri: item}} />
                                     )}
                                     horizontal
                                     ItemSeparatorComponent={() => (<View style={[w(11)]} />)}
@@ -116,6 +183,8 @@ export default function
                         </View>
                     </View>
                 </PaddedScreen>
+
+                <Snackbar msg={msg} onDismiss={() => closeSnackbar()} snackbarVisible={snackbarVisible} />
             </View>
         </SafeScreen>
     )

@@ -22,7 +22,11 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.yindeish.tfare"
+      "package": "com.yindeish.tfare",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -34,17 +38,16 @@
       "expo-secure-store",
       "expo-font",
       "expo-build-properties",
-      "expo-dev-client"
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
     },
-    "extra": {
-      "eas": {
-        "projectId": "f205daa0-7af7-404b-8c14-0b508f1afbbc"
-      }
-    },
-    "owner": "yindeish",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -53,6 +56,14 @@
       "enabled": true,
       "requestHeaders": {
         "expo-channel-name": "androidUpdate"
+      }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "3e7756b0-9d26-4dc9-a12f-80c477d06e17"
       }
     }
   }

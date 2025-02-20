@@ -37,7 +37,7 @@ function UserBlock() {
         },
         userNameText: {
             color: colors.black,
-            fontFamily: fonts.neurialGrotesk,
+            // fontFamily: fonts.neurialGrotesk,
             fontWeight: '700',
             fontSize: 14,
         },

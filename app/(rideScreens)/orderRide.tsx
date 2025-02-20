@@ -8,7 +8,7 @@ import { Href, router, usePathname } from 'expo-router';
 import { FilledForm, RecentDropoffLocations, RecentLocationsSnippet, RecentPickupLocations, RideRouteDetails, SearchingRide } from '@/components/page/orderRideBottomSheetComponents';
 import LayoutSelectors from '@/state/selectors/layout';
 import { closeBottomSheet, closeModal, openBottomSheet, resetBottomSheetState, setBottomSheetSnapPoint, setBottomSheetType, } from '@/state/slices/layout';
-import { useAppDispatch } from '@/state/hooks/useReduxToolkit';
+import { useAppDispatch, useAppSelector } from '@/state/hooks/useReduxToolkit';
 import { EBottomSheetStatus } from '@/state/enums/layout';
 import { images } from '@/constants/images';
 import { image } from '@/utils/imageStyles';
@@ -24,6 +24,9 @@ import { useBottomSheet } from '@/contexts/useBottomSheetContext';
 import { useGlobalSearchParams } from 'expo-router';
 import { EVENTS, socket } from '@/socket.io/socket.io.config';
 import { IRideAccptedEvent } from '@/socket.io/socket.io.types';
+import { useSnackbar } from '@/contexts/snackbar.context';
+import { TripCompletedSheet, TripStartedSheet } from '@/components/page/tripStartedBottomSheetComponents';
+import { RideBookedSheet } from '@/components/page/bookRideSheetComponent';
 
 
 type Region = {
@@ -38,15 +41,21 @@ function Ride() {
     const { showBottomSheet, hideBottomSheet, bottomSheetType } = useBottomSheet();
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentRideView, availableRides, } = RideSelectors()
     const { query, riderCounterOffer } = useGlobalSearchParams<{ query?: string, riderCounterOffer?: string }>();
+    const {Snackbar, msg,loading, code,} = useSnackbar();
+    const {riderRideDetails: riderRide} = useAppSelector((state) => state.ride);
     console.log({ query });
 
     useEffect(() => {
-        if (query === 'RecentLocationsSnippet') showBottomSheet([601], <RecentLocationsSnippet />);
-        if (query === 'RecentPickupLocations') showBottomSheet([508,], <RecentPickupLocations />);
-        if (query === 'RecentDropoffLocations') showBottomSheet([508,], <RecentDropoffLocations />);
-        if (query === 'FilledForm') showBottomSheet([436, 601], <FilledForm />);
-        if (query === 'RideRouteDetails') showBottomSheet([477, 601], <RideRouteDetails />);
-        if (query === 'SearchingRide') showBottomSheet([400], <SearchingRide riderCounterOffer={riderCounterOffer as string} />);
+        if (query === 'RecentLocationsSnippet') showBottomSheet([601], <RecentLocationsSnippet />, true);
+        if (query === 'RecentPickupLocations') showBottomSheet([508,], <RecentPickupLocations />, true);
+        if (query === 'RecentDropoffLocations') showBottomSheet([508,], <RecentDropoffLocations />, true);
+        if (query === 'FilledForm') showBottomSheet([436, 601], <FilledForm />, true);
+        if (query === 'RideRouteDetails') showBottomSheet([477, 601], <RideRouteDetails />, true);
+        if (query === 'SearchingRide') showBottomSheet([400], <SearchingRide riderCounterOffer={riderCounterOffer as string} />, true);
+        if (query === 'RideBooked') showBottomSheet([800], <RideBookedSheet rideId={riderRide?._id as string} />, true);
+        if (query === 'RideStarted') showBottomSheet([500], <TripStartedSheet />);
+        if (query === 'RideEnded') showBottomSheet([500], <TripCompletedSheet />, true);
+        if (query === 'RideDeclined') showBottomSheet([300], <View><Text>Trip Declined</Text></View>, true);
     }, [query])
 
 
@@ -146,7 +155,7 @@ function Ride() {
                                     //     tickets: []
                                     // }))
 
-                                    router.push(`/${ride.id}/${pages.bookRide}` as Href)
+                                    router.push(`/${ride._id}/${pages.bookRide}` as Href)
                                 }}
                                 key={index}
                             />
@@ -192,6 +201,8 @@ function Ride() {
                 </MapView> */}
 
                 <Image style={[image.w('100%'), image.h('100%'),]} source={images.mapImage} />
+
+                <Snackbar msg={msg} onDismiss={() => {}} snackbarVisible />
 
                 {/* MapView */}
 

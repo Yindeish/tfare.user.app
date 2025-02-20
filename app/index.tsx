@@ -115,13 +115,16 @@ export default function Index() {
     return <Redirect href="/introScreen" />;
   }
 
-  if (userSession != null) return <Redirect href={"/(tab)/" as Href} />;
+  if (userSession != null && token) return <Redirect href={"/(tab)/" as Href} />;
 
-  if (userSession == null && token) {
+  if (userSession == null && !token && signedinTimeSession) {
     return <Redirect href="/(auth)/signin" />; // uncomment after testing
     // return <Redirect href={`/(rideScreens)/1/${pages.tripHistory}`} />; // part of testing
     // return <Redirect href={`/(rideScreens)/${pages.tripHistory}`} />; // part of testing
   }
 
-  return null;
+  // return null;
+  else {
+    return <Redirect href={`/introScreen` as Href} />;
+}
 }

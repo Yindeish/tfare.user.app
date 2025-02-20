@@ -8,12 +8,12 @@ import { colors } from '@/constants/Colors';
 type TBottomSheetType = 'recentLocationsSnippet' | 'recentPickupLocations' | 'recentDropoffLocations' | 'routeRideDetails' | 'filledForm' | 'searchingRides' | 'loadedRides' | 'tripStarted' | 'tripCompleted' | 'cancelRide' | 'ticketDetails' | 'rideBooked';
 
 type BottomSheetContextType = {
-    showBottomSheet: (snapPoints: Array<number | string>, content: ReactNode) => void;
+    showBottomSheet: (snapPoints: Array<number | string>, content: ReactNode, isFixed?: boolean) => void;
     hideBottomSheet: () => void;
     snapPoints: Array<number | string>;
     bottomSheetType: TBottomSheetType;
     setBottomSheetType: (value: TBottomSheetType) => void;
-    showBottomSheetWithDismissAction?: (snapPoints: Array<number | string>, content: ReactNode, dismissAction: () => void) => void;
+    showBottomSheetWithDismissAction?: (snapPoints: Array<number | string>, content: ReactNode, dismissAction: () => void, isFixed?: boolean) => void;
 };
 
 const BottomSheetContext = createContext<BottomSheetContextType | undefined>(undefined);
@@ -24,10 +24,12 @@ export const BottomSheetProvider = ({ children }: { children: React.ReactNode })
     const [bottomSheetType, setBottomSheetType] = useState<TBottomSheetType>('recentLocationsSnippet');
     const [content, setContent] = useState<ReactNode>(<DefaultBottomSheetContent />);
     const [dismissAction, setDismissAction] = useState<(() => void) | undefined>(undefined);
+    const [isFixed, setIsFixed] = useState<boolean>(false);
 
-    const showBottomSheet = (snapPoints: Array<number | string>, content: ReactNode) => {
+    const showBottomSheet = (snapPoints: Array<number | string>, content: ReactNode, isFixed: boolean = false) => {
         setSnapPoints(snapPoints);
         setContent(content);
+        setIsFixed(isFixed);
         bottomSheetModalRef.current?.present();
     };
 
@@ -35,20 +37,20 @@ export const BottomSheetProvider = ({ children }: { children: React.ReactNode })
         bottomSheetModalRef.current?.dismiss();
     };
 
-    const showBottomSheetWithDismissAction = (snapPoints: Array<number | string>, content: ReactNode, dismissAction: () => void) => {
+    const showBottomSheetWithDismissAction = (snapPoints: Array<number | string>, content: ReactNode, dismissAction: () => void, isFixed: boolean = false) => {
         setSnapPoints(snapPoints);
         setContent(content);
         setDismissAction(() => dismissAction);
+        setIsFixed(isFixed);
         bottomSheetModalRef.current?.present();
     };
 
     const handleClose = useCallback(() => {
         if (dismissAction) {
             dismissAction();
-            setDismissAction(undefined); // Reset the dismiss action after it's called
+            setDismissAction(undefined);
         }
     }, [dismissAction]);
-
 
     return (
         <BottomSheetContext.Provider value={{ showBottomSheet, hideBottomSheet, snapPoints, setBottomSheetType, showBottomSheetWithDismissAction, bottomSheetType }}>
@@ -58,6 +60,7 @@ export const BottomSheetProvider = ({ children }: { children: React.ReactNode })
                     ref={bottomSheetModalRef}
                     snapPoints={snapPoints}
                     index={0}
+                    enablePanDownToClose={!isFixed}
                 >
                     {content}
                 </BottomSheetModal>

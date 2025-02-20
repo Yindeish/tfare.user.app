@@ -1,6 +1,6 @@
 import { Image, View, TouchableOpacity, ScrollView, Pressable, Platform, ViewStyle, TextStyle } from 'react-native'
 import { ActivityIndicator, Button, Snackbar, Text } from 'react-native-paper'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import { image, wHFull } from '@/utils/imageStyles'
 import { bg, flex, flexCenter, flexCol, gap, h, itemsCenter, justifyBetween, mb, mr, mt, pb, px, py, relative, rounded, w, wFull } from '@/utils/styles'
@@ -17,13 +17,42 @@ import PageTitle from '@/components/shared/pageTitle'
 import { useSession } from '@/contexts/userSignedInContext'
 import { useSnackbar } from '@/contexts/snackbar.context'
 import { IUserAccount } from '@/state/types/account'
+import { setState } from '@/state/slices/user'
+import { useStorageState } from '@/hooks/useStorageState'
 
 export default function Account() {
     const dispatch = useAppDispatch()
-    const { signIn, loadingState, userSession, msg, code, signOut } = useSession();
+    // const { signIn, loadingState, userSession, msg, code, signOut } = useSession();
     const { closeSnackbar, snackbarVisible } = useSnackbar();
     // const user = JSON.parse(userSession as string) as IUserAccount;
     const {user, wallet} = useAppSelector(state => state.user)
+    const [[_, __], setUserSession] = useStorageState('user');
+    const [[___, ____], setTokenSession] = useStorageState('token');
+
+    const [fetchState, setFetchState] = useState({
+        loading: false,
+        msg: "",
+        code: null,
+      });
+      const { code, loading, msg } = fetchState;
+
+    const signOut = async () => {
+        setFetchState({ ...fetchState, loading: true });
+        
+        dispatch(setState({ key: "user", value: null }));
+        dispatch(setState({ key: "token", value: null }));
+        setUserSession(null);
+        setTokenSession(null);
+    
+        // if(!user) {
+          setTimeout(() => {
+            setFetchState({ ...fetchState, loading: true });
+            router.replace("/(auth)/signin" as Href);
+          }, 1500)
+        // }
+        // setSession(null); signTokenOut(); //for testing
+      };
+    
 
     return (
         <SafeScreen>
@@ -113,7 +142,7 @@ export default function Account() {
 
                             <PageNavigator navigate={false} title='Rate Us' source={images.rateStarImage} imageStyle={[image.w(18), image.h(17.13)]} />
 
-                            {loadingState === 'idle' ?
+                            {!loading ?
                                 (<Button
                                     onPress={() => signOut()}
                                     labelStyle={[neurialGrotesk, fs14, fw500]}

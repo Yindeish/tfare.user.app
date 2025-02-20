@@ -387,15 +387,6 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
     );
   };
 
-  const copyToClipboard = async (text: string) => {
-    await setStringAsync(text);
-  };
-
-  const fetchCopiedText = async () => {
-    const text = await getStringAsync();
-    // setCopiedText(text);
-  };
-
   useEffect(() => {
     // if a signal is recieved from the driver to start the trip
     // for now dummy redirection

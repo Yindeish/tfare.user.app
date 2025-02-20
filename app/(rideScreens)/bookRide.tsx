@@ -124,7 +124,7 @@ export default function BookRide() {
     currentNumberOfTickets,
     paymentOptionsVisible,
   } = RideSelectors();
-  const {selectedAvailableRide, stateInput:{paymentOptionInput}} = useAppSelector((state: RootState) => state.ride);
+  const {selectedAvailableRide, ridePlans, stateInput:{paymentOptionInput}} = useAppSelector((state: RootState) => state.ride);
   const path = usePathname();
 
   const [fetchState, setFetchState] = useState({
@@ -515,7 +515,8 @@ export default function BookRide() {
 
             {/* Payment options */}
 
-            {paymentOptionsVisible && (
+            {/* {paymentOptionsVisible && ( */}
+            {allTicketsFilled && (
               <View style={[wFull, flexCol, gap(16), mt(32)]}>
                 <View
                   style={[
@@ -608,13 +609,13 @@ export default function BookRide() {
                   <BuyTicketListTile
                     leadingText="Trip Cost"
                     trailing={{
-                      text: `₦ `,
+                      text: `₦ ${ridePlans[0]?.plan?.ride?.rideFee}`,
                     }}
                   />
                   <BuyTicketListTile
                     leadingText="Service Fee"
                     trailing={{
-                      text: " ₦ 20",
+                      text: `₦ ${ridePlans?.[0]?.plan?.serviceFee}`,
                     }}
                   />
                 </View>
@@ -622,7 +623,7 @@ export default function BookRide() {
                 <BuyTicketListTile
                   leadingText="Total"
                   trailing={{
-                    text: " ₦ ",
+                    text: `₦ ${Number(ridePlans[0]?.plan?.ride?.rideFee) + Number(ridePlans?.[0]?.plan?.serviceFee)}`,
                   }}
                 />
               </View>
