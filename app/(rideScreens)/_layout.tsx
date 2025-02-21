@@ -80,7 +80,7 @@ export default function AppLayout() {
       (ticket) => ticket?.sameAsFirstTicket === true
     );
 
-    setFetchState((prev) => ({ ...prev, loading: true }));
+    setFetchState((prev) => ({ ...prev, loading: true,msg: "" }));
 
     if (sameTickets) {
       try {
@@ -126,9 +126,10 @@ export default function AppLayout() {
           if (ticketPaid) {
             dispatch(setState({key:'sameTickets', value: ticketPaid}))
             // dispatch(setPaymentOptionsVisible(true));
+            router.setParams({...searchParams, query: 'RideBooked'})
             showBottomSheet(
               [800],
-              <RideBookedSheet rideId={selectedAvailableRideId as string} />, true
+              <RideBookedSheet rideId={selectedAvailableRideId as string} />
             );
             return;
           }
@@ -228,9 +229,13 @@ export default function AppLayout() {
         </View>
       )}
 
+      {<View style={[tw `w-full h-[12px] flex items-center justify-center shadow-md rounded-[8px] fixed bottom-[200px]`, {zindex: 1000000001}]}>
+        <Text style={tw `text-[20px] text-black`}>{msg}</Text>
+        </View>}
+
       {loading && (
         <View
-          style={tw`w-full h-[35px] flex items-center justify-center absolute top-1/2 z-10`}
+          style={[tw`w-full h-[35px] flex items-center justify-center absolute top-1/2 z-10`, {zIndex: 100000000}]}
         >
           <ActivityIndicator />
         </View>

@@ -111,10 +111,6 @@ export default function Index() {
     return null; // Don't render anything while loading; splash screen will remain
   }
 
-  if (userSession == null && !token) {
-    return <Redirect href="/introScreen" />;
-  }
-
   if (userSession != null && token) return <Redirect href={"/(tab)/" as Href} />;
 
   if (userSession == null && !token && signedinTimeSession) {
@@ -124,7 +120,7 @@ export default function Index() {
   }
 
   // return null;
-  else {
+  if(userSession == null && !token && !signedinTimeSession) {
     return <Redirect href={`/introScreen` as Href} />;
 }
 }

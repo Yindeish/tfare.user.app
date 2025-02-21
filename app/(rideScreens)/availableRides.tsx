@@ -70,6 +70,8 @@ import { RefreshControl } from "react-native-gesture-handler";
 import { RootState } from "@/state/store";
 import { supabase } from "@/supabase/supabase.config";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { TripCompletedSheet, TripStartedSheet } from "@/components/page/tripStartedBottomSheetComponents";
+import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 
 export default function AvailableRide() {
   const dispatch = useAppDispatch();
@@ -80,6 +82,7 @@ export default function AvailableRide() {
   const [[isLoading, session], setSession] = useStorageState("token");
   const { showBottomSheet, hideBottomSheet, bottomSheetType } =
     useBottomSheet();
+    const searchParams = useGlobalSearchParams();
   const { query, requestId } = useGlobalSearchParams<{
     query?: string;
     riderCounterOffer?: string;
@@ -121,6 +124,7 @@ export default function AvailableRide() {
     const msg = returnedData?.msg;
     const availableRidesTotal = returnedData?.availableRides.length;
     const availableRidesRequests = returnedData?.availableRides;
+    const status = returnedData?.status;
     console.log({ returnedData, availableRidesRequests });
 
     setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
@@ -145,19 +149,45 @@ export default function AvailableRide() {
         msg: "",
         code: null,
       }));
+
+      if (status === "started") {
+        showBottomSheet([500], <TripStartedSheet />);
+        router.setParams({ ...searchParams,query: "RideStarted", });
+        router.push(
+          `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${requestId}`
+        );
+      }
+      if (status === "ended") {
+        showBottomSheet([500], <TripCompletedSheet />, true);
+        router.setParams({ query: "RideEnded"  });
+        dispatch(
+          setState({ key: "riderRideDetails", value: returnedData?.riderRide })
+        );
+      }
+      if (status === "booked") {
+        showBottomSheet(
+          [800],
+          <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
+          true
+        );
+        router.setParams({ query: "RideBooked",});
+        dispatch(
+          setState({ key: "riderRideDetails", value: returnedData?.riderRide })
+        );
+        router.setParams({...searchParams, query: 'RideBooked'})
+        showBottomSheet(
+          [800],
+          <RideBookedSheet rideId={returnedData?.currentRide?._id as string} />
+        );
+        router.push(
+          `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${requestId}`
+        );
+      }
     }
   };
 
-  socket.on(EVENTS.connection, () => {
-    // console.log({ '___id___': socket.id });
-    socket.on(EVENTS.rideRequestAccepted, (data: IRideAccptedEvent) => {
-      // console.log("Ride accepted:", data);
-      session && getAvailableRides();
-    });
-  });
-
   useEffect(() => {
-    if(requestId)getAvailableRides();
+    if(requestId != null) getAvailableRides();
   }, [requestId])
 
   return (
@@ -168,7 +198,6 @@ export default function AvailableRide() {
           <RefreshControl
             refreshing={loading}
             onRefresh={() => {
-              // userRide?.riderRideDetails &&
               getAvailableRides();
             }}
             tintColor={Colors.light.textGrey}

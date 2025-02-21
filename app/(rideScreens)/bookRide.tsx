@@ -187,12 +187,6 @@ export default function BookRide() {
   };
 
   useEffect(() => {
-    setInterval(() => {
-        checkRideStatus();
-    }, 10000);
-  }, []);
-
-  useEffect(() => {
     dispatch(setState({key:'selectedAvailableRideId', value: selectedAvailableRideId}))
   }, [selectedAvailableRideId])
 
