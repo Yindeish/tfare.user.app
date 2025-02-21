@@ -82,6 +82,8 @@ import * as Linking from 'expo-linking';
 import Toast from 'react-native-toast-message'
 import { useGlobalSearchParams } from "expo-router";
 import tw from "@/constants/tw";
+import { useBottomSheet } from "@/contexts/useBottomSheetContext";
+import { TripCompletedSheet, TripStartedSheet } from "@/components/page/tripStartedBottomSheetComponents";
 
 
 
@@ -115,6 +117,7 @@ const {
 export default function BookRide() {
   const { rideId, currentRideId, selectedAvailableRideId, requestId } = useGlobalSearchParams();
   const { token, user } = useAppSelector((state: RootState) => state.user);
+  const {riderRideDetails} = useAppSelector((state: RootState) => state.ride);
 
   const dispatch = useAppDispatch();
   const {
@@ -126,6 +129,7 @@ export default function BookRide() {
   } = RideSelectors();
   const {selectedAvailableRide, ridePlans, stateInput:{paymentOptionInput}} = useAppSelector((state: RootState) => state.ride);
   const path = usePathname();
+  const {showBottomSheet, hideBottomSheet} = useBottomSheet()
 
   const [fetchState, setFetchState] = useState({
     loading: false,
@@ -141,89 +145,6 @@ export default function BookRide() {
     dispatch(createTicket({ currentNumberOfTickets: ticketNumber }));
   };
 
-  const buyTickets = async () => {
-    const sameTickets = userRideInput?.tickets?.every(
-      (ticket) => ticket?.sameAsFirstTicket === true
-    );
-
-    setFetchState((prev) => ({ ...prev, loading: true }));
-
-    if (sameTickets) {
-
-      const returnedData = await FetchService.postWithBearerToken({
-        data: {
-          numberOfTickets: Number(currentNumberOfTickets),
-          paymentOption: paymentOptionInput,
-          requestId
-        },
-        token: token as string,
-        url: `/user/rider/me/ride/${selectedAvailableRideId || userRide?.currentRide?._id}/book`,
-      });
-      console.log({ returnedData });
-
-      setFetchState((prev) => ({
-        ...prev,
-        loading: false,
-        code: returnedData?.code,
-        msg: returnedData?.msg,
-      }));
-
-    //   toast({
-    //     title: "Ticket Booking",
-    //     // preset: "done",
-    //     message: returnedData?.msg,
-    //   });
-    Toast.show({
-        type: 'info',
-        text1: returnedData?.msg,
-        position: 'bottom',
-      });
-
-      const rides = [returnedData?.ticketUnderBooking];
-      if (rides) {
-        setFetchState((prev) => ({ ...prev, rides: rides as any}));
-      }
-      dispatch(setPaymentOptionsVisible(true));
-    } else {
-      const subsequentTickets = userRideInput?.tickets?.map((ticket) => ({
-        pickupBusstopId: ticket?.pickupBusstop?._id,
-        dropoffBusstopId: ticket?.dropoffBusstop?._id,
-        ridePlanSeats: userRide?.currentRide?.availableSeats,
-        ridePlanName: "standard",
-        userCounterOffer: ticket?.userCounterFare,
-      }));
-
-      console.log({ subsequentTickets });
-
-      const returnedData = await FetchService.postWithBearerToken({
-        data: {
-          subsequentTickets: subsequentTickets,
-        },
-        token: token as string,
-        url: `user/rider/me/ride/${userRide?.riderRideDetails?._id}/book-unlike`,
-      });
-
-      console.log({ returnedData });
-      setFetchState((prev) => ({
-        ...prev,
-        loading: false,
-        code: null,
-        msg: "",
-      }));
-
-    //   toast({
-    //     title: "Burnt installed.",
-    //     preset: "done",
-    //     message: returnedData?.msg,
-    //   });
-    //   const riderExistingUnBookedRides = returnedData?.riderExistingUnBookedRides;
-    //   if (riderExistingUnBookedRides) {
-    //     setFetchState((prev) => ({ ...prev, ride: riderExistingUnBookedRides }));
-    //   }
-      dispatch(setPaymentOptionsVisible(true));
-    }
-  };
-
   const openMap = () => {
     const riderRide = selectedAvailableRide?.ridersRides.find((ride) => String(ride?.riderId) == String(user?._id));
     const location = riderRide?.dropoffBusstop?.name || selectedAvailableRide?.inRideDropoffs[selectedAvailableRide?.inRideDropoffs.length-1]?.name;
@@ -231,6 +152,45 @@ export default function BookRide() {
   
     Linking.openURL(mapLink).catch((err) => console.error('Failed to open map:', err));
   };
+
+  const checkRideStatus = async () => {
+    setFetchState({ ...fetchState, loading: true });
+    await FetchService.getWithBearerToken({
+      url: `/ride/${requestId || riderRideDetails?._id}/status`,
+      token: token,
+    })
+      .then(async (res) => {
+        setFetchState({ ...fetchState, loading: false });
+        console.log({ res });
+
+        const data = res?.body ? await res.json() : res;
+        const code = data?.code;
+        const msg = data?.msg;
+        const status = data?.status;
+
+        setFetchState({ ...fetchState, code, msg });
+
+        if (status === "started") {
+          showBottomSheet([500], <TripStartedSheet />);
+          return;
+        }
+        if (status === "ended") {
+          showBottomSheet([500], <TripCompletedSheet />);
+          return;
+        }
+      })
+      .catch((err: any) => {
+        setFetchState({ ...fetchState, loading: false });
+        console.log({ err });
+        // notify({ msg: err?.message });
+      });
+  };
+
+  useEffect(() => {
+    setInterval(() => {
+        checkRideStatus();
+    }, 10000);
+  }, []);
 
   useEffect(() => {
     dispatch(setState({key:'selectedAvailableRideId', value: selectedAvailableRideId}))

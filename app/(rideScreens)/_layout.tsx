@@ -45,6 +45,7 @@ import { ActivityIndicator } from "react-native";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { useSnackbar } from "@/contexts/snackbar.context";
+import { openURL } from "expo-linking";
 
 export default function AppLayout() {
   const { userSession, isLoading } = useSession();
@@ -53,13 +54,13 @@ export default function AppLayout() {
     allTicketsFilled,
     currentNumberOfTickets,
     userRide,
-    // selectedAvailableRideId,
     riderRideDetails,
     stateInput: { userRideInput, paymentOptionInput },
   } = useAppSelector((state: RootState) => state.ride);
   const { token } = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
   const { showBottomSheet } = useBottomSheet();
+  const searchParams = useGlobalSearchParams();
   const { selectedAvailableRideId } = useGlobalSearchParams();
   const { notify, Snackbar, closeSnackbar, snackbarVisible } = useSnackbar();
 
@@ -113,7 +114,9 @@ export default function AppLayout() {
         const code = returnedData?.code;
         const msg = returnedData?.msg;
         const ticketPaid = returnedData?.ticketPaid;
-        const tickets = returnedData?.tickets;
+        const ticketBooked = returnedData?.ticketBooked;
+        const paymentLink = returnedData?.paymentLink;
+        console.log({ returnedData, paymentLink });
 
         if (code && (code != 200 || code != 201)) {
           notify({ msg: returnedData?.msg });
@@ -129,13 +132,9 @@ export default function AppLayout() {
             );
             return;
           }
-          if (tickets) {
-            dispatch(setState({key:'differentTickets', value: tickets}))
-            // dispatch(setPaymentOptionsVisible(true));
-            showBottomSheet(
-              [800],
-              <RideBookedSheet rideId={selectedAvailableRideId as string} />
-            );
+          if (ticketBooked && paymentLink) {
+            dispatch(setState({key:'sameTickets', value: ticketBooked}))
+            openURL(paymentLink).catch((err: any) => console.error('Failed to open tfare payment link:', err?.message));
             return;
           }
         }
@@ -193,13 +192,12 @@ export default function AppLayout() {
     }
   };
 
-  // if (isLoading) {
-  //   return <View style={{ width, height, backgroundColor: "#D8D8D8" }} />;
-  // }
+  useEffect(() => {
+    console.log('riderRideDetails changed', {riderRideDetails});
 
-  // if (!userSession) {
-  //   return <Redirect href="/(auth)/signin" />;
-  // } else
+    if(riderRideDetails && searchParams) router.setParams({...searchParams, requestId: riderRideDetails?._id});
+  }, [riderRideDetails])
+
   return (
     <View style={tw`w-full h-full flex flex-col relative`}>
       {/* Shows when all the tickets have been filled (counter fare are optional) */}

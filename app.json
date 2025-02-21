@@ -25,6 +25,8 @@
       "package": "com.yindeish.tfare",
       "permissions": [
         "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
@@ -52,7 +54,7 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/f205daa0-7af7-404b-8c14-0b508f1afbbc",
+      "url": "https://u.expo.dev/3e7756b0-9d26-4dc9-a12f-80c477d06e17",
       "enabled": true,
       "requestHeaders": {
         "expo-channel-name": "androidUpdate"

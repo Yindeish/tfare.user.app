@@ -18,6 +18,8 @@ import { useAppSelector } from '@/state/hooks/useReduxToolkit'
 import { RootState } from '@/state/store'
 import { useSnackbar } from '@/contexts/snackbar.context'
 import { IDriver, IUser } from '@/state/types/user'
+import { TripStartedSheet } from '@/components/page/tripStartedBottomSheetComponents'
+import { useBottomSheet } from '@/contexts/useBottomSheetContext'
 
 export default function
     DriverProfile() {
@@ -25,7 +27,7 @@ export default function
         const {Snackbar, snackbarVisible, closeSnackbar, notify} = useSnackbar();
         const {currentRideId} = useGlobalSearchParams();
         const {driverDetails} = useAppSelector((state: RootState) => state.ride);
-        console.log({driverDetails})
+        const {showBottomSheet} = useBottomSheet()
 
 
         const [fetchState, setFetchState] = React.useState<{
@@ -91,7 +93,12 @@ export default function
                         onPress={() => {
                             
                             // router.push(`/(tab)/trip` as Href)
-                            router.push(`/(rideScreens)/bookRide` as Href)
+                            showBottomSheet(
+                                [500],
+                                <TripStartedSheet />
+                              );
+                              router.setParams({ query: "RideStarted",});
+                            router.push(`/(rideScreens)/bookRide` as Href);
                         }}
                         style={[]}
                     >

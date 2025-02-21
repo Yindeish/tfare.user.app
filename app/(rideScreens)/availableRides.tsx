@@ -68,6 +68,8 @@ import { image } from "@/utils/imageStyles";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { RefreshControl } from "react-native-gesture-handler";
 import { RootState } from "@/state/store";
+import { supabase } from "@/supabase/supabase.config";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 export default function AvailableRide() {
   const dispatch = useAppDispatch();
@@ -84,12 +86,18 @@ export default function AvailableRide() {
     requestId?: string;
   }>();
   const route = usePathname();
-
   console.log({ requestId });
 
-  useEffect(() => {
-    if (!requestId) router.back();
-  }, []);
+  const channel = supabase.channel(`ride_${requestId}`);
+  channel
+    .on("broadcast", { event: "ride_accepted" }, (payload) => {
+      getAvailableRides();
+    })
+    .subscribe();
+
+  // useEffect(() => {
+  //   if (!requestId) router.back();
+  // }, []);
 
   useEffect(() => {
     hideBottomSheet();
@@ -149,18 +157,8 @@ export default function AvailableRide() {
   });
 
   useEffect(() => {
-    // if (session && requestId && route == 'availableRides') {
-    if (requestId && route == "/availableRides" && query == 'SearchingRide' && loading == false) {
-      // getAvailableRides();
-      // const intervalId = 
-      setInterval(() => {
-        getAvailableRides();
-      }, 5000);
-
-      //   return () => clearInterval(intervalId);
-    }
-    //   }, [session, userRide?.riderRideDetails]);
-  }, [route, requestId, router]);
+    if(requestId)getAvailableRides();
+  }, [requestId])
 
   return (
     <SafeScreen>

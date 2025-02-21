@@ -116,9 +116,13 @@ import ScaleUpDown from "../shared/scale_animator";
 import URLS from "@/constants/urls";
 import { useSnackbar } from "@/contexts/snackbar.context";
 import { State } from "react-native-gesture-handler";
-import { TripCompletedSheet, TripStartedSheet } from "./tripStartedBottomSheetComponents";
+import {
+  TripCompletedSheet,
+  TripStartedSheet,
+} from "./tripStartedBottomSheetComponents";
 import { RideBookedSheet } from "./bookRideSheetComponent";
 import { IUser } from "@/state/types/user";
+import { supabase } from "@/supabase/supabase.config";
 
 const RecentLocationsSnippet = () => {
   const dispatch = useDispatch();
@@ -1597,10 +1601,11 @@ const RideRouteDetails = ({
   });
   const { riderCounterOffer } = formData;
   const { ridePlans } = useAppSelector((state: RootState) => state.ride);
-  console.log({ridePlans})
+  console.log({ ridePlans });
 
   const [plans, setPlans] = useState(
-    ridePlans.map((plan, index) => ({ ...plan, selected: false, id: index }))
+    // ridePlans.map((plan, index) => ({ ...plan, selected: false, id: index }))
+    ridePlans.map((plan, index) => ({ ...plan, selected: true, id: index }))
   );
 
   const selectPlan = (id: number) => {
@@ -1757,6 +1762,10 @@ const RideRouteDetails = ({
                 )}
               </View>
             )}
+
+            {code == 200 && (
+              <Text style={[fw400, fs12, c(colors.black)]}>{msg}</Text>
+            )}
           </View>
         </View>
 
@@ -1818,9 +1827,13 @@ const SearchingRide = ({
   } = RideSelectors();
   const [[isLoading, session], setSession] = useStorageState("token");
   const { query } = useGlobalSearchParams();
-  const { availableRides } = useAppSelector((state: RootState) => state.ride);
+  const { availableRides, riderRideDetails, selectedAvailableRide } = useAppSelector(
+    (state: RootState) => state.ride
+  );
   const { requestId } = useGlobalSearchParams();
+  console.log({ requestId,riderRideDetails });
 
+  let interval: any;
   const [fetchState, setFetchState] = useState({
     loading: false,
     msg: "",
@@ -1828,10 +1841,11 @@ const SearchingRide = ({
   });
   const { code, msg, loading } = fetchState;
 
-  console.log({ availableRides });
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
 
   const findAvailableRides = async () => {
     setFetchState((prev) => ({ ...prev, loading: true }));
+
     const returnedData = await FetchService.postWithBearerToken({
       url: "/user/rider/me/available-rides/find",
       data: {
@@ -1843,153 +1857,130 @@ const SearchingRide = ({
       },
       token: session as string,
     });
+
     console.log({ returnedDatafind: returnedData });
 
     const code = returnedData?.code;
-    const msg = returnedData?.msg;
-    const userRideSaved = returnedData?.userRideSaved;
-    const requestUpdated = returnedData?.requestUpdated;
     const status = returnedData?.status;
-    const riderRide = returnedData?.riderRide as IRiderRideDetails;
-    const currentRide = returnedData?.currentRide as ICurrentRide;
-    const driver = returnedData?.driver as IUser;
-    console.log({ riderRide, status, currentRide, driver });
 
-    setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
+    setFetchState((prev) => ({
+      ...prev,
+      loading: false,
+      msg: returnedData?.msg,
+      code,
+    }));
 
-    if (
-      (code && code == 201 && userRideSaved) ||
-      (code && code == 201 && requestUpdated)
-    ) {
-      console.log({ userRideSaved, requestUpdated });
-
-      // hideBottomSheet();
-      // dispatch(setUserRide({riderRideDetails: userRideSaved as IRiderRideDetails, currentRide:null as any}))
-      // dispatch(setUserRide({riderRideDetails: requestUpdated as IRiderRideDetails, currentRide:null as any}))
-      console.log(
-        `/${pages.availableRides}?requestId=${
-          userRideSaved?._id || requestUpdated?._id
-        }`
+    if (code === 400) {
+      if (!status) {
+        showBottomSheet([477, 601], <RideRouteDetails code={code} msg={msg} />);
+        return;
+      }
+      console.log("400");
+      dispatch(
+        setState({ key: "riderRideDetails", value: returnedData?.riderRide })
       );
       dispatch(
         setState({
-          key: "riderRideDetails",
-          value: userRideSaved || requestUpdated,
+          key: "selectedAvailableRide",
+          value: returnedData?.currentRide,
         })
       );
+      dispatch(setState({ key: "driverDetails", value: returnedData?.driver }));
+      router.setParams({ requestId: returnedData?.riderRide?._id });
 
-      // router.push(
-      //   `/${pages.availableRides}?requestId=${
-      //     userRideSaved?._id || requestUpdated?._id
-      //   }` as Href
-      // );
-      router.setParams({
-        requestId: userRideSaved?._id || requestUpdated?._id,
-      });
-
-      setFetchState((prev) => ({
-        ...prev,
-        loading: false,
-        msg: "",
-        code: null,
-      }));
+      if (status === "requesting") {
+        showBottomSheet(
+          [477, 601],
+          <RideRouteDetails code={200} msg={returnedData?.msg} />,
+          true
+        );
+      }
+      if (status === "started") {
+        showBottomSheet([500], <TripStartedSheet />);
+        router.setParams({ query: "RideStarted", riderCounterOffer });
+        dispatch(
+          setState({ key: "riderRideDetails", value: returnedData?.riderRide })
+        );
+        dispatch(
+          setState({
+            key: "selectedAvailableRide",
+            value: returnedData?.currentRide,
+          })
+        );
+        dispatch(
+          setState({ key: "driverDetails", value: returnedData?.driver })
+        );
+      }
+      if (status === "ended") {
+        showBottomSheet([500], <TripCompletedSheet />, true);
+        router.setParams({ query: "RideEnded", riderCounterOffer });
+        dispatch(
+          setState({ key: "riderRideDetails", value: returnedData?.riderRide })
+        );
+      }
+      if (status === "booked") {
+        showBottomSheet(
+          [800],
+          <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
+          true
+        );
+        router.setParams({ query: "RideBooked", riderCounterOffer });
+        dispatch(
+          setState({ key: "riderRideDetails", value: returnedData?.riderRide })
+        );
+        router.push(
+          `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${requestId}`
+        );
+      }
+      if (status == "accepted") {
+        router.push(
+          `/(rideScreens)/availableRides?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${requestId}`
+        );
+      }
     }
-    if (code && code == 400 && !status) {
-      showBottomSheet(
-        [477, 601],
-        <RideRouteDetails code={code} msg={msg} />, true
-      );
-      setFetchState((prev) => ({
-        ...prev,
-        loading: false,
-        msg: "",
-        code: null,
-      }));
-    }
-
-    if (code && code == 400 && status == 'started') {
-      showBottomSheet(
-        [500],
-        <TripStartedSheet />
-      );
-      router.setParams({ query: "RideStarted", riderCounterOffer });
-      dispatch(setState({key:'riderRideDetails', value: riderRide}));
-      dispatch(setState({key:'selectedAvailableRide', value: currentRide}));
-      dispatch(setState({key:'driverDetails', value: driver}));
-
-      setFetchState((prev) => ({
-        ...prev,
-        loading: false,
-        msg: "",
-        code: null,
-      }));
-    }
-    if (code && code == 400 && status == 'ended') {
-      showBottomSheet(
-        [500],
-        <TripCompletedSheet />,
-        true
-      );
-      router.setParams({ query: "RideEnded", riderCounterOffer });
-      dispatch(setState({key:'riderRideDetails', value: riderRide}))
-
-      setFetchState((prev) => ({
-        ...prev,
-        loading: false,
-        msg: "",
-        code: null,
-      }));
-    }
-    if (code && code == 400 && status == 'booked') {
-      showBottomSheet(
-        [800],
-       <RideBookedSheet rideId={riderRide?._id} />,
-        true
-      );
-      router.setParams({ query: "RideBooked", riderCounterOffer });
-      dispatch(setState({key:'riderRideDetails', value: riderRide}));
-      router.push(`/(rideScreens)/bookRide?selectedAvailableRideId=${riderRide?.currentRideId}&requestId=${requestId}`)
-
-      setFetchState((prev) => ({
-        ...prev,
-        loading: false,
-        msg: "",
-        code: null,
-      }));
-    }
-
   };
 
   const getAvailableRides = async () => {
-    setFetchState((prev) => ({ ...prev, loading: true }));
-    const returnedData = await FetchService.getWithBearerToken({
-      url: `/user/rider/me/available-rides/${requestId}`,
-      token: session as string,
-    });
-    console.log({ returnedDataget: returnedData });
+    console.log({ requestIdxx: requestId });
+    try {
+      setFetchState((prev) => ({ ...prev, loading: true }));
+      const returnedData = await FetchService.getWithBearerToken({
+        url: `/user/rider/me/available-rides/${
+          requestId || riderRideDetails?._id
+        }`,
+        token: session as string,
+      });
 
-    const code = returnedData?.code;
-    const msg = returnedData?.msg;
-    const availableRidesTotal = returnedData?.availableRides.length;
-    const availableRidesRequests = returnedData?.availableRides;
+      const code = returnedData?.code;
+      const msg = returnedData?.msg;
+      const availableRidesTotal = Number(returnedData?.availableRides.length);
+      const availableRidesRequests = returnedData?.availableRides;
 
-    setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
+      setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
 
-    if (code && code == 200 && availableRidesTotal >= 1) {
-      dispatch(
-        setState({ key: "availableRides", value: availableRidesRequests })
-      );
-      hideBottomSheet();
-      router.push(`/${pages.availableRides}` as Href);
-      setFetchState((prev) => ({
-        ...prev,
-        loading: false,
-        msg: "",
-        code: null,
-      }));
-    } else if (code && code == 400) {
-      // showBottomSheet([477, 601], <RideRouteDetails code={code} msg={msg} />)
-      // setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
+      if (code && code == 200 && availableRidesTotal >= 1) {
+        dispatch(
+          setState({ key: "availableRides", value: availableRidesRequests })
+        );
+        hideBottomSheet();
+        router.push(`/${pages.availableRides}` as Href);
+        setFetchState((prev) => ({
+          ...prev,
+          loading: false,
+          msg: "",
+          code: null,
+        }));
+      }
+      // else if (code && code == 200 && availableRidesTotal == 0) {
+      //   findAvailableRides();
+      // } else if (code && code == 400) {
+      //   // showBottomSheet([477, 601], <RideRouteDetails code={code} msg={msg} />)
+      //   // setFetchState((prev) => ({ ...prev, loading: false, msg: '', code: null }));
+      // }
+    } catch (error) {
+      console.log({ error });
+      showBottomSheet([477, 601], <RideRouteDetails code={code} msg={msg} />);
+      return;
     }
   };
 
@@ -2003,79 +1994,16 @@ const SearchingRide = ({
     router.setParams({ query: "SearchingRide", riderCounterOffer });
   }, []);
 
-  socket.on(EVENTS.connection, () => {
-    console.log({ ___id___: socket.id });
-    socket.on(EVENTS.rideRequestAccepted, (data: IRideAccptedEvent) => {
-      console.log({ data });
-      if (usePathname().endsWith("orderRide")) {
-        hideBottomSheet();
-        getAvailableRides();
-      }
-    });
-  });
-
-  // useEffect(() => {
-  //   if (session) {
-  //     const intervalId = setInterval(() => {
-  //       getAvailableRides();
-  //     }, 3000);
-
-  //     return () => clearInterval(intervalId);
-  //   }
-  // }, [session]);
-
   useEffect(() => {
-    // session &&
-    // if(query == 'SearchingRide' && availableRides.length == 0) {
-    //   setInterval(() => {
-    //     findAvailableRides();
-    //   }, 5000)
-    // }
-    /////////////////////////////
+    findAvailableRides();
+  }, []);
 
-    // if(availableRides.length == 0) findAvailableRides()
-    //   .then(() => {
-    //     if (!loading && requestId)
-    //       getAvailableRides().then(() => {
-    //         if(availableRides.length == 0) findAvailableRides().then(() => {
-    //           router.setParams({query: 'RideRouteDetails'})
-    //         })
-    //     }).catch(() => {
-    //       getAvailableRides()
-    //     })
-    //   ;
-    //   })
-    //   .catch((err) => {
-    //     findAvailableRides();
-    //   });
-    if (availableRides.length == 0)
-      findAvailableRides()
-        .then(() => {
-          if (!loading && requestId)
-            getAvailableRides()
-              .then(() => {
-                if (availableRides.length == 0)
-                  getAvailableRides()
-                    .then(() => {
-                      getAvailableRides().then(() => {
-                        getAvailableRides().then(() => {
-                          router.setParams({ query: "RideRouteDetails" });
-                        });
-                      });
-                    })
-                    .catch(() => {
-                      getAvailableRides();
-                    });
-              })
-              .catch(() => {
-                getAvailableRides();
-              });
-        })
-        .catch((err) => {
-          findAvailableRides();
-        });
-    // }, [session]);
-  }, [availableRides]);
+  const channel = supabase.channel(`ride_${riderRideDetails?._id}`);
+  channel
+    .on("broadcast", { event: "ride_accepted" }, (payload) => {
+     router.push(`/(rideScreens)/availableRides?selectedAvailableRideId=${selectedAvailableRide?._id}&requestId=${requestId || riderRideDetails?._id}`)
+    })
+    .subscribe();
 
   return (
     <PaddedScreen>

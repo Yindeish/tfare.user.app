@@ -60,7 +60,7 @@ import { ICurrentRide, IRide } from "@/state/types/ride";
 import BuyTicketListTile from "./buyTicketListTile";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { useEffect, useState } from "react";
-import { Href, router } from "expo-router";
+import { Href, router, useGlobalSearchParams } from "expo-router";
 import { pages } from "@/constants/pages";
 import { RootState } from "@/state/store";
 import tw from "@/constants/tw";
@@ -68,6 +68,8 @@ import FetchService from "@/services/api/fetch.service";
 import * as Linking from "expo-linking";
 import AccountSelectors from "@/state/selectors/account";
 import { getStringAsync, setStringAsync } from "expo-clipboard";
+import { supabase } from "@/supabase/supabase.config";
+import { TripStartedSheet } from "./tripStartedBottomSheetComponents";
 
 function TicketDetailsSheet() {
   const dispatch = useAppDispatch();
@@ -322,11 +324,12 @@ function TicketDetailsSheet() {
 }
 
 function RideBookedSheet({ rideId }: { rideId: string }) {
-  const { paidTickets, selectedAvailableRide, sameTickets, differentTickets } =
+  const { paidTickets, riderRideDetails, selectedAvailableRide, sameTickets, differentTickets } =
     useAppSelector((state: RootState) => state.ride);
   const { token, user } = useAppSelector((state: RootState) => state.user);
-  const { hideBottomSheet } = useBottomSheet();
+  const { hideBottomSheet, showBottomSheet } = useBottomSheet();
   const dispatch = useAppDispatch();
+  const {requestId} = useGlobalSearchParams();
 
   const [fetchState, setFetchState] = useState({
     loading: false,
@@ -387,14 +390,13 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
     );
   };
 
-  useEffect(() => {
-    // if a signal is recieved from the driver to start the trip
-    // for now dummy redirection
-    setTimeout(() => {
-      // router.push(`/${rideId}/${pages.tripStarted}` as Href)
-      // router.push(`/(rideScreens)/rideStarted` as Href)
-    }, 3000);
-  });
+  const channel = supabase.channel(`ride_${requestId || riderRideDetails?._id}`);
+    channel
+      .on("broadcast", { event: "ride_started" }, (payload) => {
+        showBottomSheet([500], <TripStartedSheet />);
+      })
+      .subscribe();
+
 
   return (
     <PaddedScreen>
