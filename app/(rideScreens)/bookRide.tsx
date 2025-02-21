@@ -477,7 +477,7 @@ export default function BookRide() {
 
             {/* {paymentOptionsVisible && ( */}
             {allTicketsFilled && (
-              <View style={[wFull, flexCol, gap(16), mt(32)]}>
+              <View style={[wFull, flexCol, gap(16), mt(32),mb(100)]}>
                 <View
                   style={[
                     wFull,

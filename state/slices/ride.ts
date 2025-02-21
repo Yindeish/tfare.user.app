@@ -126,7 +126,8 @@ const RideSlice = createSlice({
                         sameAsFirstTicket: (val + 1) === 1 ? true : false, // setting the first ticket to use the underlying credentials
                         number: val + 1,
                         userCounterFare: (val + 1) === 1 ? state?.riderRideDetails?.riderCounterOffer : null,
-                        rideFee: (val + 1) === 1 ? Number(state?.riderRideDetails?.ridePlan?.plan?.ride?.rideFee) : null as never,
+                        // rideFee: (val + 1) === 1 ? Number(state?.riderRideDetails?.ridePlan?.plan?.ride?.rideFee) : null as never,
+                        rideFee: (val + 1) === 1 ? Number(state?.riderRideDetails?.ridePlan?.ride?.rideFee || state?.riderRideDetails?.ridePlan?.plan?.ride?.rideFee) : null as never,
                     }
 
                     state.stateInput.userRideInput.tickets = [...state.stateInput.userRideInput?.tickets || [], newTicket];
