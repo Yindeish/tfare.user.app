@@ -324,7 +324,7 @@ function TicketDetailsSheet() {
 }
 
 function RideBookedSheet({ rideId }: { rideId: string }) {
-  const { paidTickets, riderRideDetails, selectedAvailableRide, sameTickets, differentTickets } =
+  const { paidTickets, riderRideDetails, selectedAvailableRide, sameTickets, differentTickets, driverDetails } =
     useAppSelector((state: RootState) => state.ride);
   const { token, user } = useAppSelector((state: RootState) => state.user);
   const { hideBottomSheet, showBottomSheet } = useBottomSheet();
@@ -460,7 +460,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
           ]}
         >
           <Image
-            source={images.userProfileImage}
+            source={{uri: driverDetails?.picture || driverDetails?.avatar}}
             style={[image.w(70), image.h(70), image.rounded(70)]}
           />
 
@@ -530,7 +530,8 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
                 />
               )
             )}
-          {/* Same Tickets */}ƒ{/* Different Tickets */}
+          {/* Same Tickets */}
+          {/* Different Tickets */}
           {differentTickets &&
             differentTickets.map(
               (ticket, index) => (

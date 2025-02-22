@@ -27,6 +27,7 @@ import { IRideAccptedEvent } from '@/socket.io/socket.io.types';
 import { useSnackbar } from '@/contexts/snackbar.context';
 import { TripCompletedSheet, TripStartedSheet } from '@/components/page/tripStartedBottomSheetComponents';
 import { RideBookedSheet } from '@/components/page/bookRideSheetComponent';
+import { supabase } from '@/supabase/supabase.config';
 
 
 type Region = {
@@ -64,6 +65,14 @@ function Ride() {
         !query && router.setParams({ query: 'RecentLocationsSnippet' });
         // showBottomSheet([601], <RecentLocationsSnippet />)
     }, [])
+
+     const channel = supabase.channel(`ride_${riderRide?._id}`);
+       channel
+         .on("broadcast", { event: "ride_accepted" }, (payload) => {
+        //    getAvailableRides();
+        console.log({payload})
+         })
+         .subscribe();
 
     const [locationError, setLocationError] = useState<string | null>(null);
     const initialRegionObject = {

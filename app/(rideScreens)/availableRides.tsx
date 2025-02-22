@@ -142,13 +142,17 @@ export default function AvailableRide() {
         setState({ key: "availableRides", value: availableRidesRequests })
       );
     } else if (code && code == 400) {
-      console.log({ "__code && code == 400__": code && code == 400 });
-      setFetchState((prev) => ({
-        ...prev,
-        loading: false,
-        msg: "",
-        code: null,
-      }));
+      dispatch(
+        setState({ key: "riderRideDetails", value: returnedData?.riderRide })
+      );
+      dispatch(
+        setState({
+          key: "selectedAvailableRide",
+          value: returnedData?.currentRide,
+        })
+      );
+      dispatch(setState({ key: "driverDetails", value: returnedData?.driver }));
+      router.setParams({ requestId: returnedData?.riderRide?._id });
 
       if (status === "started") {
         showBottomSheet([500], <TripStartedSheet />);
@@ -160,8 +164,8 @@ export default function AvailableRide() {
       if (status === "ended") {
         showBottomSheet([500], <TripCompletedSheet />, true);
         router.setParams({ query: "RideEnded"  });
-        dispatch(
-          setState({ key: "riderRideDetails", value: returnedData?.riderRide })
+        router.push(
+          `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${requestId}`
         );
       }
       if (status === "booked") {
@@ -169,10 +173,6 @@ export default function AvailableRide() {
           [800],
           <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
           true
-        );
-        router.setParams({ query: "RideBooked",});
-        dispatch(
-          setState({ key: "riderRideDetails", value: returnedData?.riderRide })
         );
         router.setParams({...searchParams, query: 'RideBooked'})
         showBottomSheet(

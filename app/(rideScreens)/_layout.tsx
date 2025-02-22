@@ -46,6 +46,10 @@ import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { useSnackbar } from "@/contexts/snackbar.context";
 import { openURL } from "expo-linking";
+import {
+  TripCompletedSheet,
+  TripStartedSheet,
+} from "@/components/page/tripStartedBottomSheetComponents";
 
 export default function AppLayout() {
   const { userSession, isLoading } = useSession();
@@ -80,7 +84,7 @@ export default function AppLayout() {
       (ticket) => ticket?.sameAsFirstTicket === true
     );
 
-    setFetchState((prev) => ({ ...prev, loading: true,msg: "" }));
+    setFetchState((prev) => ({ ...prev, loading: true, msg: "" }));
 
     if (sameTickets) {
       try {
@@ -116,6 +120,11 @@ export default function AppLayout() {
         const ticketPaid = returnedData?.ticketPaid;
         const ticketBooked = returnedData?.ticketBooked;
         const paymentLink = returnedData?.paymentLink;
+        const status = returnedData?.status;
+        const driver = returnedData?.driver;
+        const riderRide = returnedData?.riderRide;
+        const currentRide = returnedData?.currentRide;
+
         console.log({ returnedData, paymentLink });
 
         if (code && (code != 200 || code != 201)) {
@@ -124,9 +133,27 @@ export default function AppLayout() {
           // return;
 
           if (ticketPaid) {
-            dispatch(setState({key:'sameTickets', value: ticketPaid}))
+            dispatch(setState({ key: "sameTickets", value: ticketPaid }));
+            if (riderRide)
+              dispatch(
+                setState({
+                  key: "riderRideDetails",
+                  value: returnedData?.riderRide,
+                })
+              );
+            if (currentRide)
+              dispatch(
+                setState({
+                  key: "selectedAvailableRide",
+                  value: returnedData?.currentRide,
+                })
+              );
+            if (driver)
+              dispatch(
+                setState({ key: "driverDetails", value: returnedData?.driver })
+              );
             // dispatch(setPaymentOptionsVisible(true));
-            router.setParams({...searchParams, query: 'RideBooked'})
+            router.setParams({ ...searchParams, query: "RideBooked" });
             showBottomSheet(
               [800],
               <RideBookedSheet rideId={selectedAvailableRideId as string} />
@@ -134,16 +161,48 @@ export default function AppLayout() {
             return;
           }
           if (ticketBooked && paymentLink) {
-            dispatch(setState({key:'sameTickets', value: ticketBooked}))
-            openURL(paymentLink).catch((err: any) => console.error('Failed to open tfare payment link:', err?.message));
+            dispatch(setState({ key: "sameTickets", value: ticketBooked }));
+            openURL(paymentLink).catch((err: any) =>
+              console.error("Failed to open tfare payment link:", err?.message)
+            );
             return;
           }
         }
 
-        // const rides = [returnedData?.ticketUnderBooking];
-        // if (rides) {
-        //   setFetchState((prev) => ({ ...prev, rides: rides as any }));
-        // }
+        if (code && code == 400) {
+          if (status === "started") {
+            showBottomSheet([500], <TripStartedSheet />);
+            router.setParams({ ...searchParams, query: "RideStarted" });
+            router.push(
+              `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+            );
+          }
+          if (status === "ended") {
+            showBottomSheet([500], <TripCompletedSheet />, true);
+            router.setParams({ query: "RideEnded" });
+            dispatch(
+              setState({
+                key: "riderRideDetails",
+                value: returnedData?.riderRide,
+              })
+            );
+          }
+          if (status === "booked") {
+            router.setParams({ ...searchParams, query: "RideBooked" });
+            router.push(
+              `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+            );
+             showBottomSheet(
+              [800],
+              <RideBookedSheet rideId={returnedData?.riderRide?._id} />
+            );
+          }
+
+          // const rides = [returnedData?.ticketUnderBooking];
+          // if (rides) {
+          //   setFetchState((prev) => ({ ...prev, rides: rides as any }));
+          // }
+        }
       } catch (error: any) {
         console.log({ error });
 
@@ -194,10 +253,11 @@ export default function AppLayout() {
   };
 
   useEffect(() => {
-    console.log('riderRideDetails changed', {riderRideDetails});
+    console.log("riderRideDetails changed", { riderRideDetails });
 
-    if(riderRideDetails && searchParams) router.setParams({...searchParams, requestId: riderRideDetails?._id});
-  }, [riderRideDetails])
+    if (riderRideDetails && searchParams)
+      router.setParams({ ...searchParams, requestId: riderRideDetails?._id });
+  }, [riderRideDetails]);
 
   return (
     <View style={tw`w-full h-full flex flex-col relative`}>
@@ -229,13 +289,23 @@ export default function AppLayout() {
         </View>
       )}
 
-      {<View style={[tw `w-full h-[12px] flex items-center justify-center shadow-md rounded-[8px] fixed bottom-[200px]`, {zindex: 1000000001}]}>
-        <Text style={tw `text-[20px] text-black`}>{msg}</Text>
-        </View>}
+      {
+        <View
+          style={[
+            tw`w-full h-[12px] flex items-center justify-center shadow-md rounded-[8px] fixed bottom-[200px]`,
+            { zindex: 1000000001 },
+          ]}
+        >
+          <Text style={tw`text-[20px] text-black`}>{msg}</Text>
+        </View>
+      }
 
       {loading && (
         <View
-          style={[tw`w-full h-[35px] flex items-center justify-center absolute top-1/2 z-10`, {zIndex: 100000000}]}
+          style={[
+            tw`w-full h-[35px] flex items-center justify-center absolute top-1/2 z-10`,
+            { zIndex: 100000000 },
+          ]}
         >
           <ActivityIndicator />
         </View>

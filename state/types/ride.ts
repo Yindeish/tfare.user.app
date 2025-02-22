@@ -136,6 +136,8 @@ export interface IRiderRideDetails {
   rideStatus: TRideStatus;
   riderCounterOffer: number;
   currentRideId: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IRide {
