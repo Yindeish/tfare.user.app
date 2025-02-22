@@ -486,7 +486,7 @@ export default function BookRide() {
                 >
                   <TouchableOpacity
                     onPress={() =>
-                      router.push(`/(rideScreens)/paymentOptions` as Href)
+                      router.push('/(rideScreens)/paymentOption' as Href)
                     }
                     style={[wFull, flex, justifyBetween, itemsCenter]}
                   >
@@ -495,7 +495,7 @@ export default function BookRide() {
                     </Text>
 
                     <View style={[flex, gap(16), itemsCenter]}>
-                      <Text style={[neurialGrotesk, fw400, fs14, colorBlack, tw `capitalize`]}>
+                      <Text style={[ fw400, fs14, colorBlack, tw `capitalize`]}>
                         {paymentOptionInput}
                       </Text>
 
@@ -557,19 +557,19 @@ export default function BookRide() {
                   <BuyTicketListTile
                     leadingText="Trip ID"
                     trailing={{
-                      text: selectedAvailableRideId as string,
+                      text: selectedAvailableRide?._id || selectedAvailableRideId as string,
                     }}
                   />
                   <BuyTicketListTile
                     leadingText="Trip Cost"
                     trailing={{
-                      text: `₦ ${ridePlans[0]?.plan?.ride?.rideFee}`,
+                      text: `₦ ${ridePlans[0]?.ride?.rideFee || ridePlans[0]?.plan?.ride?.rideFee || ''}`,
                     }}
                   />
                   <BuyTicketListTile
                     leadingText="Service Fee"
                     trailing={{
-                      text: `₦ ${ridePlans?.[0]?.plan?.serviceFee}`,
+                      text: `₦ ${ridePlans?.[0]?.plan?.serviceFee || ''}`,
                     }}
                   />
                 </View>
@@ -577,7 +577,7 @@ export default function BookRide() {
                 <BuyTicketListTile
                   leadingText="Total"
                   trailing={{
-                    text: `₦ ${Number(ridePlans[0]?.plan?.ride?.rideFee) + Number(ridePlans?.[0]?.plan?.serviceFee)}`,
+                    text: `₦ ${Number(ridePlans[0]?.plan?.ride?.rideFee || ridePlans[0]?.ride?.rideFee) + Number(ridePlans?.[0]?.plan?.serviceFee) || ''}`,
                   }}
                 />
               </View>

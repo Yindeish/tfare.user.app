@@ -57,7 +57,7 @@ export default function AppLayout() {
     booking,
     allTicketsFilled,
     currentNumberOfTickets,
-    userRide,
+    userRide, selectedAvailableRide,
     riderRideDetails,
     stateInput: { userRideInput, paymentOptionInput },
   } = useAppSelector((state: RootState) => state.ride);
@@ -67,6 +67,10 @@ export default function AppLayout() {
   const searchParams = useGlobalSearchParams();
   const { selectedAvailableRideId } = useGlobalSearchParams();
   const { notify, Snackbar, closeSnackbar, snackbarVisible } = useSnackbar();
+  
+  console.log('====================================');
+  console.log({selectedAvailableRideId, selectedAvailableRide});
+  console.log('====================================');
 
   const { width, height } = Dimensions.get("window");
 
@@ -78,6 +82,9 @@ export default function AppLayout() {
   const { loading, msg } = fetchState;
 
   const buyTickets = async () => {
+    console.log('====================================');
+  console.log({selectedAvailableRideId, selectedAvailableRide});
+  console.log('====================================');
     if (!allTicketsFilled) return;
 
     const sameTickets = userRideInput?.tickets?.every(
@@ -95,7 +102,8 @@ export default function AppLayout() {
             paymentOption: paymentOptionInput,
           },
           token: token as string,
-          url: `/user/rider/me/ride/${selectedAvailableRideId}/book`,
+          // url: `/user/rider/me/ride/${selectedAvailableRide?._id}/book`,
+          url: `/user/rider/me/ride/${'67b9a02318e27ad71b5ec752'}/book`,
         });
 
         setFetchState((prev) => ({
@@ -118,6 +126,7 @@ export default function AppLayout() {
         const code = returnedData?.code;
         const msg = returnedData?.msg;
         const ticketPaid = returnedData?.ticketPaid;
+        const bookedTicket = returnedData?.bookedTicket;
         const ticketBooked = returnedData?.ticketBooked;
         const paymentLink = returnedData?.paymentLink;
         const status = returnedData?.status;
@@ -161,8 +170,10 @@ export default function AppLayout() {
             );
             return;
           }
-          if (ticketBooked && paymentLink) {
-            dispatch(setState({ key: "sameTickets", value: ticketBooked }));
+          if ((ticketBooked && paymentLink) || (bookedTicket && paymentLink)) {
+            const sameTickets = ticketBooked || bookedTicket;
+
+            dispatch(setState({ key: "sameTickets", value: sameTickets }));
             openURL(paymentLink).catch((err: any) =>
               console.error("Failed to open tfare payment link:", err?.message)
             );
@@ -200,6 +211,7 @@ export default function AppLayout() {
           }
           if (status === "booked") {
             router.setParams({ ...searchParams, query: "RideBooked" });
+            dispatch(setState({key:'sameTickets', value: returnedData?.ticketPaid}))
             router.push(
               `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );

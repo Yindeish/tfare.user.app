@@ -125,7 +125,7 @@ export default function AvailableRide() {
     const availableRidesTotal = returnedData?.availableRides.length;
     const availableRidesRequests = returnedData?.availableRides;
     const status = returnedData?.status;
-    console.log({ returnedData, availableRidesRequests });
+    console.log({ returnedData });
 
     setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
 
@@ -169,7 +169,11 @@ export default function AvailableRide() {
         );
       }
       if (status === "booked") {
-        router.setParams({...searchParams, query: 'RideBooked'})
+        router.setParams({...searchParams, query: 'RideBooked'});
+        dispatch(setState({key:'sameTickets', value: returnedData?.ticketPaid}));
+        console.log('====================================');
+        console.log(returnedData?.ticketPaid);
+        console.log('====================================');
         router.push(
           `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${requestId}`
         );

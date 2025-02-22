@@ -69,6 +69,7 @@ function Ride() {
        channel
          .on("broadcast", { event: "ride_accepted" }, (payload) => {
         //    getAvailableRides();
+        router.push(`/(rideScreens)/availableRides?query=SearchingRide&requestId=${riderRide?._id}&` as Href)
         console.log({payload})
          })
          .subscribe();

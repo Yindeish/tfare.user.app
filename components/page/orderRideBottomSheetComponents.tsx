@@ -1348,10 +1348,6 @@ const FilledForm = () => {
   const searchParams = useGlobalSearchParams();
   const {query} = useGlobalSearchParams();
 
-  console.log('====================================');
-  console.log({query});
-  console.log('====================================');
-
   let [inputting, setInputting] = useState({
     pickupBusstop: false,
     dropoffpickupBusstop: false,
@@ -1388,9 +1384,7 @@ const FilledForm = () => {
           const status = data?.status;
 
           setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
-          // const ridePlans = data?.ridePlans;
           const ridePlan = data?.ridePlan;
-          console.log({ ridePlan });
 
           dispatch(setState({ key: "ridePlans", value: [ridePlan] }));
           notify({});
@@ -1435,11 +1429,8 @@ const FilledForm = () => {
               );
             }
             if (status === "booked") {
-              console.log({'booked':'bookkd'})
-              // hideBottomSheet();
-             
               router.setParams({...searchParams, query: 'RideBooked'})
-              console.log({queryhgfgfhfj: query})
+              dispatch(setState({key:'sameTickets', value: data?.ticketPaid}))
               router.push(
                 `/(rideScreens)/bookRide?selectedAvailableRideId=${data?.riderRide?.currentRideId}&requestId=${data?.riderRide?._id}?query='RideBooked'`
               );
@@ -1665,7 +1656,6 @@ const RideRouteDetails = ({
   });
   const { riderCounterOffer } = formData;
   const { ridePlans } = useAppSelector((state: RootState) => state.ride);
-  console.log({ ridePlans });
 
   const [plans, setPlans] = useState(
     // ridePlans.map((plan, index) => ({ ...plan, selected: false, id: index }))
@@ -1978,10 +1968,8 @@ const SearchingRide = ({
         );
       }
       if (status === "booked") {
-        console.log({'booked':'bookkd'})
-        // hideBottomSheet()
         router.setParams({...searchParams, query: 'RideBooked'})
-        console.log({queryhgfgfhfj: query})
+       dispatch(setState({key:'sameTickets', value: returnedData?.ticketPaid}))
         router.push(
           `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
         );
