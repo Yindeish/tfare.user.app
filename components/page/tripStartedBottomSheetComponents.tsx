@@ -330,13 +330,15 @@ function TripCompletedSheet() {
         dispatch(setStateInputField({ key: "driverRatingCommentInput", value: "" }));
 
         const data = res?.body ? await res.json() : res;
-        console.log('====================================');
-        console.log(data);
-        console.log('====================================');
         const code = data?.code;
         const msg = data?.msg;
 
         setFetchState({ ...fetchState, code, msg });
+
+        if(code == 200 || code == 201) {
+          hideBottomSheet();
+          router.replace('/(tab)')
+        }
       })
       .catch((err: any) => {
         setFetchState({ ...fetchState, loading: false, msg: err?.message });
