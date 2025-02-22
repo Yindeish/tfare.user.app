@@ -15,7 +15,6 @@ const initialState: IRideState = {
     availableRides: [
     ],
     selectedAvailableRide: null,
-    selectedAvailableRideId: null,
     paidTickets:[],
     driverDetails: null,
     ticketDetailsShown: false,

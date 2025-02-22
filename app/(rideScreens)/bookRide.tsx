@@ -153,43 +153,6 @@ export default function BookRide() {
     Linking.openURL(mapLink).catch((err) => console.error('Failed to open map:', err));
   };
 
-  const checkRideStatus = async () => {
-    setFetchState({ ...fetchState, loading: true });
-    await FetchService.getWithBearerToken({
-      url: `/ride/${requestId || riderRideDetails?._id}/status`,
-      token: token,
-    })
-      .then(async (res) => {
-        setFetchState({ ...fetchState, loading: false });
-        console.log({ res });
-
-        const data = res?.body ? await res.json() : res;
-        const code = data?.code;
-        const msg = data?.msg;
-        const status = data?.status;
-
-        setFetchState({ ...fetchState, code, msg });
-
-        if (status === "started") {
-          showBottomSheet([500], <TripStartedSheet />);
-          return;
-        }
-        if (status === "ended") {
-          showBottomSheet([500], <TripCompletedSheet />);
-          return;
-        }
-      })
-      .catch((err: any) => {
-        setFetchState({ ...fetchState, loading: false });
-        console.log({ err });
-        // notify({ msg: err?.message });
-      });
-  };
-
-  useEffect(() => {
-    dispatch(setState({key:'selectedAvailableRideId', value: selectedAvailableRideId}))
-  }, [selectedAvailableRideId])
-
   // Updating buy Ticket btn with allTicketsFilled
   useEffect(() => {
     dispatch(setState({key:'booking', value: allTicketsFilled && path === '/(rideScreens)/bookRide' as Href ?true:false}))

@@ -4,6 +4,7 @@ import {
   Stack,
   Tabs,
   useGlobalSearchParams,
+  usePathname,
 } from "expo-router";
 import {
   Dimensions,
@@ -57,7 +58,8 @@ export default function AppLayout() {
     booking,
     allTicketsFilled,
     currentNumberOfTickets,
-    userRide, selectedAvailableRide,
+    userRide,
+    selectedAvailableRide,
     riderRideDetails,
     stateInput: { userRideInput, paymentOptionInput },
   } = useAppSelector((state: RootState) => state.ride);
@@ -65,14 +67,12 @@ export default function AppLayout() {
   const dispatch = useAppDispatch();
   const { showBottomSheet } = useBottomSheet();
   const searchParams = useGlobalSearchParams();
-  const { selectedAvailableRideId } = useGlobalSearchParams();
-  const { notify, Snackbar, closeSnackbar, snackbarVisible } = useSnackbar();
-  
-  console.log('====================================');
-  console.log({selectedAvailableRideId, selectedAvailableRide});
-  console.log('====================================');
+  const { selectedAvailableRideId, requestId } = useGlobalSearchParams();
+  const path = usePathname();
 
-  const { width, height } = Dimensions.get("window");
+  console.log("====================================");
+  console.log({ selectedAvailableRideId, selectedAvailableRide });
+  console.log("====================================");
 
   const [fetchState, setFetchState] = useState({
     loading: false,
@@ -82,9 +82,9 @@ export default function AppLayout() {
   const { loading, msg } = fetchState;
 
   const buyTickets = async () => {
-    console.log('====================================');
-  console.log({selectedAvailableRideId, selectedAvailableRide});
-  console.log('====================================');
+    console.log("====================================");
+    console.log({ selectedAvailableRideId, selectedAvailableRide, requestId, riderRideDetails });
+    console.log("====================================");
     if (!allTicketsFilled) return;
 
     const sameTickets = userRideInput?.tickets?.every(
@@ -98,12 +98,13 @@ export default function AppLayout() {
         const returnedData = await FetchService.postWithBearerToken({
           data: {
             numberOfTickets: Number(currentNumberOfTickets),
-            requestId: riderRideDetails?._id,
+            requestId: requestId || riderRideDetails?._id,
             paymentOption: paymentOptionInput,
           },
           token: token as string,
-          // url: `/user/rider/me/ride/${selectedAvailableRide?._id}/book`,
-          url: `/user/rider/me/ride/${'67b9a02318e27ad71b5ec752'}/book`,
+          url: `/user/rider/me/ride/${
+            selectedAvailableRideId || selectedAvailableRide?._id
+          }/book`,
         });
 
         setFetchState((prev) => ({
@@ -113,16 +114,6 @@ export default function AppLayout() {
           msg: returnedData?.msg,
         }));
 
-        //   toast({
-        //     title: "Ticket Booking",
-        //     // preset: "done",
-        //     message: returnedData?.msg,
-        //   });
-        // Toast.show({
-        //   type: "info",
-        //   text1: returnedData?.msg,
-        //   position: "bottom",
-        // });
         const code = returnedData?.code;
         const msg = returnedData?.msg;
         const ticketPaid = returnedData?.ticketPaid;
@@ -134,13 +125,7 @@ export default function AppLayout() {
         const riderRide = returnedData?.riderRide;
         const currentRide = returnedData?.currentRide;
 
-        console.log({ returnedData, paymentLink });
-
-        // if (code && (code != 200 || code != 201)) {
         if (code && (code == 200 || code == 201)) {
-          // notify({ msg: returnedData?.msg });
-          setFetchState((prev) => ({ ...prev, msg: msg }));
-          // return;
 
           if (ticketPaid) {
             dispatch(setState({ key: "sameTickets", value: ticketPaid }));
@@ -170,6 +155,7 @@ export default function AppLayout() {
             );
             return;
           }
+
           if ((ticketBooked && paymentLink) || (bookedTicket && paymentLink)) {
             const sameTickets = ticketBooked || bookedTicket;
 
@@ -180,14 +166,16 @@ export default function AppLayout() {
             return;
           }
 
-          return;
         }
 
         if (code && code == 400) {
           alert(msg);
 
           dispatch(
-            setState({ key: "riderRideDetails", value: returnedData?.riderRide })
+            setState({
+              key: "riderRideDetails",
+              value: returnedData?.riderRide,
+            })
           );
           dispatch(
             setState({
@@ -195,7 +183,9 @@ export default function AppLayout() {
               value: returnedData?.currentRide,
             })
           );
-          dispatch(setState({ key: "driverDetails", value: returnedData?.driver }));
+          dispatch(
+            setState({ key: "driverDetails", value: returnedData?.driver })
+          );
           router.setParams({ requestId: returnedData?.riderRide?._id });
 
           if (status === "started") {
@@ -211,11 +201,13 @@ export default function AppLayout() {
           }
           if (status === "booked") {
             router.setParams({ ...searchParams, query: "RideBooked" });
-            dispatch(setState({key:'sameTickets', value: returnedData?.ticketPaid}))
+            dispatch(
+              setState({ key: "sameTickets", value: returnedData?.ticketPaid })
+            );
             router.push(
               `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );
-             showBottomSheet(
+            showBottomSheet(
               [800],
               <RideBookedSheet rideId={returnedData?.riderRide?._id} />
             );
@@ -276,18 +268,28 @@ export default function AppLayout() {
   };
 
   useEffect(() => {
-    console.log("riderRideDetails changed", { riderRideDetails });
+    console.log("riderRideDetails changed");
 
     if (riderRideDetails && searchParams)
       router.setParams({ ...searchParams, requestId: riderRideDetails?._id });
   }, [riderRideDetails]);
+
+  useEffect(() => {
+    console.log("selectedAvailableRide changed");
+
+    if (selectedAvailableRide && searchParams)
+      router.setParams({
+        ...searchParams,
+        selectedAvailableRideId: selectedAvailableRide?._id,
+      });
+  }, [selectedAvailableRide]);
 
   return (
     <View style={tw`w-full h-full flex flex-col relative`}>
       {/* Shows when all the tickets have been filled (counter fare are optional) */}
       {/* Buy Ticket Btn */}
 
-      {(booking || allTicketsFilled) && (
+      {(booking || allTicketsFilled) && path === "/bookRide" && (
         <View
           style={[
             tw`w-full absolute bottom-[30px] left-[0] p-2`,
@@ -311,18 +313,9 @@ export default function AppLayout() {
           />
         </View>
       )}
+      {/* Buy Ticket Btn */}
 
-      {
-        <View
-          style={[
-            tw`w-full h-[12px] flex items-center justify-center shadow-md rounded-[8px] fixed bottom-[200px]`,
-            { zindex: 1000000001 },
-          ]}
-        >
-          <Text style={tw`text-[20px] text-black`}>{msg}</Text>
-        </View>
-      }
-
+      {/* Loading Spinner */}
       {loading && (
         <View
           style={[
@@ -333,8 +326,8 @@ export default function AppLayout() {
           <ActivityIndicator />
         </View>
       )}
+      {/* Loading Spinner */}
 
-      {/* Buy Ticket Btn */}
       <Stack
         screenOptions={{
           animation: "slide_from_left",
@@ -344,20 +337,8 @@ export default function AppLayout() {
         <Stack.Screen name={pages.orderRide} />
         <Stack.Screen name={pages.availableRides} />
         <Stack.Screen name={"bookRide"} />
-        {/* <Stack.Screen name={`${pages.bookRide}/[rideId]`} /> */}
-        {/* <Stack.Screen name={`${pages.rideBooked}/[rideId]`} /> */}
-        {/* <Stack.Screen name={`${pages.buyTicket}/[rideId]`} /> */}
-        {/* <Stack.Screen name={`${pages.chat}/[rideId]`} /> */}
-        {/* <Stack.Screen name={`(sharedScreens)/${pages.driverProfile}/[rideId]`} /> */}
         <Stack.Screen name={`${pages.paymentOptions}`} />
-        {/* <Stack.Screen name={`${pages.rideStarted}/[rideId]`} /> */}
       </Stack>
-
-      <Snackbar
-        msg={msg}
-        onDismiss={() => closeSnackbar()}
-        snackbarVisible={snackbarVisible}
-      />
     </View>
   );
 }

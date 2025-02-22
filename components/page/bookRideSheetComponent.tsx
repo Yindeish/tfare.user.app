@@ -547,13 +547,6 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
               )
             )}
           {/* Different Tickets */}
-          {/* <BuyTicketListTile
-                        leadingText='Ticket 2 code'
-                        trailing={{
-                            text: '#765F21',
-                            icon: true
-                        }}
-                    /> */}
         </View>
 
         {/* Trip Details (tickets) */}

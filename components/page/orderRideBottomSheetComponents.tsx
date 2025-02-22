@@ -1387,10 +1387,8 @@ const FilledForm = () => {
           const ridePlan = data?.ridePlan;
 
           dispatch(setState({ key: "ridePlans", value: [ridePlan] }));
-          notify({});
 
           if (code == 200) {
-            console.log("success");
             showBottomSheet([477, 601], <RideRouteDetails />, true);
             router.setParams({ query: "RideRouteDetails" });
           }
@@ -1883,8 +1881,7 @@ const SearchingRide = ({
   } = RideSelectors();
   const [[isLoading, session], setSession] = useStorageState("token");
   const searchParams = useGlobalSearchParams();
-  const { query } = useGlobalSearchParams();
-  const { availableRides, riderRideDetails, selectedAvailableRide, ridePlans } = useAppSelector(
+  const { riderRideDetails, selectedAvailableRide, ridePlans } = useAppSelector(
     (state: RootState) => state.ride
   );
   const { requestId } = useGlobalSearchParams();
@@ -2000,8 +1997,6 @@ const SearchingRide = ({
   useEffect(() => {
     findAvailableRides();
   }, []);
-
-  console.log({'riderRideDetails?._id':riderRideDetails?._id})
 
   const channel = supabase.channel(`ride_${riderRideDetails?._id}`);
   channel

@@ -122,10 +122,8 @@ export default function AvailableRide() {
 
     const code = returnedData?.code;
     const msg = returnedData?.msg;
-    const availableRidesTotal = returnedData?.availableRides.length;
     const availableRidesRequests = returnedData?.availableRides;
     const status = returnedData?.status;
-    console.log({ returnedData });
 
     setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
 
@@ -136,12 +134,12 @@ export default function AvailableRide() {
         msg: "",
         code: null,
       }));
-      if (availableRidesTotal != availableRides.length) {
-      }
       dispatch(
         setState({ key: "availableRides", value: availableRidesRequests })
       );
-    } else if (code && code == 400) {
+    } 
+    
+    if (code && code == 400) {
       dispatch(
         setState({ key: "riderRideDetails", value: returnedData?.riderRide })
       );
@@ -229,16 +227,12 @@ export default function AvailableRide() {
                     touchable
                     roundedCorners
                     onPress={() => {
-                      // dispatch(setUserRide({riderRideDetails: null as any, currentRide: ride as ICurrentRide}));
                       dispatch(
                         setState({ key: "selectedAvailableRide", value: ride })
                       );
-
-                      // router.push(`/(rideScreens)/bookRide?rideId=${''}&currentRideId=${ride?._id}` as Href)
                       router.push(
                         `/(rideScreens)/bookRide?selectedAvailableRideId=${ride?._id}&requestId=${requestId}` as Href
                       );
-                      // router.push('/(rideScreens)/bookRide')
                     }}
                     key={index}
                   />

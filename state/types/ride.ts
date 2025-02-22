@@ -190,7 +190,6 @@ export interface IRideState {
   //     | [];
   availableRides: ICurrentRide[] | [];
   selectedAvailableRide: ICurrentRide | null;
-  selectedAvailableRideId: string | null;
   currentNumberOfTickets: number;
   activeTab: TActiveTab;
   stateInput: IStateInput;
