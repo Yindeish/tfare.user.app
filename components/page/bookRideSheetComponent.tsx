@@ -446,7 +446,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
         {/* Driver block */}
 
         <TouchableOpacity
-          onPress={() => router.push(`/(sharedScreens)/driverProfile` as Href)}
+          // onPress={() => router.push(`/(sharedScreens)/driverProfile` as Href)}
           style={[
             wFull,
             h(144),

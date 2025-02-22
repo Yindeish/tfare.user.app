@@ -169,18 +169,14 @@ export default function AvailableRide() {
         );
       }
       if (status === "booked") {
+        router.setParams({...searchParams, query: 'RideBooked'})
+        router.push(
+          `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${requestId}`
+        );
         showBottomSheet(
           [800],
           <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
           true
-        );
-        router.setParams({...searchParams, query: 'RideBooked'})
-        showBottomSheet(
-          [800],
-          <RideBookedSheet rideId={returnedData?.currentRide?._id as string} />
-        );
-        router.push(
-          `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${requestId}`
         );
       }
     }

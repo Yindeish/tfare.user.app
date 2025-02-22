@@ -55,8 +55,7 @@ function Ride() {
         if (query === 'SearchingRide') showBottomSheet([400], <SearchingRide riderCounterOffer={riderCounterOffer as string} />, true);
         if (query === 'RideBooked') showBottomSheet([800], <RideBookedSheet rideId={riderRide?._id as string} />);
         if (query === 'RideStarted') showBottomSheet([500], <TripStartedSheet />);
-        if (query === 'RideCompleted') showBottomSheet([500], <TripCompletedSheet />);
-        if (query === 'RideEnded') showBottomSheet([500], <TripCompletedSheet />, true);
+        if (query === 'RideEnded') showBottomSheet([650], <TripCompletedSheet />);
         if (query === 'RideDeclined') showBottomSheet([300], <View><Text>Trip Declined</Text></View>, true);
     }, [query])
 

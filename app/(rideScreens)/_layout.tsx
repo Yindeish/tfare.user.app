@@ -127,8 +127,9 @@ export default function AppLayout() {
 
         console.log({ returnedData, paymentLink });
 
-        if (code && (code != 200 || code != 201)) {
-          notify({ msg: returnedData?.msg });
+        // if (code && (code != 200 || code != 201)) {
+        if (code && (code == 200 || code == 201)) {
+          // notify({ msg: returnedData?.msg });
           setFetchState((prev) => ({ ...prev, msg: msg }));
           // return;
 
@@ -167,9 +168,25 @@ export default function AppLayout() {
             );
             return;
           }
+
+          return;
         }
 
         if (code && code == 400) {
+          alert(msg);
+
+          dispatch(
+            setState({ key: "riderRideDetails", value: returnedData?.riderRide })
+          );
+          dispatch(
+            setState({
+              key: "selectedAvailableRide",
+              value: returnedData?.currentRide,
+            })
+          );
+          dispatch(setState({ key: "driverDetails", value: returnedData?.driver }));
+          router.setParams({ requestId: returnedData?.riderRide?._id });
+
           if (status === "started") {
             showBottomSheet([500], <TripStartedSheet />);
             router.setParams({ ...searchParams, query: "RideStarted" });
@@ -180,12 +197,6 @@ export default function AppLayout() {
           if (status === "ended") {
             showBottomSheet([500], <TripCompletedSheet />, true);
             router.setParams({ query: "RideEnded" });
-            dispatch(
-              setState({
-                key: "riderRideDetails",
-                value: returnedData?.riderRide,
-              })
-            );
           }
           if (status === "booked") {
             router.setParams({ ...searchParams, query: "RideBooked" });

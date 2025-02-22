@@ -92,6 +92,7 @@ function TripStartedSheet() {
     useAppSelector((state: RootState) => state.ride);
   const { token } = useAppSelector((state: RootState) => state.user);
   const { notify, Snackbar, snackbarVisible, closeSnackbar } = useSnackbar();
+  const searchParams = useGlobalSearchParams();
   const {requestId} = useGlobalSearchParams();
 
   const [fetchState, setFetchState] = useState<{
@@ -165,8 +166,9 @@ function TripStartedSheet() {
     `ride_${requestId || riderRideDetails?._id}`
   );
   channel
-    .on("broadcast", { event: "ride_started" }, (payload) => {
-      showBottomSheet([500], <TripStartedSheet />);
+    .on("broadcast", { event: "ride_ended" }, (payload) => {
+      router.setParams({ ...searchParams, query: "RideEnded" });
+      showBottomSheet([800], <TripCompletedSheet />);
     })
     .subscribe();
 
@@ -291,6 +293,19 @@ function TripCompletedSheet() {
   const {requestId} = useGlobalSearchParams();
   const { riderRideDetails, driverDetails, selectedAvailableRide } =
     useAppSelector((state: RootState) => state.ride);
+  const { token } =
+    useAppSelector((state: RootState) => state.user);
+
+    const [fetchState, setFetchState] = useState<{
+      loading: boolean;
+      code: number | null;
+      msg: string;
+    }>({
+      loading: false,
+      code: null,
+      msg: "",
+    });
+    const { loading, code, msg } = fetchState;
 
   const rateDriver = (rating: number) => {
     dispatch(setStateInputField({ key: "driverRatingInput", value: rating }));
@@ -298,17 +313,39 @@ function TripCompletedSheet() {
     // update in DB
   };
 
-  const channel = supabase.channel(
-    `ride_${requestId || riderRideDetails?._id}`
-  );
-  channel
-    .on("broadcast", { event: "ride_started" }, (payload) => {
-      showBottomSheet([500], <TripStartedSheet />);
+  const sendRating = async () => {
+    setFetchState({ ...fetchState, loading: true, msg: '' });
+    await FetchService.patchWithBearerToken({
+      url: `/user/rider/me/ride/${selectedAvailableRide?._id}/rate-driver`,
+      data: {
+        requestId: requestId || riderRideDetails?._id,
+        count: driverRatingInput,
+        comment: driverRatingCommentInput,
+      },
+      token: token,
     })
-    .subscribe();
+      .then(async (res) => {
+        setFetchState({ ...fetchState, loading: false });
+        dispatch(setStateInputField({ key: "driverRatingInput", value: null }));
+        dispatch(setStateInputField({ key: "driverRatingCommentInput", value: "" }));
+
+        const data = res?.body ? await res.json() : res;
+        console.log('====================================');
+        console.log(data);
+        console.log('====================================');
+        const code = data?.code;
+        const msg = data?.msg;
+
+        setFetchState({ ...fetchState, code, msg });
+      })
+      .catch((err: any) => {
+        setFetchState({ ...fetchState, loading: false, msg: err?.message });
+        console.log({ err });
+      });
+  }
 
   return (
-    <PaddedScreen>
+    <PaddedScreen styles={[tw`relative`]}>
       <View style={[flexCol, gap(32), mt(20)]}>
         <PaddedScreen>
           <View style={[flexCol, gap(20)]}>
@@ -335,7 +372,7 @@ function TripCompletedSheet() {
 
         <TouchableOpacity
           onPress={() =>
-            router.push(`/(sharedScreens)/driverProfile/1)` as Href)
+            router.push(`/(sharedScreens)/driverProfile?)` as Href)
           }
           style={[
             wFull,
@@ -355,7 +392,7 @@ function TripCompletedSheet() {
           />
 
           <View style={[flexCol, itemsStart, gap(20)]}>
-            <Text style={[fw700, fs16, colorBlack]}>Tom Hawkins</Text>
+            <Text style={[fw700, fs16, colorBlack]}>{driverDetails?.fullName}</Text>
 
             <View style={[flex, gap(32), itemsCenter, mXAuto]}>
               <View style={[flex, itemsCenter, gap(12)]}>
@@ -374,7 +411,7 @@ function TripCompletedSheet() {
                 />
 
                 <Text style={[fw400, fs14, c(Colors.light.textGrey)]}>
-                  ABJ-123-XY
+                  {driverDetails?.driverProfile?.vehicle?.plateNumber}
                 </Text>
               </View>
             </View>
@@ -446,16 +483,24 @@ function TripCompletedSheet() {
 
         {/* Rating */}
 
+        {/* Loading Spinner */}
+        {loading && <View style={tw `w-full h-auto absolute top-1/2 flex items-center justify-center z-5`}>
+        <ActivityIndicator size={"small"} />
+        </View>}
+        {/* Loading Spinner */}
+
         <CtaBtn
           img={{
             src: images.whiteBgStarRatingImage,
             w: 18,
             h: 17,
           }}
-          onPress={() => {}}
+          onPress={() => sendRating()}
           text={{ name: "Rate now" }}
         />
       </View>
+
+      <Text style={tw `text-[10px] font-medium text-black mt-3`}>{msg}</Text>
     </PaddedScreen>
   );
 }
