@@ -331,6 +331,10 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
   const dispatch = useAppDispatch();
   const {requestId} = useGlobalSearchParams();
 
+  console.log('====================================');
+  console.log(sameTickets);
+  console.log('====================================');
+
   const [fetchState, setFetchState] = useState({
     loading: false,
     msg: "",
@@ -516,7 +520,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
             }}
           />
           {/* Same Tickets */}
-          {sameTickets &&
+          {/* {sameTickets &&
             Array.from({ length: Number(sameTickets?.quantity) }).map(
               (_, index) => (
                 <BuyTicketListTile
@@ -524,6 +528,20 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
                   trailing={{
                     // text: '#765XYZ',
                     text: sameTickets?.ticketOtp as string,
+                    icon: true,
+                  }}
+                  key={index}
+                />
+              )
+            )} */}
+          {sameTickets &&
+            sameTickets?.map(
+              (ticket, index) => (
+                <BuyTicketListTile
+                  leadingText={`Ticket ${index + 1} code`}
+                  trailing={{
+                    // text: '#765XYZ',
+                    text: ticket?.ticketOtp as string,
                     icon: true,
                   }}
                   key={index}

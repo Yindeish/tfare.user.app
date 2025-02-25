@@ -53,7 +53,7 @@ function Ride() {
         if (query === 'FilledForm') showBottomSheet([436, 601], <FilledForm />, true);
         if (query === 'RideRouteDetails') showBottomSheet([477, 601], <RideRouteDetails />, true);
         if (query === 'SearchingRide') showBottomSheet([400], <SearchingRide riderCounterOffer={riderCounterOffer as string} />, true);
-        if (query === 'RideBooked') showBottomSheet([800], <RideBookedSheet rideId={riderRide?._id as string} />);
+        if (query === 'RideBooked') showBottomSheet([800], <RideBookedSheet rideId={riderRide?._id as string} />, true);
         if (query === 'RideStarted') showBottomSheet([500], <TripStartedSheet />);
         if (query === 'RideEnded') showBottomSheet([650], <TripCompletedSheet />);
         if (query === 'RideDeclined') showBottomSheet([300], <View><Text>Trip Declined</Text></View>, true);
@@ -65,14 +65,14 @@ function Ride() {
         // showBottomSheet([601], <RecentLocationsSnippet />)
     }, [])
 
-     const channel = supabase.channel(`ride_${riderRide?._id}`);
-       channel
-         .on("broadcast", { event: "ride_accepted" }, (payload) => {
-        //    getAvailableRides();
-        router.push(`/(rideScreens)/availableRides?query=SearchingRide&requestId=${riderRide?._id}&` as Href)
-        console.log({payload})
-         })
-         .subscribe();
+    //  const channel = supabase.channel(`ride_${riderRide?._id}`);
+    //    channel
+    //      .on("broadcast", { event: "ride_accepted" }, (payload) => {
+    //     //    getAvailableRides();
+    //     router.push(`/(rideScreens)/availableRides?query=SearchingRide&requestId=${riderRide?._id}&` as Href)
+    //     console.log({payload})
+    //      })
+    //      .subscribe();
 
     const [locationError, setLocationError] = useState<string | null>(null);
     const initialRegionObject = {

@@ -184,7 +184,8 @@ export interface IRideState {
   } | null;
   tripId: string;
   differentTickets: ITicket[];
-  sameTickets: ITicket | null;
+  // sameTickets: ITicket | null;
+  sameTickets: ITicket[];
   //   availableRides:
   //     | { riderRideDetails: IRiderRideDetails; currentRide: ICurrentRide }[]
   //     | [];

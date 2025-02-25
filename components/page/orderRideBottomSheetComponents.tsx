@@ -1428,13 +1428,13 @@ const FilledForm = () => {
             }
             if (status === "booked") {
               router.setParams({...searchParams, query: 'RideBooked'})
-              dispatch(setState({key:'sameTickets', value: data?.ticketPaid}))
+              dispatch(setState({key:'sameTickets', value: [data?.ticketPaid]}))
               router.push(
                 `/(rideScreens)/bookRide?selectedAvailableRideId=${data?.riderRide?.currentRideId}&requestId=${data?.riderRide?._id}?query='RideBooked'`
               );
               showBottomSheet(
                 [800],
-                <RideBookedSheet rideId={data?.riderRide?._id} />
+                <RideBookedSheet rideId={data?.riderRide?._id} />, true
               );
             }
             if (status == "accepted") {
@@ -1703,7 +1703,7 @@ const RideRouteDetails = ({
                 // plan?.selected == true || ridePlans[0] != null
                 plan != null
                   ? border(0.7, Colors.light.background)
-                  : border(0.7, "transparent"),
+                  : border(0.7, colors.grey500),
               ]}
               key={index}
             >
@@ -1966,13 +1966,13 @@ const SearchingRide = ({
       }
       if (status === "booked") {
         router.setParams({...searchParams, query: 'RideBooked'})
-       dispatch(setState({key:'sameTickets', value: returnedData?.ticketPaid}))
+       dispatch(setState({key:'sameTickets', value: [returnedData?.ticketPaid]}))
         router.push(
           `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
         );
         showBottomSheet(
           [800],
-          <RideBookedSheet rideId={returnedData?.riderRide?._id} />
+          <RideBookedSheet rideId={returnedData?.riderRide?._id} />, true
         );
       }
       if (status == "accepted") {

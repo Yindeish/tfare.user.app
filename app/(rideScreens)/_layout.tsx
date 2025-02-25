@@ -151,7 +151,7 @@ export default function AppLayout() {
             router.setParams({ ...searchParams, query: "RideBooked" });
             showBottomSheet(
               [800],
-              <RideBookedSheet rideId={selectedAvailableRideId as string} />
+              <RideBookedSheet rideId={selectedAvailableRideId as string} />, true
             );
             return;
           }
@@ -202,14 +202,14 @@ export default function AppLayout() {
           if (status === "booked") {
             router.setParams({ ...searchParams, query: "RideBooked" });
             dispatch(
-              setState({ key: "sameTickets", value: returnedData?.ticketPaid })
+              setState({ key: "sameTickets", value: [returnedData?.ticketPaid] })
             );
             router.push(
               `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );
             showBottomSheet(
               [800],
-              <RideBookedSheet rideId={returnedData?.riderRide?._id} />
+              <RideBookedSheet rideId={returnedData?.riderRide?._id} />, true
             );
           }
 
