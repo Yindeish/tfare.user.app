@@ -62,14 +62,14 @@ export function SignupProvider(props: React.PropsWithChildren) {
 
         notify();
         onChange('loadingState', 'idle' as TSignupLoadingState);
-        onChange('code', returnedData.code as number);
+        onChange('code', returnedData?.code as number);
         onChange('msg', returnedData.msg);
         onChange('signedUpUser', returnedData.signedUpUser as IUserAccount);
 
         //!Disabling Security Question info for now
-        // if (returnedData.code === 201) router.replace(`/(auth)/${pages.securityQuestion}` as Href);
+        // if (returnedData?.code === 201) router.replace(`/(auth)/${pages.securityQuestion}` as Href);
         //!Disabling Security Question info for now
-        if (returnedData.code === 201) router.replace(`/(auth)/${pages.signin}` as Href);
+        if (returnedData?.code === 201) router.replace(`/(auth)/${pages.signin}` as Href);
         console.log('hey')
 
         // router.replace(`/(auth)/${pages.signin}` as Href);//for testing
@@ -83,10 +83,10 @@ export function SignupProvider(props: React.PropsWithChildren) {
 
         notify();
         onChange('loadingState', 'idle' as TSignupLoadingState);
-        onChange('code', returnedData.code as number);
+        onChange('code', returnedData?.code as number);
         onChange('msg', returnedData.msg);
 
-        if (returnedData.code === 200) router.replace(`/(auth)/${pages.signin}` as Href);
+        if (returnedData?.code === 200) router.replace(`/(auth)/${pages.signin}` as Href);
     }
 
     return (

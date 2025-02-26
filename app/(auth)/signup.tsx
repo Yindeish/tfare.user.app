@@ -195,10 +195,10 @@ export default function Signup() {
         setFetchState((prev) => ({
           ...prev,
           msg: returnedData?.msg,
-          code: returnedData.code,
+          code: returnedData?.code,
           loading: false,
         }));
-        if (returnedData.code === 201)
+        if (returnedData?.code === 201)
           router.replace(`/(auth)/${pages.signin}` as Href);
       } catch (error: any) {
         console.log({ error });

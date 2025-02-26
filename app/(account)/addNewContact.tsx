@@ -62,7 +62,7 @@ export default function addNewContact() {
             })
 
             onChange({ key: 'loading', value: false });
-            onChange({ key: 'code', value: returnedData.code });
+            onChange({ key: 'code', value: returnedData?.code });
             onChange({ key: 'msg', value: returnedData.msg });
 
             if (returnedData?.code == 200 || returnedData?.code == 201) {

@@ -23,6 +23,9 @@ import { RootState } from '@/state/store';
 import { EVENTS, socket } from '@/socket.io/socket.io.config';
 import { IRideAccptedEvent } from '@/socket.io/socket.io.types';
 import { getItemAsync } from 'expo-secure-store';
+import { SupabaseServices } from '@/supabase/supabase.services';
+import { supabase } from '@/supabase/supabase.config';
+import { IRiderRideDetails } from '@/state/types/ride';
 
 const { orderRideBtn, orderRideText } = StyleSheet.create({
     orderRideBtn: {
@@ -69,6 +72,16 @@ export default function Index() {
         !wallet && getUserWallet();
     }, [wallet])
 
+    supabase
+       .channel('realtime:rides')
+       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rt_events' }, (payload) => {
+         console.log('====================================');
+         console.log('riding', payload);
+         console.log('====================================');
+       })
+       .subscribe();
+
+       
     return (
         <SafeScreen>
             <ScrollView bounces style={[wHFull, flexCol,]} refreshControl={<RefreshControl refreshing={loading} onRefresh={getUserWallet} />}>

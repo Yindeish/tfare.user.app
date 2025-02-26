@@ -394,7 +394,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
     );
   };
 
-  const channel = supabase.channel(`ride_${requestId || riderRideDetails?._id}`);
+  const channel = supabase.channel(`ride_starting`);
     channel
       .on("broadcast", { event: "ride_started" }, (payload) => {
         showBottomSheet([500], <TripStartedSheet />);
@@ -535,7 +535,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
               )
             )} */}
           {sameTickets &&
-            sameTickets?.map(
+            (sameTickets || [])?.map(
               (ticket, index) => (
                 <BuyTicketListTile
                   leadingText={`Ticket ${index + 1} code`}

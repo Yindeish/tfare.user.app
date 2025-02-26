@@ -91,10 +91,11 @@ export default function AvailableRide() {
   const route = usePathname();
   console.log({ requestId });
 
-  const channel = supabase.channel(`ride_${requestId}`);
+  const channel = supabase.channel(`ride_accepting`);
   channel
     .on("broadcast", { event: "ride_accepted" }, (payload) => {
-      getAvailableRides();
+      const id = payload?.payload?.ride?._id;
+      id && getAvailableRides(id);
     })
     .subscribe();
 
@@ -113,10 +114,10 @@ export default function AvailableRide() {
   });
   const { code, msg, loading } = fetchState;
 
-  const getAvailableRides = async () => {
+  const getAvailableRides = async (id?: string) => {
     setFetchState((prev) => ({ ...prev, loading: true }));
     const returnedData = await FetchService.getWithBearerToken({
-      url: `/user/rider/me/available-rides/${requestId}`,
+      url: `/user/rider/me/available-rides/${id || requestId}`,
       token: session as string,
     });
 
@@ -185,7 +186,7 @@ export default function AvailableRide() {
   };
 
   useEffect(() => {
-    if(requestId != null) getAvailableRides();
+    if(requestId != null || requestId != 'undefined') getAvailableRides();
   }, [requestId])
 
   return (

@@ -10,14 +10,18 @@ import { colorBlack, fs14, fw500, fw700, neurialGrotesk } from "@/utils/fontStyl
 import { image, mXAuto, wHFull } from "@/utils/imageStyles";
 import { absolute, bg, flex, flexCol, gap, h, itemsCenter, justifyStart, l, px, py, relative, rounded, t, w, wFull, zIndex } from "@/utils/styles";
 import { useEffect, useState } from "react";
-import { Image, View } from "react-native";
+import { Image, TextStyle, View, ViewStyle } from "react-native";
 import { Text } from "react-native-paper";
 // import MapView, { Marker } from 'react-native-maps';
 import { CancelRide, TripCompletedSheet, TripStartedSheet } from "@/components/page/tripStartedBottomSheetComponents";
-import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
+import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
 import { closeBottomSheet, closeModal, openBottomSheet, openModal } from "@/state/slices/layout";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import PageTitle from "@/components/shared/pageTitle";
+import { IBusStop } from "@/state/types/ride";
+import { router, useGlobalSearchParams } from "expo-router";
+import { supabase } from "@/supabase/supabase.config";
+import { RootState } from "@/state/store";
 
 type Region = {
     latitude: number;
@@ -30,15 +34,32 @@ function TripStarted() {
     const dispatch = useAppDispatch()
     const { } = LayoutSelectors();
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput } } = RideSelectors()
+    const {selectedAvailableRide, riderRideDetails} = useAppSelector((state: RootState) => state.ride);
+    const {requestId} = useGlobalSearchParams();
     const { showBottomSheet, setBottomSheetType, bottomSheetType, hideBottomSheet } = useBottomSheet()
 
-    useEffect(() => {
-        showBottomSheet([480], <TripStartedSheet />)
+    // useEffect(() => {
+    //     showBottomSheet([480], <TripStartedSheet />)
 
-        setTimeout(() => {
+    //     // setTimeout(() => {
+    //     //     showBottomSheet([626, 800], <TripCompletedSheet />)
+    //     // }, 3000)
+    // }, [])
+
+     const channel = supabase.channel(`ride_ending`);
+      channel
+        .on("broadcast", { event: "ride_ended" }, (payload) => {
+          const ride = payload?.payload;
+          console.log('====================================');
+          console.log({requestId:requestId || riderRideDetails?._id, ride});
+          console.log('====================================');
+    
+          if(String(ride?._id) === String(requestId) || String(riderRideDetails?._id)) {
             showBottomSheet([626, 800], <TripCompletedSheet />)
-        }, 3000)
-    }, [])
+          }
+         
+        })
+        .subscribe();
 
     const [locationError, setLocationError] = useState<string | null>(null);
     const initialRegionObject = {
@@ -59,7 +80,7 @@ function TripStarted() {
 
     return (
         <SafeScreen>
-            <View style={[wHFull, bg(colors.transparent), relative]}>
+            <View style={[wHFull, bg(colors.transparent), relative] as ViewStyle[]}>
 
                 <PaddedScreen>
                     <PageTitle
@@ -81,9 +102,9 @@ function TripStarted() {
                             <Text style={[fw700, fs14, colorBlack, neurialGrotesk,]}>Destination</Text>
                         </View>
 
-                        <View style={[wFull, h(0.7), mXAuto, bg(Colors.light.border)]} />
+                        <View style={[wFull, h(0.7), mXAuto, bg(Colors.light.border)] as ViewStyle[]} />
 
-                        <Text style={[fw500, fs14, colorBlack]}>{dropoffBusstopInput}</Text>
+                        <Text style={[fw500, fs14, colorBlack] as TextStyle[]}>{dropoffBusstopInput?.name}</Text>
                     </View>}
 
                 {/* Drop off inputs block */}

@@ -13,6 +13,14 @@ import * as SplashScreen from "expo-splash-screen";
 import { BottomSheetProvider } from "../contexts/useBottomSheetContext";
 import * as Updates from "expo-updates";
 import { SnackbarProvider } from "@/contexts/snackbar.context";
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://7160fc815c9043dc29b9990397f1af28@o4508883889618944.ingest.us.sentry.io/4508883891519488',
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 
 export default function Root() {
   async function onFetchUpdateAsync() {

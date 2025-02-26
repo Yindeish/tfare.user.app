@@ -1,4 +1,5 @@
 const DEPLOYED_API_URL = 'https://tfare-user-api.onrender.com/api/v0';
+// const DEPLOYED_API_URL = 'http://172.20.10.3:3000/api/v0';
 const IP_ADDRESS = '172.20.10.4';
 const LOCAL_AP_URL = `http://${IP_ADDRESS}:3000/api/v0`;
 // const SOCKETIO_URL = `http://${IP_ADDRESS}:3001`;

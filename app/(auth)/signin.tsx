@@ -166,10 +166,10 @@ export default function Signin() {
         setFetchState((prev) => ({
           ...prev,
           msg: returnedData?.msg,
-          code: returnedData.code,
+          code: returnedData?.code,
           loading: false,
         }));
-        if (returnedData.code === 200 || returnedData.code === 201)
+        if (returnedData?.code === 200 || returnedData?.code === 201)
         {
           const signedinTime = new Date();
           const user = returnedData?.user;

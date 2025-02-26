@@ -163,7 +163,7 @@ function TripStartedSheet() {
   };
 
   const channel = supabase.channel(
-    `ride_${requestId || riderRideDetails?._id}`
+    `ride_ending`
   );
   channel
     .on("broadcast", { event: "ride_ended" }, (payload) => {

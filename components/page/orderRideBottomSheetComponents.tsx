@@ -111,7 +111,12 @@ import { ObjectSchema, string } from "yup";
 import CustomModal from "../shared/modal";
 import { AntDesign } from "@expo/vector-icons";
 import tw from "@/constants/tw";
-import { IBusStop, ICurrentRide, IPlan, IRiderRideDetails } from "@/state/types/ride";
+import {
+  IBusStop,
+  ICurrentRide,
+  IPlan,
+  IRiderRideDetails,
+} from "@/state/types/ride";
 import ScaleUpDown from "../shared/scale_animator";
 import URLS from "@/constants/urls";
 import { useSnackbar } from "@/contexts/snackbar.context";
@@ -1346,7 +1351,7 @@ const FilledForm = () => {
   } = RideSelectors();
   const { notify } = useSnackbar();
   const searchParams = useGlobalSearchParams();
-  const {query} = useGlobalSearchParams();
+  const { query } = useGlobalSearchParams();
 
   let [inputting, setInputting] = useState({
     pickupBusstop: false,
@@ -1404,7 +1409,7 @@ const FilledForm = () => {
             );
             dispatch(setState({ key: "driverDetails", value: data?.driver }));
             router.setParams({ requestId: data?.riderRide?._id });
-      
+
             if (status === "requesting") {
               showBottomSheet(
                 [477, 601],
@@ -1414,27 +1419,30 @@ const FilledForm = () => {
             }
             if (status === "started") {
               showBottomSheet([500], <TripStartedSheet />);
-              router.setParams({ ...searchParams,query: "RideStarted", });
+              router.setParams({ ...searchParams, query: "RideStarted" });
               router.push(
                 `/(rideScreens)/bookRide?selectedAvailableRideId=${data?.riderRide?.currentRideId}&requestId=${data?.riderRide?._id}`
               );
             }
             if (status === "ended") {
               showBottomSheet([500], <TripCompletedSheet />, true);
-              router.setParams({ ...searchParams,query: "RideEnded" });
+              router.setParams({ ...searchParams, query: "RideEnded" });
               router.push(
                 `/(rideScreens)/bookRide?selectedAvailableRideId=${data?.riderRide?.currentRideId}&requestId=${data?.riderRide?._id}`
               );
             }
             if (status === "booked") {
-              router.setParams({...searchParams, query: 'RideBooked'})
-              dispatch(setState({key:'sameTickets', value: [data?.ticketPaid]}))
+              router.setParams({ ...searchParams, query: "RideBooked" });
+              dispatch(
+                setState({ key: "sameTickets", value: [data?.ticketPaid] })
+              );
               router.push(
                 `/(rideScreens)/bookRide?selectedAvailableRideId=${data?.riderRide?.currentRideId}&requestId=${data?.riderRide?._id}?query='RideBooked'`
               );
               showBottomSheet(
                 [800],
-                <RideBookedSheet rideId={data?.riderRide?._id} />, true
+                <RideBookedSheet rideId={data?.riderRide?._id} />,
+                true
               );
             }
             if (status == "accepted") {
@@ -1661,7 +1669,15 @@ const RideRouteDetails = ({
   );
 
   // const selectPlan = (id: number) => {
-  const selectPlan = (plan: { ride: { rideFee: number; }; planName: "standard"; serviceFee: number; riderTolerance: number; driverTolerance: number; vehicleSeats: number; _id: string; }) => {
+  const selectPlan = (plan: {
+    ride: { rideFee: number };
+    planName: "standard";
+    serviceFee: number;
+    riderTolerance: number;
+    driverTolerance: number;
+    vehicleSeats: number;
+    _id: string;
+  }) => {
     // const newPlans = plans.map((plan) =>
     //   plan.id == id
     //     ? { ...plan, selected: plan?.selected == true ? false : true }
@@ -1688,7 +1704,7 @@ const RideRouteDetails = ({
             }}
           />
 
-          {ridePlans?.map(({plan}, index) => (
+          {ridePlans?.map(({ plan }, index) => (
             <TouchableOpacity
               onPress={() => selectPlan(plan)}
               style={[
@@ -1922,7 +1938,7 @@ const SearchingRide = ({
       code,
     }));
 
-    if((code == 201) || code == 200) {
+    if (code == 201 || code == 200) {
       dispatch(setState({ key: "riderRideDetails", value: userRideSaved }));
     }
 
@@ -1952,27 +1968,34 @@ const SearchingRide = ({
       }
       if (status === "started") {
         showBottomSheet([500], <TripStartedSheet />);
-        router.setParams({ ...searchParams,query: "RideStarted", });
+        router.setParams({ ...searchParams, query: "RideStarted" });
         router.push(
           `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
         );
       }
       if (status === "ended") {
         showBottomSheet([500], <TripCompletedSheet />, true);
-        router.setParams({ ...searchParams,query: "RideEnded", riderCounterOffer });
+        router.setParams({
+          ...searchParams,
+          query: "RideEnded",
+          riderCounterOffer,
+        });
         router.push(
           `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
         );
       }
       if (status === "booked") {
-        router.setParams({...searchParams, query: 'RideBooked'})
-       dispatch(setState({key:'sameTickets', value: [returnedData?.ticketPaid]}))
+        router.setParams({ ...searchParams, query: "RideBooked" });
+        dispatch(
+          setState({ key: "sameTickets", value: [returnedData?.ticketPaid] })
+        );
         router.push(
           `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
         );
         showBottomSheet(
           [800],
-          <RideBookedSheet rideId={returnedData?.riderRide?._id} />, true
+          <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
+          true
         );
       }
       if (status == "accepted") {
@@ -1998,11 +2021,22 @@ const SearchingRide = ({
     findAvailableRides();
   }, []);
 
-  const channel = supabase.channel(`ride_${riderRideDetails?._id}`);
+  const channel = supabase.channel(`ride_accepting`);
   channel
     .on("broadcast", { event: "ride_accepted" }, (payload) => {
-      console.log({payload})
-     router.push(`/(rideScreens)/availableRides?selectedAvailableRideId=${selectedAvailableRide?._id}&requestId=${requestId || riderRideDetails?._id}`)
+      const ride = payload?.payload;
+      console.log('====================================');
+      console.log({requestId:requestId || riderRideDetails?._id, ride});
+      console.log('====================================');
+
+      if(String(ride?._id) === String(requestId) || String(riderRideDetails?._id)) {
+        router.push(
+          `/(rideScreens)/availableRides?selectedAvailableRideId=${ride?._id || 
+            selectedAvailableRide?._id
+          }&requestId=${requestId || riderRideDetails?._id}`
+        );
+      }
+     
     })
     .subscribe();
 

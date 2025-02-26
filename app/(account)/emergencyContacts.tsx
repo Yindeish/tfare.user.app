@@ -41,7 +41,7 @@ export default function emergencyContacts() {
         const returnedData = await FetchService.getWithBearerToken({ token: tokenSession as string, url: '/user/rider/me/account/emergency-contacts', timeout: 1000 })
 
         onChange({ key: 'loading', value: false });
-        onChange({ key: 'code', value: returnedData.code });
+        onChange({ key: 'code', value: returnedData?.code });
         onChange({ key: 'msg', value: returnedData.msg });
 
         if (returnedData?.riderEmergencyContacts) {

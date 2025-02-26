@@ -46,7 +46,7 @@ export default function SavedAddresses() {
         const returnedData = await FetchService.getWithBearerToken({ token: tokenSession as string, url: '/user/rider/me/account/saved-addresses', timeout: 1000 })
 
         onChange({ key: 'loading', value: false });
-        onChange({ key: 'code', value: returnedData.code });
+        onChange({ key: 'code', value: returnedData?.code });
         onChange({ key: 'msg', value: returnedData.msg });
 
         if (returnedData?.riderSavedAddresses) {
