@@ -128,10 +128,11 @@ import {
 import { RideBookedSheet } from "./bookRideSheetComponent";
 import { IUser } from "@/state/types/user";
 import { supabase } from "@/supabase/supabase.config";
+import { RideConstants } from "@/constants/ride";
 
 const RecentLocationsSnippet = () => {
   const dispatch = useDispatch();
-  //   const [[isLoading, session], setSession] = useStorageState("token");
+    const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
   const { token: session } = useAppSelector((state: RootState) => state.user);
   const { savedAddresses } = AccountSelectors();
 
@@ -175,7 +176,7 @@ const RecentLocationsSnippet = () => {
     console.log({ busstops });
     if (busstops) {
       setSearchState((prev) => ({ ...prev, busstops: busstops as never[] }));
-      dispatch(setSavedAddresses(busstops));
+      // dispatch(setSavedAddresses(busstops));
     }
   };
 
@@ -197,6 +198,7 @@ const RecentLocationsSnippet = () => {
       dropoffBusstop: string().required(),
     }),
     onSubmit: ({ dropoffBusstop, pickupBusstop }) => {
+      setQuery(RideConstants.query.FilledForm);
       showBottomSheet([436], <FilledForm />, true);
       // router.setParams({ query: "FilledForm" });
     },
@@ -218,14 +220,28 @@ const RecentLocationsSnippet = () => {
   };
 
   const openRecentPickupLocations = () => {
+    // router.setParams({ query: "RecentPickupLocations" });
+    setQuery(RideConstants.query.RecentPickupLocations);
     showBottomSheet([508], <RecentPickupLocations />, true);
-    router.setParams({ query: "RecentPickupLocations" });
   };
 
   const openRecentDropoffLocations = () => {
     showBottomSheet([508], <RecentDropoffLocations />, true);
-    router.setParams({ query: "RecentDropoffLocations" });
+    // router.setParams({ query: "RecentDropoffLocations" });
+    setQuery(RideConstants.query.RecentDropoffLocations)
   };
+
+  // Updating pickup search
+  useEffect(() => {
+    inputtingPickup && searchBusstops(values.pickupBusstop as string);
+  }, [values.pickupBusstop, inputtingPickup])
+  // Updating pickup search
+  
+  // Updating pickup search
+  useEffect(() => {
+    inputtingDropoff && searchBusstops(values.dropoffBusstop as string);
+  }, [values.dropoffBusstop, inputtingDropoff])
+  // Updating pickup search
 
   useEffect(() => {
     session && savedAddresses.length <= 0 && getSavedBusstops();
@@ -283,12 +299,12 @@ const RecentLocationsSnippet = () => {
               cursorColor={Colors.light.textGrey}
               placeholder="Enter Location"
               value={values.pickupBusstop}
-              // onChangeText={handleChange("pickupBusstop")}
+              onChangeText={handleChange("pickupBusstop")}
               // onBlur={handleBlur("pickupBusstop")}
-              onChangeText={(text) => {
-                searchBusstops(text);
-                setFieldValue("pickupBusstop", text);
-              }}
+              // onChangeText={(text) => {
+              //   searchBusstops(text);
+              //   setFieldValue("pickupBusstop", text);
+              // }}
               onFocus={() => {
                 setSearchState((prev) => ({ ...prev, inputtingPickup: true }));
               }}
@@ -326,6 +342,7 @@ const RecentLocationsSnippet = () => {
                   {(busstops as IBusStop[])?.map((busstop, index) => (
                     <Text
                       onPress={() => {
+                        console.log({busstop})
                         setFieldValue("pickupBusstop", busstop?.name);
                         dispatch(
                           setStateInputField({
@@ -451,10 +468,11 @@ const RecentLocationsSnippet = () => {
               cursorColor={Colors.light.textGrey}
               placeholder="Enter Destination"
               value={values.dropoffBusstop}
-              onChangeText={(text) => {
-                searchBusstops(text);
-                setFieldValue("dropoffBusstop", text);
-              }}
+              // onChangeText={(text) => {
+              //   searchBusstops(text);
+              //   setFieldValue("dropoffBusstop", text);
+              // }}
+              onChangeText={handleChange('dropoffBusstop')}
               onFocus={() => {
                 setSearchState((prev) => ({ ...prev, inputtingDropoff: true }));
               }}
@@ -601,6 +619,7 @@ const RecentPickupLocations = () => {
     stateInput: { pickupBusstopInput },
   } = RideSelectors();
   const { token } = useAppSelector((state: RootState) => state.user);
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   const [searchState, setSearchState] = useState({
     loading: false,
@@ -642,8 +661,9 @@ const RecentPickupLocations = () => {
           <BottomSheetTitle
             title="Pick up bus stop"
             onPressFn={() => {
-              showBottomSheet([601, 800], <RecentLocationsSnippet />, true);
-              router.setParams({ query: "RecentLocationsSnippet" });
+              // router.setParams({ query: "RecentLocationsSnippet" });
+              setQuery(RideConstants.query.RecentLocationsSnippet);
+              showBottomSheet([601], <RecentLocationsSnippet />, true);
             }}
           />
 
@@ -979,6 +999,7 @@ const RecentDropoffLocations = () => {
   } = RideSelectors();
 
   const { token } = useAppSelector((state: RootState) => state.user);
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   const [searchState, setSearchState] = useState({
     loading: false,
@@ -1020,8 +1041,9 @@ const RecentDropoffLocations = () => {
           <BottomSheetTitle
             title="Drop off bus stop"
             onPressFn={() => {
+              // router.setParams({ query: "RecentLocationsSnippet" });
+              setQuery(RideConstants.query.RecentLocationsSnippet);
               showBottomSheet([601], <RecentLocationsSnippet />, true);
-              router.setParams({ query: "RecentLocationsSnippet" });
             }}
           />
 
@@ -1351,7 +1373,7 @@ const FilledForm = () => {
   } = RideSelectors();
   const { notify } = useSnackbar();
   const searchParams = useGlobalSearchParams();
-  const { query } = useGlobalSearchParams();
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   let [inputting, setInputting] = useState({
     pickupBusstop: false,
@@ -1363,9 +1385,6 @@ const FilledForm = () => {
     code: null,
   });
   const { loading, code, msg } = fetchState;
-
-  const onChange = (key: string, val: boolean) =>
-    setInputting((prev) => ({ ...prev, [key]: val }));
 
   const findRidePlans = async () => {
     try {
@@ -1394,8 +1413,9 @@ const FilledForm = () => {
           dispatch(setState({ key: "ridePlans", value: [ridePlan] }));
 
           if (code == 200) {
+            // router.setParams({ query: "RideRouteDetails" });
+            setQuery(RideConstants.query.RideRouteDetails);
             showBottomSheet([477, 601], <RideRouteDetails />, true);
-            router.setParams({ query: "RideRouteDetails" });
           }
           if (code === 400) {
             dispatch(
@@ -1411,6 +1431,7 @@ const FilledForm = () => {
             router.setParams({ requestId: data?.riderRide?._id });
 
             if (status === "requesting") {
+              setQuery(RideConstants.query.SearchingRide);
               showBottomSheet(
                 [477, 601],
                 <RideRouteDetails code={200} msg={data?.msg} />,
@@ -1418,21 +1439,24 @@ const FilledForm = () => {
               );
             }
             if (status === "started") {
+              // router.setParams({ ...searchParams, query: "RideStarted" });
+              setQuery(RideConstants.query.RideStarted);
               showBottomSheet([500], <TripStartedSheet />);
-              router.setParams({ ...searchParams, query: "RideStarted" });
               router.push(
                 `/(rideScreens)/bookRide?selectedAvailableRideId=${data?.riderRide?.currentRideId}&requestId=${data?.riderRide?._id}`
               );
             }
             if (status === "ended") {
+              // router.setParams({ ...searchParams, query: "RideEnded" });
+              setQuery(RideConstants.query.RideEnded);
               showBottomSheet([500], <TripCompletedSheet />, true);
-              router.setParams({ ...searchParams, query: "RideEnded" });
               router.push(
                 `/(rideScreens)/bookRide?selectedAvailableRideId=${data?.riderRide?.currentRideId}&requestId=${data?.riderRide?._id}`
               );
             }
             if (status === "booked") {
-              router.setParams({ ...searchParams, query: "RideBooked" });
+              // router.setParams({ ...searchParams, query: "RideBooked" });
+              setQuery(RideConstants.query.RideBooked);
               dispatch(
                 setState({ key: "sameTickets", value: [data?.ticketPaid] })
               );
@@ -1446,6 +1470,7 @@ const FilledForm = () => {
               );
             }
             if (status == "accepted") {
+              setQuery(RideConstants.query.SearchingRide);
               hideBottomSheet();
               router.push(
                 `/(rideScreens)/availableRides?selectedAvailableRideId=${data?.riderRide?.currentRideId}&requestId=${data?.riderRide?._id}`
@@ -1469,6 +1494,7 @@ const FilledForm = () => {
           <BottomSheetTitle
             title="Pick up bus stop"
             onPressFn={() => {
+              setQuery(RideConstants.query.RecentLocationsSnippet);
               showBottomSheet([601], <RecentLocationsSnippet />);
             }}
           />
@@ -1656,7 +1682,6 @@ const RideRouteDetails = ({
   } = RideSelectors();
   const dispatch = useAppDispatch();
 
-  const [[isLoading, session], setSession] = useStorageState("token");
   const [formData, setFormData] = useState({
     riderCounterOffer: "",
   });
@@ -1667,6 +1692,7 @@ const RideRouteDetails = ({
     // ridePlans.map((plan, index) => ({ ...plan, selected: false, id: index }))
     ridePlans.map((plan, index) => ({ ...plan, selected: true, id: index }))
   );
+  const [selectedPlan, setSelectedPlan] = useState<null | { ride: { rideFee: number; }; planName: "standard"; serviceFee: number; riderTolerance: number; driverTolerance: number; vehicleSeats: number; _id: string; }>(null);
 
   // const selectPlan = (id: number) => {
   const selectPlan = (plan: {
@@ -1706,7 +1732,8 @@ const RideRouteDetails = ({
 
           {ridePlans?.map(({ plan }, index) => (
             <TouchableOpacity
-              onPress={() => selectPlan(plan)}
+              // onPress={() => selectPlan(plan)}
+              onPress={() => setSelectedPlan(plan)}
               style={[
                 wFull,
                 flex,
@@ -1717,7 +1744,7 @@ const RideRouteDetails = ({
                 bg("#F9F7F8"),
                 rounded(8),
                 // plan?.selected == true || ridePlans[0] != null
-                plan != null
+                selectedPlan != null
                   ? border(0.7, Colors.light.background)
                   : border(0.7, colors.grey500),
               ]}
@@ -1883,9 +1910,7 @@ const SearchingRide = ({
 }) => {
   const dispatch = useAppDispatch();
   const { showBottomSheet, hideBottomSheet } = useBottomSheet();
-  const { price, duration, seats } = useAppSelector(
-    (state: RootState) => state.ride
-  );
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   const {
     stateInput: {
@@ -1902,7 +1927,6 @@ const SearchingRide = ({
   );
   const { requestId } = useGlobalSearchParams();
 
-  let interval: any;
   const [fetchState, setFetchState] = useState({
     loading: false,
     msg: "",
@@ -1944,6 +1968,7 @@ const SearchingRide = ({
 
     if (code === 400) {
       if (!status) {
+        setQuery(RideConstants.query.RideRouteDetails);
         showBottomSheet([477, 601], <RideRouteDetails code={code} msg={msg} />);
         return;
       }
@@ -1960,6 +1985,7 @@ const SearchingRide = ({
       router.setParams({ requestId: returnedData?.riderRide?._id });
 
       if (status === "requesting") {
+        setQuery(RideConstants.query.RideRouteDetails);
         showBottomSheet(
           [477, 601],
           <RideRouteDetails code={200} msg={returnedData?.msg} />,
@@ -1967,25 +1993,28 @@ const SearchingRide = ({
         );
       }
       if (status === "started") {
+        // router.setParams({ ...searchParams, query: "RideStarted" });
+        setQuery(RideConstants.query.RideStarted);
         showBottomSheet([500], <TripStartedSheet />);
-        router.setParams({ ...searchParams, query: "RideStarted" });
         router.push(
           `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
         );
       }
       if (status === "ended") {
         showBottomSheet([500], <TripCompletedSheet />, true);
-        router.setParams({
-          ...searchParams,
-          query: "RideEnded",
-          riderCounterOffer,
-        });
+        // router.setParams({
+        //   ...searchParams,
+        //   query: "RideEnded",
+        //   riderCounterOffer,
+        // });
+        setQuery(RideConstants.query.RideEnded);
         router.push(
           `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
         );
       }
       if (status === "booked") {
-        router.setParams({ ...searchParams, query: "RideBooked" });
+        // router.setParams({ ...searchParams, query: "RideBooked" });
+        setQuery(RideConstants.query.RideEnded);
         dispatch(
           setState({ key: "sameTickets", value: [returnedData?.ticketPaid] })
         );
@@ -1999,6 +2028,7 @@ const SearchingRide = ({
         );
       }
       if (status == "accepted") {
+        setQuery(RideConstants.query.SearchingRide);
         hideBottomSheet();
         router.push(
           `/(rideScreens)/availableRides?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
@@ -2009,24 +2039,66 @@ const SearchingRide = ({
 
   const cancelRide = async () => {
     // run some async db stuffs
+    setQuery(null);
     hideBottomSheet();
     router.push(`/(tab)/` as Href);
   };
 
   useEffect(() => {
-    router.setParams({ query: "SearchingRide", riderCounterOffer });
+    setQuery(RideConstants.query.SearchingRide);
+    // router.setParams({ query: "SearchingRide", riderCounterOffer });
   }, []);
 
   useEffect(() => {
     findAvailableRides();
   }, []);
 
-  const channel = supabase.channel(`ride_accepting`);
+  const channel = supabase.channel(RideConstants.channel.ride_accepting);
+
+  async function getRideDetails(rideId: string, userId: string) {
+    const { data, error } = await supabase
+      .from("rides")
+      .select("*")
+      .eq("ride_id", rideId)
+      .eq("user_id", userId)
+      .single(); // Ensures we get only one result
+  
+    if (error) {
+      console.error("Error fetching ride details:", error);
+      return null;
+    }
+  
+    return data;
+  }
+
+  // getRideDetails(riderRideDetails?._id as string, riderRideDetails?.riderId as string)
+  // .then((ride) => {
+  //   console.log("Fetched Ride:", ride);
+
+  //   if((ride as IRiderRideDetails)?.rideStatus == 'accepted') {
+  //     console.log('was accpted');
+      
+  //   }
+  // })
+  // .catch((err) => console.error(err));
+
+  // channel.subscribe((status) => {
+  //   if (status === "SUBSCRIBED") {
+  //     channel.send({
+  //       type: "broadcast",
+  //       event: "ride_accepted",
+  //       payload: {
+  //         ride: {id: 'mmmememmem'}
+  //       }
+  //     });
+  //   }
+  // });
+
   channel
-    .on("broadcast", { event: "ride_accepted" }, (payload) => {
+    .on("broadcast", { event: RideConstants.event.ride_accepted }, (payload) => {
       const ride = payload?.payload;
       console.log('====================================');
-      console.log({requestId:requestId || riderRideDetails?._id, ride});
+      console.log('accepting......', {requestId:requestId || riderRideDetails?._id, ride});
       console.log('====================================');
 
       if(String(ride?._id) === String(requestId) || String(riderRideDetails?._id)) {
@@ -2050,7 +2122,8 @@ const SearchingRide = ({
               source={images.yellowTripImage}
             />
 
-            <Text style={[neurialGrotesk, fw700, colorBlack, { fontSize: 22 }]}>
+            <Text
+            style={[neurialGrotesk, fw700, colorBlack, { fontSize: 22 }]}>
               Searching for Rides
             </Text>
           </View>

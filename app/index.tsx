@@ -9,6 +9,7 @@ import FetchService from "@/services/api/fetch.service";
 import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
 import * as SecureStore from "expo-secure-store";
 import { setState } from "@/state/slices/user";
+import tw from "@/constants/tw";
 
 
 export default function Index() {
@@ -24,7 +25,7 @@ export default function Index() {
 
   const { width, height } = Dimensions.get("window");
 
-  console.log({ user, token });
+  console.log({ userSession, tokenSession, signedinTimeSession });
 
   const loadUserData = async () => {
     try {
@@ -68,7 +69,7 @@ export default function Index() {
   }, []);
 
   useEffect(() => {
-   if(!token || !user) loadUserData();
+   if(!tokenSession || !userSession) loadUserData();
   }, [token, user])
 
   // Check session validity and update Redux state
@@ -111,16 +112,16 @@ export default function Index() {
     return null; // Don't render anything while loading; splash screen will remain
   }
 
-  if (userSession != null && token) return <Redirect href={"/(tab)/" as Href} />;
+  if (userSession != null && tokenSession) return  <Redirect href={"/(tab)/" as Href} />;
 
-  if (userSession == null && !token && signedinTimeSession) {
+  if (userSession == null && !tokenSession && signedinTimeSession) {
     return <Redirect href="/(auth)/signin" />; // uncomment after testing
     // return <Redirect href={`/(rideScreens)/1/${pages.tripHistory}`} />; // part of testing
     // return <Redirect href={`/(rideScreens)/${pages.tripHistory}`} />; // part of testing
   }
 
   // return null;
-  if(userSession == null && !token && !signedinTimeSession) {
+  if(userSession == null && !tokenSession && !signedinTimeSession) {
     return <Redirect href={`/introScreen` as Href} />;
 }
 }

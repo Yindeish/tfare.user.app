@@ -26,6 +26,8 @@ import { getItemAsync } from 'expo-secure-store';
 import { SupabaseServices } from '@/supabase/supabase.services';
 import { supabase } from '@/supabase/supabase.config';
 import { IRiderRideDetails } from '@/state/types/ride';
+import { useStorageState } from '@/hooks/useStorageState';
+import { RideConstants } from '@/constants/ride';
 
 const { orderRideBtn, orderRideText } = StyleSheet.create({
     orderRideBtn: {
@@ -45,7 +47,8 @@ const { orderRideBtn, orderRideText } = StyleSheet.create({
 export default function Index() {
     const dispatch = useAppDispatch();
     const { tokenSession } = useSession();
-    const { query, riderCounterOffer } = useGlobalSearchParams<{ query?: string, riderCounterOffer?: string }>();
+    const { riderCounterOffer } = useGlobalSearchParams<{ query?: string, riderCounterOffer?: string }>();
+    const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
     const [fetchState, setFetchState] = useState({
         loading: false,
@@ -72,16 +75,6 @@ export default function Index() {
         !wallet && getUserWallet();
     }, [wallet])
 
-    supabase
-       .channel('realtime:rides')
-       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rt_events' }, (payload) => {
-         console.log('====================================');
-         console.log('riding', payload);
-         console.log('====================================');
-       })
-       .subscribe();
-
-       
     return (
         <SafeScreen>
             <ScrollView bounces style={[wHFull, flexCol,]} refreshControl={<RefreshControl refreshing={loading} onRefresh={getUserWallet} />}>
@@ -92,8 +85,9 @@ export default function Index() {
                 <PaddedScreen styles={{ backgroundColor: colors.white, marginVertical: 20 }}>
                     <TouchableOpacity
                         onPress={() => {
+                            // router.setParams({ query });
+                            setQuery(query);
                             router.push(`/${pages.orderRide}` as Href);
-                            router.setParams({ query });
                         }}
                         style={[orderRideBtn as ViewStyle, wFull, flex, itemsCenter, justifyCenter]}>
                         <Image style={{ width: 20, height: 17.27 }} source={images.whiteTripImage} />

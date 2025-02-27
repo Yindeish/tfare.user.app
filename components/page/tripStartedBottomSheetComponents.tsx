@@ -85,6 +85,8 @@ import { RootState } from "@/state/store";
 import FetchService from "@/services/api/fetch.service";
 import { useSnackbar } from "@/contexts/snackbar.context";
 import { supabase } from "@/supabase/supabase.config";
+import { useStorageState } from "@/hooks/useStorageState";
+import { RideConstants } from "@/constants/ride";
 
 function TripStartedSheet() {
   const { showBottomSheet } = useBottomSheet();
@@ -94,6 +96,7 @@ function TripStartedSheet() {
   const { notify, Snackbar, snackbarVisible, closeSnackbar } = useSnackbar();
   const searchParams = useGlobalSearchParams();
   const {requestId} = useGlobalSearchParams();
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   const [fetchState, setFetchState] = useState<{
     loading: boolean;
@@ -163,12 +166,13 @@ function TripStartedSheet() {
   };
 
   const channel = supabase.channel(
-    `ride_ending`
+    RideConstants.channel.ride_ending
   );
   channel
-    .on("broadcast", { event: "ride_ended" }, (payload) => {
-      router.setParams({ ...searchParams, query: "RideEnded" });
-      showBottomSheet([800], <TripCompletedSheet />);
+    .on("broadcast", { event: RideConstants.event.ride_ended}, (payload) => {
+      // router.setParams({ ...searchParams, query: "RideEnded" });
+      setQuery(RideConstants.query.RideEnded);
+      showBottomSheet([100, 650], <TripCompletedSheet />, true);
     })
     .subscribe();
 
@@ -295,6 +299,7 @@ function TripCompletedSheet() {
     useAppSelector((state: RootState) => state.ride);
   const { token } =
     useAppSelector((state: RootState) => state.user);
+    const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
     const [fetchState, setFetchState] = useState<{
       loading: boolean;
@@ -336,6 +341,7 @@ function TripCompletedSheet() {
         setFetchState({ ...fetchState, code, msg });
 
         if(code == 200 || code == 201) {
+          setQuery(null);
           hideBottomSheet();
           router.replace('/(tab)')
         }

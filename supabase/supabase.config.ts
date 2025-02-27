@@ -9,15 +9,15 @@ const supabaseRealtimeUrl = 'wss://wkxhkjlklfqmenzetcsp.supabase.co/realtime/v1'
 
 
 export const supabase = createClient(supabaseUrl, supabaseKey, 
-//     {
+    {
 //     realtime: {
 //        reconnectAfterMs: (attempt: number) => [1000, 2000, 5000][attempt - 1] || 10000
 //     },
-//     auth: {
-//         storage: AsyncStorage,
-//         autoRefreshToken: true,
-//         persistSession: true,
-//         detectSessionInUrl: false,
-//       },
-// }
+    auth: {
+        storage: AsyncStorage,
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+      },
+}
 );

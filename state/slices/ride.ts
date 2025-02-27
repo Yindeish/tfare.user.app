@@ -24,7 +24,8 @@ const initialState: IRideState = {
     activeTab: 'completed',
     currentTicket: null,
     differentTickets: [],
-    sameTickets: null,
+    // sameTickets: null,
+    sameTickets: [],
     tripId: '',
     stateInput: {
         cancelRideReasonInput: '',

@@ -72,6 +72,7 @@ import { supabase } from "@/supabase/supabase.config";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { TripCompletedSheet, TripStartedSheet } from "@/components/page/tripStartedBottomSheetComponents";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
+import { RideConstants } from "@/constants/ride";
 
 export default function AvailableRide() {
   const dispatch = useAppDispatch();
@@ -83,18 +84,19 @@ export default function AvailableRide() {
   const { showBottomSheet, hideBottomSheet, bottomSheetType } =
     useBottomSheet();
     const searchParams = useGlobalSearchParams();
-  const { query, requestId } = useGlobalSearchParams<{
+  const { requestId } = useGlobalSearchParams<{
     query?: string;
     riderCounterOffer?: string;
     requestId?: string;
   }>();
-  const route = usePathname();
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
   console.log({ requestId });
 
-  const channel = supabase.channel(`ride_accepting`);
+  const channel = supabase.channel(RideConstants.channel.ride_accepting);
   channel
-    .on("broadcast", { event: "ride_accepted" }, (payload) => {
+    .on("broadcast", { event: RideConstants.event.ride_accepted}, (payload) => {
       const id = payload?.payload?.ride?._id;
+      dispatch(setState({key:'riderRideDetails', value: payload?.payload?.ride}))
       id && getAvailableRides(id);
     })
     .subscribe();
@@ -154,22 +156,25 @@ export default function AvailableRide() {
       router.setParams({ requestId: returnedData?.riderRide?._id });
 
       if (status === "started") {
+        // router.setParams({ ...searchParams,query: "RideStarted", });
+        setQuery(RideConstants.query.RideStarted);
         showBottomSheet([500], <TripStartedSheet />);
-        router.setParams({ ...searchParams,query: "RideStarted", });
         router.push(
           `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${requestId}`
         );
       }
       if (status === "ended") {
+        // router.setParams({ query: "RideEnded"  });
+        setQuery(RideConstants.query.RideEnded)
         showBottomSheet([500], <TripCompletedSheet />, true);
-        router.setParams({ query: "RideEnded"  });
         router.push(
           `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${requestId}`
         );
       }
       if (status === "booked") {
-        router.setParams({...searchParams, query: 'RideBooked'});
-        dispatch(setState({key:'sameTickets', value: returnedData?.ticketPaid}));
+        // router.setParams({...searchParams, query: 'RideBooked'});
+        setQuery(RideConstants.query.RideBooked)
+        dispatch(setState({key:'sameTickets', value: [returnedData?.ticketPaid]}));
         console.log('====================================');
         console.log(returnedData?.ticketPaid);
         console.log('====================================');

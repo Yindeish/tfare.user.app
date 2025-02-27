@@ -70,6 +70,8 @@ import AccountSelectors from "@/state/selectors/account";
 import { getStringAsync, setStringAsync } from "expo-clipboard";
 import { supabase } from "@/supabase/supabase.config";
 import { TripStartedSheet } from "./tripStartedBottomSheetComponents";
+import { useStorageState } from "@/hooks/useStorageState";
+import { RideConstants } from "@/constants/ride";
 
 function TicketDetailsSheet() {
   const dispatch = useAppDispatch();
@@ -394,10 +396,10 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
     );
   };
 
-  const channel = supabase.channel(`ride_starting`);
+  const channel = supabase.channel(RideConstants.channel.ride_starting);
     channel
-      .on("broadcast", { event: "ride_started" }, (payload) => {
-        showBottomSheet([500], <TripStartedSheet />);
+      .on("broadcast", { event: RideConstants.event.ride_started}, (payload) => {
+        showBottomSheet([100, 500], <TripStartedSheet />, true);
       })
       .subscribe();
 

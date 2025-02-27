@@ -28,6 +28,8 @@ import { useSnackbar } from '@/contexts/snackbar.context';
 import { TripCompletedSheet, TripStartedSheet } from '@/components/page/tripStartedBottomSheetComponents';
 import { RideBookedSheet } from '@/components/page/bookRideSheetComponent';
 import { supabase } from '@/supabase/supabase.config';
+import { useStorageState } from '@/hooks/useStorageState';
+import { RideConstants } from '@/constants/ride';
 
 
 type Region = {
@@ -41,38 +43,15 @@ function Ride() {
     const dispatch = useAppDispatch()
     const { showBottomSheet, hideBottomSheet, bottomSheetType } = useBottomSheet();
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentRideView, availableRides, } = RideSelectors()
-    const { query, riderCounterOffer } = useGlobalSearchParams<{ query?: string, riderCounterOffer?: string }>();
+    const { riderCounterOffer } = useGlobalSearchParams<{ query?: string, riderCounterOffer?: string }>();
     const {Snackbar, msg,loading, code,} = useSnackbar();
-    const {riderRideDetails: riderRide} = useAppSelector((state) => state.ride);
-    console.log({ query });
-
+    const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
+    
     useEffect(() => {
-        if (query === 'RecentLocationsSnippet') showBottomSheet([601], <RecentLocationsSnippet />, true);
-        if (query === 'RecentPickupLocations') showBottomSheet([508,], <RecentPickupLocations />, true);
-        if (query === 'RecentDropoffLocations') showBottomSheet([508,], <RecentDropoffLocations />, true);
-        if (query === 'FilledForm') showBottomSheet([436, 601], <FilledForm />, true);
-        if (query === 'RideRouteDetails') showBottomSheet([477, 601], <RideRouteDetails />, true);
-        if (query === 'SearchingRide') showBottomSheet([400], <SearchingRide riderCounterOffer={riderCounterOffer as string} />, true);
-        if (query === 'RideBooked') showBottomSheet([800], <RideBookedSheet rideId={riderRide?._id as string} />, true);
-        if (query === 'RideStarted') showBottomSheet([500], <TripStartedSheet />);
-        if (query === 'RideEnded') showBottomSheet([650], <TripCompletedSheet />);
-        if (query === 'RideDeclined') showBottomSheet([300], <View><Text>Trip Declined</Text></View>, true);
-    }, [query])
-
-
-    useEffect(() => {
-        !query && router.setParams({ query: 'RecentLocationsSnippet' });
+        // !query && router.setParams({ query: 'RecentLocationsSnippet' });
+        !query && setQuery(RideConstants.query.RecentLocationsSnippet);
         // showBottomSheet([601], <RecentLocationsSnippet />)
     }, [])
-
-    //  const channel = supabase.channel(`ride_${riderRide?._id}`);
-    //    channel
-    //      .on("broadcast", { event: "ride_accepted" }, (payload) => {
-    //     //    getAvailableRides();
-    //     router.push(`/(rideScreens)/availableRides?query=SearchingRide&requestId=${riderRide?._id}&` as Href)
-    //     console.log({payload})
-    //      })
-    //      .subscribe();
 
     const [locationError, setLocationError] = useState<string | null>(null);
     const initialRegionObject = {
@@ -99,8 +78,9 @@ function Ride() {
                 {currentRideView === 'orderRide' ?
                     (<PageFloatingTitle view={false} onPress={() => {
                         router.push(`/(tab)/` as Href)
+                        // router.setParams({ query });
+                        // setQuery(null);
                         hideBottomSheet();
-                        router.setParams({ query });
                     }} title='Order a Ride' />) :
                     (<PageFloatingTitle view onPress={() => {
                         dispatch(closeBottomSheet());

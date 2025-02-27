@@ -51,6 +51,16 @@ import {
   TripCompletedSheet,
   TripStartedSheet,
 } from "@/components/page/tripStartedBottomSheetComponents";
+import { useStorageState } from "@/hooks/useStorageState";
+import { RideConstants } from "@/constants/ride";
+import {
+  FilledForm,
+  RecentDropoffLocations,
+  RecentLocationsSnippet,
+  RecentPickupLocations,
+  RideRouteDetails,
+  SearchingRide,
+} from "@/components/page/orderRideBottomSheetComponents";
 
 export default function AppLayout() {
   const { userSession, isLoading } = useSession();
@@ -69,7 +79,16 @@ export default function AppLayout() {
   const searchParams = useGlobalSearchParams();
   const { selectedAvailableRideId, requestId } = useGlobalSearchParams();
   const path = usePathname();
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
+  const { riderCounterOffer } = useGlobalSearchParams<{
+    query?: string;
+    riderCounterOffer?: string;
+  }>();
+  const { riderRideDetails: riderRide } = useAppSelector((state) => state.ride);
 
+  console.log("====================================");
+  console.log({ query });
+  console.log("====================================");
   console.log("====================================");
   console.log({ selectedAvailableRideId, selectedAvailableRide });
   console.log("====================================");
@@ -83,7 +102,12 @@ export default function AppLayout() {
 
   const buyTickets = async () => {
     console.log("====================================");
-    console.log({ selectedAvailableRideId, selectedAvailableRide, requestId, riderRideDetails });
+    console.log({
+      selectedAvailableRideId,
+      selectedAvailableRide,
+      requestId,
+      riderRideDetails,
+    });
     console.log("====================================");
     if (!allTicketsFilled) return;
 
@@ -126,9 +150,8 @@ export default function AppLayout() {
         const currentRide = returnedData?.currentRide;
 
         if (code && (code == 200 || code == 201)) {
-
           if (ticketPaid) {
-            dispatch(setState({ key: "sameTickets", value: [ticketPaid ]}));
+            dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
             if (riderRide)
               dispatch(
                 setState({
@@ -151,7 +174,8 @@ export default function AppLayout() {
             router.setParams({ ...searchParams, query: "RideBooked" });
             showBottomSheet(
               [800],
-              <RideBookedSheet rideId={selectedAvailableRideId as string} />, true
+              <RideBookedSheet rideId={selectedAvailableRideId as string} />,
+              true
             );
             return;
           }
@@ -165,7 +189,6 @@ export default function AppLayout() {
             );
             return;
           }
-
         }
 
         if (code && code == 400) {
@@ -202,14 +225,18 @@ export default function AppLayout() {
           if (status === "booked") {
             router.setParams({ ...searchParams, query: "RideBooked" });
             dispatch(
-              setState({ key: "sameTickets", value: [returnedData?.ticketPaid] })
+              setState({
+                key: "sameTickets",
+                value: [returnedData?.ticketPaid],
+              })
             );
             router.push(
               `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );
             showBottomSheet(
               [800],
-              <RideBookedSheet rideId={returnedData?.riderRide?._id} />, true
+              <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
+              true
             );
           }
 
@@ -268,15 +295,48 @@ export default function AppLayout() {
   };
 
   useEffect(() => {
-    console.log("riderRideDetails changed");
+    if (query === RideConstants.query.RecentLocationsSnippet)
+      showBottomSheet([601], <RecentLocationsSnippet />, true);
+    if (query === RideConstants.query.RecentPickupLocations)
+      showBottomSheet([508], <RecentPickupLocations />, true);
+    if (query === RideConstants.query.RecentDropoffLocations)
+      showBottomSheet([508], <RecentDropoffLocations />, true);
+    if (query === RideConstants.query.FilledForm)
+      showBottomSheet([436, 601], <FilledForm />, true);
+    if (query === RideConstants.query.RideRouteDetails)
+      showBottomSheet([477, 601], <RideRouteDetails />, true);
+    if (query === RideConstants.query.SearchingRide)
+      showBottomSheet(
+        [400],
+        <SearchingRide riderCounterOffer={riderCounterOffer as string} />,
+        true
+      );
+    if (query === RideConstants.query.RideBooked)
+      showBottomSheet(
+        [800],
+        <RideBookedSheet rideId={riderRide?._id as string} />,
+        true
+      );
+    if (query === RideConstants.query.RideStarted)
+      showBottomSheet([100, 500], <TripStartedSheet />, true);
+    if (query === RideConstants.query.RideEnded)
+      showBottomSheet([100, 650], <TripCompletedSheet />, true);
+    if (query === RideConstants.query.RideDeclined)
+      showBottomSheet(
+        [300],
+        <View>
+          <Text>Trip Declined</Text>
+        </View>,
+        true
+      );
+  }, [query]);
 
+  useEffect(() => {
     if (riderRideDetails && searchParams)
       router.setParams({ ...searchParams, requestId: riderRideDetails?._id });
   }, [riderRideDetails]);
 
   useEffect(() => {
-    console.log("selectedAvailableRide changed");
-
     if (selectedAvailableRide && searchParams)
       router.setParams({
         ...searchParams,

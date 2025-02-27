@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Image, ViewStyle, TextStyle } from 'react-native'
+import { View, TouchableOpacity, Image, ViewStyle, TextStyle, ScrollView } from 'react-native'
 import React, { useEffect } from 'react'
 import SafeScreen from '@/components/shared/safeScreen'
 import { image, mXAuto, wHFull } from '@/utils/imageStyles'
@@ -20,6 +20,7 @@ import { useSnackbar } from '@/contexts/snackbar.context'
 import { IDriver, IUser } from '@/state/types/user'
 import { TripStartedSheet } from '@/components/page/tripStartedBottomSheetComponents'
 import { useBottomSheet } from '@/contexts/useBottomSheetContext'
+import tw from '@/constants/tw'
 
 export default function
     DriverProfile() {
@@ -83,7 +84,7 @@ export default function
 
     return (
         <SafeScreen>
-            <View style={[wHFull as ViewStyle]}>
+            <ScrollView style={[wFull as ViewStyle, tw ``]}>
                 <PaddedScreen>
 
                     {/* Page Header */}
@@ -116,7 +117,7 @@ export default function
 
                     {/* Page Header */}
 
-                    <View style={[flexCol, gap(32)]}>
+                    <View style={[flexCol, gap(32), tw `mb-[100px]`]}>
                         <View style={[w('auto'), flexCol, gap(32)]}>
                             <Image
                                 source={{uri: driver?.picture || driver?.avatar}}
@@ -192,7 +193,7 @@ export default function
                 </PaddedScreen>
 
                 <Snackbar msg={msg} onDismiss={() => closeSnackbar()} snackbarVisible={snackbarVisible} />
-            </View>
+            </ScrollView>
         </SafeScreen>
     )
 }
