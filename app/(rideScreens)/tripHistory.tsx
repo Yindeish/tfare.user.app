@@ -3,6 +3,7 @@ import PaddedScreen from "@/components/shared/paddedScreen";
 import PageTitle from "@/components/shared/pageTitle";
 import SafeScreen from "@/components/shared/safeScreen";
 import Colors from "@/constants/Colors";
+import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import FetchService from "@/services/api/fetch.service";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
 import RideSelectors from "@/state/selectors/ride";
@@ -40,37 +41,6 @@ import { Text } from "react-native-paper";
 function TripHistory() {
   const dispatch = useAppDispatch();
   const { activeTab } = RideSelectors();
-
-  // const DATA = [
-  //     {
-  //         id: 0,
-  //         name: 'Home',
-  //     },
-  //     {
-  //         id: 1,
-  //         name: 'Apartment',
-  //     },
-  //     {
-  //         id: 2,
-  //         name: 'Workplace',
-  //     },
-  //     {
-  //         id: 3,
-  //         name: 'Workplace',
-  //     },
-  //     {
-  //         id: 4,
-  //         name: 'Workplace',
-  //     },
-  //     {
-  //         id: 5,
-  //         name: 'Workplace',
-  //     },
-  //     {
-  //         id: 6,
-  //         name: 'Workplace',
-  //     },
-  // ]
 
   const [fetchState, setFetchState] = useState<{
     loading: boolean;

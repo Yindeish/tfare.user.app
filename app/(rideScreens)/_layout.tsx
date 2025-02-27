@@ -84,13 +84,9 @@ export default function AppLayout() {
     query?: string;
     riderCounterOffer?: string;
   }>();
-  const { riderRideDetails: riderRide } = useAppSelector((state) => state.ride);
 
   console.log("====================================");
   console.log({ query });
-  console.log("====================================");
-  console.log("====================================");
-  console.log({ selectedAvailableRideId, selectedAvailableRide });
   console.log("====================================");
 
   const [fetchState, setFetchState] = useState({
@@ -101,14 +97,6 @@ export default function AppLayout() {
   const { loading, msg } = fetchState;
 
   const buyTickets = async () => {
-    console.log("====================================");
-    console.log({
-      selectedAvailableRideId,
-      selectedAvailableRide,
-      requestId,
-      riderRideDetails,
-    });
-    console.log("====================================");
     if (!allTicketsFilled) return;
 
     const sameTickets = userRideInput?.tickets?.every(
@@ -151,7 +139,7 @@ export default function AppLayout() {
 
         if (code && (code == 200 || code == 201)) {
           if (ticketPaid) {
-            dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+            dispatch(setState({ key: "sameTickets", value: ticketPaid }));
             if (riderRide)
               dispatch(
                 setState({
@@ -293,43 +281,6 @@ export default function AppLayout() {
       dispatch(setPaymentOptionsVisible(true));
     }
   };
-
-  useEffect(() => {
-    if (query === RideConstants.query.RecentLocationsSnippet)
-      showBottomSheet([601], <RecentLocationsSnippet />, true);
-    if (query === RideConstants.query.RecentPickupLocations)
-      showBottomSheet([508], <RecentPickupLocations />, true);
-    if (query === RideConstants.query.RecentDropoffLocations)
-      showBottomSheet([508], <RecentDropoffLocations />, true);
-    if (query === RideConstants.query.FilledForm)
-      showBottomSheet([436, 601], <FilledForm />, true);
-    if (query === RideConstants.query.RideRouteDetails)
-      showBottomSheet([477, 601], <RideRouteDetails />, true);
-    if (query === RideConstants.query.SearchingRide)
-      showBottomSheet(
-        [400],
-        <SearchingRide riderCounterOffer={riderCounterOffer as string} />,
-        true
-      );
-    if (query === RideConstants.query.RideBooked)
-      showBottomSheet(
-        [800],
-        <RideBookedSheet rideId={riderRide?._id as string} />,
-        true
-      );
-    if (query === RideConstants.query.RideStarted)
-      showBottomSheet([100, 500], <TripStartedSheet />, true);
-    if (query === RideConstants.query.RideEnded)
-      showBottomSheet([100, 650], <TripCompletedSheet />, true);
-    if (query === RideConstants.query.RideDeclined)
-      showBottomSheet(
-        [300],
-        <View>
-          <Text>Trip Declined</Text>
-        </View>,
-        true
-      );
-  }, [query]);
 
   useEffect(() => {
     if (riderRideDetails && searchParams)

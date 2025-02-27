@@ -43,6 +43,7 @@ import { IRiderRideDetails } from "@/state/types/ride";
 import { Utils } from "@/utils";
 import { getItemAsync } from "expo-secure-store";
 import FetchService from "@/services/api/fetch.service";
+import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 
 const {} = StyleSheet.create({});
 
@@ -55,7 +56,6 @@ interface IItem {
 }
 
 export default function TripHistory() {
-  const { height } = Dimensions.get("window");
 
   // const DATA: IItem[] = [
   //     {
@@ -122,7 +122,9 @@ export default function TripHistory() {
           </Text>
 
           <TouchableOpacity
-            onPress={() => router.push("/(rideScreens)/tripHistory")}
+            onPress={() => {
+              router.push("/(rideScreens)/tripHistory");
+            }}
             style={[flex, itemsCenter, gap(4)]}
           >
             <Text

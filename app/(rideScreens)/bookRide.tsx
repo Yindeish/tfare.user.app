@@ -84,6 +84,9 @@ import { useGlobalSearchParams } from "expo-router";
 import tw from "@/constants/tw";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { TripCompletedSheet, TripStartedSheet } from "@/components/page/tripStartedBottomSheetComponents";
+import { RideConstants } from "@/constants/ride";
+import { useStorageState } from "@/hooks/useStorageState";
+import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 
 
 
@@ -117,8 +120,6 @@ const {
 export default function BookRide() {
   const { rideId, currentRideId, selectedAvailableRideId, requestId } = useGlobalSearchParams();
   const { token, user } = useAppSelector((state: RootState) => state.user);
-  const {riderRideDetails} = useAppSelector((state: RootState) => state.ride);
-
   const dispatch = useAppDispatch();
   const {
     userRide,
@@ -127,9 +128,10 @@ export default function BookRide() {
     currentNumberOfTickets,
     paymentOptionsVisible,
   } = RideSelectors();
-  const {selectedAvailableRide, ridePlans, stateInput:{paymentOptionInput}} = useAppSelector((state: RootState) => state.ride);
+  const {selectedAvailableRide, riderRideDetails: riderRide, ridePlans, stateInput:{paymentOptionInput}} = useAppSelector((state: RootState) => state.ride);
   const path = usePathname();
-  const {showBottomSheet, hideBottomSheet} = useBottomSheet()
+  const {showBottomSheet, hideBottomSheet} = useBottomSheet();
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   const [fetchState, setFetchState] = useState({
     loading: false,
@@ -224,6 +226,29 @@ export default function BookRide() {
     }
   }, [userRideInput?.tickets]);
   // check if all tickets have been filled
+
+  // !BottomSheets
+  useEffect(() => {
+    if (query === RideConstants.query.RideBooked)
+      showBottomSheet(
+        [800],
+        <RideBookedSheet rideId={riderRide?._id as string} />,
+        true
+      );
+    if (query === RideConstants.query.RideStarted)
+      showBottomSheet([100, 500], <TripStartedSheet />, true);
+    if (query === RideConstants.query.RideEnded)
+      showBottomSheet([100, 650], <TripCompletedSheet />, true);
+    if (query === RideConstants.query.RideDeclined)
+      showBottomSheet(
+        [300],
+        <View>
+          <Text>Trip Declined</Text>
+        </View>,
+        true
+      );
+  }, [query]);
+  // !BottomSheets
 
   return (
     <SafeScreen>

@@ -53,6 +53,25 @@ function Ride() {
         // showBottomSheet([601], <RecentLocationsSnippet />)
     }, [])
 
+    useEffect(() => {
+        if (query === RideConstants.query.RecentLocationsSnippet)
+          showBottomSheet([601], <RecentLocationsSnippet />, true);
+        if (query === RideConstants.query.RecentPickupLocations)
+          showBottomSheet([508], <RecentPickupLocations />, true);
+        if (query === RideConstants.query.RecentDropoffLocations)
+          showBottomSheet([508], <RecentDropoffLocations />, true);
+        if (query === RideConstants.query.FilledForm)
+          showBottomSheet([436, 601], <FilledForm />, true);
+        if (query === RideConstants.query.RideRouteDetails)
+          showBottomSheet([477, 601], <RideRouteDetails />, true);
+        if (query === RideConstants.query.SearchingRide)
+          showBottomSheet(
+            [400],
+            <SearchingRide riderCounterOffer={riderCounterOffer as string} />,
+            true
+          );
+      }, [query]);
+
     const [locationError, setLocationError] = useState<string | null>(null);
     const initialRegionObject = {
         latitude: 37.78825,
