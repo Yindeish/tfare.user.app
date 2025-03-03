@@ -44,42 +44,11 @@ import { Utils } from "@/utils";
 import { getItemAsync } from "expo-secure-store";
 import FetchService from "@/services/api/fetch.service";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
-
-const {} = StyleSheet.create({});
-
-interface IItem {
-  name: string;
-  startTime: string;
-  endTime: string;
-  amount: string;
-  routeID: string;
-}
+import { useStorageState } from "@/hooks/useStorageState";
+import { RideConstants } from "@/constants/ride";
 
 export default function TripHistory() {
-
-  // const DATA: IItem[] = [
-  //     {
-  //         name: 'Dugbe Bus Stop',
-  //         amount: '0000.00',
-  //         endTime: 'Apr 14, 2024',
-  //         routeID: '1234567ABC',
-  //         startTime: '8:41 AM'
-  //     },
-  //     {
-  //         name: 'Dugbe Bus Stop',
-  //         amount: '0000.00',
-  //         endTime: 'Apr 14, 2024',
-  //         routeID: '1234567DBC',
-  //         startTime: '8:41 AM'
-  //     },
-  //     {
-  //         name: 'Dugbe Bus Stop',
-  //         amount: '0000.00',
-  //         endTime: 'Apr 14, 2024',
-  //         routeID: '1234567CBC',
-  //         startTime: '8:41 AM'
-  //     },
-  // ];
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   const [fetchState, setFetchState] = useState<{
     loading: boolean;
@@ -144,40 +113,86 @@ export default function TripHistory() {
           style={[flexCol, { gap: 32, height: (history?.length || 0) * 100 }]}
         >
           {history?.map((item, index) => (
-            <View
-              style={[
-                flex,
-                wFull,
-                itemsStart,
-                justifyBetween,
-                {
-                  paddingRight: 16,
-                  paddingBottom: 16,
-                  height: 59,
-                  borderBottomWidth: 0.7,
-                  borderBottomColor: Colors.light.border,
-                },
-              ]}
-              key={index}
-            >
-              <View style={[flexCol, itemsStart, justifyBetween, hFull]}>
-                <Text style={[fw700, fs14, colorBlack]}>
-                  {item?.dropoffBusstop?.name}
-                </Text>
-                <Text style={[colorTextGrey, fs12, fw400]}>{`${Utils.formatTime(
-                  item?.createdAt
-                )} - ${Utils.formatDate(item?.updatedAt)}`}</Text>
-              </View>
+            <View key={index}>
+              {(item?.rideStatus === "started" || item?.rideStatus === "paused") ? (
+                <TouchableOpacity 
+                onPress={() => {
+                  router.push('/(rideScreens)/bookRide') //for now
+                  setQuery(RideConstants.query.RecentPickupLocations);
+                }}
+                  style={[
+                    flex,
+                    wFull,
+                    itemsStart,
+                    justifyBetween,
+                    {
+                      paddingRight: 16,
+                      paddingBottom: 16,
+                      height: 59,
+                      borderBottomWidth: 0.7,
+                      borderBottomColor: Colors.light.border,
+                    },
+                  ]}
+                >
+                  <View style={[flexCol, itemsStart, justifyBetween, hFull]}>
+                    <Text style={[fw700, fs14, colorBlack]}>
+                      {item?.dropoffBusstop?.name}
+                    </Text>
+                    <Text
+                      style={[colorTextGrey, fs12, fw400]}
+                    >{`${Utils.formatTime(
+                      item?.createdAt
+                    )} - ${Utils.formatDate(item?.updatedAt)}`}</Text>
+                  </View>
 
-              <View style={[flexCol, itemsEnd,justifyBetween, hFull]}>
-                <Text style={[fw400, fs14, { color: "#27AE65" }]}>{`₦ ${
-                  Number((item?.ridePlan as any)?.serviceFee) +
-                  Number(item?.riderCounterOffer)
-                }`}</Text>
-                <Text
-                  style={[colorTextGrey, fw400, fs12]}
-                >{`# ${item?._id}`}</Text>
-              </View>
+                  <View style={[flexCol, itemsEnd, justifyBetween, hFull]}>
+                    <Text style={[fw400, fs14, { color: "#27AE65" }]}>{`₦ ${
+                      Number((item?.ridePlan as any)?.serviceFee) +
+                      Number(item?.riderCounterOffer)
+                    }`}</Text>
+                    <Text
+                      style={[colorTextGrey, fw400, fs12]}
+                    >{`# ${item?._id}`}</Text>
+                  </View>
+                </TouchableOpacity>
+              ) : (
+                <View
+                  style={[
+                    flex,
+                    wFull,
+                    itemsStart,
+                    justifyBetween,
+                    {
+                      paddingRight: 16,
+                      paddingBottom: 16,
+                      height: 59,
+                      borderBottomWidth: 0.7,
+                      borderBottomColor: Colors.light.border,
+                    },
+                  ]}
+                >
+                  <View style={[flexCol, itemsStart, justifyBetween, hFull]}>
+                    <Text style={[fw700, fs14, colorBlack]}>
+                      {item?.dropoffBusstop?.name}
+                    </Text>
+                    <Text
+                      style={[colorTextGrey, fs12, fw400]}
+                    >{`${Utils.formatTime(
+                      item?.createdAt
+                    )} - ${Utils.formatDate(item?.updatedAt)}`}</Text>
+                  </View>
+
+                  <View style={[flexCol, itemsEnd, justifyBetween, hFull]}>
+                    <Text style={[fw400, fs14, { color: "#27AE65" }]}>{`₦ ${
+                      Number((item?.ridePlan as any)?.serviceFee) +
+                      Number(item?.riderCounterOffer)
+                    }`}</Text>
+                    <Text
+                      style={[colorTextGrey, fw400, fs12]}
+                    >{`# ${item?._id}`}</Text>
+                  </View>
+                </View>
+              )}
             </View>
           ))}
         </View>

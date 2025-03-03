@@ -14,11 +14,13 @@ import { setUserAccountSecurityFeild } from '@/state/slices/account'
 import AccountSecurityListTile from '@/components/page/accountSecurityListTile'
 import AccountSecuritySheet from '@/components/page/accountSecuritySheet'
 import { useBottomSheet } from '@/contexts/useBottomSheetContext'
+import { useStorageState } from '@/hooks/useStorageState'
 
 export default function accountSecurity() {
     const dispatch = useAppDispatch()
     const { stateInput, } = AccountSelectors();
-    const { showBottomSheet } = useBottomSheet()
+    const { showBottomSheet } = useBottomSheet();
+    const [[_, biometricLogin], setBiometricLogin] = useStorageState('biometricLogin');
 
     useEffect(() => {
         // showBottomSheet([640, 820], <AccountSecuritySheet />)
@@ -49,6 +51,8 @@ export default function accountSecurity() {
                                     }))
 
                                     // update DB
+                                    const prevValue = biometricLogin;
+                                    setBiometricLogin(prevValue == 'false' ? 'true': 'false');
                                 },
                                 value: stateInput?.accountSecurity.biometricLoginInput
                             }}

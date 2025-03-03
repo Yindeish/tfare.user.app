@@ -11,15 +11,13 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Href, Link, Redirect, router } from "expo-router";
-import { useSession } from "../../contexts/userSignedInContext";
-import SafeScreen from "../../components/shared/safeScreen";
 import {
   ActivityIndicator,
   MD2Colors,
   Snackbar,
   Text,
 } from "react-native-paper";
-import { fonts } from "../../constants/fonts";
+import { fonts } from "../../../constants/fonts";
 import {
   wFull,
   wHFull,
@@ -32,8 +30,9 @@ import {
   justifyBetween,
   mXAuto,
   flexCenter,
-} from "../../utils/styles";
-import Colors, { colors } from "../../constants/Colors";
+  mt,
+} from "../../../utils/styles";
+import Colors, { colors } from "../../../constants/Colors";
 import PaddedScreen from "@/components/shared/paddedScreen";
 import { useSnackbar } from "@/contexts/snackbar.context";
 import { useSession as userTokenSession } from "@/contexts/userTokenContext";
@@ -43,12 +42,10 @@ import { ScrollView } from "react-native-gesture-handler";
 import { c, fs10 } from "@/utils/fontStyles";
 import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
 import FetchService from "@/services/api/fetch.service";
-import { pages } from "@/constants/pages";
-import * as SecureStore from 'expo-secure-store';
-import { setState } from "@/state/slices/user";
+import SafeScreen from "@/components/shared/safeScreen";
 import tw from "@/constants/tw";
-import { useStorageState } from "@/hooks/useStorageState";
-
+import FetchConfig from "@/services/api/fetch.config";
+import { getItemAsync } from "expo-secure-store";
 
 const {
   signInTitle,
@@ -120,28 +117,11 @@ const {
   },
 });
 
-interface ISigninFormData {
-  email: string;
-  pin: string;
-}
-
-const SignInSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  pin: Yup.string()
-    .min(4, "Pin must be at least 4 characters")
-    .required("Pin is required"),
-});
-
 export default function Signin() {
   // const { signIn, loadingState, userSession, msg, code, signOut, testSignIn } = useSession();
   const { closeSnackbar, snackbarVisible, Snackbar, notify } = useSnackbar();
   const { tokenSession } = userTokenSession();
   const dispatch = useAppDispatch();
-  const [[_, biometricLogin], __] = useStorageState('biometricLogin');
-  
-  console.log('====================================');
-  console.log(biometricLogin);
-  console.log('====================================');
 
   const [fetchState, setFetchState] = useState({
     msg: "",
@@ -154,47 +134,46 @@ export default function Signin() {
 
   const formik = useFormik({
     initialValues: {
-      email: "",
       pin: "",
+      confirmPin: "",
     },
-    validationSchema: SignInSchema,
-    onSubmit: async (values) => {
+    validationSchema: Yup.object().shape({
+      pin: Yup.number()
+        .min(4, "Pin must be at least 4 digits")
+        .required("Pin is required"),
+      confirmPin: Yup.number()
+        .oneOf([Yup.ref("pin")], "Pin don't match!")
+        .required("Confirm your pin"),
+    }),
+    onSubmit: async ({ confirmPin, pin }) => {
       try {
         setFetchState((prev) => ({ ...prev, loading: true, msg: "" }));
 
-        const returnedData = await FetchService.post({
-          data: { ...values, role: "rider" },
-          url: "/auth/signin",
+        const token = await getItemAsync('pin-reset-token')
+
+        const response = await fetch(`${FetchConfig.baseUrl}/auth/reset-password`, {
+            method: FetchConfig.methods.POST,
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ pin })
         });
 
-        notify({ msg: returnedData?.msg });
-        const signedUpUser = returnedData?.signedUpUser;
+        const returnedData = await response.json();
+
+        const msg = returnedData?.msg;
+        const code = returnedData?.code;
+
+        notify({ msg });
 
         setFetchState((prev) => ({
           ...prev,
-          msg: returnedData?.msg,
-          code: returnedData?.code,
+          msg,
+          code,
           loading: false,
         }));
-        if (returnedData?.code === 200 || returnedData?.code === 201)
-        {
-          const signedinTime = new Date();
-          const user = returnedData?.user;
-          const token = returnedData?.token;
-
-          try {
-            await SecureStore.setItemAsync('user', JSON.stringify(user));
-            await SecureStore.setItemAsync('token', token);
-            await SecureStore.setItemAsync('signedinTime', JSON.stringify(signedinTime));
-
-            dispatch(setState({key:'user', value: user}));
-            dispatch(setState({key:'token', value: token}));
-            router.replace('/(tab)')
-          } catch (error: any) {
-            throw new Error(error?.message)
-          }
-
-          router.replace(`/(tab)` as Href);
+        if (returnedData?.code === 200 || returnedData?.code === 201) {
+          router.replace(`/(auth)/signin` as Href);
         }
       } catch (error: any) {
         console.log({ error });
@@ -205,47 +184,27 @@ export default function Signin() {
           loading: false,
         }));
 
-        notify({msg: error?.message || "Error in signing in",})
+        notify({ msg: error?.message || "Error in signing in" });
       }
     },
   });
 
   return (
     <SafeScreen>
-      <View style={[flexCenter, { flex: 1 }, ]}>
-        <ScrollView contentContainerStyle={[flexCenter, tw `w-full h-full`]}>
+      <View style={[flexCenter, { flex: 1 }]}>
+        <ScrollView contentContainerStyle={[flexCenter, tw`w-full h-full`]}>
           <PaddedScreen styles={wHFull}>
             <View
-              style={[wHFull, flexCol, itemsStart, justifyCenter, { gap: 40 },]}
+              style={[wHFull, flexCol, itemsStart, justifyCenter, { gap: 40 }]}
             >
               <View style={[flexCol, wFull, { gap: 2 }]}>
-                <Text style={signInTitle as TextStyle}>Sign in</Text>
-                <Text style={signInTitle as TextStyle}>to continue</Text>
+                <Text style={signInTitle as TextStyle}>
+                  Enter New <Text style={[tw`text-black font-bold`]}>4-</Text>
+                </Text>
+                <Text style={signInTitle as TextStyle}>Digit Pin code</Text>
               </View>
 
               <View style={[form as ViewStyle, { gap: 16 }]}>
-                <TextInput
-                  style={[
-                    textInput as TextStyle,
-                    formik.errors.email && formik.touched.email
-                      ? { borderColor: Colors.light.error }
-                      : undefined,
-                  ]}
-                  placeholder="Email Address"
-                  placeholderTextColor={Colors.light.textGrey}
-                  keyboardType="email-address"
-                  value={formik.values.email}
-                  onChangeText={formik.handleChange("email")}
-                  onBlur={formik.handleBlur("email")}
-                  autoFocus
-                />
-
-                {formik.errors.email && formik.touched.email && (
-                  <Text style={invalidEntryText as TextStyle}>
-                    {formik.errors.email}
-                  </Text>
-                )}
-
                 <TextInput
                   style={[
                     textInput as TextStyle,
@@ -267,11 +226,26 @@ export default function Signin() {
                   </Text>
                 )}
 
-                <View style={[wFull, flex, itemsCenter, justifyEnd]}>
-                  <Text onPress={() => router.push('/(auth)/(resetPin)/emailForm')} style={[forgotPassword as TextStyle, tw `font-medium`]}>
-                    Forgot Pin Code?
+                <TextInput
+                  style={[
+                    textInput as TextStyle,
+                    formik.errors.confirmPin && formik.touched.confirmPin
+                      ? { borderColor: Colors.light.error }
+                      : undefined,
+                  ]}
+                  placeholder="Confirm 4-Digit Pin Code"
+                  placeholderTextColor={Colors.light.textGrey}
+                  keyboardType="number-pad"
+                  value={formik.values.confirmPin}
+                  secureTextEntry
+                  onChangeText={formik.handleChange("confirmPin")}
+                  onBlur={formik.handleBlur("confirmPin")}
+                />
+                {formik.errors.confirmPin && formik.touched.confirmPin && (
+                  <Text style={invalidEntryText as TextStyle}>
+                    {formik.errors.confirmPin}
                   </Text>
-                </View>
+                )}
               </View>
 
               <Pressable
@@ -281,6 +255,7 @@ export default function Signin() {
                   flex,
                   itemsCenter,
                   justifyCenter,
+                  mt(120),
                 ]}
                 disabled={loading}
                 onPress={() => formik.handleSubmit()}

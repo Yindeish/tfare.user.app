@@ -60,7 +60,8 @@ import greenBgCheckboxImage from '../assets/images/icons/green-bg-checkbox-image
 import whiteBgTicketImage from '../assets/images/icons/white-bg-ticket-image.png';
 import greenBgCheckTripImage from '../assets/images/icons/green-bg-check-trip-image.png';
 import expandImage from '../assets/images/icons/expand-image.png';
-import mapImage from '../assets/images/rideScreen/map-image.png'
+import mapImage from '../assets/images/rideScreen/map-image.png';
+import mapScreenImage from '../assets/images/rideScreen/map-image-2.png';
 import fallbackAvatar from '../assets/images/accountScreen/fall_back_avatar.jpeg'
 
 // !Trip Images
@@ -141,6 +142,7 @@ const images = {
     greenBgCheckTripImage,
     expandImage,
     mapImage,
+    mapScreenImage,
     fallbackAvatar,
 
     // !Trip Images

@@ -165,6 +165,7 @@ export default function AppLayout() {
               <RideBookedSheet rideId={selectedAvailableRideId as string} />,
               true
             );
+            router.replace('/rideMap' as Href)
             return;
           }
 
@@ -218,8 +219,11 @@ export default function AppLayout() {
                 value: [returnedData?.ticketPaid],
               })
             );
+            // router.push(
+            //   `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+            // );
             router.push(
-              `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+              `/rideMap?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );
             showBottomSheet(
               [800],
@@ -348,6 +352,7 @@ export default function AppLayout() {
         <Stack.Screen name={pages.orderRide} />
         <Stack.Screen name={pages.availableRides} />
         <Stack.Screen name={"bookRide"} />
+        <Stack.Screen name={"rideMap"} />
         <Stack.Screen name={`${pages.paymentOptions}`} />
       </Stack>
     </View>

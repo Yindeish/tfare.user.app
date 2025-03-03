@@ -166,7 +166,7 @@ function TripStartedSheet() {
   };
 
   const channel = supabase.channel(
-    RideConstants.channel.ride_ending
+    `${RideConstants.channel.ride_ending}${riderRideDetails?._id}`
   );
   channel
     .on("broadcast", { event: RideConstants.event.ride_ended}, (payload) => {

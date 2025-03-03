@@ -142,6 +142,36 @@ const postWithBearerToken = async ({ data: formData, url,  timeout = 20000 }: { 
     }
 }
 
+const patch = async ({ data: formData, url, timeout = 20000 }: { data?: object, url: string, timeout?: number }) => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    const fetchTimeout = setTimeout(() => {
+        controller.abort();
+    }, timeout);
+    try {
+        const response = await fetch(`${baseUrl}${url}`, {
+            method: methods.PATCH,
+            headers,
+            // signal,
+            body: JSON.stringify(formData)
+        });
+        // timeout && clearTimeout(fetchTimeout);
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.log({ error })
+        // if ((error as any)?.name === 'AbortError') {
+        //     console.error('Fetch request timed out');
+        //     return { code: 400, msg: 'Fetch request timed out' }
+        // } else {
+        //     console.error('Fetch request error:', error);
+        //     return { code: 500, msg: 'Fetch request errorout' }
+        // }
+    }
+}
+
 const patchWithBearerToken = async ({ data: formData, url, timeout = 20000 }: { token: string, url: string, data?: object, timeout?: number }) => {
     const controller = new AbortController();
     const signal = controller.signal;
@@ -183,7 +213,7 @@ const patchWithBearerToken = async ({ data: formData, url, timeout = 20000 }: { 
 
 
 const FetchService = {
-    post, get,
+    post, get,patch,
     getWithBearerToken,
     postWithBearerToken,
     patchWithBearerToken

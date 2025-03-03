@@ -18,6 +18,7 @@ export type TRideStatus =
   | "accepted"
   | "declined"
   | "started"
+  | "paused"
   | "booked"
   | "ended";
 

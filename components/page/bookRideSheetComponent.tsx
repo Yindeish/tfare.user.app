@@ -396,10 +396,11 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
     );
   };
 
-  const channel = supabase.channel(RideConstants.channel.ride_starting);
+  const channel = supabase.channel(`${RideConstants.channel.ride_starting}${riderRideDetails?._id}`);
     channel
       .on("broadcast", { event: RideConstants.event.ride_started}, (payload) => {
         showBottomSheet([100, 500], <TripStartedSheet />, true);
+        router.replace('/(rideScreens)/tripDetails');
       })
       .subscribe();
 
@@ -452,7 +453,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
         {/* Driver block */}
 
         <TouchableOpacity
-          // onPress={() => router.push(`/(sharedScreens)/driverProfile` as Href)}
+          onPress={() => router.push(`/(sharedScreens)/driverProfile` as Href)}
           style={[
             wFull,
             h(144),
