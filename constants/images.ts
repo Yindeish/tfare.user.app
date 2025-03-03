@@ -63,6 +63,8 @@ import expandImage from '../assets/images/icons/expand-image.png';
 import mapImage from '../assets/images/rideScreen/map-image.png';
 import mapScreenImage from '../assets/images/rideScreen/map-image-2.png';
 import fallbackAvatar from '../assets/images/accountScreen/fall_back_avatar.jpeg'
+import faceScan from '../assets/images/icons/face-id.png';
+import fingerprintScan from '../assets/images/icons/fingerprint-scan.png';
 
 // !Trip Images
 import settings from '../assets/images/tripScreen/settings.png'
@@ -144,6 +146,8 @@ const images = {
     mapImage,
     mapScreenImage,
     fallbackAvatar,
+    fingerprintScan,
+    faceScan,
 
     // !Trip Images
     settings,

@@ -214,8 +214,6 @@ export default function Signup() {
     },
   });
 
-  console.log({ msg });
-
   return (
     <SafeScreen>
       <PaddedScreen styles={wHFull}>

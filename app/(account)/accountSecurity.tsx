@@ -52,9 +52,10 @@ export default function accountSecurity() {
 
                                     // update DB
                                     const prevValue = biometricLogin;
-                                    setBiometricLogin(prevValue == 'false' ? 'true': 'false');
+                                    setBiometricLogin(prevValue === 'false' ? 'true': 'false');
                                 },
-                                value: stateInput?.accountSecurity.biometricLoginInput
+                                // value: stateInput?.accountSecurity.biometricLoginInput
+                                value: biometricLogin === 'true'
                             }}
                             label='Biometric Login'
                         />

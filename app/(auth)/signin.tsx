@@ -8,8 +8,10 @@ import {
   ViewStyle,
   KeyboardAvoidingView,
   ToastAndroid,
+  TouchableOpacity,
+  Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Href, Link, Redirect, router } from "expo-router";
 import { useSession } from "../../contexts/userSignedInContext";
 import SafeScreen from "../../components/shared/safeScreen";
@@ -44,11 +46,12 @@ import { c, fs10 } from "@/utils/fontStyles";
 import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
 import FetchService from "@/services/api/fetch.service";
 import { pages } from "@/constants/pages";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 import { setState } from "@/state/slices/user";
 import tw from "@/constants/tw";
 import { useStorageState } from "@/hooks/useStorageState";
-
+import { images } from "@/constants/images";
+import {authenticateAsync, hasHardwareAsync, supportedAuthenticationTypesAsync} from 'expo-local-authentication';
 
 const {
   signInTitle,
@@ -120,11 +123,6 @@ const {
   },
 });
 
-interface ISigninFormData {
-  email: string;
-  pin: string;
-}
-
 const SignInSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
   pin: Yup.string()
@@ -137,11 +135,7 @@ export default function Signin() {
   const { closeSnackbar, snackbarVisible, Snackbar, notify } = useSnackbar();
   const { tokenSession } = userTokenSession();
   const dispatch = useAppDispatch();
-  const [[_, biometricLogin], __] = useStorageState('biometricLogin');
-  
-  console.log('====================================');
-  console.log(biometricLogin);
-  console.log('====================================');
+  const [[_, biometricLogin], __] = useStorageState("biometricLogin");
 
   const [fetchState, setFetchState] = useState({
     msg: "",
@@ -149,8 +143,7 @@ export default function Signin() {
     loading: false,
   });
   const { msg, loading, code } = fetchState;
-
-  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -176,22 +169,24 @@ export default function Signin() {
           code: returnedData?.code,
           loading: false,
         }));
-        if (returnedData?.code === 200 || returnedData?.code === 201)
-        {
+        if (returnedData?.code === 200 || returnedData?.code === 201) {
           const signedinTime = new Date();
           const user = returnedData?.user;
           const token = returnedData?.token;
 
           try {
-            await SecureStore.setItemAsync('user', JSON.stringify(user));
-            await SecureStore.setItemAsync('token', token);
-            await SecureStore.setItemAsync('signedinTime', JSON.stringify(signedinTime));
+            await SecureStore.setItemAsync("user", JSON.stringify(user));
+            await SecureStore.setItemAsync("token", token);
+            await SecureStore.setItemAsync(
+              "signedinTime",
+              JSON.stringify(signedinTime)
+            );
 
-            dispatch(setState({key:'user', value: user}));
-            dispatch(setState({key:'token', value: token}));
-            router.replace('/(tab)')
+            dispatch(setState({ key: "user", value: user }));
+            dispatch(setState({ key: "token", value: token }));
+            router.replace("/(tab)");
           } catch (error: any) {
-            throw new Error(error?.message)
+            throw new Error(error?.message);
           }
 
           router.replace(`/(tab)` as Href);
@@ -205,18 +200,65 @@ export default function Signin() {
           loading: false,
         }));
 
-        notify({msg: error?.message || "Error in signing in",})
+        notify({ msg: error?.message || "Error in signing in" });
       }
     },
   });
 
+  const commitBiometricSignin = async () => {
+    if (!biometricAvailable) return;
+
+    const result = await authenticateAsync({
+      promptMessage: "Authenticate to sign in",
+      fallbackLabel: "Enter PIN",
+      cancelLabel: "Cancel",
+    });
+
+    if (result.success) {
+      // Proceed with auto-login (Fetch user data, set token, etc.)
+      try {
+        const storedUser = await SecureStore.getItemAsync("user");
+        const storedToken = await SecureStore.getItemAsync("token");
+
+        if (storedUser && storedToken) {
+          dispatch(setState({ key: "user", value: JSON.parse(storedUser) }));
+          dispatch(setState({ key: "token", value: storedToken }));
+          router.replace("/(tab)");
+        }
+      } catch (error) {
+        notify({ msg: "Error retrieving saved credentials" });
+      }
+    } else {
+      notify({ msg: "Biometric authentication failed" });
+    }
+  }
+
+  const checkBiometricSupport = async () => {
+    const hasHardware = await hasHardwareAsync();
+    const supportedAuthTypes = await supportedAuthenticationTypesAsync();
+    
+    if (hasHardware && supportedAuthTypes.length > 0) {
+      setBiometricAvailable(true);
+    }
+  };
+
+  useEffect(() => {
+    if(biometricLogin === 'true') checkBiometricSupport();
+  }, [biometricLogin]);
+
+  useEffect(() => {
+    if (biometricAvailable && biometricLogin === 'true') {
+      commitBiometricSignin();
+    }
+  }, [biometricAvailable, biometricLogin]);
+
   return (
     <SafeScreen>
-      <View style={[flexCenter, { flex: 1 }, ]}>
-        <ScrollView contentContainerStyle={[flexCenter, tw `w-full h-full`]}>
+      <View style={[flexCenter, { flex: 1 }]}>
+        <ScrollView contentContainerStyle={[flexCenter, tw`w-full h-full`]}>
           <PaddedScreen styles={wHFull}>
             <View
-              style={[wHFull, flexCol, itemsStart, justifyCenter, { gap: 40 },]}
+              style={[wHFull, flexCol, itemsStart, justifyCenter, { gap: 40 }]}
             >
               <View style={[flexCol, wFull, { gap: 2 }]}>
                 <Text style={signInTitle as TextStyle}>Sign in</Text>
@@ -268,29 +310,54 @@ export default function Signin() {
                 )}
 
                 <View style={[wFull, flex, itemsCenter, justifyEnd]}>
-                  <Text onPress={() => router.push('/(auth)/(resetPin)/emailForm')} style={[forgotPassword as TextStyle, tw `font-medium`]}>
+                  <Text
+                    onPress={() => router.push("/(auth)/(resetPin)/emailForm")}
+                    style={[forgotPassword as TextStyle, tw`font-medium`]}
+                  >
                     Forgot Pin Code?
                   </Text>
                 </View>
               </View>
 
-              <Pressable
-                style={[
-                  wFull,
-                  signInBtn as ViewStyle,
-                  flex,
-                  itemsCenter,
-                  justifyCenter,
-                ]}
-                disabled={loading}
-                onPress={() => formik.handleSubmit()}
+              <View
+                style={tw`w-full h-[50px] flex flex-row gap-[10px] items-center`}
               >
-                {!loading ? (
-                  <Text style={[signInText as TextStyle]}>Sign In</Text>
-                ) : (
-                  <ActivityIndicator color={colors.white} size="small" />
-                )}
-              </Pressable>
+                <Pressable
+                  style={[
+                    // wFull,
+                    signInBtn as ViewStyle,
+                    flex,
+                    itemsCenter,
+                    justifyCenter,
+                    {flex: 1}
+                  ]}
+                  disabled={loading}
+                  onPress={() => formik.handleSubmit()}
+                >
+                  {!loading ? (
+                    <Text style={[signInText as TextStyle]}>Sign In</Text>
+                  ) : (
+                    <ActivityIndicator color={colors.white} size="small" />
+                  )}
+                </Pressable>
+
+                {biometricLogin === 'true' && <TouchableOpacity
+                onPress={() => {
+                  checkBiometricSupport();
+                  commitBiometricSignin();
+                }}
+                  style={tw`w-[50px] h-full bg-[#EF5DA8] flex flex-row items-center justify-center rounded-[10px]`}
+                >
+                  <Image
+                    style={tw`w-[24px] h-[24px]`}
+                    source={
+                      Platform.OS === "ios"
+                        ? images.faceScan
+                        : images.fingerprintScan
+                    }
+                  />
+                </TouchableOpacity>}
+              </View>
 
               <Text style={[noAccount as TextStyle, mXAuto as TextStyle]}>
                 Don't have an account?

@@ -6,6 +6,7 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { Text } from "react-native-paper";
 import React, { useEffect, useState } from "react";
@@ -109,7 +110,7 @@ export default function TripHistory() {
           </TouchableOpacity>
         </View>
 
-        <View
+        {!loading?(<View
           style={[flexCol, { gap: 32, height: (history?.length || 0) * 100 }]}
         >
           {history?.map((item, index) => (
@@ -195,7 +196,7 @@ export default function TripHistory() {
               )}
             </View>
           ))}
-        </View>
+        </View>):(<ActivityIndicator />)}
       </View>
     </PaddedScreen>
   );
