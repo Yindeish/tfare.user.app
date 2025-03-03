@@ -28,6 +28,8 @@ export default function Account() {
     const {user, wallet} = useAppSelector(state => state.user)
     const [[_, __], setUserSession] = useStorageState('user');
     const [[___, ____], setTokenSession] = useStorageState('token');
+    const [[_$$, biometricLogin], __$$] = useStorageState("biometricLogin");
+    const [[_$, __$], setBiometricEmail] = useStorageState('biometricEmail');
 
     const [fetchState, setFetchState] = useState({
         loading: false,
@@ -38,6 +40,12 @@ export default function Account() {
 
     const signOut = async () => {
         setFetchState({ ...fetchState, loading: true });
+
+        // !Biometric Setup
+        if(biometricLogin === 'true') {
+            setBiometricEmail(user?.email as string);
+        }
+        // !Biometric Setup
         
         dispatch(setState({ key: "user", value: null }));
         dispatch(setState({ key: "token", value: null }));

@@ -136,6 +136,7 @@ export default function Signin() {
   const { tokenSession } = userTokenSession();
   const dispatch = useAppDispatch();
   const [[_, biometricLogin], __] = useStorageState("biometricLogin");
+  const [[_$, biometricEmail], __$] = useStorageState('biometricEmail');
 
   const [fetchState, setFetchState] = useState({
     msg: "",
@@ -215,18 +216,48 @@ export default function Signin() {
     });
 
     if (result.success) {
-      // Proceed with auto-login (Fetch user data, set token, etc.)
-      try {
-        const storedUser = await SecureStore.getItemAsync("user");
-        const storedToken = await SecureStore.getItemAsync("token");
 
-        if (storedUser && storedToken) {
-          dispatch(setState({ key: "user", value: JSON.parse(storedUser) }));
-          dispatch(setState({ key: "token", value: storedToken }));
-          router.replace("/(tab)");
+      try {
+        setFetchState((prev) => ({ ...prev, loading: true, msg: "" }));
+
+        const returnedData = await FetchService.post({
+          data: { email: biometricEmail, role: "rider" },
+          url: "/auth/auto-signin",
+        });
+
+        notify({ msg: returnedData?.msg });
+
+        setFetchState((prev) => ({
+          ...prev,
+          msg: returnedData?.msg,
+          code: returnedData?.code,
+          loading: false,
+        }));
+
+        if (returnedData?.code === 200 || returnedData?.code === 201) {
+          const signedinTime = new Date();
+          const user = returnedData?.user;
+          const token = returnedData?.token;
+
+          try {
+            await SecureStore.setItemAsync("user", JSON.stringify(user));
+            await SecureStore.setItemAsync("token", token);
+            await SecureStore.setItemAsync(
+              "signedinTime",
+              JSON.stringify(signedinTime)
+            );
+
+            dispatch(setState({ key: "user", value: user }));
+            dispatch(setState({ key: "token", value: token }));
+            router.replace("/(tab)");
+          } catch (error: any) {
+            throw new Error(error?.message);
+          }
+
+          router.replace(`/(tab)` as Href);
         }
-      } catch (error) {
-        notify({ msg: "Error retrieving saved credentials" });
+      } catch (error: any) {
+        notify({ msg: error?.message});
       }
     } else {
       notify({ msg: "Biometric authentication failed" });
