@@ -132,7 +132,7 @@ import { RideConstants } from "@/constants/ride";
 
 const RecentLocationsSnippet = () => {
   const dispatch = useDispatch();
-    const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
   const { token: session } = useAppSelector((state: RootState) => state.user);
   const { savedAddresses } = AccountSelectors();
 
@@ -228,19 +228,19 @@ const RecentLocationsSnippet = () => {
   const openRecentDropoffLocations = () => {
     showBottomSheet([508], <RecentDropoffLocations />, true);
     // router.setParams({ query: "RecentDropoffLocations" });
-    setQuery(RideConstants.query.RecentDropoffLocations)
+    setQuery(RideConstants.query.RecentDropoffLocations);
   };
 
   // Updating pickup search
   useEffect(() => {
     inputtingPickup && searchBusstops(values.pickupBusstop as string);
-  }, [values.pickupBusstop, inputtingPickup])
+  }, [values.pickupBusstop, inputtingPickup]);
   // Updating pickup search
-  
+
   // Updating pickup search
   useEffect(() => {
     inputtingDropoff && searchBusstops(values.dropoffBusstop as string);
-  }, [values.dropoffBusstop, inputtingDropoff])
+  }, [values.dropoffBusstop, inputtingDropoff]);
   // Updating pickup search
 
   useEffect(() => {
@@ -306,7 +306,11 @@ const RecentLocationsSnippet = () => {
               //   setFieldValue("pickupBusstop", text);
               // }}
               onFocus={() => {
-                setSearchState((prev) => ({ ...prev, inputtingPickup: true }));
+                setSearchState((prev) => ({
+                  ...prev,
+                  inputtingPickup: true,
+                  inputtingDropoff: false,
+                }));
               }}
             />
 
@@ -340,9 +344,8 @@ const RecentLocationsSnippet = () => {
                   ]}
                 >
                   {(busstops as IBusStop[])?.map((busstop, index) => (
-                    <Text
+                    <TouchableOpacity
                       onPress={() => {
-                        console.log({busstop})
                         setFieldValue("pickupBusstop", busstop?.name);
                         dispatch(
                           setStateInputField({
@@ -355,13 +358,14 @@ const RecentLocationsSnippet = () => {
                           inputtingPickup: false,
                           pickupSearchText: busstop.name,
                         }));
-                        console.log({ busstop, pickupBusstopInput });
                       }}
-                      style={[h(30) as TextStyle]}
                       key={index}
+                      style={tw``}
                     >
-                      {busstop?.name}
-                    </Text>
+                      <Text style={[h(30) as TextStyle, tw``]}>
+                        {busstop?.name}
+                      </Text>
+                    </TouchableOpacity>
                   ))}
                 </ScrollView>
               ) : (
@@ -472,9 +476,13 @@ const RecentLocationsSnippet = () => {
               //   searchBusstops(text);
               //   setFieldValue("dropoffBusstop", text);
               // }}
-              onChangeText={handleChange('dropoffBusstop')}
+              onChangeText={handleChange("dropoffBusstop")}
               onFocus={() => {
-                setSearchState((prev) => ({ ...prev, inputtingDropoff: true }));
+                setSearchState((prev) => ({
+                  ...prev,
+                  inputtingDropoff: true,
+                  inputtingPickup: false,
+                }));
               }}
             />
 
@@ -506,7 +514,7 @@ const RecentLocationsSnippet = () => {
                   ]}
                 >
                   {(busstops as IBusStop[])?.map((busstop, index) => (
-                    <Text
+                    <TouchableOpacity
                       onPress={() => {
                         setFieldValue("dropoffBusstop", busstop?.name);
                         dispatch(
@@ -521,11 +529,10 @@ const RecentLocationsSnippet = () => {
                           dropoffSearchText: busstop.name,
                         }));
                       }}
-                      style={[h(30) as TextStyle]}
                       key={index}
                     >
-                      {busstop?.name}
-                    </Text>
+                      <Text style={[h(30) as TextStyle]}>{busstop?.name}</Text>
+                    </TouchableOpacity>
                   ))}
                 </ScrollView>
               ) : (
@@ -1696,12 +1703,23 @@ const RideRouteDetails = ({
   });
   const { riderCounterOffer } = formData;
   const { ridePlans } = useAppSelector((state: RootState) => state.ride);
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   const [plans, setPlans] = useState(
     // ridePlans.map((plan, index) => ({ ...plan, selected: false, id: index }))
     ridePlans.map((plan, index) => ({ ...plan, selected: true, id: index }))
   );
-  const [selectedPlan, setSelectedPlan] = useState<null | { ride: { rideFee: number; }; planName: "standard"; serviceFee: number; riderTolerance: number; driverTolerance: number; vehicleSeats: number; _id: string; }>(null);
+  const [selectedPlan, setSelectedPlan] = useState<null | {
+    ride: { rideFee: number };
+    planName: "standard";
+    serviceFee: number;
+    riderTolerance: number;
+    driverTolerance: number;
+    vehicleSeats: number;
+    _id: string;
+  }>(null);
+
+  const [error, setError] = useState(false);
 
   // const selectPlan = (id: number) => {
   const selectPlan = (plan: {
@@ -1728,6 +1746,13 @@ const RideRouteDetails = ({
     dispatch(setStateInputField({ key: "selectedPlan", value: plan }));
   };
 
+  // !Updating error with respect to ride plan
+  useEffect(() => {
+    if (!selectPlan) setError(true);
+    else setError(false);
+  }, [selectedPlan]);
+  // !Updating error with respect to ride plan
+
   return (
     <PaddedScreen>
       <View style={[flexCol, gap(56), mt(20)]}>
@@ -1753,9 +1778,14 @@ const RideRouteDetails = ({
                 bg("#F9F7F8"),
                 rounded(8),
                 // plan?.selected == true || ridePlans[0] != null
-                selectedPlan != null
-                  ? border(0.7, Colors.light.background)
-                  : border(0.7, colors.grey500),
+                border(
+                  0.7,
+                  error
+                    ? colors.red500
+                    : !selectedPlan
+                    ? colors.grey500
+                    : Colors.light.background
+                ),
               ]}
               key={index}
             >
@@ -1877,12 +1907,15 @@ const RideRouteDetails = ({
 
         <TouchableOpacity
           onPress={() => {
-            showBottomSheet(
-              [400],
-              <SearchingRide riderCounterOffer={riderCounterOffer} />,
-              true
-            );
-            router.setParams({ query: "SearchingRide" });
+            if (!error && selectedPlan) {
+              // router.setParams({ query: "SearchingRide" });
+              setQuery(RideConstants.query.SearchingRide);
+              showBottomSheet(
+                [400],
+                <SearchingRide riderCounterOffer={riderCounterOffer} />,
+                true
+              );
+            }
           }}
         >
           <View
@@ -1895,6 +1928,7 @@ const RideRouteDetails = ({
               justifyCenter,
               gap(10),
               bg(Colors.light.background),
+              { opacity: error || !selectedPlan ? 0.5 : 1 },
             ]}
           >
             <Text style={[neurialGrotesk, fw700, fs18, colorWhite]}>
@@ -1942,6 +1976,10 @@ const SearchingRide = ({
     code: null,
   });
   const { code, msg, loading } = fetchState;
+
+  console.log("====================================");
+  console.log({ requestId: requestId || riderRideDetails?._id });
+  console.log("====================================");
 
   const findAvailableRides = async () => {
     setFetchState((prev) => ({ ...prev, loading: true }));
@@ -2071,7 +2109,9 @@ const SearchingRide = ({
     findAvailableRides();
   }, []);
 
-  const channel = supabase.channel(`${RideConstants.channel.ride_accepting}${riderRideDetails?._id}`);
+  const channel = supabase.channel(
+    `${RideConstants.channel.ride_accepting}${riderRideDetails?._id}`
+  );
 
   async function getRideDetails(rideId: string, userId: string) {
     const { data, error } = await supabase
@@ -2080,12 +2120,12 @@ const SearchingRide = ({
       .eq("ride_id", rideId)
       .eq("user_id", userId)
       .single(); // Ensures we get only one result
-  
+
     if (error) {
       console.error("Error fetching ride details:", error);
       return null;
     }
-  
+
     return data;
   }
 
@@ -2095,7 +2135,7 @@ const SearchingRide = ({
 
   //   if((ride as IRiderRideDetails)?.rideStatus == 'accepted') {
   //     console.log('was accpted');
-      
+
   //   }
   // })
   // .catch((err) => console.error(err));
@@ -2113,21 +2153,30 @@ const SearchingRide = ({
   // });
 
   channel
-    .on("broadcast", { event: RideConstants.event.ride_accepted }, (payload) => {
-      const ride = payload?.payload;
-      console.log('====================================');
-      console.log('accepting......', {requestId:requestId || riderRideDetails?._id, ride});
-      console.log('====================================');
+    .on(
+      "broadcast",
+      { event: RideConstants.event.ride_accepted },
+      (payload) => {
+        const ride = payload?.payload;
+        console.log("====================================");
+        console.log("accepting......", {
+          requestId: requestId || riderRideDetails?._id,
+          ride,
+        });
+        console.log("====================================");
 
-      if(String(ride?._id) === String(requestId) || String(riderRideDetails?._id)) {
-        router.push(
-          `/(rideScreens)/availableRides?selectedAvailableRideId=${ride?._id || 
-            selectedAvailableRide?._id
-          }&requestId=${requestId || riderRideDetails?._id}`
-        );
+        if (
+          String(ride?._id) === String(requestId) ||
+          String(riderRideDetails?._id)
+        ) {
+          router.push(
+            `/(rideScreens)/availableRides?selectedAvailableRideId=${
+              ride?._id || selectedAvailableRide?._id
+            }&requestId=${requestId || riderRideDetails?._id}`
+          );
+        }
       }
-     
-    })
+    )
     .subscribe();
 
   return (
@@ -2140,8 +2189,7 @@ const SearchingRide = ({
               source={images.yellowTripImage}
             />
 
-            <Text
-            style={[neurialGrotesk, fw700, colorBlack, { fontSize: 22 }]}>
+            <Text style={[neurialGrotesk, fw700, colorBlack, { fontSize: 22 }]}>
               Searching for Rides
             </Text>
           </View>

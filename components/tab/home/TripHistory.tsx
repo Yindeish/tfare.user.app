@@ -64,6 +64,10 @@ export default function TripHistory() {
   });
   const { loading, history, code, msg } = fetchState;
 
+  console.log('====================================');
+  console.log(history);
+  console.log('====================================');
+
   const getHistory = async () => {
     setFetchState((prev) => ({ ...prev, loading: true }));
     const returnedData = await FetchService.getWithBearerToken({

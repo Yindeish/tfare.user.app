@@ -139,7 +139,7 @@ export default function AppLayout() {
 
         if (code && (code == 200 || code == 201)) {
           if (ticketPaid) {
-            dispatch(setState({ key: "sameTickets", value: ticketPaid }));
+            dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
             if (riderRide)
               dispatch(
                 setState({

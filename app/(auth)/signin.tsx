@@ -274,14 +274,14 @@ export default function Signin() {
   };
 
   useEffect(() => {
-    if(biometricLogin === 'true') checkBiometricSupport();
-  }, [biometricLogin]);
+    if(biometricLogin === 'true' && (biometricEmail !== '' || biometricEmail !== null)) checkBiometricSupport();
+  }, [biometricLogin, biometricEmail]);
 
   useEffect(() => {
-    if (biometricAvailable && biometricLogin === 'true') {
+    if (biometricAvailable && biometricLogin === 'true' && (biometricEmail !== '' || biometricEmail !== null)) {
       commitBiometricSignin();
     }
-  }, [biometricAvailable, biometricLogin]);
+  }, [biometricAvailable, biometricLogin, biometricEmail]);
 
   return (
     <SafeScreen>
@@ -372,7 +372,7 @@ export default function Signin() {
                   )}
                 </Pressable>
 
-                {biometricLogin === 'true' && <TouchableOpacity
+                {(biometricLogin === 'true' && (biometricEmail !== '' || biometricEmail !== null)) && <TouchableOpacity
                 onPress={() => {
                   checkBiometricSupport();
                   commitBiometricSignin();

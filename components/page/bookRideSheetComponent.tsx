@@ -332,9 +332,10 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
   const { hideBottomSheet, showBottomSheet } = useBottomSheet();
   const dispatch = useAppDispatch();
   const {requestId} = useGlobalSearchParams();
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   console.log('====================================');
-  console.log(sameTickets);
+  console.log(sameTickets, {riderRideDetails});
   console.log('====================================');
 
   const [fetchState, setFetchState] = useState({
@@ -399,8 +400,9 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
   const channel = supabase.channel(`${RideConstants.channel.ride_starting}${riderRideDetails?._id}`);
     channel
       .on("broadcast", { event: RideConstants.event.ride_started}, (payload) => {
+        setQuery(RideConstants.query.RideStarted);
         showBottomSheet([100, 500], <TripStartedSheet />, true);
-        router.replace('/(rideScreens)/tripDetails');
+        router.replace('/(rideScreens)/rideMap');
       })
       .subscribe();
 
@@ -578,7 +580,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
           img={{
             src: images.redBgCautionImage,
           }}
-          onPress={() => {}}
+          onPress={() => router.replace('/(rideScreens)/tripDetails')}
           text={{ name: "View Trip Details" }}
           bg={{ color: Colors.light.background }}
         />

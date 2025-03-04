@@ -22,6 +22,8 @@ import { IBusStop } from "@/state/types/ride";
 import { router, useGlobalSearchParams } from "expo-router";
 import { supabase } from "@/supabase/supabase.config";
 import { RootState } from "@/state/store";
+import { useStorageState } from "@/hooks/useStorageState";
+import { RideConstants } from "@/constants/ride";
 
 type Region = {
     latitude: number;
@@ -36,7 +38,8 @@ function TripStarted() {
     const { stateInput: { pickupBusstopInput, dropoffBusstopInput } } = RideSelectors()
     const {selectedAvailableRide, riderRideDetails} = useAppSelector((state: RootState) => state.ride);
     const {requestId} = useGlobalSearchParams();
-    const { showBottomSheet, setBottomSheetType, bottomSheetType, hideBottomSheet } = useBottomSheet()
+    const { showBottomSheet, setBottomSheetType, bottomSheetType, hideBottomSheet } = useBottomSheet();
+    const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
     // useEffect(() => {
     //     showBottomSheet([480], <TripStartedSheet />)
@@ -46,15 +49,16 @@ function TripStarted() {
     //     // }, 3000)
     // }, [])
 
-     const channel = supabase.channel(`ride_ending`);
+     const channel = supabase.channel(`${RideConstants.channel.ride_ending}${riderRideDetails?._id}`);
       channel
-        .on("broadcast", { event: "ride_ended" }, (payload) => {
+        .on("broadcast", { event: RideConstants.event.ride_ended }, (payload) => {
           const ride = payload?.payload;
           console.log('====================================');
           console.log({requestId:requestId || riderRideDetails?._id, ride});
           console.log('====================================');
     
           if(String(ride?._id) === String(requestId) || String(riderRideDetails?._id)) {
+            setQuery(RideConstants.query.RideEnded);
             showBottomSheet([626, 800], <TripCompletedSheet />)
           }
          

@@ -21,6 +21,8 @@ import { IDriver, IUser } from '@/state/types/user'
 import { TripStartedSheet } from '@/components/page/tripStartedBottomSheetComponents'
 import { useBottomSheet } from '@/contexts/useBottomSheetContext'
 import tw from '@/constants/tw'
+import { useStorageState } from '@/hooks/useStorageState'
+import { RideConstants } from '@/constants/ride'
 
 export default function
     DriverProfile() {
@@ -29,6 +31,7 @@ export default function
         const {currentRideId} = useGlobalSearchParams();
         const {driverDetails} = useAppSelector((state: RootState) => state.ride);
         const {showBottomSheet} = useBottomSheet()
+        const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
 
         const [fetchState, setFetchState] = React.useState<{
@@ -95,11 +98,12 @@ export default function
                             
                             // router.push(`/(tab)/trip` as Href)
                             showBottomSheet(
-                                [500],
-                                <TripStartedSheet />
+                                [100, 500],
+                                <TripStartedSheet />,
+                                true
                               );
                               router.setParams({ query: "RideStarted",});
-                            router.push(`/(rideScreens)/bookRide` as Href);
+                            router.push(`/(rideScreens)/tripDetails` as Href);
                         }}
                         style={[]}
                     >
