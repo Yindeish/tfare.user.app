@@ -126,7 +126,7 @@ function TripDetails() {
         <PageFloatingTitle
           title="Trip Details"
           color={{ icon: Colors.light.textGrey, text: colors.black }}
-          onPress={() => router.push(`/${pages.availableRides}` as Href)}
+          onPress={() => router.push(`/(rideScreens)/rideMap` as Href)}
           view={false}
         />
         {/* Page Title */}
