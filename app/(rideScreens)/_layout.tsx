@@ -84,6 +84,7 @@ export default function AppLayout() {
     query?: string;
     riderCounterOffer?: string;
   }>();
+  const {Snackbar, snackbarVisible,closeSnackbar, notify}= useSnackbar()
 
   console.log("====================================");
   console.log({ query });
@@ -237,6 +238,10 @@ export default function AppLayout() {
           //   setFetchState((prev) => ({ ...prev, rides: rides as any }));
           // }
         }
+
+        else {
+          notify({msg});
+        }
       } catch (error: any) {
         console.log({ error });
 
@@ -311,6 +316,7 @@ export default function AppLayout() {
             { zIndex: 100000000, opacity: allTicketsFilled ? 1 : 0.5 },
           ]}
         >
+          <Snackbar msg={msg} onDismiss={() => closeSnackbar()} snackbarVisible={snackbarVisible} />
           <CtaBtn
             img={{
               src: images.whiteBgTicketImage,
@@ -351,6 +357,7 @@ export default function AppLayout() {
       >
         <Stack.Screen name={pages.orderRide} />
         <Stack.Screen name={pages.availableRides} />
+        <Stack.Screen name={"tripDetails"} />
         <Stack.Screen name={"bookRide"} />
         <Stack.Screen name={"rideMap"} />
         <Stack.Screen name={`${pages.paymentOptions}`} />

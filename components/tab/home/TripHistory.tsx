@@ -119,11 +119,23 @@ export default function TripHistory() {
         >
           {history?.map((item, index) => (
             <View key={index}>
-              {(item?.rideStatus === "started" || item?.rideStatus === "paused") ? (
+              {(item?.rideStatus === "started" || item?.rideStatus === "paused") || item?.rideStatus === 'accepted' || item?.rideStatus === 'booked' || item?.rideStatus === 'requesting' ? (
                 <TouchableOpacity 
                 onPress={() => {
-                  router.push('/(rideScreens)/bookRide') //for now
-                  setQuery(RideConstants.query.RecentPickupLocations);
+                  if(item?.rideStatus === 'started' || item?.rideStatus === 'paused') {
+                    router.push('/(rideScreens)/rideMap')
+                    setQuery(RideConstants.query.RideStarted);
+                  }
+                  if(item?.rideStatus === 'booked') {
+                    router.push('/(rideScreens)/rideMap')
+                    setQuery(RideConstants.query.RideBooked);
+                  }
+                  if(item?.rideStatus === 'accepted') {
+                    router.push('/(rideScreens)/bookRide');
+                  }
+                  if(item?.rideStatus === 'requesting') {
+                    router.push('/(rideScreens)/availableRides');
+                  }
                 }}
                   style={[
                     flex,
