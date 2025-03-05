@@ -1,5 +1,7 @@
 import Colors, { colors } from "@/constants/Colors";
 import { images } from "@/constants/images";
+import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
+import { RootState } from "@/state/store";
 import { c, colorBlack, fs12, fs14, fw400, fw500, fw700, neurialGrotesk } from "@/utils/fontStyles";
 import { image } from "@/utils/imageStyles";
 import { bg, borderGrey, borderL, borderR, borderT, flex, flexCol, gap, h, itemsCenter, justifyBetween, p, px, py, rounded, w, wFull } from "@/utils/styles";
@@ -8,6 +10,10 @@ import { Text } from "react-native-paper";
 
 
 function TripBlock() {
+    const dispatch = useAppDispatch();
+      const { selectedAvailableTrip } = useAppSelector(
+        (state: RootState) => state.trip
+      );
 
 
     return (
@@ -19,7 +25,7 @@ function TripBlock() {
                         <Image style={[image.w(14), image.h(20)]} source={images.yellowLocationImage} />
                         <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Take off</Text>
                     </View>
-                    <Text style={[fw700, fs14, c(colors.black)]}>Ojoo Bus Stop</Text>
+                    <Text style={[fw700, fs14, c(colors.black)]}>{selectedAvailableTrip?.route?.pickupBusstop?.name}</Text>
                 </View>
 
                 <Image style={[image.w(90), image.h(5), { objectFit: 'contain' }]} source={images.tripDirection} />
@@ -29,7 +35,7 @@ function TripBlock() {
                         <Image style={[image.w(14), image.h(20)]} source={images.blueLocationImage} />
                         <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>Drop off</Text>
                     </View>
-                    <Text style={[fw700, fs14, c(colors.black)]}>Ojoo Bus Stop</Text>
+                    <Text style={[fw700, fs14, c(colors.black)]}>{selectedAvailableTrip?.route?.dropoffBusstop?.name}</Text>
                 </View>
             </View>
 
@@ -39,12 +45,12 @@ function TripBlock() {
                         <Image style={[image.w(18), image.h(18)]} source={images.clockImage} />
                         <Text style={[fw400, fs12, c(Colors.light.textGrey)]}>Departure Date &Time</Text>
                     </View>
-                    <Text style={[fw500, fs14, c(colors.black)]}>Apri 14 - 7:30 AM</Text>
+                    <Text style={[fw500, fs14, c(colors.black)]}>{selectedAvailableTrip?.departureDate} - {selectedAvailableTrip?.departureTime}</Text>
                 </View>
 
                 <View style={[w('auto'), h(45), rounded(100), flex, itemsCenter, gap(16), bg(colors.white), p(16), { borderWidth: 0.7, borderColor: Colors.light.border }]}>
                     <Image style={[image.w(18), image.h(14.73)]} source={images.passengersImage} />
-                    <Text style={[fs12, fw500, colorBlack]}>{3} seats Available</Text>
+                    <Text style={[fs12, fw500, colorBlack]}>{selectedAvailableTrip?.availableSeats} seats Available</Text>
                 </View>
             </View>
 

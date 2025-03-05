@@ -22,11 +22,11 @@ export type TRideStatus =
   | "booked"
   | "ended";
 
-export interface IRoute {
-  routeName: string;
-  routeDesc: string;
-  routeDistance: string;
-}
+// export interface IRoute {
+//   routeName: string;
+//   routeDesc: string;
+//   routeDistance: string;
+// }
 
 export interface IBusStop {
   _id?: string;
@@ -119,13 +119,20 @@ export interface IPlan {
   };
 }
 
-export interface ICurrentRide {
+export interface ICurrentTrip {
   _id: string;
   driverId: string;
+  driver?: IUser;
   availableSeats: number;
   vehicleName: string;
   inRideDropoffs: IBusStop[];
   ridersRides: IRiderRideDetails[];
+  departureDate: string;
+  departureTime: string;
+  routeId: string;
+  route?: IRoute;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface IRiderRideDetails {
@@ -138,7 +145,7 @@ export interface IRiderRideDetails {
   ridePlan: IPlan;
   rideStatus: TRideStatus;
   riderCounterOffer: number;
-  currentRideId: string;
+  currentTripId: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -172,28 +179,23 @@ export interface IPlan {
   };
 }
 
-export interface IRideState {
+export interface ITripState {
   loading: ILoading;
   booking: boolean;
   searchMatchBusstops: IBusStop[] | [];
   currentRideView: TCurrentrideView;
-  // userRide: IRiderRideDetails | null,
   riderRideDetails: IRiderRideDetails | null;
   paidTickets: ITicketInput[];
   driverDetails: IUser | null;
-  userRide: {
+  userTrip: {
     riderRideDetails: IRiderRideDetails;
-    currentRide: ICurrentRide;
+    currentTrip: ICurrentTrip;
   } | null;
   tripId: string;
   differentTickets: ITicket[];
-  // sameTickets: ITicket | null;
   sameTickets: ITicket[];
-  //   availableRides:
-  //     | { riderRideDetails: IRiderRideDetails; currentRide: ICurrentRide }[]
-  //     | [];
-  availableRides: ICurrentRide[] | [];
-  selectedAvailableRide: ICurrentRide | null;
+  availableTrips: ICurrentTrip[] | [];
+  selectedAvailableTrip: ICurrentTrip | null;
   currentNumberOfTickets: number;
   activeTab: TActiveTab;
   stateInput: IStateInput;
