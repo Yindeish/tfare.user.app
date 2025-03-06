@@ -13,7 +13,7 @@ import { Href, router } from 'expo-router'
 import { tabs } from '@/constants/tabs'
 import AccountTextField from '@/components/page/accountTextFeild'
 import AccountSelectors from '@/state/selectors/account'
-import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
+import { useAppDispatch, useAppSelector } from '@/state/hooks/useReduxToolkit'
 import { setProfileCta, setUserProfileInfo, setUserProfileInfoFeild } from '@/state/slices/account'
 import { IStateInputProfile, IUserAccount } from '@/state/types/account'
 import { useSession } from '@/contexts/userSignedInContext'
@@ -27,6 +27,7 @@ import FetchService from '@/services/api/fetch.service'
 import ErrorMsg from '@/components/shared/error_msg'
 import CloudinaryServices from '@/cloudinary/cloudinary.services'
 import { useStorageState } from '@/hooks/useStorageState'
+import { RootState } from '@/state/store'
 
 
 export default function profileInfo() {
@@ -34,7 +35,9 @@ export default function profileInfo() {
     const { profileCta, stateInput, } = AccountSelectors();
     // const [[_, userSession],] = useSession();
     const [[_, userSession], updateUserSession] = useStorageState('user');
-    const user = JSON.parse(userSession as string) as IUserAccount;
+    const parsedUser = JSON.parse(userSession as string) as IUserAccount;
+
+    const {user} = useAppSelector((state: RootState) => state.user);
 
     console.log({ user })
 
@@ -49,10 +52,10 @@ export default function profileInfo() {
 
     const { values, errors, touched, handleChange, handleBlur, handleSubmit, setValues } = useFormik({
         initialValues: {
-            fullName: user?.fullName || '',
-            userName: user?.fullName || '',
-            email: user?.email || '',
-            phoneNumber: String(user?.phoneNumber)|| '',
+            fullName: user?.fullName || parsedUser?.fullName || '',
+            userName: user?.fullName || parsedUser?.fullName || '',
+            email: user?.email || parsedUser?.email || '',
+            phoneNumber: String(user?.phoneNumber) || String(parsedUser?.phoneNumber) || '',
         },
         validationSchema: new ObjectSchema({
             fullName: string(),
@@ -144,10 +147,10 @@ export default function profileInfo() {
 
     useEffect(() => {
         setValues({
-            fullName: user?.fullName as string,
-            userName: (user as any)?.profileName || user?.userName as string,
-            email: user?.email as string,
-            phoneNumber: String(user?.phoneNumber as number),
+            fullName: user?.fullName as string || parsedUser?.fullName,
+            userName: (user as any)?.profileName || user?.fullName as string || parsedUser?.fullName,
+            email: user?.email as string || parsedUser?.email,
+            phoneNumber: String(user?.phoneNumber as number) || String(parsedUser?.phoneNumber),
         })
     }, [])
 

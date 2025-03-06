@@ -273,15 +273,15 @@ export default function Signin() {
     }
   };
 
-  useEffect(() => {
-    if(biometricLogin === 'true' && (biometricEmail !== '' || biometricEmail !== null)) checkBiometricSupport();
-  }, [biometricLogin, biometricEmail]);
+  // useEffect(() => {
+  //   if(biometricLogin === 'true' && (biometricEmail !== '' || biometricEmail !== null)) checkBiometricSupport();
+  // }, [biometricLogin, biometricEmail]);
 
-  useEffect(() => {
-    if (biometricAvailable && biometricLogin === 'true' && (biometricEmail !== '' || biometricEmail !== null)) {
-      commitBiometricSignin();
-    }
-  }, [biometricAvailable, biometricLogin, biometricEmail]);
+  // useEffect(() => {
+  //   if (biometricAvailable && biometricLogin === 'true' && (biometricEmail !== '' || biometricEmail !== null)) {
+  //     commitBiometricSignin();
+  //   }
+  // }, [biometricAvailable, biometricLogin, biometricEmail]);
 
   return (
     <SafeScreen>

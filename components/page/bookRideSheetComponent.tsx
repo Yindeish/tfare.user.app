@@ -540,13 +540,16 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
               )
             )} */}
           {sameTickets &&
-            (sameTickets || [])?.map(
-              (ticket, index) => (
+            // (sameTickets || [])?.map(
+            (Array.from({length: Number(sameTickets[0]?.quantity)}))?.map(
+              // (ticket, index) => (
+              (_, index) => (
                 <BuyTicketListTile
                   leadingText={`Ticket ${index + 1} code`}
                   trailing={{
                     // text: '#765XYZ',
-                    text: ticket?.ticketOtp as string,
+                    // text: ticket?.ticketOtp as string,
+                    text: sameTickets[0]?.ticketOtp as string,
                     icon: true,
                   }}
                   key={index}

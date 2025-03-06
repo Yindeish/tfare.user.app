@@ -208,39 +208,7 @@ export default function Trip() {
 
               {!loading ? (
                 <View style={[flexCol, gap(24), tw ` h-[700px]`]}>
-                  {[
-      {
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        availableSeats: 2,
-        departureDate: "12, apr",
-        departureTime: "3 AM",
-        inRideDropoffs: [
-            {
-name: 'jhjgjh'
-            } ,
-            {
-name: 'jhjgjh'
-            } ,
-        ],
-        ridersRides: [],
-        driverId: "87697",
-        route: {
-          dropoffBusstop: {
-            name: "tyyoup",
-          },
-          pickupBusstop: {
-            name: "tyyoup",
-          },
-          inTripDropoffsIds: [],
-          rideDirection: "forward",
-          _id: "775678",
-        },
-        vehicleName: "9jhjkahjgj",
-        _id: "fydfgd",
-        routeId: "6757",
-      },
-    ]?.map((trip, index) => (
+                  {availableTrips?.map((trip, index) => (
                     <View
                       style={[
                         bg("#F9F7F8"),
