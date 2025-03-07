@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  Platform,
 } from "react-native";
 import { Text } from "react-native-paper";
 import React, { useEffect, useState } from "react";
@@ -96,6 +97,8 @@ import { RideConstants } from "@/constants/ride";
 import { useStorageState } from "@/hooks/useStorageState";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 import Ticket from "@/components/page/ticket";
+import * as Device from "expo-device";
+import * as Location from "expo-location";
 
 function TripDetails() {
   const { rideId, currentRideId, selectedAvailableRideId, requestId } =
@@ -135,66 +138,77 @@ function TripDetails() {
           <RideBlock />
 
           <FlatList
-              horizontal={false}
-              data={userRideInput?.tickets}
-              renderItem={({ index, item: ticketId }) => (
-                <Ticket ticket={ticketId} index={index} key={index} />
-              )}
-            />
+            horizontal={false}
+            data={userRideInput?.tickets}
+            renderItem={({ index, item: ticketId }) => (
+              <Ticket ticket={ticketId} index={index} key={index} />
+            )}
+          />
 
           <View style={[wFull, flexCol, gap(16)]}>
-                <View
-                  style={[
-                    wFull,
-                    flexCol,
-                    gap(16),
-                    pb(120),
-                    {
-                      borderBottomColor: Colors.light.border,
-                      borderBottomWidth: 0.7,
-                    },
-                  ]}
-                >
-                <View
-                  style={[
-                    wFull,
-                    flexCol,
-                    gap(16),
-                    pb(16),
-                    {
-                      borderBottomColor: Colors.light.border,
-                      borderBottomWidth: 0.7,
-                    },
-                  ]}
-                >
-                  <BuyTicketListTile
-                    leadingText="Trip ID"
-                    trailing={{
-                      text: selectedAvailableRide?._id || selectedAvailableRideId as string,
-                    }}
-                  />
-                  <BuyTicketListTile
-                    leadingText="Trip Cost"
-                    trailing={{
-                      text: `₦ ${ridePlans[0]?.ride?.rideFee || ridePlans[0]?.plan?.ride?.rideFee || ''}`,
-                    }}
-                  />
-                  <BuyTicketListTile
-                    leadingText="Service Fee"
-                    trailing={{
-                      text: `₦ ${ridePlans?.[0]?.plan?.serviceFee || ''}`,
-                    }}
-                  />
-                </View>
-
+            <View
+              style={[
+                wFull,
+                flexCol,
+                gap(16),
+                pb(120),
+                {
+                  borderBottomColor: Colors.light.border,
+                  borderBottomWidth: 0.7,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  wFull,
+                  flexCol,
+                  gap(16),
+                  pb(16),
+                  {
+                    borderBottomColor: Colors.light.border,
+                    borderBottomWidth: 0.7,
+                  },
+                ]}
+              >
                 <BuyTicketListTile
-                  leadingText="Total"
+                  leadingText="Trip ID"
                   trailing={{
-                    text: `₦ ${Number(ridePlans[0]?.plan?.ride?.rideFee || ridePlans[0]?.ride?.rideFee) + Number(ridePlans?.[0]?.plan?.serviceFee) || ''}`,
+                    text:
+                      selectedAvailableRide?._id ||
+                      (selectedAvailableRideId as string),
+                  }}
+                />
+                <BuyTicketListTile
+                  leadingText="Trip Cost"
+                  trailing={{
+                    text: `₦ ${
+                      ridePlans[0]?.ride?.rideFee ||
+                      ridePlans[0]?.plan?.ride?.rideFee ||
+                      ""
+                    }`,
+                  }}
+                />
+                <BuyTicketListTile
+                  leadingText="Service Fee"
+                  trailing={{
+                    text: `₦ ${ridePlans?.[0]?.plan?.serviceFee || ""}`,
                   }}
                 />
               </View>
-        </View>
+
+              <BuyTicketListTile
+                leadingText="Total"
+                trailing={{
+                  text: `₦ ${
+                    Number(
+                      ridePlans[0]?.plan?.ride?.rideFee ||
+                        ridePlans[0]?.ride?.rideFee
+                    ) + Number(ridePlans?.[0]?.plan?.serviceFee) || ""
+                  }`,
+                }}
+              />
+            </View>
+          </View>
         </View>
       </ScrollView>
     </SafeScreen>
@@ -209,20 +223,36 @@ function RideBlock() {
   );
   const { user } = useAppSelector((state: RootState) => state.user);
 
-  const openMap = () => {
-    const riderRide = selectedAvailableRide?.ridersRides.find(
-      (ride) => String(ride?.riderId) == String(user?._id)
-    );
-    const location =
-      riderRide?.dropoffBusstop?.name ||
-      selectedAvailableRide?.inRideDropoffs[
-        selectedAvailableRide?.inRideDropoffs.length - 1
-      ]?.name;
-    const mapLink = `https://www.google.com/maps?q=${location}`;
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null
+  );
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-    Linking.openURL(mapLink).catch((err) =>
-      console.error("Failed to open map:", err)
-    );
+  async function getCurrentLocation() {
+    if (Platform.OS === "android" && !Device.isDevice) {
+      setErrorMsg(
+        "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
+      );
+      return;
+    }
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied");
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    setLocation(location);
+  }
+
+  const openMap = () => {
+    getCurrentLocation();
+
+     if (location) {
+      const { latitude, longitude } = location.coords;
+      const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      Linking.openURL(url);
+    }
   };
 
   return (

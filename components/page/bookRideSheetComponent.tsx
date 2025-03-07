@@ -21,6 +21,7 @@ import {
 import {
   FlatList,
   Image,
+  Platform,
   TextInput,
   TextStyle,
   View,
@@ -72,6 +73,8 @@ import { supabase } from "@/supabase/supabase.config";
 import { TripStartedSheet } from "./tripStartedBottomSheetComponents";
 import { useStorageState } from "@/hooks/useStorageState";
 import { RideConstants } from "@/constants/ride";
+import * as Device from "expo-device";
+import * as Location from "expo-location";
 
 function TicketDetailsSheet() {
   const dispatch = useAppDispatch();
@@ -380,22 +383,69 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
       }));
     }
   };
+  
+   const [location, setLocation] = useState<Location.LocationObject | null>(
+        null
+      );
+      const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    
+      async function getCurrentLocation() {
+        if (Platform.OS === "android" && !Device.isDevice) {
+          setErrorMsg(
+            "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
+          );
+          return;
+        }
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setErrorMsg("Permission to access location was denied");
+          return;
+        }
+    
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      }
+    
+      const openMap = () => {
+        getCurrentLocation();
+    
+         if (location) {
+          const { latitude, longitude } = location.coords;
+          const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+          Linking.openURL(url);
+        }
+      };
 
-  const openMap = () => {
-    const riderRide = selectedAvailableRide?.ridersRides.find(
-      (ride) => String(ride?.riderId) == String(user?._id)
-    );
-    const location =
-      riderRide?.dropoffBusstop?.name ||
-      selectedAvailableRide?.inRideDropoffs[
-        selectedAvailableRide?.inRideDropoffs.length - 1
-      ]?.name;
-    const mapLink = `https://www.google.com/maps?q=${location}`;
+  // // Update to link to the rider current position
+  // const openMap = () => {
+  //   const riderRide = selectedAvailableRide?.ridersRides.find(
+  //     (ride) => String(ride?.riderId) == String(user?._id)
+  //   );
+  //   const location =
+  //     riderRide?.dropoffBusstop?.name ||
+  //     selectedAvailableRide?.inRideDropoffs[
+  //       selectedAvailableRide?.inRideDropoffs.length - 1
+  //     ]?.name;
+  //   const mapLink = `https://www.google.com/maps?q=${location}`;
 
-    Linking.openURL(mapLink).catch((err) =>
-      console.error("Failed to open map:", err)
-    );
-  };
+  //   Linking.openURL(mapLink).catch((err) =>
+  //     console.error("Failed to open map:", err)
+  //   );
+  // };
+
+  const openCallerApp = (phoneNumber: string) => {
+      const url = `tel:${phoneNumber}`;
+      Linking.openURL(url).catch((err) => {
+        console.error("Failed to open dialer:", err);
+      });
+    };
+  
+    const openWhatsApp = (phoneNumber: string) => {
+      const url = `whatsapp://send?phone=${phoneNumber}`;
+      Linking.openURL(url).catch((err) => {
+        console.error("Failed to open WhatsApp:", err);
+      });
+    };
 
   const channel = supabase.channel(`${RideConstants.channel.ride_starting}${riderRideDetails?._id}`);
     channel

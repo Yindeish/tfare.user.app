@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  Platform,
 } from "react-native";
 import { Text } from "react-native-paper";
 import React, { useEffect, useState } from "react";
@@ -96,6 +97,8 @@ import { RideConstants } from "@/constants/ride";
 import { useStorageState } from "@/hooks/useStorageState";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 import Ticket from "@/components/page/ticket";
+import * as Device from "expo-device";
+import * as Location from "expo-location";
 
 function TripDetails() {
   const { rideId, currentRideId, selectedAvailableRideId, requestId } =
@@ -209,21 +212,53 @@ function RideBlock() {
   );
   const { user } = useAppSelector((state: RootState) => state.user);
 
-  const openMap = () => {
-    const riderRide = selectedAvailableRide?.ridersRides.find(
-      (ride) => String(ride?.riderId) == String(user?._id)
+   const [location, setLocation] = useState<Location.LocationObject | null>(
+      null
     );
-    const location =
-      riderRide?.dropoffBusstop?.name ||
-      selectedAvailableRide?.inRideDropoffs[
-        selectedAvailableRide?.inRideDropoffs.length - 1
-      ]?.name;
-    const mapLink = `https://www.google.com/maps?q=${location}`;
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  
+    async function getCurrentLocation() {
+      if (Platform.OS === "android" && !Device.isDevice) {
+        setErrorMsg(
+          "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
+        );
+        return;
+      }
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+  
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    }
+  
+    const openMap = () => {
+      getCurrentLocation();
+  
+       if (location) {
+        const { latitude, longitude } = location.coords;
+        const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+        Linking.openURL(url);
+      }
+    };
 
-    Linking.openURL(mapLink).catch((err) =>
-      console.error("Failed to open map:", err)
-    );
-  };
+  // const openMap = () => {
+  //   const riderRide = selectedAvailableRide?.ridersRides.find(
+  //     (ride) => String(ride?.riderId) == String(user?._id)
+  //   );
+  //   const location =
+  //     riderRide?.dropoffBusstop?.name ||
+  //     selectedAvailableRide?.inRideDropoffs[
+  //       selectedAvailableRide?.inRideDropoffs.length - 1
+  //     ]?.name;
+  //   const mapLink = `https://www.google.com/maps?q=${location}`;
+
+  //   Linking.openURL(mapLink).catch((err) =>
+  //     console.error("Failed to open map:", err)
+  //   );
+  // };
 
   return (
     <View

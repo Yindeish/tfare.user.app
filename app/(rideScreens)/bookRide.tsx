@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  Platform,
 } from "react-native";
 import { Text } from "react-native-paper";
 import React, { useEffect, useState } from "react";
@@ -87,7 +88,8 @@ import { TripCompletedSheet, TripStartedSheet } from "@/components/page/tripStar
 import { RideConstants } from "@/constants/ride";
 import { useStorageState } from "@/hooks/useStorageState";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
-
+import * as Device from "expo-device";
+import * as Location from "expo-location";
 
 
 const {
@@ -141,19 +143,47 @@ export default function BookRide() {
   });
   const { code, msg, loading, rides } = fetchState;
 
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+      null
+    );
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const tripCost = (Number(ridePlans[0]?.ride?.rideFee) * (currentNumberOfTickets || 1)) || (Number(ridePlans[0]?.plan?.ride?.rideFee) * (currentNumberOfTickets || 1));
+  const serviceFee = Number(ridePlans?.[0]?.plan?.serviceFee);
+  const totalCost = tripCost + serviceFee;
+
   const selectNumberOfTickets = (ticketNumber: number) => {
     dispatch(setCurrentNumberOfTickets(ticketNumber));
 
     dispatch(createTicket({ currentNumberOfTickets: ticketNumber }));
   };
 
-  const openMap = () => {
-    const riderRide = selectedAvailableRide?.ridersRides.find((ride) => String(ride?.riderId) == String(user?._id));
-    const location = riderRide?.dropoffBusstop?.name || selectedAvailableRide?.inRideDropoffs[selectedAvailableRide?.inRideDropoffs.length-1]?.name;
-    const mapLink = `https://www.google.com/maps?q=${location}`;
+   async function getCurrentLocation() {
+      if (Platform.OS === "android" && !Device.isDevice) {
+        setErrorMsg(
+          "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
+        );
+        return;
+      }
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
   
-    Linking.openURL(mapLink).catch((err) => console.error('Failed to open map:', err));
-  };
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    }
+  
+    const openMap = () => {
+      getCurrentLocation();
+  
+       if (location) {
+        const { latitude, longitude } = location.coords;
+        const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+        Linking.openURL(url);
+      }
+    };
 
   // Updating buy Ticket btn with allTicketsFilled
   useEffect(() => {
@@ -551,13 +581,14 @@ export default function BookRide() {
                   <BuyTicketListTile
                     leadingText="Trip Cost"
                     trailing={{
-                      text: `₦ ${ridePlans[0]?.ride?.rideFee || ridePlans[0]?.plan?.ride?.rideFee || ''}`,
+                      // text: `₦ ${ridePlans[0]?.ride?.rideFee || ridePlans[0]?.plan?.ride?.rideFee || ''}`,
+                      text: `₦ ${tripCost || ''}`,
                     }}
                   />
                   <BuyTicketListTile
                     leadingText="Service Fee"
                     trailing={{
-                      text: `₦ ${ridePlans?.[0]?.plan?.serviceFee || ''}`,
+                      text: `₦ ${serviceFee || ''}`,
                     }}
                   />
                 </View>
@@ -565,7 +596,8 @@ export default function BookRide() {
                 <BuyTicketListTile
                   leadingText="Total"
                   trailing={{
-                    text: `₦ ${Number(ridePlans[0]?.plan?.ride?.rideFee || ridePlans[0]?.ride?.rideFee) + Number(ridePlans?.[0]?.plan?.serviceFee) || ''}`,
+                    // text: `₦ ${Number(ridePlans[0]?.plan?.ride?.rideFee || ridePlans[0]?.ride?.rideFee) + Number(ridePlans?.[0]?.plan?.serviceFee) || ''}`,
+                    text: `₦ ${totalCost || ''}`,
                   }}
                 />
               </View>
