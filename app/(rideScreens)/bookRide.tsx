@@ -261,7 +261,7 @@ export default function BookRide() {
   useEffect(() => {
     if (query === RideConstants.query.RideBooked)
       showBottomSheet(
-        [800],
+        [100, 800],
         <RideBookedSheet rideId={riderRide?._id as string} />,
         true
       );
@@ -410,7 +410,7 @@ export default function BookRide() {
 
             {/* 5 is the seats (total) and 3 is the available seats */}
             {currentNumberOfTickets <
-              Number(userRide?.currentRide?.availableSeats) && (
+              Number(selectedAvailableRide?.availableSeats) && (
               <TouchableOpacity
                 onPress={() => {
                   dispatch(

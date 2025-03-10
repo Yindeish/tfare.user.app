@@ -95,7 +95,7 @@ export default function Index() {
                         <Text style={[neurialGrotesk, fw500, fs12, colorWhite]}>Order Ride</Text>
                     </TouchableOpacity>
 
-                    <TripHistory />
+                    <TripHistory refreshCondition={[loading, wallet]} />
                 </PaddedScreen>
 
             </ScrollView>

@@ -189,6 +189,7 @@ export interface IRideState {
   differentTickets: ITicket[];
   // sameTickets: ITicket | null;
   sameTickets: ITicket[];
+  lastRides: IRiderRideDetails[],
   //   availableRides:
   //     | { riderRideDetails: IRiderRideDetails; currentRide: ICurrentRide }[]
   //     | [];

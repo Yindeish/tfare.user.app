@@ -131,7 +131,7 @@ import { supabase } from "@/supabase/supabase.config";
 import { RideConstants } from "@/constants/ride";
 
 const RecentLocationsSnippet = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
   const { token: session } = useAppSelector((state: RootState) => state.user);
   const { savedAddresses } = AccountSelectors();
@@ -1480,7 +1480,7 @@ const FilledForm = () => {
                 `/(rideScreens)/rideMap?selectedAvailableRideId=${data?.riderRide?.currentRideId}&requestId=${data?.riderRide?._id}`
               );
               showBottomSheet(
-                [800],
+                [100, 800],
                 <RideBookedSheet rideId={data?.riderRide?._id} />,
                 true
               );
@@ -2000,7 +2000,7 @@ const SearchingRide = ({
 
     const code = returnedData?.code;
     const status = returnedData?.status;
-    const userRideSaved = returnedData?.userRideSaved;
+    const userRideSaved = returnedData?.userRideSaved || returnedData?.riderRide;
 
     setFetchState((prev) => ({
       ...prev,
@@ -2078,7 +2078,7 @@ const SearchingRide = ({
           `/(rideScreens)/rideMap?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
         );
         showBottomSheet(
-          [800],
+          [100, 800],
           <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
           true
         );

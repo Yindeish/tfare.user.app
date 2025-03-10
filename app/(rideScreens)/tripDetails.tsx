@@ -75,6 +75,7 @@ import {
   IRide,
   IRiderRideDetails,
   ITicket,
+  ITicketInput,
 } from "@/state/types/ride";
 import CtaBtn from "@/components/shared/ctaBtn";
 import { indices } from "@/constants/zIndices";
@@ -96,9 +97,10 @@ import {
 import { RideConstants } from "@/constants/ride";
 import { useStorageState } from "@/hooks/useStorageState";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
-import Ticket from "@/components/page/ticket";
+// import Ticket from "@/components/page/ticket";
 import * as Device from "expo-device";
 import * as Location from "expo-location";
+import ScaleUpDown from "@/components/shared/scale_animator";
 
 function TripDetails() {
   const { rideId, currentRideId, selectedAvailableRideId, requestId } =
@@ -116,11 +118,16 @@ function TripDetails() {
     selectedAvailableRide,
     riderRideDetails: riderRide,
     ridePlans,
+    lastRides,
     stateInput: { paymentOptionInput },
   } = useAppSelector((state: RootState) => state.ride);
   const path = usePathname();
   const { showBottomSheet, hideBottomSheet } = useBottomSheet();
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
+  const { differentTickets } = useAppSelector((state: RootState) => state.ride);
+
+  const tripCost = lastRides?.map((ride) => ride?.ridePlan?.ride?.rideFee || ride?.ridePlan?.plan?.ride?.rideFee)?.reduce((prev, current) => prev+current, 0);
+  const serviceFee = (lastRides?.[0]?.ridePlan as any)?.serviceFee;
 
   return (
     <SafeScreen>
@@ -134,15 +141,21 @@ function TripDetails() {
         />
         {/* Page Title */}
 
-        <View style={[wHFull, mt(120), flexCol, gap(32), px(20)]}>
+        <View style={[wFull, mt(120), flexCol, gap(32), px(20)]}>
           <RideBlock />
 
-          <FlatList
+          {/* <FlatList
             horizontal={false}
-            data={userRideInput?.tickets}
+            data={Number(differentTickets?.length) > 0 ? differentTickets as ITicket[] : userRideInput?.tickets as ITicket[]}
             renderItem={({ index, item: ticketId }) => (
               <Ticket ticket={ticketId} index={index} key={index} />
             )}
+          /> */}
+          <FlatList
+            horizontal={false}
+            data={lastRides}
+            renderItem={({ index, item }) => <Ticket ride={{...item, ticketNumber: index+1}} key={index} />}
+            style={tw ``}
           />
 
           <View style={[wFull, flexCol, gap(16)]}>
@@ -156,6 +169,7 @@ function TripDetails() {
                   borderBottomColor: Colors.light.border,
                   borderBottomWidth: 0.7,
                 },
+                tw ``
               ]}
             >
               <View
@@ -168,6 +182,7 @@ function TripDetails() {
                     borderBottomColor: Colors.light.border,
                     borderBottomWidth: 0.7,
                   },
+                  tw ``
                 ]}
               >
                 <BuyTicketListTile
@@ -180,18 +195,21 @@ function TripDetails() {
                 />
                 <BuyTicketListTile
                   leadingText="Trip Cost"
+                  // trailing={{
+                  //   text: `₦ ${
+                  //     ridePlans[0]?.ride?.rideFee ||
+                  //     ridePlans[0]?.plan?.ride?.rideFee ||
+                  //     ""
+                  //   }`,
                   trailing={{
-                    text: `₦ ${
-                      ridePlans[0]?.ride?.rideFee ||
-                      ridePlans[0]?.plan?.ride?.rideFee ||
-                      ""
-                    }`,
+                    text: `₦ ${tripCost || ""}`,
                   }}
                 />
                 <BuyTicketListTile
                   leadingText="Service Fee"
                   trailing={{
-                    text: `₦ ${ridePlans?.[0]?.plan?.serviceFee || ""}`,
+                    // text: `₦ ${ridePlans?.[0]?.plan?.serviceFee || ""}`,
+                    text: `₦ ${serviceFee || ""}`,
                   }}
                 />
               </View>
@@ -200,10 +218,7 @@ function TripDetails() {
                 leadingText="Total"
                 trailing={{
                   text: `₦ ${
-                    Number(
-                      ridePlans[0]?.plan?.ride?.rideFee ||
-                        ridePlans[0]?.ride?.rideFee
-                    ) + Number(ridePlans?.[0]?.plan?.serviceFee) || ""
+                    Number(tripCost) + Number(serviceFee) || ""
                   }`,
                 }}
               />
@@ -248,7 +263,7 @@ function RideBlock() {
   const openMap = () => {
     getCurrentLocation();
 
-     if (location) {
+    if (location) {
       const { latitude, longitude } = location.coords;
       const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
       Linking.openURL(url);
@@ -322,26 +337,28 @@ function RideBlock() {
         </View>
 
         <View style={[flex, itemsCenter, gap(12)]}>
-          <TouchableOpacity
-            onPress={openMap}
-            style={[
-              w(45),
-              h(45),
-              rounded(45),
-              // bg(Colors.light.background),
-              flex,
-              itemsCenter,
-              justifyCenter,
-              { borderWidth: 0.7, borderColor: Colors.light.border },
-            ]}
-          >
-            (
-            <Image
-              style={[image.w(55), image.h(55)]}
-              source={images.trackOngoing}
-            />
-            )
-          </TouchableOpacity>
+          <ScaleUpDown>
+            <TouchableOpacity
+              onPress={openMap}
+              style={[
+                w(45),
+                h(45),
+                rounded(45),
+                // bg(Colors.light.background),
+                flex,
+                itemsCenter,
+                justifyCenter,
+                { borderWidth: 0.7, borderColor: Colors.light.border },
+              ]}
+            >
+              (
+              <Image
+                style={[image.w(55), image.h(55)]}
+                source={images.trackOngoing}
+              />
+              )
+            </TouchableOpacity>
+          </ScaleUpDown>
 
           <Text style={[c("#27AE65"), neurialGrotesk, fw700, fs14]}>
             Ongoing
@@ -352,139 +369,98 @@ function RideBlock() {
   );
 }
 
-// function Ticket({ ride }: { ride: IRiderRideDetails }) {
-//   return (
-//     <View style={tw`w-full h-auto flex flex-col gap-[16px]`}>
-//       {/* Pick up block */}
+function Ticket({ ride }: { ride: IRiderRideDetails & {ticketNumber: number} }) {
+  return (
+    <View style={tw`w-full h-auto flex flex-col gap-[16px]`}>
+      <Text
+        style={[colorBlack, fw700, fs14]}
+      >{`Ticket ${ride?.ticketNumber}`}</Text>
 
-//       <View
-//         style={[
-//           wFull,
-//           flexCol,
-//           gap(16),
-//           {
-//             borderBottomWidth: 0.7,
-//             borderBottomColor: Colors.light.border,
-//           },
-//         ]}
-//       >
-//         <View style={[flexCol, gap(15)]}>
-//           <View style={[flex, gap(12), itemsCenter]}>
-//             <Image
-//               source={images.greenBgCoasterImage}
-//               style={[image.w(20), image.h(20)]}
-//             />
+      {/* Pick up block */}
 
-//             <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>
-//               Pick up Bus Stop
-//             </Text>
-//           </View>
+      <View
+        style={[
+          wFull,
+          flexCol,
+          gap(16),
+          {
+            borderBottomWidth: 0.7,
+            borderBottomColor: Colors.light.border,
+          },
+        ]}
+      >
+        <View style={[flexCol, gap(15)]}>
+          <View style={[flex, gap(12), itemsCenter]}>
+            <Image
+              source={images.greenBgCoasterImage}
+              style={[image.w(20), image.h(20)]}
+            />
 
-//           {/* <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.pickupBusstop.routeName}</Text> */}
-//           <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>
-//             {ride?.pickupBusstop?.name}
-//           </Text>
-//         </View>
-//       </View>
+            <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>
+              Pick up Bus Stop
+            </Text>
+          </View>
 
-//       {/* Pick up block */}
-//       {/* Drop off block */}
+          {/* <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.pickupBusstop.routeName}</Text> */}
+          <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>
+            {ride?.pickupBusstop?.name}
+          </Text>
+        </View>
+      </View>
 
-//       <View
-//         style={[
-//           wFull,
-//           flex,
-//           justifyBetween,
-//           pr(16),
-//           {
-//             borderBottomWidth: 0.7,
-//             borderBottomColor: Colors.light.border,
-//           },
-//         ]}
-//       >
-//         <View style={[flexCol, gap(15)]}>
-//           <View style={[flex, gap(12), itemsCenter]}>
-//             <Image
-//               source={images.redBgCoasterImage}
-//               style={[image.w(20), image.h(20)]}
-//             />
+      {/* Pick up block */}
+      {/* Drop off block */}
 
-//             <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>
-//               Drop off Bus Stop
-//             </Text>
-//           </View>
+      <View
+        style={[
+          wFull,
+          flex,
+          justifyBetween,
+          pr(16),
+          {
+            borderBottomWidth: 0.7,
+            borderBottomColor: Colors.light.border,
+          },
+        ]}
+      >
+        <View style={[flexCol, gap(15)]}>
+          <View style={[flex, gap(12), itemsCenter]}>
+            <Image
+              source={images.redBgCoasterImage}
+              style={[image.w(20), image.h(20)]}
+            />
 
-//           {/* <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.dropoffBusstop.routeName}</Text> */}
-//           <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>
-//             {ride?.dropoffBusstop?.name}
-//           </Text>
-//         </View>
+            <Text style={[c(Colors.light.border), neurialGrotesk, fw400, fs12]}>
+              Drop off Bus Stop
+            </Text>
+          </View>
 
-//         <View style={[flexCol, gap(16), justifyStart]}>
-//           <View style={[flex, itemsCenter, gap(8)]}>
-//             <Image
-//               style={[image.w(14), image.h(11)]}
-//               source={images.rideOfferImage}
-//             />
-//             <Text
-//               style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12]}
-//             >
-//               Ticket fee
-//             </Text>
-//           </View>
+          {/* <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>{ticket.dropoffBusstop.routeName}</Text> */}
+          <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>
+            {ride?.dropoffBusstop?.name}
+          </Text>
+        </View>
 
-//           <Text style={[colorBlack, fw700, fs14]}>
-//             ₦ {ride?.ridePlan?.ride?.rideFee}
-//           </Text>
-//         </View>
-//       </View>
+        <View style={[flexCol, gap(16), justifyStart]}>
+          <View style={[flex, itemsCenter, gap(8)]}>
+            <Image
+              style={[image.w(14), image.h(11)]}
+              source={images.rideOfferImage}
+            />
+            <Text
+              style={[c(Colors.light.textGrey), neurialGrotesk, fw400, fs12]}
+            >
+              Ticket fee
+            </Text>
+          </View>
 
-//       {/* Drop off block */}
+          <Text style={[colorBlack, fw700, fs14]}>
+            ₦ {ride?.ridePlan?.ride?.rideFee}
+          </Text>
+        </View>
+      </View>
 
-//       {/* Counter fare block */}
-
-//       <View
-//         style={[
-//           wFull,
-//           flexCol,
-//           gap(16),
-//           pb(16),
-//           {
-//             borderBottomWidth: 0.7,
-//             borderBottomColor: Colors.light.border,
-//           },
-//         ]}
-//       >
-//         <View style={[wFull, flex, justifyBetween]}>
-//           <View
-//             style={[
-//               flex,
-//               gap(16),
-//               itemsCenter,
-//               justifyStart,
-//               w("57%"),
-//               h(50),
-//               pl(16),
-//               rounded(10),
-//               bg(colors.white),
-//               { borderWidth: 0.7, borderColor: Colors.light.border },
-//             ]}
-//           >
-//             <Image
-//               style={[image.w(14), image.h(10)]}
-//               source={images.rideOfferImage}
-//             />
-
-//             <View style={[flex, itemsCenter]}>
-//               <Text style={[c(Colors.light.textGrey), fs14, fw500]}>
-//                 ₦ {ride?.ridePlan?.ride?.rideFee}
-//               </Text>
-//             </View>
-//           </View>
-//         </View>
-//       </View>
-
-//       {/* Counter fare block */}
-//     </View>
-//   );
-// }
+      {/* Drop off block */}
+    </View>
+  );
+}

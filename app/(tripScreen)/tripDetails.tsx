@@ -99,6 +99,7 @@ import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 import Ticket from "@/components/page/ticket";
 import * as Device from "expo-device";
 import * as Location from "expo-location";
+import ScaleUpDown from "@/components/shared/scale_animator";
 
 function TripDetails() {
   const { rideId, currentRideId, selectedAvailableRideId, requestId } =
@@ -327,6 +328,7 @@ function RideBlock() {
         </View>
 
         <View style={[flex, itemsCenter, gap(12)]}>
+          <ScaleUpDown>
           <TouchableOpacity
             onPress={openMap}
             style={[
@@ -347,6 +349,7 @@ function RideBlock() {
             />
             )
           </TouchableOpacity>
+          </ScaleUpDown>
 
           <Text style={[c("#27AE65"), neurialGrotesk, fw700, fs14]}>
             Ongoing

@@ -75,7 +75,7 @@ export default function PaymentOptions() {
                             img={{ src: images.proceedCheckImage, w: 20, h: 20 }}
                             onPress={() => {
                                 router.push(`/(tripScreen)/bookTrip/1` as Href);
-                                showBottomSheet([800], <RideBookedSheet rideId={rideId as string} />)
+                                showBottomSheet([100, 800], <RideBookedSheet rideId={rideId as string} />)
                             }}
                             text={{ name: 'Proceed', color: colors.white }}
                             bg={{ color: Colors.light.background }}

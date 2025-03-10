@@ -140,7 +140,9 @@ export default function AppLayout() {
 
         if (code && (code == 200 || code == 201)) {
           if (ticketPaid) {
-            dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+            
+            if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+            if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: ticketPaid }));
             if (riderRide)
               dispatch(
                 setState({
@@ -160,9 +162,10 @@ export default function AppLayout() {
                 setState({ key: "driverDetails", value: returnedData?.driver })
               );
             // dispatch(setPaymentOptionsVisible(true));
-            router.setParams({ ...searchParams, query: "RideBooked" });
+            // router.setParams({ ...searchParams, query: "RideBooked" });
+            setQuery(RideConstants.query.RideBooked);
             showBottomSheet(
-              [800],
+              [100, 800],
               <RideBookedSheet rideId={selectedAvailableRideId as string} />,
               true
             );
@@ -202,24 +205,29 @@ export default function AppLayout() {
           router.setParams({ requestId: returnedData?.riderRide?._id });
 
           if (status === "started") {
-            showBottomSheet([500], <TripStartedSheet />);
-            router.setParams({ ...searchParams, query: "RideStarted" });
+            // router.setParams({ ...searchParams, query: "RideStarted" });
+            setQuery(RideConstants.query.RideStarted)
             router.push(
               `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );
+            showBottomSheet([100, 500], <TripStartedSheet />, true);
           }
           if (status === "ended") {
+            // router.setParams({ query: "RideEnded" });
+            setQuery(RideConstants.query.RideEnded)
             showBottomSheet([500], <TripCompletedSheet />, true);
-            router.setParams({ query: "RideEnded" });
           }
           if (status === "booked") {
-            router.setParams({ ...searchParams, query: "RideBooked" });
-            dispatch(
-              setState({
-                key: "sameTickets",
-                value: [returnedData?.ticketPaid],
-              })
-            );
+            // router.setParams({ ...searchParams, query: "RideBooked" });
+            setQuery(RideConstants.query.RideBooked);
+            // dispatch(
+            //   setState({
+            //     key: "sameTickets",
+            //     value: [returnedData?.ticketPaid],
+            //   })
+            // );
+            if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+            if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: [ticketPaid] }));
             // router.push(
             //   `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             // );
@@ -227,7 +235,7 @@ export default function AppLayout() {
               `/rideMap?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );
             showBottomSheet(
-              [800],
+              [100, 800],
               <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
               true
             );

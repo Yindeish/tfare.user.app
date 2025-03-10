@@ -26,6 +26,7 @@ const initialState: IRideState = {
     differentTickets: [],
     // sameTickets: null,
     sameTickets: [],
+    lastRides: [],
     tripId: '',
     stateInput: {
         cancelRideReasonInput: '',
@@ -98,7 +99,7 @@ const RideSlice = createSlice({
             // if (state.stateInput.userRideInput && state.stateInput.userRideInput?.tickets) {
                 // Reset user tickets list
                 
-                state.stateInput.userRideInput.tickets = []; //pop and push later; this is a bad practice. Having to refres te list
+                state.stateInput.userRideInput.tickets = []; //pop and push later; this is a bad practice. Having to refres the list
 
                 // console.log({'state.userRide': state.userRide})
                 // for (let val = 0; val < currentNumberOfTickets; val++) {
@@ -119,8 +120,8 @@ const RideSlice = createSlice({
 
                 for (let val = 0; val < (currentNumberOfTickets); val++) {
                     const newTicket: ITicketInput = {
-                        dropoffBusstop: (val + 1) === 1 ? state.stateInput.dropoffBusstopInput : null, // setting the first ticket to use the underlying credentials
-                        pickupBusstop: (val + 1) === 1 ? state.stateInput.pickupBusstopInput : null, // setting the first ticket to use the underlying credentials
+                        dropoffBusstop: (val + 1) === 1 ? state.stateInput.dropoffBusstopInput || state.riderRideDetails?.dropoffBusstop : null, // setting the first ticket to use the underlying credentials
+                        pickupBusstop: (val + 1) === 1 ? state.stateInput.pickupBusstopInput || state.riderRideDetails?.pickupBusstop : null, // setting the first ticket to use the underlying credentials
                         owner: {},
                         ticketOtp: '',
                         sameAsFirstTicket: (val + 1) === 1 ? true : false, // setting the first ticket to use the underlying credentials
@@ -173,29 +174,23 @@ const RideSlice = createSlice({
             const { currentNumberOfTickets } = action.payload;
 
             // if (state.stateInput.userRideInput && state.userRide.tickets) {
-            //     const ticket = state.userRide.tickets.find(ticket => Number(ticket.number) === Number(currentNumberOfTickets));
+                const ticket = state.stateInput?.userRideInput?.tickets?.find(ticket => Number(ticket.number) === Number(currentNumberOfTickets));
 
-            //     if (ticket) {
-            //         state.userRide.tickets = state.userRide.tickets.map((ticket,) => {
+                if (ticket) {
+                    state.stateInput.userRideInput.tickets = state.stateInput.userRideInput.tickets?.map((ticket,) => {
 
-            //             if (Number(ticket.number) === Number(currentNumberOfTickets)) {
+                        if (Number(ticket.number) === Number(currentNumberOfTickets)) {
 
-            //                 return {
-            //                     ...ticket,
-            //                     pickupBusstop: {
-            //                         type: 'pickupBusstop',
-            //                         routeName: state.stateInput.pickupBusstopInput,
-            //                     },
-            //                     dropoffBusstop: {
-            //                         type: 'dropoffBusstop',
-            //                         routeName: state.stateInput.dropoffBusstopInput,
-            //                     },
-            //                     sameAsFirstTicket: false
-            //                 }
-            //             } else return ticket
-            //         }
-            //         ) as ITicketInput[];
-            //     } else return;
+                            return {
+                                ...ticket,
+                                pickupBusstop: state.stateInput.pickupBusstopInput,
+                                dropoffBusstop: state.stateInput.dropoffBusstopInput,
+                                sameAsFirstTicket: false
+                            }
+                        } else return ticket
+                    }
+                    ) as ITicketInput[];
+                } else return;
             // } else return;
         },
         editTicketCounterFare: (state, action: PayloadAction<{ currentNumberOfTickets: number }>) => {

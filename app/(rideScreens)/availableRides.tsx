@@ -158,7 +158,7 @@ export default function AvailableRide() {
       if (status === "started") {
         // router.setParams({ ...searchParams,query: "RideStarted", });
         setQuery(RideConstants.query.RideStarted);
-        showBottomSheet([500], <TripStartedSheet />);
+        showBottomSheet([100, 500], <TripStartedSheet />, true);
         router.push(
           `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${requestId}`
         );
@@ -182,7 +182,7 @@ export default function AvailableRide() {
           `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${requestId}`
         );
         showBottomSheet(
-          [800],
+          [100, 800],
           <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
           true
         );

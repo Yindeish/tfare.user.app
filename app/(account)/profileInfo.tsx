@@ -230,7 +230,7 @@ export default function profileInfo() {
                             placeholder='Full Name'
                             keyboardType='default'
                             value={values.fullName}
-                            onChangeText={handleChange('fullName')}
+                            onChangeText={profileCta === 'save' ? handleChange('fullName'): () => {}}
                             onBlur={handleBlur('fullName')}
                         />
 
@@ -243,7 +243,7 @@ export default function profileInfo() {
                             placeholder='User Name'
                             keyboardType='default'
                             value={values.userName}
-                            onChangeText={handleChange('userName')}
+                            onChangeText={profileCta === 'save' ? handleChange('userName'): () => {}}
                             onBlur={handleBlur('userName')}
                         />
 
@@ -256,7 +256,7 @@ export default function profileInfo() {
                             placeholder='Email Address'
                             keyboardType='email-address'
                             value={values.email}
-                            onChangeText={handleChange('email')}
+                            onChangeText={profileCta === 'save' ? handleChange('email') : () => {}}
                             onBlur={handleBlur('email')}
                         />
 
@@ -269,7 +269,7 @@ export default function profileInfo() {
                             placeholder='Phone Number'
                             keyboardType='numeric'
                             value={values.phoneNumber}
-                            onChangeText={handleChange('phoneNumber')}
+                            onChangeText={profileCta === 'save' ? handleChange('phoneNumber') : () => {}}
                             onBlur={handleBlur('phoneNumber')}
                         />
                     </View>
