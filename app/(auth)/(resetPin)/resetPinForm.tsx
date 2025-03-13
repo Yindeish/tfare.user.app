@@ -216,6 +216,7 @@ export default function Signin() {
                   placeholderTextColor={Colors.light.textGrey}
                   keyboardType="number-pad"
                   value={formik.values.pin}
+                  autoCorrect={false}
                   secureTextEntry
                   onChangeText={formik.handleChange("pin")}
                   onBlur={formik.handleBlur("pin")}
@@ -237,6 +238,7 @@ export default function Signin() {
                   placeholderTextColor={Colors.light.textGrey}
                   keyboardType="number-pad"
                   value={formik.values.confirmPin}
+                  autoCorrect={false}
                   secureTextEntry
                   onChangeText={formik.handleChange("confirmPin")}
                   onBlur={formik.handleBlur("confirmPin")}

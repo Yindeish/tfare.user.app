@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import { Text } from "react-native-paper";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   bg,
   flex,
@@ -51,7 +51,7 @@ import {
 import { image } from "@/utils/imageStyles";
 import { images } from "@/constants/images";
 import RideSelectors from "@/state/selectors/ride";
-import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
+import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
 import Checkbox from "expo-checkbox";
 import {
   closeModal,
@@ -60,19 +60,23 @@ import {
   setBottomSheetSnapPoint,
   setBottomSheetType,
 } from "@/state/slices/layout";
-import { ITicketInput } from "@/state/types/ride";
+import { IRiderRideDetails, ITicketInput, TRideStatus } from "@/state/types/ride";
 import {
   editTicketCounterFare,
   setCurrentTicket,
+  setState,
   setStateInputField,
   toggleTicketAsFirstTicket,
 } from "@/state/slices/ride";
 import CounterFareCtaBtn from "./counterFareCtaBtn";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { TicketDetailsSheet } from "./bookRideSheetComponent";
+import FetchService from "@/services/api/fetch.service";
+import { RootState } from "@/state/store";
 
 function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
   const dispatch = useAppDispatch();
+  const {token} = useAppSelector((state: RootState) => state.user);
   const { showBottomSheet } = useBottomSheet();
   const {
     currentTicket,
@@ -85,10 +89,91 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
     },
     currentNumberOfTickets,
   } = RideSelectors();
+  const {selectedAvailableRide, currentRoute, stateInput:{ticketsDetails}} = useAppSelector((state: RootState) => state.ride);
+  
+  const [fetchState, setFetchState] = useState({
+    loading: false,
+    msg: '',
+    code: null
+  });
+  const {code, loading, msg} = fetchState;
+
+
+  const negotiateTicketFare = async (ticketNumber: number) => {
+    setFetchState((prev) => ({ ...prev, loading: true }));
+
+    const dropoffPlan = currentRoute?.inTripDropoffs?.find((dropoff) => String(dropoff?._id) === String(dropoffBusstopInput?._id))?.plan;
+
+    const returnedData = await FetchService.postWithBearerToken({
+      url: `/user/rider/me/ride/${selectedAvailableRide?._id}/negotiate-fare`,
+      data: {
+        pickupBusstopId: pickupBusstopInput?._id,
+        dropoffBusstopId: dropoffBusstopInput?._id,
+        userCounterOffer: userCounterFareInput,
+        ridePlan: dropoffPlan?.ride?.rideFee || dropoffPlan?.plan?.ride?.rideFee,
+        routeId: dropoffPlan?.routeId,
+      },
+      token: token as string,
+    });
+
+    const code = returnedData?.code;
+    const msg = returnedData?.msg;
+    const userRideSaved = returnedData?.userRideSaved || returnedData?.riderRide;
+
+    setFetchState((prev) => ({
+      ...prev,
+      loading: false,
+      msg,
+      code,
+    }));
+
+    if (code == 201 || code == 200) {
+      const tickets = ticketsDetails.map((ticketItem) => {
+        if(Number(ticketItem?.number) == ticketNumber) {
+          return {
+            ...ticketItem,
+            ticketStatus: 'pending'
+          }
+        }
+        else return ticketItem;
+      })
+
+      dispatch(setStateInputField({key:'ticketsDetails', value: tickets}));
+      dispatch(setState({ key: "riderRideDetails", value: userRideSaved }));
+      // dispatch(setState({key:'counterFareStatus', value: 'pending'}))
+    }
+  }
+
+  const toggleTicketAsFirstTicket = (ticketNumber: number) => {
+    const firstTicket = ticketsDetails.find((ticket) => Number(ticket?.number) == 1);
+
+    let tickets = ticketsDetails.map((ticket) => {
+      if(Number(ticket?.number) == ticketNumber) {
+        const sameAsFirstTicket = !ticket?.sameAsFirstTicket;
+
+        return {
+          ...ticket,
+          sameAsFirstTicket: !!sameAsFirstTicket,
+          pickupBusstop: sameAsFirstTicket ? firstTicket?.pickupBusstop:null,
+          dropoffBusstop: sameAsFirstTicket ? firstTicket?.dropoffBusstop:null,
+          ticketStatus: sameAsFirstTicket ? firstTicket?.ticketStatus : null,
+          userCounterFare: sameAsFirstTicket ? firstTicket?.userCounterFare : null,
+          rideFee: sameAsFirstTicket ? firstTicket?.rideFee : null,
+          serviceFee: sameAsFirstTicket ? firstTicket?.serviceFee : null,
+        } as ITicketInput;
+      }
+      else return ticket;
+    });
+
+    dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}))
+  }
+
+  // ?????????????????//************************ R E N D E R I N G */
+  // ?????????????????//************************ R E N D E R I N G */
 
   // If ticket number is 1
 
-  if (ticket.number === 1) {
+  if (Number(ticket?.number) === 1) {
     return (
       <View style={[wFull, flexCol, gap(32), mt(32)]}>
         <Text style={[colorBlack, neurialGrotesk, fw700, fs14]}>Ticket 1</Text>
@@ -196,13 +281,14 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
         <View style={[flex, gap(12), itemsCenter]}>
           <Checkbox
             value={ticket.sameAsFirstTicket}
-            onValueChange={() => {
-              dispatch(
-                toggleTicketAsFirstTicket({
-                  currentNumberOfTickets: ticket.number,
-                })
-              );
-            }}
+            // onValueChange={() => {
+            //   dispatch(
+            //     toggleTicketAsFirstTicket({
+            //       currentNumberOfTickets: ticket.number,
+            //     })
+            //   );
+            // }}
+            onValueChange={() => toggleTicketAsFirstTicket(ticket?.number)}
             color={ticket.sameAsFirstTicket ? "#27AE65" : colors.grey500}
           />
 
@@ -355,7 +441,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                 </View>
 
                 <Text style={[colorBlack, fw700, fs14]}>
-                  ₦ {ticket.rideFee}
+                  ₦ {ticket?.rideFee}
                 </Text>
               </View>
             </View>
@@ -415,19 +501,28 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                       <TextInput
                         onFocus={() => dispatch(setCurrentTicket(ticket))}
                         onChangeText={(text) => () => {
-                          dispatch(
-                            setStateInputField({
-                              key: "userCounterFareInput",
-                              value: text,
-                            })
-                          );
-                          dispatch(
-                            editTicketCounterFare({
-                              currentNumberOfTickets: Number(
-                                currentTicket?.number
-                              ),
-                            })
-                          );
+                          const ticktes = ticketsDetails?.map((ticketItem) => {
+                            if(Number(ticket?.number) == Number(ticket?.number)) {
+                              return {
+                                ...ticketItem,
+                                userCounterFare: text
+                              }
+                            }
+                            else return ticket;
+                          })
+                          // dispatch(
+                          //   setStateInputField({
+                          //     key: "userCounterFareInput",
+                          //     value: text,
+                          //   })
+                          // );
+                          // dispatch(
+                          //   editTicketCounterFare({
+                          //     currentNumberOfTickets: Number(
+                          //       currentTicket?.number
+                          //     ),
+                          //   })
+                          // );
                         }}
                         value={userCounterFareInput?.toString()}
                         placeholder={"Negotiate fare"}
@@ -455,10 +550,10 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                     </View>
                   </View>
 
-                  <CounterFareCtaBtn />
+                  <CounterFareCtaBtn ticket={ticket} fetchState={fetchState} negotiateTicketFare={() => negotiateTicketFare(ticket?.number)} setFetchState={setFetchState} />
                 </View>
 
-                {true && (
+                {(code == 400 && !loading) && (
                   <View
                     style={[wFull, flex, itemsCenter, justifyStart, gap(12)]}
                   >
@@ -479,7 +574,8 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                         c(Colors.light.error),
                       ]}
                     >
-                      Offer too low to work with
+                      {msg}
+                      {/* Offer too low to work with */}
                     </Text>
                   </View>
                 )}

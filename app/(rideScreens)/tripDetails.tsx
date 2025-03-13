@@ -144,13 +144,6 @@ function TripDetails() {
         <View style={[wFull, mt(120), flexCol, gap(32), px(20)]}>
           <RideBlock />
 
-          {/* <FlatList
-            horizontal={false}
-            data={Number(differentTickets?.length) > 0 ? differentTickets as ITicket[] : userRideInput?.tickets as ITicket[]}
-            renderItem={({ index, item: ticketId }) => (
-              <Ticket ticket={ticketId} index={index} key={index} />
-            )}
-          /> */}
           <FlatList
             horizontal={false}
             data={lastRides}

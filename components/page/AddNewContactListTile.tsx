@@ -33,7 +33,7 @@ function AddNewContactListTile({ icon, input }: { icon: IIcon, input: IInput }) 
                 onChangeText={input.onChangeText}
                 onBlur={input.onBlur}
                 value={input.value} placeholder={input.palceHolder}
-
+                autoCorrect={false}
                 style={[!icon.present ? wHFull as TextStyle : { flex: 0.8 }, { borderWidth: 0 }]}
 
                 // others

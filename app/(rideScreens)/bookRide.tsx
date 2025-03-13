@@ -68,8 +68,14 @@ import {
   setCurrentNumberOfTickets,
   setPaymentOptionsVisible,
   setState,
+  setStateInputField,
 } from "@/state/slices/ride";
-import { ICurrentRide, IRide, IRiderRideDetails } from "@/state/types/ride";
+import {
+  ICurrentRide,
+  IRide,
+  IRiderRideDetails,
+  ITicketInput,
+} from "@/state/types/ride";
 import Ticket from "@/components/page/ticket";
 import CtaBtn from "@/components/shared/ctaBtn";
 import { indices } from "@/constants/zIndices";
@@ -79,18 +85,20 @@ import FetchService from "@/services/api/fetch.service";
 import { RootState } from "@/state/store";
 import Spinner from "@/components/shared/spinner";
 // import {toast} from "burnt";
-import * as Linking from 'expo-linking';
-import Toast from 'react-native-toast-message'
+import * as Linking from "expo-linking";
+import Toast from "react-native-toast-message";
 import { useGlobalSearchParams } from "expo-router";
 import tw from "@/constants/tw";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
-import { TripCompletedSheet, TripStartedSheet } from "@/components/page/tripStartedBottomSheetComponents";
+import {
+  TripCompletedSheet,
+  TripStartedSheet,
+} from "@/components/page/tripStartedBottomSheetComponents";
 import { RideConstants } from "@/constants/ride";
 import { useStorageState } from "@/hooks/useStorageState";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 import * as Device from "expo-device";
 import * as Location from "expo-location";
-
 
 const {
   sharedStyle,
@@ -120,7 +128,8 @@ const {
 });
 
 export default function BookRide() {
-  const { rideId, currentRideId, selectedAvailableRideId, requestId } = useGlobalSearchParams();
+  const { rideId, currentRideId, selectedAvailableRideId, requestId } =
+    useGlobalSearchParams();
   const { token, user } = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
   const {
@@ -130,9 +139,15 @@ export default function BookRide() {
     currentNumberOfTickets,
     paymentOptionsVisible,
   } = RideSelectors();
-  const {selectedAvailableRide, riderRideDetails: riderRide, ridePlans, stateInput:{paymentOptionInput}} = useAppSelector((state: RootState) => state.ride);
+  const {
+    selectedAvailableRide,
+    riderRideDetails: riderRide,
+    ridePlans,
+    currentRoute,
+    stateInput: { paymentOptionInput, ticketsDetails },
+  } = useAppSelector((state: RootState) => state.ride);
   const path = usePathname();
-  const {showBottomSheet, hideBottomSheet} = useBottomSheet();
+  const { showBottomSheet, hideBottomSheet } = useBottomSheet();
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   const [fetchState, setFetchState] = useState({
@@ -144,56 +159,95 @@ export default function BookRide() {
   const { code, msg, loading, rides } = fetchState;
 
   const [location, setLocation] = useState<Location.LocationObject | null>(
-      null
-    );
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    null
+  );
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const tripCost = (Number(ridePlans[0]?.ride?.rideFee) * (currentNumberOfTickets || 1)) || (Number(ridePlans[0]?.plan?.ride?.rideFee) * (currentNumberOfTickets || 1));
-  const serviceFee = Number(ridePlans?.[0]?.plan?.serviceFee);
-  const totalCost = tripCost + serviceFee;
+  // const tripCost = userRideInput?.tickets?.[1]?.sameAsFirstTicket
+  //   ? Number(ridePlans[0]?.ride?.rideFee) * (currentNumberOfTickets || 1) ||
+  //     Number(ridePlans[0]?.plan?.ride?.rideFee) * (currentNumberOfTickets || 1)
+  //   : userRideInput?.tickets?.reduce(
+  //       (prev, current) => prev + Number(current?.rideFee),
+  //       0
+  //     );
+  const tripCost = ticketsDetails?.reduce((prev, current) => prev + Number(current?.rideFee), 0)
+const serviceFee = Number(ticketsDetails[0]?.serviceFee);
+  // const serviceFee = Number(ridePlans?.[0]?.plan?.serviceFee);
+  const totalCost = Number(tripCost) + serviceFee;
+  console.log({ticketsDetails})
 
   const selectNumberOfTickets = (ticketNumber: number) => {
     dispatch(setCurrentNumberOfTickets(ticketNumber));
 
-    dispatch(createTicket({ currentNumberOfTickets: ticketNumber }));
+    let tickets = ticketsDetails as ITicketInput[];
+
+    for (let val = 1; val <= ticketNumber; val++) {
+      const ticketPresent = ticketsDetails?.find(
+        (ticket) => Number(ticket?.number) == val
+      );
+
+      if (!ticketPresent) {
+        const newTicket = {
+          number: val,
+          ticketStatus: "idle",
+          sameAsFirstTicket: false,
+        };
+
+        tickets = [...(tickets as ITicketInput[]), newTicket as ITicketInput];
+      }
+    }
+
+    tickets = tickets.filter(
+      (ticketItem) => Number(ticketItem?.number) <= ticketNumber
+    );
+
+    dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
   };
 
-   async function getCurrentLocation() {
-      if (Platform.OS === "android" && !Device.isDevice) {
-        setErrorMsg(
-          "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
-        );
-        return;
-      }
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-  
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+  async function getCurrentLocation() {
+    if (Platform.OS === "android" && !Device.isDevice) {
+      setErrorMsg(
+        "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
+      );
+      return;
     }
-  
-    const openMap = () => {
-      getCurrentLocation();
-  
-       if (location) {
-        const { latitude, longitude } = location.coords;
-        const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
-        Linking.openURL(url);
-      }
-    };
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied");
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    setLocation(location);
+  }
+
+  const openMap = () => {
+    getCurrentLocation();
+
+    if (location) {
+      const { latitude, longitude } = location.coords;
+      const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      Linking.openURL(url);
+    }
+  };
 
   // Updating buy Ticket btn with allTicketsFilled
   useEffect(() => {
-    dispatch(setState({key:'booking', value: allTicketsFilled && path === '/(rideScreens)/bookRide' as Href ?true:false}))
-  }, [allTicketsFilled, path])
+    dispatch(
+      setState({
+        key: "booking",
+        value:
+          allTicketsFilled && path === ("/(rideScreens)/bookRide" as Href)
+            ? true
+            : false,
+      })
+    );
+  }, [allTicketsFilled, path]);
   // Updating buy Ticket btn with allTicketsFilled
 
   useEffect(() => {
-    if(!selectedAvailableRide) router.back()
-  }, [selectedAvailableRide])
+    if (!selectedAvailableRide) router.back();
+  }, [selectedAvailableRide]);
 
   //   const getRideDetails = async () => {
   //     const url = `user/rider/me/ride/${currentRideId}/ride-details`;
@@ -232,29 +286,44 @@ export default function BookRide() {
 
   // create a single ticket based on the default number of tickets
   useEffect(() => {
-    if (currentNumberOfTickets === 1) {
-      dispatch(createTicket({ currentNumberOfTickets: 1 }));
-    }
+    // if (currentNumberOfTickets === 1) {
+    //   dispatch(createTicket({ currentNumberOfTickets: 1 }));
+    // }
   }, [currentNumberOfTickets]);
   // create a single ticket based on the default number of tickets
 
   // check if all tickets have been filled
+  // useEffect(() => {
+  //   if (Number(userRideInput?.tickets?.length) > 0) {
+  //     const allTciketsFilled = userRideInput?.tickets?.every(
+  //       (ticket) => ticket.dropoffBusstop && ticket.dropoffBusstop
+  //       // &&  ticket.dropoffBusstop.routeName !== '' && ticket.dropoffBusstop.routeName !== '')
+  //     );
+  //     if (allTciketsFilled) {
+  //       dispatch(setAllTicketsFilled(true));
+  //       dispatch(setState({key:'booking', value: true}));
+  //     }
+  //     else {
+  //       dispatch(setAllTicketsFilled(false));
+  //       dispatch(setState({key:'booking', value: false}));
+  //     }
+  //   }
+  // }, [userRideInput?.tickets]);
   useEffect(() => {
-    if (Number(userRideInput?.tickets?.length) > 0) {
-      const allTciketsFilled = userRideInput?.tickets?.every(
+    if (Number(ticketsDetails?.length) > 0) {
+      const allTciketsFilled = ticketsDetails?.every(
         (ticket) => ticket.dropoffBusstop && ticket.dropoffBusstop
         // &&  ticket.dropoffBusstop.routeName !== '' && ticket.dropoffBusstop.routeName !== '')
       );
       if (allTciketsFilled) {
         dispatch(setAllTicketsFilled(true));
-        dispatch(setState({key:'booking', value: true}));
-      }
-      else {
+        dispatch(setState({ key: "booking", value: true }));
+      } else {
         dispatch(setAllTicketsFilled(false));
-        dispatch(setState({key:'booking', value: false}));
+        dispatch(setState({ key: "booking", value: false }));
       }
     }
-  }, [userRideInput?.tickets]);
+  }, [ticketsDetails]);
   // check if all tickets have been filled
 
   // !BottomSheets
@@ -300,7 +369,7 @@ export default function BookRide() {
             touchable
             roundedCorners={false}
             onPress={() => {
-              openMap()
+              openMap();
             }}
           />
 
@@ -399,7 +468,8 @@ export default function BookRide() {
 
             <FlatList
               horizontal={false}
-              data={userRideInput?.tickets}
+              // data={userRideInput?.tickets}
+              data={ticketsDetails}
               renderItem={({ index, item: ticketId }) => (
                 <Ticket ticket={ticketId} index={index} key={index} />
               )}
@@ -412,16 +482,17 @@ export default function BookRide() {
             {currentNumberOfTickets <
               Number(selectedAvailableRide?.availableSeats) && (
               <TouchableOpacity
-                onPress={() => {
-                  dispatch(
-                    setCurrentNumberOfTickets(currentNumberOfTickets + 1)
-                  );
-                  dispatch(
-                    createTicket({
-                      currentNumberOfTickets: currentNumberOfTickets + 1,
-                    })
-                  );
-                }}
+              onPress={() => selectNumberOfTickets(currentNumberOfTickets+1)}
+                // onPress={() => {
+                //   dispatch(
+                //     setCurrentNumberOfTickets(currentNumberOfTickets + 1)
+                //   );
+                //   dispatch(
+                //     createTicket({
+                //       currentNumberOfTickets: currentNumberOfTickets + 1,
+                //     })
+                //   );
+                // }}
               >
                 <View
                   style={[
@@ -489,7 +560,7 @@ export default function BookRide() {
 
             {/* {paymentOptionsVisible && ( */}
             {allTicketsFilled && (
-              <View style={[wFull, flexCol, gap(16), mt(32),mb(100)]}>
+              <View style={[wFull, flexCol, gap(16), mt(32), mb(100)]}>
                 <View
                   style={[
                     wFull,
@@ -504,7 +575,7 @@ export default function BookRide() {
                 >
                   <TouchableOpacity
                     onPress={() =>
-                      router.push('/(rideScreens)/paymentOption' as Href)
+                      router.push("/(rideScreens)/paymentOption" as Href)
                     }
                     style={[wFull, flex, justifyBetween, itemsCenter]}
                   >
@@ -513,7 +584,7 @@ export default function BookRide() {
                     </Text>
 
                     <View style={[flex, gap(16), itemsCenter]}>
-                      <Text style={[ fw400, fs14, colorBlack, tw `capitalize`]}>
+                      <Text style={[fw400, fs14, colorBlack, tw`capitalize`]}>
                         {paymentOptionInput}
                       </Text>
 
@@ -575,20 +646,22 @@ export default function BookRide() {
                   <BuyTicketListTile
                     leadingText="Trip ID"
                     trailing={{
-                      text: selectedAvailableRide?._id || selectedAvailableRideId as string,
+                      text:
+                        selectedAvailableRide?._id ||
+                        (selectedAvailableRideId as string),
                     }}
                   />
                   <BuyTicketListTile
                     leadingText="Trip Cost"
                     trailing={{
                       // text: `₦ ${ridePlans[0]?.ride?.rideFee || ridePlans[0]?.plan?.ride?.rideFee || ''}`,
-                      text: `₦ ${tripCost || ''}`,
+                      text: `₦ ${tripCost || ""}`,
                     }}
                   />
                   <BuyTicketListTile
                     leadingText="Service Fee"
                     trailing={{
-                      text: `₦ ${serviceFee || ''}`,
+                      text: `₦ ${serviceFee || ""}`,
                     }}
                   />
                 </View>
@@ -597,7 +670,7 @@ export default function BookRide() {
                   leadingText="Total"
                   trailing={{
                     // text: `₦ ${Number(ridePlans[0]?.plan?.ride?.rideFee || ridePlans[0]?.ride?.rideFee) + Number(ridePlans?.[0]?.plan?.serviceFee) || ''}`,
-                    text: `₦ ${totalCost || ''}`,
+                    text: `₦ ${totalCost || ""}`,
                   }}
                 />
               </View>
@@ -630,7 +703,6 @@ function RideBlock({
   onPress?: () => void;
   touchable?: boolean;
 }) {
-
   return (
     <View
       style={[

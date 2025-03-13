@@ -117,11 +117,13 @@ function TripDetails() {
     selectedAvailableRide,
     riderRideDetails: riderRide,
     ridePlans,
-    stateInput: { paymentOptionInput },
+    stateInput: { paymentOptionInput, ticketsDetails },
   } = useAppSelector((state: RootState) => state.ride);
   const path = usePathname();
   const { showBottomSheet, hideBottomSheet } = useBottomSheet();
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
+
+  console.log({ticketsDetails})
 
   return (
     <SafeScreen>
@@ -140,7 +142,7 @@ function TripDetails() {
 
           <FlatList
               horizontal={false}
-              data={userRideInput?.tickets}
+              data={ticketsDetails}
               renderItem={({ index, item: ticketId }) => (
                 <Ticket ticket={ticketId} index={index} key={index} />
               )}

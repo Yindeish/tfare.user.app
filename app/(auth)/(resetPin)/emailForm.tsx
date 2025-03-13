@@ -227,6 +227,7 @@ export default function EamilForm() {
                   placeholderTextColor={Colors.light.textGrey}
                   keyboardType="email-address"
                   value={formik.values.email}
+                  autoCorrect={false}
                   onChangeText={formik.handleChange("email")}
                   onBlur={formik.handleBlur("email")}
                   autoFocus

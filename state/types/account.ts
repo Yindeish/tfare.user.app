@@ -24,6 +24,7 @@ interface IUserAccountWallet {
 }
 
 interface IUserAccount {
+    _id?: string;
     fullName: string,
     userName: string,
     email: string,

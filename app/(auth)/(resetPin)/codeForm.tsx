@@ -219,6 +219,7 @@ export default function CodeForm() {
                   placeholderTextColor={Colors.light.textGrey}
                   keyboardType="numeric"
                   value={formik.values.code}
+                  autoCorrect={false}
                   onChangeText={formik.handleChange("code")}
                   onBlur={formik.handleBlur("code")}
                   autoFocus

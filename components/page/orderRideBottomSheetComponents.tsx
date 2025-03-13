@@ -299,6 +299,7 @@ const RecentLocationsSnippet = () => {
               cursorColor={Colors.light.textGrey}
               placeholder="Enter Location"
               value={values.pickupBusstop}
+              autoCorrect={false}
               onChangeText={handleChange("pickupBusstop")}
               // onBlur={handleBlur("pickupBusstop")}
               // onChangeText={(text) => {
@@ -383,15 +384,21 @@ const RecentLocationsSnippet = () => {
               data={savedAddresses}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  onPress={() => {
-                    dispatch(
-                      setStateInputField({
-                        key: "pickupBusstopInput",
-                        value: item?.busStop,
-                      })
-                    );
-                    setFieldValue("pickupBusstop", item?.busStop?.name);
-                  }}
+                onPress={() => {
+                  console.log({item})
+                  setFieldValue("pickupBusstop", item?.busStop?.name);
+                  dispatch(
+                    setStateInputField({
+                      key: "pickupBusstopInput",
+                      value: item?.busStop,
+                    })
+                  );
+                  setSearchState((prev) => ({
+                    ...prev,
+                    inputtingPickup: false,
+                    pickupSearchText: item?.busStop?.name,
+                  }));
+                }}
                 >
                   <View
                     style={[
@@ -472,6 +479,7 @@ const RecentLocationsSnippet = () => {
               cursorColor={Colors.light.textGrey}
               placeholder="Enter Destination"
               value={values.dropoffBusstop}
+              autoCorrect={false}
               // onChangeText={(text) => {
               //   searchBusstops(text);
               //   setFieldValue("dropoffBusstop", text);
@@ -557,6 +565,10 @@ const RecentLocationsSnippet = () => {
                       })
                     );
                     setFieldValue("dropoffBusstop", item?.busStop?.name);
+                    setSearchState((prev) => ({
+                      ...prev,
+                      dropoffSearchText: item?.busStop?.name,
+                    }));
                   }}
                 >
                   <View
@@ -717,6 +729,7 @@ const RecentPickupLocations = () => {
               cursorColor={Colors.light.textGrey}
               placeholder="Enter Location"
               value={searchText}
+              autoCorrect={false}
               onChangeText={(text) => {
                 setSearchState((prev) => ({ ...prev, searchText: text }));
                 searchBusstops(text);

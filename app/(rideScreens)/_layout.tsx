@@ -41,7 +41,7 @@ import CtaBtn from "@/components/shared/ctaBtn";
 import { indices } from "@/constants/zIndices";
 import Toast from "react-native-toast-message";
 import FetchService from "@/services/api/fetch.service";
-import { setPaymentOptionsVisible, setState } from "@/state/slices/ride";
+import { setPaymentOptionsVisible, setState, setStateInputField } from "@/state/slices/ride";
 import { ActivityIndicator } from "react-native";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
@@ -71,7 +71,7 @@ export default function AppLayout() {
     userRide,
     selectedAvailableRide,
     riderRideDetails,
-    stateInput: { userRideInput, paymentOptionInput },
+    stateInput: { userRideInput, paymentOptionInput, ticketsDetails },
   } = useAppSelector((state: RootState) => state.ride);
   const { token } = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
@@ -98,9 +98,10 @@ export default function AppLayout() {
   const { loading, msg } = fetchState;
 
   const buyTickets = async () => {
+    console.log({ticketsDetails})
     if (!allTicketsFilled) return;
 
-    const sameTickets = userRideInput?.tickets?.every(
+    const sameTickets = ticketsDetails?.every(
       (ticket) => ticket?.sameAsFirstTicket === true
     );
 
@@ -110,8 +111,8 @@ export default function AppLayout() {
       try {
         const returnedData = await FetchService.postWithBearerToken({
           data: {
-            numberOfTickets: Number(currentNumberOfTickets),
-            requestId: requestId || riderRideDetails?._id,
+            numberOfTickets: Number(ticketsDetails?.length),
+            requestId: riderRideDetails?._id || requestId,
             paymentOption: paymentOptionInput,
           },
           token: token as string,
@@ -247,6 +248,8 @@ export default function AppLayout() {
           // }
         }
 
+        // if(code != 500) dispatch(setStateInputField({key: 'ticketsDetails', value: []}))
+
         else {
           notify({msg});
         }
@@ -259,23 +262,171 @@ export default function AppLayout() {
           msg: error?.message,
         }));
       }
+      return;
     } else {
-      const subsequentTickets = userRideInput?.tickets?.map((ticket) => ({
-        pickupBusstopId: ticket?.pickupBusstop?._id,
-        dropoffBusstopId: ticket?.dropoffBusstop?._id,
-        ridePlanSeats: userRide?.currentRide?.availableSeats,
-        ridePlanName: "standard",
-        userCounterOffer: ticket?.userCounterFare,
-      }));
+      // const subsequentTickets = userRideInput?.tickets?.map((ticket) => ({
+      //   pickupBusstopId: ticket?.pickupBusstop?._id,
+      //   dropoffBusstopId: ticket?.dropoffBusstop?._id,
+      //   ridePlanSeats: userRide?.currentRide?.availableSeats,
+      //   ridePlanName: "standard",
+      //   userCounterOffer: ticket?.userCounterFare,
+      // }));
+      const unnegotiatedTickets = ticketsDetails?.filter((ticket) => ticket?.ticketStatus == 'idle');
+      console.log({unnegotiatedTickets})
 
-      console.log({ subsequentTickets });
+      if(unnegotiatedTickets.length > 0) {
+        const returnedData = await FetchService.postWithBearerToken({
+          data: {
+            unitFareId: unnegotiatedTickets?.map((ticket) => String(ticket?.unitFare?._id)),
+            paymentOption: paymentOptionInput
+          },
+          token: token as string,
+          url: `/user/rider/me/ride/${selectedAvailableRide?._id}/book-unlike`,
+        });
+  
+        console.log({ returnedData });
+        setFetchState((prev) => ({
+          ...prev,
+          loading: false,
+          code: null,
+          msg: "",
+        }));
+  
+        const code = returnedData?.code;
+        const msg = returnedData?.msg;
+        const ticketPaid = returnedData?.ticketPaid;
+        const bookedTicket = returnedData?.bookedTicket;
+        const ticketBooked = returnedData?.ticketBooked;
+        const paymentLink = returnedData?.paymentLink;
+        const status = returnedData?.status;
+        const driver = returnedData?.driver;
+        const riderRide = returnedData?.riderRide;
+        const currentRide = returnedData?.currentRide;
+  
+        if (code && (code == 200 || code == 201)) {
+          if (ticketPaid) {
+            
+            if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+            if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+            if (riderRide)
+              dispatch(
+                setState({
+                  key: "riderRideDetails",
+                  value: returnedData?.riderRide,
+                })
+              );
+            if (currentRide)
+              dispatch(
+                setState({
+                  key: "selectedAvailableRide",
+                  value: returnedData?.currentRide,
+                })
+              );
+            if (driver)
+              dispatch(
+                setState({ key: "driverDetails", value: returnedData?.driver })
+              );
+            // dispatch(setPaymentOptionsVisible(true));
+            // router.setParams({ ...searchParams, query: "RideBooked" });
+            setQuery(RideConstants.query.RideBooked);
+            showBottomSheet(
+              [100, 800],
+              <RideBookedSheet rideId={selectedAvailableRideId as string} />,
+              true
+            );
+            router.replace('/rideMap' as Href)
+            return;
+          }
+  
+          if ((ticketBooked && paymentLink) || (bookedTicket && paymentLink)) {
+            const sameTickets = ticketBooked || bookedTicket;
+  
+            dispatch(setState({ key: "sameTickets", value: sameTickets }));
+            openURL(paymentLink).catch((err: any) =>
+              console.error("Failed to open tfare payment link:", err?.message)
+            );
+            return;
+          }
+        }
+  
+        if (code && code == 400) {
+          alert(msg);
+  
+          dispatch(
+            setState({
+              key: "riderRideDetails",
+              value: returnedData?.riderRide,
+            })
+          );
+          dispatch(
+            setState({
+              key: "selectedAvailableRide",
+              value: returnedData?.currentRide,
+            })
+          );
+          dispatch(
+            setState({ key: "driverDetails", value: returnedData?.driver })
+          );
+          router.setParams({ requestId: returnedData?.riderRide?._id });
+  
+          if (status === "started") {
+            // router.setParams({ ...searchParams, query: "RideStarted" });
+            setQuery(RideConstants.query.RideStarted)
+            router.push(
+              `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+            );
+            showBottomSheet([100, 500], <TripStartedSheet />, true);
+          }
+          if (status === "ended") {
+            // router.setParams({ query: "RideEnded" });
+            setQuery(RideConstants.query.RideEnded)
+            showBottomSheet([500], <TripCompletedSheet />, true);
+          }
+          if (status === "booked") {
+            // router.setParams({ ...searchParams, query: "RideBooked" });
+            setQuery(RideConstants.query.RideBooked);
+            // dispatch(
+            //   setState({
+            //     key: "sameTickets",
+            //     value: [returnedData?.ticketPaid],
+            //   })
+            // );
+            if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+            if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+            // router.push(
+            //   `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+            // );
+            router.push(
+              `/rideMap?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+            );
+            showBottomSheet(
+              [100, 800],
+              <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
+              true
+            );
+          }
+  
+          // const rides = [returnedData?.ticketUnderBooking];
+          // if (rides) {
+          //   setFetchState((prev) => ({ ...prev, rides: rides as any }));
+          // }
+        }
+
+        // if(code != 500) dispatch(setStateInputField({key: 'ticketsDetails', value: []}))
+  
+        else {
+          notify({msg});
+        }
+
+        return;
+      }
 
       const returnedData = await FetchService.postWithBearerToken({
         data: {
-          subsequentTickets: subsequentTickets,
+          paymentOption: paymentOptionInput
         },
         token: token as string,
-        url: `user/rider/me/ride/${userRide?.riderRideDetails?._id}/book-unlike`,
+        url: `/user/rider/me/ride/${selectedAvailableRide?._id}/book-unlike`,
       });
 
       console.log({ returnedData });
@@ -286,16 +437,131 @@ export default function AppLayout() {
         msg: "",
       }));
 
-      //   toast({
-      //     title: "Burnt installed.",
-      //     preset: "done",
-      //     message: returnedData?.msg,
-      //   });
-      //   const riderExistingUnBookedRides = returnedData?.riderExistingUnBookedRides;
-      //   if (riderExistingUnBookedRides) {
-      //     setFetchState((prev) => ({ ...prev, ride: riderExistingUnBookedRides }));
-      //   }
-      dispatch(setPaymentOptionsVisible(true));
+      const code = returnedData?.code;
+      const msg = returnedData?.msg;
+      const ticketPaid = returnedData?.ticketPaid;
+      const bookedTicket = returnedData?.bookedTicket;
+      const ticketBooked = returnedData?.ticketBooked;
+      const paymentLink = returnedData?.paymentLink;
+      const status = returnedData?.status;
+      const driver = returnedData?.driver;
+      const riderRide = returnedData?.riderRide;
+      const currentRide = returnedData?.currentRide;
+
+      if (code && (code == 200 || code == 201)) {
+        if (ticketPaid) {
+          
+          if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+          if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+          if (riderRide)
+            dispatch(
+              setState({
+                key: "riderRideDetails",
+                value: returnedData?.riderRide,
+              })
+            );
+          if (currentRide)
+            dispatch(
+              setState({
+                key: "selectedAvailableRide",
+                value: returnedData?.currentRide,
+              })
+            );
+          if (driver)
+            dispatch(
+              setState({ key: "driverDetails", value: returnedData?.driver })
+            );
+          // dispatch(setPaymentOptionsVisible(true));
+          // router.setParams({ ...searchParams, query: "RideBooked" });
+          setQuery(RideConstants.query.RideBooked);
+          showBottomSheet(
+            [100, 800],
+            <RideBookedSheet rideId={selectedAvailableRideId as string} />,
+            true
+          );
+          router.replace('/rideMap' as Href)
+          return;
+        }
+
+        if ((ticketBooked && paymentLink) || (bookedTicket && paymentLink)) {
+          const sameTickets = ticketBooked || bookedTicket;
+
+          dispatch(setState({ key: "sameTickets", value: sameTickets }));
+          openURL(paymentLink).catch((err: any) =>
+            console.error("Failed to open tfare payment link:", err?.message)
+          );
+          return;
+        }
+      }
+
+      if (code && code == 400) {
+        alert(msg);
+
+        dispatch(
+          setState({
+            key: "riderRideDetails",
+            value: returnedData?.riderRide,
+          })
+        );
+        dispatch(
+          setState({
+            key: "selectedAvailableRide",
+            value: returnedData?.currentRide,
+          })
+        );
+        dispatch(
+          setState({ key: "driverDetails", value: returnedData?.driver })
+        );
+        router.setParams({ requestId: returnedData?.riderRide?._id });
+
+        if (status === "started") {
+          // router.setParams({ ...searchParams, query: "RideStarted" });
+          setQuery(RideConstants.query.RideStarted)
+          router.push(
+            `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+          );
+          showBottomSheet([100, 500], <TripStartedSheet />, true);
+        }
+        if (status === "ended") {
+          // router.setParams({ query: "RideEnded" });
+          setQuery(RideConstants.query.RideEnded)
+          showBottomSheet([500], <TripCompletedSheet />, true);
+        }
+        if (status === "booked") {
+          // router.setParams({ ...searchParams, query: "RideBooked" });
+          setQuery(RideConstants.query.RideBooked);
+          // dispatch(
+          //   setState({
+          //     key: "sameTickets",
+          //     value: [returnedData?.ticketPaid],
+          //   })
+          // );
+          if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+          if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+          // router.push(
+          //   `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+          // );
+          router.push(
+            `/rideMap?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+          );
+          showBottomSheet(
+            [100, 800],
+            <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
+            true
+          );
+        }
+
+        // const rides = [returnedData?.ticketUnderBooking];
+        // if (rides) {
+        //   setFetchState((prev) => ({ ...prev, rides: rides as any }));
+        // }
+      }
+
+      // if(code != 500) dispatch(setStateInputField({key: 'ticketsDetails', value: []}))
+
+      else {
+        notify({msg});
+      }
     }
   };
 

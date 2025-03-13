@@ -43,7 +43,9 @@ import { pages } from "@/constants/pages";
 import {
   ICurrentRide,
   IRiderRideDetails,
+  IRoute,
   ITicket,
+  ITicketInput,
   TRideStatus,
 } from "@/state/types/ride";
 import { Utils } from "@/utils";
@@ -55,7 +57,7 @@ import { RideConstants } from "@/constants/ride";
 import { TripStartedSheet } from "@/components/page/tripStartedBottomSheetComponents";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
-import { setState } from "@/state/slices/ride";
+import { setState, setStateInputField } from "@/state/slices/ride";
 import { IUser } from "@/state/types/user";
 
 export default function TripHistory({
@@ -74,6 +76,7 @@ export default function TripHistory({
     history: (IRiderRideDetails & {
       currentRide: ICurrentRide;
       driver: IUser;
+      route: IRoute;
     })[];
   }>({
     loading: false,
@@ -158,17 +161,48 @@ export default function TripHistory({
                 item?.rideStatus === "requesting" ? (
                   <TouchableOpacity
                     onPress={() => {
+                      const currentRide = item?.currentRide;
+                      const driver = item?.driver;
+                      const route = item?.route;
+                      const riderId = item?.riderId;
+
+                      const riderRides = currentRide?.ridersRides.filter((ride) => String(ride?.riderId) == String(riderId));
+
+                      const tickets = riderRides.map((ride, index) => {
+                        const newTicket = {
+                          number: Number(index +1),
+                          pickupBusstop: ride?.pickupBusstop,
+                          dropoffBusstop: ride?.dropoffBusstop,
+                          id: String(index),
+                          sameAsFirstTicket: false,
+                          userCounterFare: ride?.riderCounterOffer,
+                          rideFee: Number(ride?.ridePlan?.ride?.rideFee),
+                          serviceFee: Number(ride?.ridePlan?.serviceFee),
+                          ticketStatus: ride?.rideStatus == 'accepted' ? 'accepted': 'idle'
+                        } 
+
+                        return newTicket;
+                      });
+
+                      dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}));
+                      
                       dispatch(
                         setState({ key: "riderRideDetails", value: item })
                       );
                       dispatch(
                         setState({
                           key: "selectedAvailableRide",
-                          value: item?.currentRide,
+                          value: currentRide,
                         })
                       );
                       dispatch(
-                        setState({ key: "driverDetails", value: item?.driver })
+                        setState({
+                          key: "currentRoute",
+                          value: route,
+                        })
+                      );
+                      dispatch(
+                        setState({ key: "driverDetails", value: driver })
                       );
 
                       if (

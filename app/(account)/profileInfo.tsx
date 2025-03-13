@@ -230,6 +230,7 @@ export default function profileInfo() {
                             placeholder='Full Name'
                             keyboardType='default'
                             value={values.fullName}
+                            autoCorrect={false}
                             onChangeText={profileCta === 'save' ? handleChange('fullName'): () => {}}
                             onBlur={handleBlur('fullName')}
                         />
@@ -243,6 +244,7 @@ export default function profileInfo() {
                             placeholder='User Name'
                             keyboardType='default'
                             value={values.userName}
+                            autoCorrect={false}
                             onChangeText={profileCta === 'save' ? handleChange('userName'): () => {}}
                             onBlur={handleBlur('userName')}
                         />
@@ -256,6 +258,7 @@ export default function profileInfo() {
                             placeholder='Email Address'
                             keyboardType='email-address'
                             value={values.email}
+                            autoCorrect={false}
                             onChangeText={profileCta === 'save' ? handleChange('email') : () => {}}
                             onBlur={handleBlur('email')}
                         />
@@ -269,6 +272,7 @@ export default function profileInfo() {
                             placeholder='Phone Number'
                             keyboardType='numeric'
                             value={values.phoneNumber}
+                            autoCorrect={false}
                             onChangeText={profileCta === 'save' ? handleChange('phoneNumber') : () => {}}
                             onBlur={handleBlur('phoneNumber')}
                         />

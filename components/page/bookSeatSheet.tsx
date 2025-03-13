@@ -1,6 +1,6 @@
 import { image, mXAuto, wHFull } from "@/utils/imageStyles";
 import { bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, mt, pb, px, py, rounded, w, wFull } from "@/utils/styles";
-import { FlatList, Image, ScrollView, StyleSheet, TextInput, View } from "react-native";
+import { FlatList, Image, ScrollView, StyleSheet, TextInput, TextStyle, View } from "react-native";
 import PaddedScreen from "../shared/paddedScreen";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Text } from "react-native-paper";
@@ -89,11 +89,12 @@ function BookSeatSheet() {
                     </TouchableOpacity>
 
                     <TextInput
-                        style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                        style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }] as TextStyle[]}
                         placeholderTextColor={Colors.light.textGrey}
                         cursorColor={Colors.light.textGrey}
                         placeholder="Your Pick up Bus Stop"
                         value={''}
+                        autoCorrect={false}
                         onChangeText={(text) => {
                             // dispatch(setStateInputField({ key: 'pickupBusstopInput', value: text }));
                         }}
@@ -130,11 +131,12 @@ function BookSeatSheet() {
                     </TouchableOpacity>
 
                     <TextInput
-                        style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }]}
+                        style={[fs14, fw500, neurialGrotesk, h(20), { color: Colors.light.textGrey, borderColor: colors.transparent, borderWidth: 0, flex: 0.8 }] as TextStyle[]}
                         placeholderTextColor={Colors.light.textGrey}
                         cursorColor={Colors.light.textGrey}
                         placeholder="Your Drop off Bus Stop"
                         value={''}
+                        autoCorrect={false}
                         onChangeText={(text) => {
                             // dispatch(setStateInputField({ key: 'dropoffBusstopInput', value: text }));
                         }}

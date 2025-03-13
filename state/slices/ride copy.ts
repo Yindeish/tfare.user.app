@@ -50,7 +50,7 @@ const initialState: IRideState = {
     userCounterFareInput: null,
     paymentOptionInput: "wallet",
     userRideInput: {},
-    ticketsDetails:[], //new for tickets handling
+
     //
     selectedPlan: null,
   },
@@ -169,7 +169,6 @@ const RideSlice = createSlice({
                     state?.riderRideDetails?.ridePlan?.ride?.rideFee
                 )
               : (null as never),
-              ticketStatus: 'idle'
         };
 
         state.stateInput.userRideInput.tickets = [

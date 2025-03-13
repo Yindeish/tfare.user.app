@@ -395,7 +395,7 @@ function TripCompletedSheet() {
           ]}
         >
           <Image
-            source={images.userProfileImage}
+            source={{uri: driverDetails?.picture ||driverDetails?.avatar}}
             style={[image.w(70), image.h(70), image.rounded(70)]}
           />
 
@@ -468,6 +468,7 @@ function TripCompletedSheet() {
             );
           }}
           value={driverRatingCommentInput}
+          autoCorrect={false}
           placeholder={"Input Comments"}
           multiline
           numberOfLines={4}

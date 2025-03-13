@@ -40,7 +40,7 @@ import {
 } from "expo-router";
 import Colors, { colors } from "@/constants/Colors";
 import { pages } from "@/constants/pages";
-import { setCurrentRideView, setState, setUserRide } from "@/state/slices/ride";
+import { setCurrentRideView, setState, setStateInputField, setUserRide } from "@/state/slices/ride";
 import RideBlock from "@/components/page/rideBlock";
 import RideSelectors from "@/state/selectors/ride";
 import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
@@ -50,7 +50,7 @@ import { IRideAccptedEvent } from "@/socket.io/socket.io.types";
 import { EVENTS, socket } from "@/socket.io/socket.io.config";
 import { useStorageState } from "@/hooks/useStorageState";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
-import { ICurrentRide, IRide, IRiderRideDetails } from "@/state/types/ride";
+import { IBusStop, ICurrentRide, IRide, IRiderRideDetails, ITicketInput } from "@/state/types/ride";
 import {
   c,
   colorBlack,
@@ -73,6 +73,7 @@ import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { TripCompletedSheet, TripStartedSheet } from "@/components/page/tripStartedBottomSheetComponents";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 import { RideConstants } from "@/constants/ride";
+import { useSession } from "@/contexts/userSignedInContext";
 
 export default function AvailableRide() {
   const dispatch = useAppDispatch();
@@ -81,6 +82,11 @@ export default function AvailableRide() {
     stateInput: { pickupBusstopInput, dropoffBusstopInput },
   } = RideSelectors();
   const [[isLoading, session], setSession] = useStorageState("token");
+  const [[_$, userSession], __] = useStorageState('user');
+  const user = JSON.parse(userSession as string);
+
+  console.log({user});
+
   const { showBottomSheet, hideBottomSheet, bottomSheetType } =
     useBottomSheet();
     const searchParams = useGlobalSearchParams();
@@ -117,6 +123,9 @@ export default function AvailableRide() {
   const { code, msg, loading } = fetchState;
 
   const getAvailableRides = async (id?: string) => {
+    if(!id && !requestId) {
+      return;
+    }
     setFetchState((prev) => ({ ...prev, loading: true }));
     const returnedData = await FetchService.getWithBearerToken({
       url: `/user/rider/me/available-rides/${id || requestId}`,
@@ -126,6 +135,7 @@ export default function AvailableRide() {
     const code = returnedData?.code;
     const msg = returnedData?.msg;
     const availableRidesRequests = returnedData?.availableRides;
+    const route = returnedData?.route;
     const status = returnedData?.status;
 
     setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
@@ -139,6 +149,9 @@ export default function AvailableRide() {
       }));
       dispatch(
         setState({ key: "availableRides", value: availableRidesRequests })
+      );
+      dispatch(
+        setState({ key: "currentRoute", value: route })
       );
     } 
     
@@ -234,8 +247,27 @@ export default function AvailableRide() {
                     roundedCorners
                     onPress={() => {
                       dispatch(
+                        setState({ key: "currentRoute", value: (ride as any)?.route })
+                      );
+                      dispatch(
                         setState({ key: "selectedAvailableRide", value: ride })
                       );
+                      const riderAcceptedRide = ride?.ridersRides.find((ride) => String(ride?.riderId) == String(user?._id));
+
+                      const newTicket = {
+                        number:1,
+                        dropoffBusstop: riderAcceptedRide?.dropoffBusstop,
+                        pickupBusstop: riderAcceptedRide?.pickupBusstop,
+                        rideFee: Number(riderAcceptedRide?.riderCounterOffer) || Number(riderAcceptedRide?.ridePlan?.ride?.rideFee),
+                        serviceFee: Number(riderAcceptedRide?.ridePlan?.serviceFee),
+                        ticketStatus: 'accepted',
+                        userCounterFare: Number(riderAcceptedRide?.riderCounterOffer),
+                        sameAsFirstTicket: true,
+                      };
+
+                      const tickets = [newTicket] as ITicketInput[];
+
+                      dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}))
                       router.push(
                         `/(rideScreens)/bookRide?selectedAvailableRideId=${ride?._id}&requestId=${requestId}` as Href
                       );

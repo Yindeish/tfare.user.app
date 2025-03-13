@@ -21,6 +21,7 @@ export type TRideStatus =
   | "paused"
   | "booked"
   | "ended";
+  export type TTicketSatus = 'idle' | 'cancelled' | 'paid' | 'booked';
 
 export interface IRoute {
   routeName: string;
@@ -28,23 +29,30 @@ export interface IRoute {
   routeDistance: string;
 }
 
+export interface ICity {
+  _id: string;
+  name: string;
+  stateName: string;
+}
+
 export interface IBusStop {
   _id?: string;
   name: string;
-  order?: {
-    forward: { number: number };
-    backward: { number: number };
-  };
-  category?: {
-    origin: TCategoryOrigin;
-    destination: TCategoryDestination;
-  };
+  order?: number;
+  city: ICity;
 }
 
 export interface ISavedBusStop {
   userId: string;
   busstopTitle: string;
   busStop: IBusStop;
+}
+
+export interface IUnitFare {
+  pickupBusstopId: string;
+  dropoffBusstopId: string;
+  plan: IPlan;
+  _id: string;
 }
 
 export interface IRoute {
@@ -54,7 +62,15 @@ export interface IRoute {
   pickupBusstop: IBusStop;
   dropoffBusstop: IBusStop;
   rideDirection: "forward" | "backward";
-  inTripDropoffsIds: string[];
+  inTripDropoffsIds?: string[];
+  inTripDropoffs?: {
+    name: string;
+    city: ICity;
+    order: number;
+    plan: IPlan;
+    _id: string;
+  }[];
+  unitFares?: IUnitFare[]
 }
 
 export interface IRecentBusStop {
@@ -78,6 +94,9 @@ export interface ITicketInput {
   number: number;
   userCounterFare?: number | null;
   rideFee?: number;
+  serviceFee?: number;
+  ticketStatus?: TTicketSatus;
+  unitFare?: IUnitFare
 }
 
 export interface ITicket {
@@ -87,7 +106,7 @@ export interface ITicket {
   riderCounterOffer: string,
   riderId: string,
   ticketOtp: string,
-  ticketStatus: string,
+  ticketStatus: TRideStatus,
   updatedAt: string,
   _id: string,
 }
@@ -101,7 +120,7 @@ export interface IStateInput {
   cancelRideReasonInput: string;
   userRideInput: Partial<IRide>;
   paymentOptionInput: string;
-
+  ticketsDetails: ITicketInput[];
   //
   selectedPlan: IPlan | null;
 }
@@ -117,6 +136,7 @@ export interface IPlan {
   trip?: {
     tripFee: number;
   };
+  serviceFee?: number;
 }
 
 export interface ICurrentRide {
@@ -190,6 +210,8 @@ export interface IRideState {
   // sameTickets: ITicket | null;
   sameTickets: ITicket[];
   lastRides: IRiderRideDetails[],
+  currentRideUnderNegotiation: IRiderRideDetails | null,
+  currentRoute: IRoute | null,
   //   availableRides:
   //     | { riderRideDetails: IRiderRideDetails; currentRide: ICurrentRide }[]
   //     | [];

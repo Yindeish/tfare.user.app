@@ -247,6 +247,7 @@ export default function Signup() {
               underlineColorAndroid={colors.transparent}
               placeholderTextColor={Colors.light.textGrey}
               value={formik.values.profileName}
+              autoCorrect={false}
               cursorColor={Colors.light.textGrey}
               onChangeText={formik.handleChange("profileName")}
               onBlur={formik.handleBlur("profileName")}
@@ -268,6 +269,7 @@ export default function Signup() {
               underlineColorAndroid={colors.transparent}
               placeholderTextColor={Colors.light.textGrey}
               value={formik.values.email}
+              autoCorrect={false}
               cursorColor={Colors.light.textGrey}
               onChangeText={formik.handleChange("email")}
               onBlur={formik.handleBlur("email")}
@@ -289,6 +291,7 @@ export default function Signup() {
               underlineColorAndroid={colors.transparent}
               placeholderTextColor={Colors.light.textGrey}
               value={formik.values.phoneNumber}
+              autoCorrect={false}
               keyboardType="numeric"
               cursorColor={Colors.light.textGrey}
               onChangeText={formik.handleChange("phoneNumber")}
@@ -312,6 +315,7 @@ export default function Signup() {
               underlineColorAndroid={colors.transparent}
               placeholderTextColor={Colors.light.textGrey}
               value={formik.values.pin}
+              autoCorrect={false}
               secureTextEntry={secureTextEntry}
               onChangeText={formik.handleChange("pin")}
               onBlur={formik.handleBlur("pin")}
@@ -334,6 +338,7 @@ export default function Signup() {
               underlineColorAndroid={colors.transparent}
               placeholderTextColor={Colors.light.textGrey}
               value={formik.values.confirmedPin}
+              autoCorrect={false}
               secureTextEntry={secureTextEntry}
               onChangeText={formik.handleChange("confirmedPin")}
               onBlur={formik.handleBlur("confirmedPin")}

@@ -1,7 +1,7 @@
 import Colors, { colors } from "@/constants/Colors";
 import { c, colorBlack, fs12, fs14, fw400, fw500 } from "@/utils/fontStyles";
 import { bg, flexCol, gap, h, px, py, rounded, wFull } from "@/utils/styles";
-import { TextInput } from "react-native";
+import { TextInput, TextStyle } from "react-native";
 import { Text } from "react-native-paper";
 import { View } from "react-native";
 
@@ -33,9 +33,10 @@ function AccountTextField({ label, input }: { label: ILabel, input: IInput }) {
                 onChangeText={(text) => input.onChangeText(input.fieldKey, text)}
 
                 value={input.value} placeholder={input.palceHolder}
+                autoCorrect={false}
                 secureTextEntry={input.hidden}
 
-                style={[py(16), px(10), rounded(10), bg(colors.transparent), colorBlack, fs14, fw500, h(50), { borderWidth: 0.7, borderColor: Colors.light.border }]}
+                style={[py(16), px(10), rounded(10), bg(colors.transparent), colorBlack, fs14, fw500, h(50), { borderWidth: 0.7, borderColor: Colors.light.border }] as TextStyle[]}
 
                 onFocus={() => input.onFocus}
                 onBlur={() => input.onBlur}
@@ -47,7 +48,7 @@ function AccountTextField({ label, input }: { label: ILabel, input: IInput }) {
                 underlineColorAndroid={colors.transparent}
                 placeholderTextColor={Colors.light.textGrey}
             />) :
-                (<Text style={[py(16), px(10), rounded(10), bg(colors.transparent), c(Colors.light.textGrey), fs14, fw500, { borderWidth: 0.7, borderColor: Colors.light.border }]}>{input.value}</Text>)
+                (<Text style={[py(16), px(10), rounded(10), bg(colors.transparent), c(Colors.light.textGrey), fs14, fw500, { borderWidth: 0.7, borderColor: Colors.light.border }] as TextStyle[]}>{input.value}</Text>)
             }
         </View>
     )

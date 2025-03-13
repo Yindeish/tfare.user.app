@@ -94,6 +94,7 @@ function AccountSecuritySheet() {
                     }}
 
                     value={stateInput.deactivateAccount.reasonInput}
+                    autoCorrect={false}
                     placeholder={'Input Comments'}
                     multiline
                     numberOfLines={4}
