@@ -384,21 +384,21 @@ const RecentLocationsSnippet = () => {
               data={savedAddresses}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                onPress={() => {
-                  console.log({item})
-                  setFieldValue("pickupBusstop", item?.busStop?.name);
-                  dispatch(
-                    setStateInputField({
-                      key: "pickupBusstopInput",
-                      value: item?.busStop,
-                    })
-                  );
-                  setSearchState((prev) => ({
-                    ...prev,
-                    inputtingPickup: false,
-                    pickupSearchText: item?.busStop?.name,
-                  }));
-                }}
+                  onPress={() => {
+                    console.log({ item });
+                    setFieldValue("pickupBusstop", item?.busStop?.name);
+                    dispatch(
+                      setStateInputField({
+                        key: "pickupBusstopInput",
+                        value: item?.busStop,
+                      })
+                    );
+                    setSearchState((prev) => ({
+                      ...prev,
+                      inputtingPickup: false,
+                      pickupSearchText: item?.busStop?.name,
+                    }));
+                  }}
                 >
                   <View
                     style={[
@@ -1777,11 +1777,69 @@ const RideRouteDetails = ({
             }}
           />
 
-          {(ridePlans && Number(ridePlans?.length) != 0 && (ridePlans as any)?.[0] != undefined ) && <View>
-            {ridePlans?.map((item, index) => (
-            <TouchableOpacity
-              // onPress={() => selectPlan(plan)}
-              onPress={() => setSelectedPlan(item?.plan)}
+          {ridePlans &&
+            Number(ridePlans?.length) != 0 &&
+            (ridePlans as any)?.[0] != undefined && (
+              <View>
+                {ridePlans?.map((item, index) => (
+                  <TouchableOpacity
+                    // onPress={() => selectPlan(plan)}
+                    onPress={() => setSelectedPlan(item?.plan)}
+                    style={[
+                      wFull,
+                      flex,
+                      itemsCenter,
+                      justifyBetween,
+                      py(17),
+                      px(9),
+                      bg("#F9F7F8"),
+                      rounded(8),
+                      // plan?.selected == true || ridePlans[0] != null
+                      border(
+                        0.7,
+                        error
+                          ? colors.red500
+                          : !selectedPlan
+                          ? colors.grey500
+                          : Colors.light.background
+                      ),
+                    ]}
+                    key={index}
+                  >
+                    <Image
+                      style={[image.w(50), image.h(18)]}
+                      source={images.carImage}
+                    />
+
+                    <View style={[flexCol, gap(12), { flex: 0.8 }]}>
+                      <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>
+                        Standard Ride
+                      </Text>
+
+                      <View style={[flex, h(14.73), gap(4), itemsCenter]}>
+                        <Image
+                          style={[image.w(18), image.h(14.73)]}
+                          source={images.passengersImage}
+                        />
+
+                        <Text style={[fw400, fs12, c(Colors.light.border)]}>
+                          {item?.plan?.vehicleSeats} seats
+                        </Text>
+                      </View>
+                    </View>
+
+                    <Text style={[fw400, fs14, colorBlack]}>
+                      ₦{item?.plan?.ride?.rideFee}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+          {(!ridePlans ||
+            Number((ridePlans as any)?.length) == 0 ||
+            (ridePlans as any)?.[0] == undefined) && (
+            <View
               style={[
                 wFull,
                 flex,
@@ -1792,63 +1850,12 @@ const RideRouteDetails = ({
                 bg("#F9F7F8"),
                 rounded(8),
                 // plan?.selected == true || ridePlans[0] != null
-                border(
-                  0.7,
-                  error
-                    ? colors.red500
-                    : !selectedPlan
-                    ? colors.grey500
-                    : Colors.light.background
-                ),
+                border(0.7, colors.grey500),
               ]}
-              key={index}
             >
-              <Image
-                style={[image.w(50), image.h(18)]}
-                source={images.carImage}
-              />
-
-              <View style={[flexCol, gap(12), { flex: 0.8 }]}>
-                <Text style={[neurialGrotesk, fw700, fs14, colorBlack]}>
-                  Standard Ride
-                </Text>
-
-                <View style={[flex, h(14.73), gap(4), itemsCenter]}>
-                  <Image
-                    style={[image.w(18), image.h(14.73)]}
-                    source={images.passengersImage}
-                  />
-
-                  <Text style={[fw400, fs12, c(Colors.light.border)]}>
-                    {item?.plan?.vehicleSeats} seats
-                  </Text>
-                </View>
-              </View>
-
-              <Text style={[fw400, fs14, colorBlack]}>
-                ₦{item?.plan?.ride?.rideFee}
-              </Text>
-            </TouchableOpacity>
-          ))}
-            </View>}
-
-          {((!ridePlans || Number((ridePlans as any)?.length) == 0) || (ridePlans as any)?.[0] == undefined) && <View style={[
-                wFull,
-                flex,
-                itemsCenter,
-                justifyBetween,
-                py(17),
-                px(9),
-                bg("#F9F7F8"),
-                rounded(8),
-                // plan?.selected == true || ridePlans[0] != null
-                border(
-                  0.7,
-                  colors.grey500
-                ),
-              ]}>
-            <Text style={tw `text-black`}>No Match Route!</Text>
-            </View>}
+              <Text style={tw`text-black`}>No Match Route!</Text>
+            </View>
+          )}
 
           <View
             style={[
@@ -2033,7 +2040,8 @@ const SearchingRide = ({
 
     const code = returnedData?.code;
     const status = returnedData?.status;
-    const userRideSaved = returnedData?.userRideSaved || returnedData?.riderRide;
+    const userRideSaved =
+      returnedData?.userRideSaved || returnedData?.riderRide;
 
     setFetchState((prev) => ({
       ...prev,
@@ -2044,6 +2052,8 @@ const SearchingRide = ({
 
     if (code == 201 || code == 200) {
       dispatch(setState({ key: "riderRideDetails", value: userRideSaved }));
+      dispatch(setStateInputField({ key: "pickupBusstopInput", value: null }));
+      dispatch(setStateInputField({ key: "dropoffBusstopInput", value: null }));
     }
 
     if (code === 400) {

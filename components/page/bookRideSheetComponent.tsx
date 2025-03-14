@@ -396,7 +396,7 @@ function TicketDetailsSheet() {
                       setSearchState((prev) => ({
                         ...prev,
                         inputtingPickup: false,
-                        pickupSearchText: busstop.name,
+                        pickupSearchText: busstop?.name,
                       }));
                     }}
                     key={index}

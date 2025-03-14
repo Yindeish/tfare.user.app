@@ -120,9 +120,9 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
       "broadcast",
       { event: RideConstants.event.ride_accepted },
       (payload) => {
-        const ride = payload?.payload;
+        const ride = payload?.payload?.ride as IRiderRideDetails;
         console.log("====================================");
-        console.log("accepting......", {
+        console.log("accepting......", ride, {
           requestId: riderRideDetails?._id,
           ride,
         });
@@ -130,10 +130,14 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
         // dispatch(setState({key:'counterFareStatus', value: 'accepted' as TRideStatus}))
 
         const tickets = ticketsDetails.map((ticketItem) => {
-          if (Number(ticketItem?.number) == Number(ticket?.number) && ticket?.ticketStatus == 'pending' as any) {
+          if (
+            Number(ticketItem?.number) == Number(ticket?.number) &&
+            ticket?.ticketStatus == ("pending" as any)
+          ) {
             return {
               ...ticket,
               ticketStatus: "accepted",
+              rideFee: ticket?.userCounterFare,
             };
           } else return ticketItem;
         });
@@ -144,18 +148,32 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
     .subscribe();
 
   const negotiateTicketFare = async () => {
-  
     setFetchState((prev) => ({ ...prev, loading: true }));
 
-    const dropoffPlan = currentRoute?.inTripDropoffs?.find((dropoff) => String(dropoff?._id) === String(dropoffBusstopInput?._id))?.plan;
+    // const dropoffPlan = currentRoute?.inTripDropoffs?.find((dropoff) => String(dropoff?._id) === String(dropoffBusstopInput?._id))?.plan;
+    const dropoffPlan = currentRoute?.inTripDropoffs?.find(
+      (dropoff) => String(dropoff?._id) === String(ticket?.dropoffBusstop?._id)
+    )?.plan;
 
+    // const returnedData = await FetchService.postWithBearerToken({
+    //   url: `/user/rider/me/ride/${selectedAvailableRide?._id}/negotiate-fare`,
+    //   data: {
+    //     pickupBusstopId: pickupBusstopInput?._id,
+    //     dropoffBusstopId: dropoffBusstopInput?._id,
+    //     userCounterOffer: userCounterFareInput,
+    //     ridePlan: dropoffPlan?.ride?.rideFee || dropoffPlan?.plan?.ride?.rideFee,
+    //     routeId: dropoffPlan?.routeId,
+    //   },
+    //   token: token as string,
+    // });
     const returnedData = await FetchService.postWithBearerToken({
       url: `/user/rider/me/ride/${selectedAvailableRide?._id}/negotiate-fare`,
       data: {
-        pickupBusstopId: pickupBusstopInput?._id,
-        dropoffBusstopId: dropoffBusstopInput?._id,
-        userCounterOffer: userCounterFareInput,
-        ridePlan: dropoffPlan?.ride?.rideFee || dropoffPlan?.plan?.ride?.rideFee,
+        pickupBusstopId: ticket?.pickupBusstop?._id,
+        dropoffBusstopId: ticket?.dropoffBusstop?._id,
+        userCounterOffer: ticket?.userCounterFare,
+        ridePlan:
+          dropoffPlan?.ride?.rideFee || dropoffPlan?.plan?.ride?.rideFee,
         routeId: dropoffPlan?.routeId,
       },
       token: token as string,
@@ -163,7 +181,8 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
 
     const code = returnedData?.code;
     const msg = returnedData?.msg;
-    const userRideSaved = returnedData?.userRideSaved || returnedData?.riderRide;
+    const userRideSaved =
+      returnedData?.userRideSaved || returnedData?.riderRide;
 
     setFetchState((prev) => ({
       ...prev,
@@ -174,17 +193,16 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
 
     if (code == 201 || code == 200) {
       const tickets = ticketsDetails.map((ticketItem) => {
-        if(ticketItem?.number == ticket?.number) {
+        if (ticketItem?.number == ticket?.number) {
           return {
             ...ticketItem,
-            ticketStatus: 'pending'
-          }
-        }
-        else return ticketItem;
-      })
-  
-      dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}))
-      dispatch(setCurrentTicket(ticket))
+            ticketStatus: "pending",
+          };
+        } else return ticketItem;
+      });
+
+      dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+      dispatch(setCurrentTicket(ticket));
       dispatch(setState({ key: "riderRideDetails", value: userRideSaved }));
       // dispatch(setState({key:'counterFareStatus', value: 'pending'}))
     }
@@ -329,7 +347,10 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
 
         {/* Ceckbox block for toggling same ticket as first ticket */}
 
-        <TouchableOpacity onPress={() => toggleTicketAsFirstTicket(ticket?.number)} style={[flex, gap(12), itemsCenter]}>
+        <TouchableOpacity
+          onPress={() => toggleTicketAsFirstTicket(ticket?.number)}
+          style={[flex, gap(12), itemsCenter]}
+        >
           <Checkbox
             value={ticket.sameAsFirstTicket}
             // onValueChange={() => {
@@ -526,6 +547,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                 </Text>
 
                 <View style={[wFull, flex, justifyBetween]}>
+                  {/* Counterfare Input Block */}
                   <View
                     style={[
                       flex,
@@ -551,7 +573,9 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                       </Text>
                       <TextInput
                         onFocus={() => dispatch(setCurrentTicket(ticket))}
-                        onChangeText={(text) => () => {
+                        onChangeText={(text) => {
+                          if(ticket?.ticketStatus == 'pending' as any) return;
+
                           const ticktes = ticketsDetails?.map((ticketItem) => {
                             if (
                               Number(ticket?.number) == Number(ticket?.number)
@@ -560,8 +584,11 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                                 ...ticketItem,
                                 userCounterFare: text,
                               };
-                            } else return ticket;
+                            } else return ticketItem;
                           });
+
+                          dispatch(setStateInputField({key: 'ticketsDetails', value: ticktes}))
+
                           // dispatch(
                           //   setStateInputField({
                           //     key: "userCounterFareInput",
@@ -601,7 +628,9 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                       />
                     </View>
                   </View>
+                  {/* Counterfare Input Block */}
 
+                  {/* Counter Fare Request Btn */}
                   {/* <CounterFareCtaBtn ticket={ticket} fetchState={fetchState} setFetchState={setFetchState} /> */}
                   <View style={tw`w-[40%]`}>
                     {ticket.ticketStatus === "idle" ? (
@@ -679,6 +708,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                       </View>
                     )}
                   </View>
+                  {/* Counter Fare Request Btn */}
                 </View>
 
                 {code == 400 && !loading && (
