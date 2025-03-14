@@ -97,7 +97,6 @@ export default function AppLayout() {
   });
   const { loading, msg } = fetchState;
   const someTicketsUnderNegotiation = ticketsDetails.find((ticket) => ticket?.ticketStatus == 'pending' as any);
-  console.log({ticketsDetails, someTicketsUnderNegotiation })
 
   const buyTickets = async () => {
     if (!allTicketsFilled || someTicketsUnderNegotiation) return;
@@ -593,7 +592,7 @@ export default function AppLayout() {
       {/* Shows when all the tickets have been filled (counter fare are optional) */}
       {/* Buy Ticket Btn */}
 
-      {(booking || (allTicketsFilled && !someTicketsUnderNegotiation)) && path === "/bookRide" && (
+      {((booking || allTicketsFilled) && !someTicketsUnderNegotiation) && path === "/bookRide" && (
         <View
           style={[
             tw`w-full absolute bottom-[30px] left-[0] p-2`,

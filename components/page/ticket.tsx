@@ -130,23 +130,15 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
         // dispatch(setState({key:'counterFareStatus', value: 'accepted' as TRideStatus}))
 
         const tickets = ticketsDetails.map((ticketItem) => {
-          if (Number(ticketItem?.number) == Number(ticket?.number)) {
+          if (Number(ticketItem?.number) == Number(ticket?.number) && ticket?.ticketStatus == 'pending' as any) {
             return {
               ...ticket,
               ticketStatus: "accepted",
             };
-          } else return ticket;
+          } else return ticketItem;
         });
 
-        console.log({ tickets, new: "yes" });
-
         dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
-
-        //   if (
-        //     String(ride?._id) == String(riderRideDetails?._id)
-        //   ) {
-        //     dispatch(setState({key:'counterFareStatus', value: 'accepted' as TRideStatus}))
-        //   }
       }
     )
     .subscribe();
@@ -337,7 +329,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
 
         {/* Ceckbox block for toggling same ticket as first ticket */}
 
-        <View style={[flex, gap(12), itemsCenter]}>
+        <TouchableOpacity onPress={() => toggleTicketAsFirstTicket(ticket?.number)} style={[flex, gap(12), itemsCenter]}>
           <Checkbox
             value={ticket.sameAsFirstTicket}
             // onValueChange={() => {
@@ -354,7 +346,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
           <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey)]}>
             Same pickup and dropoff as Ticket 1?
           </Text>
-        </View>
+        </TouchableOpacity>
 
         {/* Ceckbox block for toggling same ticket as first ticket */}
 
