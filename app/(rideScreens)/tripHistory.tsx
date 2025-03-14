@@ -285,6 +285,7 @@ function TripHistory() {
                                   item?.rideStatus == ("ended" as TRideStatus)
                                     ? "#27AE65"
                                     : item?.rideStatus == "booked" ||
+                                    item?.rideStatus == "accepted" ||
                                       item?.rideStatus == "started"
                                     ? "orange"
                                     : "red",

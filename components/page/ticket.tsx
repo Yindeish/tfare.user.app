@@ -42,6 +42,7 @@ import {
   colorWhite,
   fs12,
   fs14,
+  fs16,
   fs18,
   fw400,
   fw500,
@@ -60,7 +61,11 @@ import {
   setBottomSheetSnapPoint,
   setBottomSheetType,
 } from "@/state/slices/layout";
-import { IRiderRideDetails, ITicketInput, TRideStatus } from "@/state/types/ride";
+import {
+  IRiderRideDetails,
+  ITicketInput,
+  TRideStatus,
+} from "@/state/types/ride";
 import {
   editTicketCounterFare,
   setCurrentTicket,
@@ -73,10 +78,13 @@ import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import { TicketDetailsSheet } from "./bookRideSheetComponent";
 import FetchService from "@/services/api/fetch.service";
 import { RootState } from "@/state/store";
+import tw from "@/constants/tw";
+import { RideConstants } from "@/constants/ride";
+import { supabase } from "@/supabase/supabase.config";
 
 function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
   const dispatch = useAppDispatch();
-  const {token} = useAppSelector((state: RootState) => state.user);
+  const { token } = useAppSelector((state: RootState) => state.user);
   const { showBottomSheet } = useBottomSheet();
   const {
     currentTicket,
@@ -85,21 +93,66 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
       pickupBusstopInput,
       dropoffBusstopInput,
       userCounterFareInput,
-      userRideInput
+      userRideInput,
     },
     currentNumberOfTickets,
   } = RideSelectors();
-  const {selectedAvailableRide, currentRoute, stateInput:{ticketsDetails}} = useAppSelector((state: RootState) => state.ride);
-  
+  const {
+    selectedAvailableRide,
+    currentRoute,
+    riderRideDetails,
+    stateInput: { ticketsDetails },
+  } = useAppSelector((state: RootState) => state.ride);
+
   const [fetchState, setFetchState] = useState({
     loading: false,
-    msg: '',
-    code: null
+    msg: "",
+    code: null,
   });
-  const {code, loading, msg} = fetchState;
+  const { code, loading, msg } = fetchState;
 
+  const channel = supabase.channel(
+    `${RideConstants.channel.ride_accepting}${riderRideDetails?._id}`
+  );
 
-  const negotiateTicketFare = async (ticketNumber: number) => {
+  channel
+    .on(
+      "broadcast",
+      { event: RideConstants.event.ride_accepted },
+      (payload) => {
+        const ride = payload?.payload;
+        console.log("====================================");
+        console.log("accepting......", {
+          requestId: riderRideDetails?._id,
+          ride,
+        });
+        console.log("====================================");
+        // dispatch(setState({key:'counterFareStatus', value: 'accepted' as TRideStatus}))
+
+        const tickets = ticketsDetails.map((ticketItem) => {
+          if (Number(ticketItem?.number) == Number(ticket?.number)) {
+            return {
+              ...ticket,
+              ticketStatus: "accepted",
+            };
+          } else return ticket;
+        });
+
+        console.log({ tickets, new: "yes" });
+
+        dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+
+        //   if (
+        //     String(ride?._id) == String(riderRideDetails?._id)
+        //   ) {
+        //     dispatch(setState({key:'counterFareStatus', value: 'accepted' as TRideStatus}))
+        //   }
+      }
+    )
+    .subscribe();
+
+  const negotiateTicketFare = async () => {
+  
     setFetchState((prev) => ({ ...prev, loading: true }));
 
     const dropoffPlan = currentRoute?.inTripDropoffs?.find((dropoff) => String(dropoff?._id) === String(dropoffBusstopInput?._id))?.plan;
@@ -129,7 +182,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
 
     if (code == 201 || code == 200) {
       const tickets = ticketsDetails.map((ticketItem) => {
-        if(Number(ticketItem?.number) == ticketNumber) {
+        if(ticketItem?.number == ticket?.number) {
           return {
             ...ticketItem,
             ticketStatus: 'pending'
@@ -137,36 +190,42 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
         }
         else return ticketItem;
       })
-
-      dispatch(setStateInputField({key:'ticketsDetails', value: tickets}));
+  
+      dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}))
+      dispatch(setCurrentTicket(ticket))
       dispatch(setState({ key: "riderRideDetails", value: userRideSaved }));
       // dispatch(setState({key:'counterFareStatus', value: 'pending'}))
     }
-  }
+  };
 
   const toggleTicketAsFirstTicket = (ticketNumber: number) => {
-    const firstTicket = ticketsDetails.find((ticket) => Number(ticket?.number) == 1);
+    const firstTicket = ticketsDetails.find(
+      (ticket) => Number(ticket?.number) == 1
+    );
 
     let tickets = ticketsDetails.map((ticket) => {
-      if(Number(ticket?.number) == ticketNumber) {
+      if (Number(ticket?.number) == ticketNumber) {
         const sameAsFirstTicket = !ticket?.sameAsFirstTicket;
 
         return {
           ...ticket,
           sameAsFirstTicket: !!sameAsFirstTicket,
-          pickupBusstop: sameAsFirstTicket ? firstTicket?.pickupBusstop:null,
-          dropoffBusstop: sameAsFirstTicket ? firstTicket?.dropoffBusstop:null,
+          pickupBusstop: sameAsFirstTicket ? firstTicket?.pickupBusstop : null,
+          dropoffBusstop: sameAsFirstTicket
+            ? firstTicket?.dropoffBusstop
+            : null,
           ticketStatus: sameAsFirstTicket ? firstTicket?.ticketStatus : null,
-          userCounterFare: sameAsFirstTicket ? firstTicket?.userCounterFare : null,
+          userCounterFare: sameAsFirstTicket
+            ? firstTicket?.userCounterFare
+            : null,
           rideFee: sameAsFirstTicket ? firstTicket?.rideFee : null,
           serviceFee: sameAsFirstTicket ? firstTicket?.serviceFee : null,
         } as ITicketInput;
-      }
-      else return ticket;
+      } else return ticket;
     });
 
-    dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}))
-  }
+    dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+  };
 
   // ?????????????????//************************ R E N D E R I N G */
   // ?????????????????//************************ R E N D E R I N G */
@@ -502,14 +561,15 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                         onFocus={() => dispatch(setCurrentTicket(ticket))}
                         onChangeText={(text) => () => {
                           const ticktes = ticketsDetails?.map((ticketItem) => {
-                            if(Number(ticket?.number) == Number(ticket?.number)) {
+                            if (
+                              Number(ticket?.number) == Number(ticket?.number)
+                            ) {
                               return {
                                 ...ticketItem,
-                                userCounterFare: text
-                              }
-                            }
-                            else return ticket;
-                          })
+                                userCounterFare: text,
+                              };
+                            } else return ticket;
+                          });
                           // dispatch(
                           //   setStateInputField({
                           //     key: "userCounterFareInput",
@@ -550,10 +610,86 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                     </View>
                   </View>
 
-                  <CounterFareCtaBtn ticket={ticket} fetchState={fetchState} negotiateTicketFare={() => negotiateTicketFare(ticket?.number)} setFetchState={setFetchState} />
+                  {/* <CounterFareCtaBtn ticket={ticket} fetchState={fetchState} setFetchState={setFetchState} /> */}
+                  <View style={tw`w-[40%]`}>
+                    {ticket.ticketStatus === "idle" ? (
+                      <TouchableOpacity
+                        onPress={() => negotiateTicketFare()}
+                        style={[
+                          flex,
+                          gap(16),
+                          itemsCenter,
+                          justifyCenter,
+                          w("100%"),
+                          h(50),
+                          pl(16),
+                          rounded(10),
+                          bg(Colors.light.banner),
+                          {
+                            borderWidth: 0.7,
+                            borderColor: Colors.light.banner,
+                          },
+                        ]}
+                      >
+                        <Text style={[neurialGrotesk, fw700, fs16, colorWhite]}>
+                          Request
+                        </Text>
+                      </TouchableOpacity>
+                    ) : ticket.ticketStatus === ("accepted" as any) ? (
+                      <View
+                        style={[
+                          flex,
+                          gap(16),
+                          itemsCenter,
+                          justifyCenter,
+                          w("100%"),
+                          h(50),
+                          pl(16),
+                          rounded(10),
+                          bg(colors.white),
+                          { borderWidth: 0.7, borderColor: "#27AE65" },
+                        ]}
+                      >
+                        <Text
+                          style={[neurialGrotesk, fw700, fs16, c("#27AE65")]}
+                        >
+                          Accepted
+                        </Text>
+                      </View>
+                    ) : (
+                      <View
+                        style={[
+                          flex,
+                          gap(16),
+                          itemsCenter,
+                          justifyCenter,
+                          w("100%"),
+                          h(50),
+                          pl(16),
+                          rounded(10),
+                          bg(colors.white),
+                          {
+                            borderWidth: 0.7,
+                            borderColor: Colors.light.banner,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            neurialGrotesk,
+                            fw700,
+                            fs16,
+                            c(Colors.light.banner),
+                          ]}
+                        >
+                          Pending
+                        </Text>
+                      </View>
+                    )}
+                  </View>
                 </View>
 
-                {(code == 400 && !loading) && (
+                {code == 400 && !loading && (
                   <View
                     style={[wFull, flex, itemsCenter, justifyStart, gap(12)]}
                   >

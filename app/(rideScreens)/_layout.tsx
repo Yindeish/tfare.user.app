@@ -96,10 +96,11 @@ export default function AppLayout() {
     code: null,
   });
   const { loading, msg } = fetchState;
+  const someTicketsUnderNegotiation = ticketsDetails.find((ticket) => ticket?.ticketStatus == 'pending' as any);
+  console.log({ticketsDetails, someTicketsUnderNegotiation })
 
   const buyTickets = async () => {
-    console.log({ticketsDetails})
-    if (!allTicketsFilled) return;
+    if (!allTicketsFilled || someTicketsUnderNegotiation) return;
 
     const sameTickets = ticketsDetails?.every(
       (ticket) => ticket?.sameAsFirstTicket === true
@@ -139,11 +140,14 @@ export default function AppLayout() {
         const riderRide = returnedData?.riderRide;
         const currentRide = returnedData?.currentRide;
 
+
+        dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
         if (code && (code == 200 || code == 201)) {
           if (ticketPaid) {
             
-            if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
-            if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+            dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+            // if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) 
+            // if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: ticketPaid }));
             if (riderRide)
               dispatch(
                 setState({
@@ -303,11 +307,14 @@ export default function AppLayout() {
         const riderRide = returnedData?.riderRide;
         const currentRide = returnedData?.currentRide;
   
+
+        dispatch(setState({ key: "differentTickets", value: ticketPaid }));
         if (code && (code == 200 || code == 201)) {
           if (ticketPaid) {
             
-            if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
-            if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+            // if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+            // if(Number(ticketPaid?.quantity) == 1) 
+              dispatch(setState({ key: "differentTickets", value: ticketPaid }));
             if (riderRide)
               dispatch(
                 setState({
@@ -448,11 +455,14 @@ export default function AppLayout() {
       const riderRide = returnedData?.riderRide;
       const currentRide = returnedData?.currentRide;
 
+
+      dispatch(setState({ key: "differentTickets", value: ticketPaid }));
       if (code && (code == 200 || code == 201)) {
         if (ticketPaid) {
           
-          if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
-          if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+          // if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+          // if(Number(ticketPaid?.quantity) == 1) 
+            dispatch(setState({ key: "differentTickets", value: ticketPaid }));
           if (riderRide)
             dispatch(
               setState({
@@ -583,7 +593,7 @@ export default function AppLayout() {
       {/* Shows when all the tickets have been filled (counter fare are optional) */}
       {/* Buy Ticket Btn */}
 
-      {(booking || allTicketsFilled) && path === "/bookRide" && (
+      {(booking || (allTicketsFilled && !someTicketsUnderNegotiation)) && path === "/bookRide" && (
         <View
           style={[
             tw`w-full absolute bottom-[30px] left-[0] p-2`,

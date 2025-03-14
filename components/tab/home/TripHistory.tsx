@@ -269,7 +269,8 @@ export default function TripHistory({
                             color:
                               item?.rideStatus == ("ended" as TRideStatus)
                                 ? "#27AE65"
-                                : item?.rideStatus == "booked" ||
+                                : item?.rideStatus == "accepted" ||
+                                item?.rideStatus == "booked" ||
                                   item?.rideStatus == "started"
                                 ? "orange"
                                 : "red",

@@ -374,7 +374,7 @@ export default function Signin() {
                   )}
                 </Pressable>
 
-                {(biometricLogin === 'true' && (biometricEmail !== '' || biometricEmail !== null)) && <TouchableOpacity
+                {(biometricLogin === 'true' && (biometricEmail != '' || biometricEmail != null)) && <TouchableOpacity
                 onPress={() => {
                   checkBiometricSupport();
                   commitBiometricSignin();

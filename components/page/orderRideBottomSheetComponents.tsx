@@ -1777,10 +1777,11 @@ const RideRouteDetails = ({
             }}
           />
 
-          {ridePlans?.map(({ plan }, index) => (
+          {(ridePlans && Number(ridePlans?.length) != 0 && (ridePlans as any)?.[0] != undefined ) && <View>
+            {ridePlans?.map((item, index) => (
             <TouchableOpacity
               // onPress={() => selectPlan(plan)}
-              onPress={() => setSelectedPlan(plan)}
+              onPress={() => setSelectedPlan(item?.plan)}
               style={[
                 wFull,
                 flex,
@@ -1819,16 +1820,35 @@ const RideRouteDetails = ({
                   />
 
                   <Text style={[fw400, fs12, c(Colors.light.border)]}>
-                    {plan?.vehicleSeats} seats
+                    {item?.plan?.vehicleSeats} seats
                   </Text>
                 </View>
               </View>
 
               <Text style={[fw400, fs14, colorBlack]}>
-                ₦{plan?.ride?.rideFee}
+                ₦{item?.plan?.ride?.rideFee}
               </Text>
             </TouchableOpacity>
           ))}
+            </View>}
+
+          {((!ridePlans || Number((ridePlans as any)?.length) == 0) || (ridePlans as any)?.[0] == undefined) && <View style={[
+                wFull,
+                flex,
+                itemsCenter,
+                justifyBetween,
+                py(17),
+                px(9),
+                bg("#F9F7F8"),
+                rounded(8),
+                // plan?.selected == true || ridePlans[0] != null
+                border(
+                  0.7,
+                  colors.grey500
+                ),
+              ]}>
+            <Text style={tw `text-black`}>No Match Route!</Text>
+            </View>}
 
           <View
             style={[

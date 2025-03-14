@@ -15,12 +15,17 @@ import AccountSecurityListTile from '@/components/page/accountSecurityListTile'
 import AccountSecuritySheet from '@/components/page/accountSecuritySheet'
 import { useBottomSheet } from '@/contexts/useBottomSheetContext'
 import { useStorageState } from '@/hooks/useStorageState'
+import { IUserAccount } from '@/state/types/account'
 
 export default function accountSecurity() {
     const dispatch = useAppDispatch()
     const { stateInput, } = AccountSelectors();
     const { showBottomSheet } = useBottomSheet();
     const [[_, biometricLogin], setBiometricLogin] = useStorageState('biometricLogin');
+    const [[_$, __$], setBiometricEmail] = useStorageState('biometricEmail');
+    const [[_$$, userSession], setUserSession] = useStorageState('user');
+
+    const user = JSON.parse(userSession as string) as IUserAccount;
 
     useEffect(() => {
         // showBottomSheet([640, 820], <AccountSecuritySheet />)
@@ -53,6 +58,10 @@ export default function accountSecurity() {
                                     // update DB
                                     const prevValue = biometricLogin;
                                     setBiometricLogin(prevValue === 'false' ? 'true': 'false');
+
+                                    if(prevValue === 'true') {
+                                        setBiometricEmail(user?.email as string);
+                                    }
                                 },
                                 // value: stateInput?.accountSecurity.biometricLoginInput
                                 value: biometricLogin === 'true'

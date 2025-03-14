@@ -40,7 +40,7 @@ import {
 } from "expo-router";
 import Colors, { colors } from "@/constants/Colors";
 import { pages } from "@/constants/pages";
-import { setCurrentRideView, setState, setStateInputField, setUserRide } from "@/state/slices/ride";
+import { setCurrentNumberOfTickets, setCurrentRideView, setState, setStateInputField, setUserRide } from "@/state/slices/ride";
 import RideBlock from "@/components/page/rideBlock";
 import RideSelectors from "@/state/selectors/ride";
 import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
@@ -268,6 +268,7 @@ export default function AvailableRide() {
                       const tickets = [newTicket] as ITicketInput[];
 
                       dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}))
+                      dispatch(setCurrentNumberOfTickets(1));
                       router.push(
                         `/(rideScreens)/bookRide?selectedAvailableRideId=${ride?._id}&requestId=${requestId}` as Href
                       );

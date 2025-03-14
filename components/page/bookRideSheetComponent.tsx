@@ -208,9 +208,33 @@ function TicketDetailsSheet() {
     ) as IBusStop[];
 
     setSearchState((prev) => ({ ...prev, busstops }));
+
+    // incase the user doesn't later click an busstop in the suggestion box
+    if(inputtingPickup && !inputtingDropoff) { 
+      const matchBusstop = busstops.find((busstop) => busstop?.name?.toLowerCase()?.includes(query?.toLowerCase()))
+      dispatch(
+        setStateInputField({
+          key: "pickupBusstopInput",
+          value: matchBusstop,
+        })
+      );
+    }
+
+    if(inputtingDropoff && !inputtingPickup) { 
+      const matchBusstop = busstops.find((busstop) => busstop?.name?.toLowerCase()?.includes(query?.toLowerCase()))
+      dispatch(
+        setStateInputField({
+          key: "dropoffBusstopInput",
+          value: matchBusstop,
+        })
+      );
+    }
+
+    // incase the user doesn't later click an busstop in the suggestion box
   };
 
   const getRidePlan = () => {
+    if (values.dropoffBusstop == "" || values.pickupBusstop == "") return;
     // plan
 
     const unitFare = currentRoute?.unitFares?.find(
@@ -686,7 +710,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   console.log("====================================");
-  console.log(sameTickets, { riderRideDetails });
+  console.log({sameTickets}, {differentTickets}, { riderRideDetails });
   console.log("====================================");
 
   const [fetchState, setFetchState] = useState({

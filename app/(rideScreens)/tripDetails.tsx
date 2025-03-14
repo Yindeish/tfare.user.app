@@ -124,10 +124,13 @@ function TripDetails() {
   const path = usePathname();
   const { showBottomSheet, hideBottomSheet } = useBottomSheet();
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
-  const { differentTickets } = useAppSelector((state: RootState) => state.ride);
+  const { differentTickets, stateInput:{ticketsDetails} } = useAppSelector((state: RootState) => state.ride);
 
-  const tripCost = lastRides?.map((ride) => ride?.ridePlan?.ride?.rideFee || ride?.ridePlan?.plan?.ride?.rideFee)?.reduce((prev, current) => prev+current, 0);
-  const serviceFee = (lastRides?.[0]?.ridePlan as any)?.serviceFee;
+  // const tripCost = lastRides?.map((ride) => ride?.ridePlan?.ride?.rideFee || ride?.ridePlan?.plan?.ride?.rideFee)?.reduce((prev, current) => prev+current, 0);
+  // const serviceFee = (lastRides?.[0]?.ridePlan as any)?.serviceFee;
+
+  const tripCost = ticketsDetails?.reduce((prev, current) => prev + Number(current?.rideFee), 0)
+const serviceFee = Number(ticketsDetails[0]?.serviceFee);
 
   return (
     <SafeScreen>
