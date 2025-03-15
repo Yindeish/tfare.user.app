@@ -84,6 +84,7 @@ export default function AvailableRide() {
   const [[isLoading, session], setSession] = useStorageState("token");
   const [[_$, userSession], __] = useStorageState('user');
   const user = JSON.parse(userSession as string);
+  const path = usePathname();
 
   console.log({user});
 
@@ -102,8 +103,9 @@ export default function AvailableRide() {
   channel
     .on("broadcast", { event: RideConstants.event.ride_accepted}, (payload) => {
       const id = payload?.payload?.ride?._id;
-      dispatch(setState({key:'riderRideDetails', value: payload?.payload?.ride}))
-      id && getAvailableRides(id);
+      dispatch(setState({key:'riderRideDetails', value: payload?.payload?.ride}));
+      // (id && path === "/bookRide") && getAvailableRides(id);
+      (id && path === "/availableRide") && getAvailableRides(id);
     })
     .subscribe();
 
@@ -263,9 +265,11 @@ export default function AvailableRide() {
                         ticketStatus: 'accepted',
                         userCounterFare: Number(riderAcceptedRide?.riderCounterOffer),
                         sameAsFirstTicket: true,
+                        rideId: riderAcceptedRide?._id,
+                        quntity: 1
                       };
 
-                      const tickets = [newTicket] as ITicketInput[];
+                      const tickets = [newTicket] as unknown as ITicketInput[];
 
                       dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}))
                       dispatch(setCurrentNumberOfTickets(1));

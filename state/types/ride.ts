@@ -21,7 +21,7 @@ export type TRideStatus =
   | "paused"
   | "booked"
   | "ended";
-  export type TTicketSatus = 'idle' | 'cancelled' | 'paid' | 'booked';
+  export type TTicketSatus = 'idle' | 'cancelled' | 'paid' | 'booked' | 'declined';
 
 export interface IRoute {
   routeName: string;
@@ -96,19 +96,31 @@ export interface ITicketInput {
   rideFee?: number;
   serviceFee?: number;
   ticketStatus?: TTicketSatus;
-  unitFare?: IUnitFare
+  unitFare?: IUnitFare;
+  rideId?: string;
+  quantity?: number;
 }
 
 export interface ITicket {
-  createdAt: Date,
-  quantity: string,
-  ride: string,
-  riderCounterOffer: string,
   riderId: string,
-  ticketOtp: string,
-  ticketStatus: TRideStatus,
-  updatedAt: string,
-  _id: string,
+  riderCounterOffer: number,
+  quantity: number,
+  ticketOtp: number,
+  ticketStatus: TTicketSatus,
+  ride?: {
+      currentRideId: string,
+      riderRideDetailsId: string,
+      ridePlan: IPlan,
+      rideFee: number
+  },
+  trip?: {
+      currentTripId: string,
+      riderTripDetailsId: string,
+      tripPlan: IPlan,
+      tripFee: number
+  },
+  createdAt: Date,
+  updatedAt: Date
 }
 
 export interface IStateInput {

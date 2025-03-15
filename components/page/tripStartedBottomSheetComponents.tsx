@@ -170,9 +170,11 @@ function TripStartedSheet() {
   );
   channel
     .on("broadcast", { event: RideConstants.event.ride_ended}, (payload) => {
-      // router.setParams({ ...searchParams, query: "RideEnded" });
+      if(query == RideConstants.query.RideStarted) {
+        // router.setParams({ ...searchParams, query: "RideEnded" });
       setQuery(RideConstants.query.RideEnded);
       showBottomSheet([100, 650], <TripCompletedSheet />, true);
+      }
     })
     .subscribe();
 

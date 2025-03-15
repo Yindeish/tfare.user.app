@@ -6,6 +6,7 @@ import {
   View,
   ScrollView,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { Text } from "react-native-paper";
 import React, { useEffect, useState } from "react";
@@ -81,6 +82,7 @@ import { RootState } from "@/state/store";
 import tw from "@/constants/tw";
 import { RideConstants } from "@/constants/ride";
 import { supabase } from "@/supabase/supabase.config";
+import { usePathname } from "expo-router";
 
 function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
   const dispatch = useAppDispatch();
@@ -104,6 +106,8 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
     stateInput: { ticketsDetails },
   } = useAppSelector((state: RootState) => state.ride);
 
+  const path = usePathname();
+
   const [fetchState, setFetchState] = useState({
     loading: false,
     msg: "",
@@ -120,6 +124,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
       "broadcast",
       { event: RideConstants.event.ride_accepted },
       (payload) => {
+       if(path == '/bookRide') {
         const ride = payload?.payload?.ride as IRiderRideDetails;
         console.log("====================================");
         console.log("accepting......", ride, {
@@ -143,6 +148,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
         });
 
         dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+       }
       }
     )
     .subscribe();
@@ -175,6 +181,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
         ridePlan:
           dropoffPlan?.ride?.rideFee || dropoffPlan?.plan?.ride?.rideFee,
         routeId: dropoffPlan?.routeId,
+        requestId: ticket?.rideId
       },
       token: token as string,
     });
@@ -197,6 +204,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
           return {
             ...ticketItem,
             ticketStatus: "pending",
+            rideId: userRideSaved?._id
           };
         } else return ticketItem;
       });
@@ -230,6 +238,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
             : null,
           rideFee: sameAsFirstTicket ? firstTicket?.rideFee : null,
           serviceFee: sameAsFirstTicket ? firstTicket?.serviceFee : null,
+          rideId: sameAsFirstTicket ? firstTicket?.rideId : null,
         } as ITicketInput;
       } else return ticket;
     });
@@ -573,10 +582,10 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                       </Text>
                       <TextInput
                         onFocus={() => dispatch(setCurrentTicket(ticket))}
-                        onChangeText={(text) => {
+                        onChangeText={(ticket?.ticketStatus == 'pending' as any) ? () => {} : (text) => {
                           if(ticket?.ticketStatus == 'pending' as any) return;
 
-                          const ticktes = ticketsDetails?.map((ticketItem) => {
+                          const tickets = ticketsDetails?.map((ticketItem) => {
                             if (
                               Number(ticket?.number) == Number(ticket?.number)
                             ) {
@@ -587,7 +596,9 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                             } else return ticketItem;
                           });
 
-                          dispatch(setStateInputField({key: 'ticketsDetails', value: ticktes}))
+                          dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}));
+
+                          console.log({currentTicket})
 
                           // dispatch(
                           //   setStateInputField({
@@ -603,7 +614,8 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                           //   })
                           // );
                         }}
-                        value={userCounterFareInput?.toString()}
+                        // value={userCounterFareInput?.toString()}
+                        value={String(ticket?.userCounterFare)}
                         placeholder={"Negotiate fare"}
                         style={[
                           py(16) as TextStyle,
@@ -643,7 +655,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                           justifyCenter,
                           w("100%"),
                           h(50),
-                          pl(16),
+                          pl(loading? 7: 16),
                           rounded(10),
                           bg(Colors.light.banner),
                           {
@@ -652,6 +664,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                           },
                         ]}
                       >
+                        {loading && <ActivityIndicator color={colors.white} style={tw `w-[20px] h-[20px]`} />}
                         <Text style={[neurialGrotesk, fw700, fs16, colorWhite]}>
                           Request
                         </Text>
@@ -675,6 +688,27 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                           style={[neurialGrotesk, fw700, fs16, c("#27AE65")]}
                         >
                           Accepted
+                        </Text>
+                      </View>
+                    ) : ticket?.ticketStatus === 'declined' ? (
+                      <View
+                        style={[
+                          flex,
+                          gap(16),
+                          itemsCenter,
+                          justifyCenter,
+                          w("100%"),
+                          h(50),
+                          pl(16),
+                          rounded(10),
+                          bg(colors.white),
+                          { borderWidth: 0.7, borderColor: "#27AE65" },
+                        ]}
+                      >
+                        <Text
+                          style={[neurialGrotesk, fw700, fs16, c("#27AE65")]}
+                        >
+                          Declined
                         </Text>
                       </View>
                     ) : (
@@ -726,7 +760,6 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
 
                     <Text
                       style={[
-                        neurialGrotesk,
                         fw400,
                         fs12,
                         c(Colors.light.error),

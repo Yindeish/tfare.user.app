@@ -2209,8 +2209,10 @@ const SearchingRide = ({
         console.log("====================================");
 
         if (
-          String(ride?._id) === String(requestId) ||
-          String(riderRideDetails?._id)
+         ( String(ride?._id) === String(requestId) ||
+          String(riderRideDetails?._id) // Need to change this based on the check for the ride id in the ticketDetails list
+        && query == RideConstants.query.SearchingRide
+        )
         ) {
           router.push(
             `/(rideScreens)/availableRides?selectedAvailableRideId=${

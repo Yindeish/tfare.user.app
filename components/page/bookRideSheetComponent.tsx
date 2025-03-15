@@ -52,7 +52,10 @@ import {
   neurialGrotesk,
 } from "@/utils/fontStyles";
 import { images } from "@/constants/images";
-import { BottomSheetScrollView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetScrollView,
+  BottomSheetTextInput,
+} from "@gorhom/bottom-sheet";
 import Colors, { colors } from "@/constants/Colors";
 import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
 import {
@@ -113,7 +116,7 @@ function TicketDetailsSheet() {
     currentNumberOfTickets,
     stateInput: { ticketsDetails },
   } = useAppSelector((state: RootState) => state.ride);
-  console.log({ currentRoute, ticketsDetails });
+  console.log({ currentTicket });
 
   const [fetchState, setFetchState] = useState({
     loading: false,
@@ -145,24 +148,6 @@ function TicketDetailsSheet() {
     pickupSearchText,
   } = searchState;
 
-  // const searchBusstops = async (query: string) => {
-  //   setSearchState((prev) => ({ ...prev, loading: true }));
-
-  //   const returnedData = await FetchService.getWithBearerToken({
-  //     url: `/user/rider/me/busstop/search?searchValue=${query}`,
-  //     token: session as string,
-  //   });
-
-  //   setSearchState((prev) => ({ ...prev, loading: false }));
-
-  //   const busstops = returnedData?.matchSearchBusStops as IAddress[];
-  //   console.log({ busstops });
-  //   if (busstops) {
-  //     setSearchState((prev) => ({ ...prev, busstops: busstops as never[] }));
-  //     // dispatch(setSavedAddresses(busstops));
-  //   }
-  // };
-
   const {
     values,
     errors,
@@ -173,8 +158,8 @@ function TicketDetailsSheet() {
     setFieldValue,
   } = useFormik({
     initialValues: {
-      pickupBusstop: pickupBusstopInput?.name,
-      dropoffBusstop: dropoffBusstopInput?.name,
+      pickupBusstop: "",
+      dropoffBusstop: "",
     },
     validationSchema: new ObjectSchema({
       pickupBusstop: string().required(),
@@ -210,8 +195,10 @@ function TicketDetailsSheet() {
     setSearchState((prev) => ({ ...prev, busstops }));
 
     // incase the user doesn't later click an busstop in the suggestion box
-    if(inputtingPickup && !inputtingDropoff) { 
-      const matchBusstop = busstops.find((busstop) => busstop?.name?.toLowerCase()?.includes(query?.toLowerCase()))
+    if (inputtingPickup && !inputtingDropoff) {
+      const matchBusstop = busstops.find((busstop) =>
+        busstop?.name?.toLowerCase()?.includes(query?.toLowerCase())
+      );
       dispatch(
         setStateInputField({
           key: "pickupBusstopInput",
@@ -220,8 +207,10 @@ function TicketDetailsSheet() {
       );
     }
 
-    if(inputtingDropoff && !inputtingPickup) { 
-      const matchBusstop = busstops.find((busstop) => busstop?.name?.toLowerCase()?.includes(query?.toLowerCase()))
+    if (inputtingDropoff && !inputtingPickup) {
+      const matchBusstop = busstops.find((busstop) =>
+        busstop?.name?.toLowerCase()?.includes(query?.toLowerCase())
+      );
       dispatch(
         setStateInputField({
           key: "dropoffBusstopInput",
@@ -255,12 +244,11 @@ function TicketDetailsSheet() {
           rideFee: matchPlan?.ride?.rideFee,
           serviceFee: matchPlan?.serviceFee,
           unitFare,
-          ticketStatus: 'idle'
+          ticketStatus: "idle",
         };
-      }
-      else return ticket;
+      } else return ticket;
     });
-    dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}));
+    dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
 
     // dispatch(setState({ key: "ridePlans", value: [matchPlan] }));
 
@@ -271,6 +259,52 @@ function TicketDetailsSheet() {
     //   })
     // );
     hideBottomSheet();
+  };
+
+  const selectPickup = (busstop: IBusStop) => {
+    setFieldValue('pickupBusstop', busstop?.name)
+    
+    const tickets = ticketsDetails?.map((ticketDetails) => {
+      if(Number(ticketDetails?.number) === Number(currentTicket?.number)) {
+        return {
+          ...ticketDetails,
+          pickupBusstop: busstop
+        }
+      }
+      else return ticketDetails;
+    })
+
+    dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}))
+
+    dispatch(
+      setStateInputField({
+        key: "pickupBusstopInput",
+        value: busstop,
+      })
+    );
+  }
+
+  const selectDropoff = (busstop: IBusStop) => {
+    setFieldValue('dropoffBusstop', busstop?.name);
+
+    const tickets = ticketsDetails?.map((ticketDetails) => {
+      if(Number(ticketDetails?.number) === Number(currentTicket?.number)) {
+        return {
+          ...ticketDetails,
+          dropoffBusstop: busstop
+        }
+      }
+      else return ticketDetails;
+    })
+
+    dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}))
+
+    dispatch(
+      setStateInputField({
+        key: "dropoffBusstopInput",
+        value: busstop,
+      })
+    );
   };
 
   // Updating pickup search
@@ -344,15 +378,15 @@ function TicketDetailsSheet() {
             cursorColor={Colors.light.textGrey}
             placeholder="Pick up Bus Stop"
             value={values.pickupBusstop}
-            onChangeText={handleChange("pickupBusstop")}
             autoCorrect={false}
-            onFocus={() => {
-              setSearchState((prev) => ({
-                ...prev,
-                inputtingPickup: true,
-                inputtingDropoff: false,
-              }));
-            }}
+            // onChangeText={handleChange("pickupBusstop")}
+            // onFocus={() => {
+            //   setSearchState((prev) => ({
+            //     ...prev,
+            //     inputtingPickup: true,
+            //     inputtingDropoff: false,
+            //   }));
+            // }}
             // value={pickupBusstopInput?.name}
             // onChangeText={(text) => {
             //   dispatch(
@@ -362,126 +396,16 @@ function TicketDetailsSheet() {
           />
         </View>
 
-        {/* Pickup Suggestion Dropodwon */}
-        {inputtingPickup && (
-          <View style={[relative, wFull, h(10)]}>
-            {!searchState.loading ? (
-              <ScrollView
-                style={[
-                  absolute,
-                  top0,
-                  left0,
-                  zIndex(20),
-                  wFull,
-                  bg(colors.white),
-                  h(176),
-                  flexCol,
-                  gap(30),
-                  py(16),
-                  px(24),
-                  bg("#F9F7F8"),
-                  { borderBottomRightRadius: 10, borderBottomLeftRadius: 10 },
-                ]}
-              >
-                {(busstops as IBusStop[])?.map((busstop, index) => (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setFieldValue("pickupBusstop", busstop?.name);
-                      dispatch(
-                        setStateInputField({
-                          key: "pickupBusstopInput",
-                          value: busstop,
-                        })
-                      );
-                      setSearchState((prev) => ({
-                        ...prev,
-                        inputtingPickup: false,
-                        pickupSearchText: busstop?.name,
-                      }));
-                    }}
-                    key={index}
-                    style={tw``}
-                  >
-                    <Text style={[h(30) as TextStyle, tw``]}>
-                      {busstop?.name}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            ) : (
-              <ActivityIndicator />
-            )}
-          </View>
-        )}
-        {/* Pickup Suggestion Dropodwon */}
+        {/* In-trip Dropoff List */}
 
-        {/* Saved Bustop List */}
-        {!loading ? (
-          <FlatList
-            style={[wFull, h(46), flex, gap(16)]}
-            horizontal
-            data={savedAddresses}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  dispatch(
-                    setStateInputField({
-                      key: "pickupBusstopInput",
-                      value: item?.busStop,
-                    })
-                  );
-                  setFieldValue("pickupBusstop", item?.busStop?.name);
-                }}
-              >
-                <View
-                  style={[
-                    w("auto"),
-                    hFull,
-                    rounded(100),
-                    px(32),
-                    gap(10),
-                    flex,
-                    itemsCenter,
-                    justifyCenter,
-                    { borderWidth: 1, borderColor: Colors.light.border },
-                  ]}
-                >
-                  <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>
-                    {item?.busstopTitle}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            )}
-            ItemSeparatorComponent={() => (
-              <View style={[w(16), hFull, bg(colors.transparent)]} />
-            )}
-            keyExtractor={({}) => Math.random().toString()}
-          />
-        ) : (
-          <View style={[wFull, h(50), flexCenter]}>
-            <ActivityIndicator style={[w(50), h(50)]} />
-          </View>
-        )}
-        {/* Saved Bustop List */}
-
-        {/* <FlatList
+        <FlatList
           style={[wFull, h(46), flex, gap(16)]}
           horizontal
-          data={savedAddresses}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() =>
-                dispatch(
-                  setStateInputField({
-                    key: "pickupBusstopInput",
-                    value: item.busStop?.name,
-                  })
-                )
-              }
-            >
+          data={currentRoute?.inTripDropoffs}
+          renderItem={({ item: busstop }) => (
+            <TouchableOpacity onPress={() => selectPickup(busstop)}>
               <View
                 style={[
-                  w(98),
                   hFull,
                   rounded(100),
                   py(16),
@@ -491,10 +415,13 @@ function TicketDetailsSheet() {
                   itemsCenter,
                   justifyCenter,
                   { borderWidth: 1, borderColor: Colors.light.border },
+                  tw`w-auto`,
                 ]}
               >
+                <Image style={tw`w-[22px] h-[19px]`} source={images.trip} />
+
                 <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>
-                  {item.busstopTitle}
+                  {busstop?.name}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -502,8 +429,9 @@ function TicketDetailsSheet() {
           ItemSeparatorComponent={() => (
             <View style={[w(16), hFull, bg(colors.transparent)]} />
           )}
-          keyExtractor={({ busStop }) => String(busStop?._id)}
-        /> */}
+          keyExtractor={({ _id }) => String(_id)}
+        />
+        {/* In-trip Dropoff List */}
 
         {/* Pick up block */}
 
@@ -554,102 +482,42 @@ function TicketDetailsSheet() {
           />
         </View>
 
-        {/* Dropoff Suggestion Dropodwon */}
-        {inputtingDropoff && (
-          <View style={[relative, wFull, h(10), mt(-32)]}>
-            {!searchState.loading ? (
-              <ScrollView
+        {/* In-trip Dropoff List */}
+
+        <FlatList
+          style={[wFull, h(46), flex, gap(16)]}
+          horizontal
+          data={currentRoute?.inTripDropoffs}
+          renderItem={({ item: busstop }) => (
+            <TouchableOpacity onPress={() => selectDropoff(busstop)}>
+              <View
                 style={[
-                  absolute,
-                  top0,
-                  left0,
-                  zIndex(20),
-                  wFull,
-                  bg(colors.white),
-                  h(176),
-                  flexCol,
-                  gap(30),
+                  hFull,
+                  rounded(100),
                   py(16),
-                  px(24),
-                  bg("#F9F7F8"),
-                  { borderBottomRightRadius: 10, borderBottomLeftRadius: 10 },
+                  px(32),
+                  gap(10),
+                  flex,
+                  itemsCenter,
+                  justifyCenter,
+                  { borderWidth: 1, borderColor: Colors.light.border },
+                  tw`w-auto`,
                 ]}
               >
-                {(busstops as IBusStop[])?.map((busstop, index) => (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setFieldValue("dropoffBusstop", busstop?.name);
-                      dispatch(
-                        setStateInputField({
-                          key: "dropoffBusstopInput",
-                          value: busstop,
-                        })
-                      );
-                      setSearchState((prev) => ({
-                        ...prev,
-                        inputtingDropoff: false,
-                        dropoffSearchText: busstop.name,
-                      }));
-                    }}
-                    key={index}
-                  >
-                    <Text style={[h(30) as TextStyle]}>{busstop?.name}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            ) : (
-              <ActivityIndicator />
-            )}
-          </View>
-        )}
-        {/* Dropoff Suggestion Dropodwon */}
+                <Image style={tw`w-[22px] h-[19px]`} source={images.trip} />
 
-        {!loading ? (
-          <FlatList
-            style={[wFull, h(46), flex, gap(16)]}
-            horizontal
-            data={savedAddresses}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  dispatch(
-                    setStateInputField({
-                      key: "dropoffBusstopInput",
-                      value: item?.busStop,
-                    })
-                  );
-                  setFieldValue("dropoffBusstop", item?.busStop?.name);
-                }}
-              >
-                <View
-                  style={[
-                    w("auto"),
-                    hFull,
-                    rounded(100),
-                    px(32),
-                    gap(10),
-                    flex,
-                    itemsCenter,
-                    justifyCenter,
-                    { borderWidth: 1, borderColor: Colors.light.border },
-                  ]}
-                >
-                  <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>
-                    {item.busstopTitle}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            )}
-            ItemSeparatorComponent={() => (
-              <View style={[w(16), hFull, bg(colors.transparent)]} />
-            )}
-            keyExtractor={({}) => Math.random().toString()}
-          />
-        ) : (
-          <View style={[wFull, h(50), flexCenter]}>
-            <ActivityIndicator style={[w(50), h(50)]} />
-          </View>
-        )}
+                <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>
+                  {busstop?.name}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          ItemSeparatorComponent={() => (
+            <View style={[w(16), hFull, bg(colors.transparent)]} />
+          )}
+          keyExtractor={({ _id }) => String(_id)}
+        />
+        {/* In-trip Dropoff List */}
 
         {/* Drop off block */}
       </View>
@@ -702,6 +570,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
     sameTickets,
     differentTickets,
     driverDetails,
+    stateInput: { ticketsDetails },
   } = useAppSelector((state: RootState) => state.ride);
   const { token, user } = useAppSelector((state: RootState) => state.user);
   const { hideBottomSheet, showBottomSheet } = useBottomSheet();
@@ -710,7 +579,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   console.log("====================================");
-  console.log({sameTickets}, {differentTickets}, { riderRideDetails });
+  console.log({ticketsDetails});
   console.log("====================================");
 
   const [fetchState, setFetchState] = useState({
@@ -719,42 +588,6 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
     code: null,
   });
   const { code, msg, loading } = fetchState;
-
-  const getRideTicketsDetails = async () => {
-    try {
-      setFetchState((prev) => ({ ...prev, loading: true }));
-      const returnedData = await FetchService.getWithBearerToken({
-        url: `/user/rider/me/ride/${selectedAvailableRide?._id}/ticket-details`,
-        token: token as string,
-      });
-
-      setFetchState((prev) => ({
-        ...prev,
-        loading: false,
-        msg: "",
-        code: null,
-      }));
-
-      const code = returnedData?.code;
-      const msg = returnedData?.msg;
-      const ticketDetails = returnedData?.tickets;
-      console.log({ returnedData, ticketDetails });
-
-      setFetchState((prev) => ({ ...prev, loading: false, msg, code }));
-
-      if (code && code == 200 && ticketDetails) {
-        dispatch(setState({ key: "paidTickets", value: ticketDetails }));
-      }
-    } catch (error) {
-      console.log({ error });
-      setFetchState((prev) => ({
-        ...prev,
-        loading: false,
-        msg: "",
-        code: null,
-      }));
-    }
-  };
 
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
@@ -788,45 +621,16 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
     }
   };
 
-  // // Update to link to the rider current position
-  // const openMap = () => {
-  //   const riderRide = selectedAvailableRide?.ridersRides.find(
-  //     (ride) => String(ride?.riderId) == String(user?._id)
-  //   );
-  //   const location =
-  //     riderRide?.dropoffBusstop?.name ||
-  //     selectedAvailableRide?.inRideDropoffs[
-  //       selectedAvailableRide?.inRideDropoffs.length - 1
-  //     ]?.name;
-  //   const mapLink = `https://www.google.com/maps?q=${location}`;
-
-  //   Linking.openURL(mapLink).catch((err) =>
-  //     console.error("Failed to open map:", err)
-  //   );
-  // };
-
-  const openCallerApp = (phoneNumber: string) => {
-    const url = `tel:${phoneNumber}`;
-    Linking.openURL(url).catch((err) => {
-      console.error("Failed to open dialer:", err);
-    });
-  };
-
-  const openWhatsApp = (phoneNumber: string) => {
-    const url = `whatsapp://send?phone=${phoneNumber}`;
-    Linking.openURL(url).catch((err) => {
-      console.error("Failed to open WhatsApp:", err);
-    });
-  };
-
   const channel = supabase.channel(
     `${RideConstants.channel.ride_starting}${riderRideDetails?._id}`
   );
   channel
     .on("broadcast", { event: RideConstants.event.ride_started }, (payload) => {
-      setQuery(RideConstants.query.RideStarted);
-      showBottomSheet([100, 500], <TripStartedSheet />, true);
-      router.replace("/(rideScreens)/rideMap");
+      if (query == RideConstants.query.RideBooked) {
+        setQuery(RideConstants.query.RideStarted);
+        showBottomSheet([100, 500], <TripStartedSheet />, true);
+        router.replace("/(rideScreens)/rideMap");
+      }
     })
     .subscribe();
 
@@ -947,6 +751,19 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
               icon: true,
             }}
           />
+
+          {ticketsDetails?.map((ticket, index) => (
+            <BuyTicketListTile
+              leadingText={`Ticket ${ticket?.number} code`}
+              trailing={{
+                // text: '#765XYZ',
+                text: String(ticket?.ticketOtp),
+                icon: true,
+              }}
+              key={index}
+            />
+          ))}
+
           {/* Same Tickets */}
           {/* {sameTickets &&
             Array.from({ length: Number(sameTickets?.quantity) }).map(
@@ -962,7 +779,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
                 />
               )
             )} */}
-          {sameTickets &&
+          {/* {sameTickets &&
             // (sameTickets || [])?.map(
             Array.from({ length: Number(sameTickets[0]?.quantity) })?.map(
               // (ticket, index) => (
@@ -972,28 +789,28 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
                   trailing={{
                     // text: '#765XYZ',
                     // text: ticket?.ticketOtp as string,
-                    text: sameTickets[0]?.ticketOtp as string,
+                    text: String(sameTickets[0]?.ticketOtp),
                     icon: true,
                   }}
                   key={index}
                 />
               )
-            )}
+            )} */}
           {/* Same Tickets */}
           {/* Different Tickets */}
-          {differentTickets &&
+          {/* {differentTickets &&
             Number(differentTickets?.length) > 0 &&
             differentTickets?.map((ticket, index) => (
               <BuyTicketListTile
                 leadingText={`Ticket ${index + 1} code`}
                 trailing={{
                   // text: '#765XYZ',
-                  text: ticket?.ticketOtp as string,
+                  text: String(ticket?.ticketOtp),
                   icon: true,
                 }}
                 key={index}
               />
-            ))}
+            ))} */}
           {/* Different Tickets */}
         </View>
 

@@ -41,7 +41,11 @@ import CtaBtn from "@/components/shared/ctaBtn";
 import { indices } from "@/constants/zIndices";
 import Toast from "react-native-toast-message";
 import FetchService from "@/services/api/fetch.service";
-import { setPaymentOptionsVisible, setState, setStateInputField } from "@/state/slices/ride";
+import {
+  setPaymentOptionsVisible,
+  setState,
+  setStateInputField,
+} from "@/state/slices/ride";
 import { ActivityIndicator } from "react-native";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 import { useBottomSheet } from "@/contexts/useBottomSheetContext";
@@ -61,6 +65,7 @@ import {
   RideRouteDetails,
   SearchingRide,
 } from "@/components/page/orderRideBottomSheetComponents";
+import { ITicket, ITicketInput } from "@/state/types/ride";
 
 export default function AppLayout() {
   const { userSession, isLoading } = useSession();
@@ -84,7 +89,7 @@ export default function AppLayout() {
     query?: string;
     riderCounterOffer?: string;
   }>();
-  const {Snackbar, snackbarVisible,closeSnackbar, notify}= useSnackbar()
+  const { Snackbar, snackbarVisible, closeSnackbar, notify } = useSnackbar();
 
   console.log("====================================");
   console.log({ query });
@@ -96,7 +101,9 @@ export default function AppLayout() {
     code: null,
   });
   const { loading, msg } = fetchState;
-  const someTicketsUnderNegotiation = ticketsDetails.find((ticket) => ticket?.ticketStatus == 'pending' as any);
+  const someTicketsUnderNegotiation = ticketsDetails.find(
+    (ticket) => ticket?.ticketStatus == ("pending" as any)
+  );
 
   const buyTickets = async () => {
     if (!allTicketsFilled || someTicketsUnderNegotiation) return;
@@ -133,19 +140,39 @@ export default function AppLayout() {
         const ticketPaid = returnedData?.ticketPaid;
         const bookedTicket = returnedData?.bookedTicket;
         const ticketBooked = returnedData?.ticketBooked;
+        ``;
         const paymentLink = returnedData?.paymentLink;
         const status = returnedData?.status;
         const driver = returnedData?.driver;
         const riderRide = returnedData?.riderRide;
         const currentRide = returnedData?.currentRide;
 
+        let ticket = ticketPaid || ticketBooked || bookedTicket;
 
-        dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+        if (ticket) console.log("No tickets");
+        console.log({ ticket });
+
+        // tickets = tickets?.map((ticket: ITicket) => {
+        const riderRideDetailsId = String(ticket?.ride?.riderRideDetailsId);
+
+        let tickets = ticketsDetails?.map((ticketDetail) =>
+          String(ticketDetail?.rideId) === riderRideDetailsId
+            ? {
+                ...ticketDetail,
+                ticketOtp: ticket.ticketOtp,
+                ticketStatus: ticket.ticketStatus,
+              }
+            : ticketDetail
+        );
+        // });
+
+        dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+
+        // dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
         if (code && (code == 200 || code == 201)) {
           if (ticketPaid) {
-            
             dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
-            // if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) 
+            // if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity)
             // if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: ticketPaid }));
             if (riderRide)
               dispatch(
@@ -173,7 +200,7 @@ export default function AppLayout() {
               <RideBookedSheet rideId={selectedAvailableRideId as string} />,
               true
             );
-            router.replace('/rideMap' as Href)
+            router.replace("/rideMap" as Href);
             return;
           }
 
@@ -210,7 +237,7 @@ export default function AppLayout() {
 
           if (status === "started") {
             // router.setParams({ ...searchParams, query: "RideStarted" });
-            setQuery(RideConstants.query.RideStarted)
+            setQuery(RideConstants.query.RideStarted);
             router.push(
               `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );
@@ -218,7 +245,7 @@ export default function AppLayout() {
           }
           if (status === "ended") {
             // router.setParams({ query: "RideEnded" });
-            setQuery(RideConstants.query.RideEnded)
+            setQuery(RideConstants.query.RideEnded);
             showBottomSheet([500], <TripCompletedSheet />, true);
           }
           if (status === "booked") {
@@ -230,8 +257,12 @@ export default function AppLayout() {
             //     value: [returnedData?.ticketPaid],
             //   })
             // );
-            if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
-            if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: [ticketPaid] }));
+            if (Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity)
+              dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+            if (Number(ticketPaid?.quantity) == 1)
+              dispatch(
+                setState({ key: "differentTickets", value: [ticketPaid] })
+              );
             // router.push(
             //   `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             // );
@@ -252,9 +283,8 @@ export default function AppLayout() {
         }
 
         // if(code != 500) dispatch(setStateInputField({key: 'ticketsDetails', value: []}))
-
         else {
-          notify({msg});
+          notify({ msg });
         }
       } catch (error: any) {
         console.log({ error });
@@ -274,19 +304,23 @@ export default function AppLayout() {
       //   ridePlanName: "standard",
       //   userCounterOffer: ticket?.userCounterFare,
       // }));
-      const unnegotiatedTickets = ticketsDetails?.filter((ticket) => ticket?.ticketStatus == 'idle');
-      console.log({unnegotiatedTickets})
+      const unnegotiatedTickets = ticketsDetails?.filter(
+        (ticket) => ticket?.ticketStatus == "idle"
+      );
+      console.log({ unnegotiatedTickets });
 
-      if(unnegotiatedTickets.length > 0) {
+      if (unnegotiatedTickets.length > 0) {
         const returnedData = await FetchService.postWithBearerToken({
           data: {
-            unitFareId: unnegotiatedTickets?.map((ticket) => String(ticket?.unitFare?._id)),
-            paymentOption: paymentOptionInput
+            unitFareId: unnegotiatedTickets?.map((ticket) =>
+              String(ticket?.unitFare?._id)
+            ),
+            paymentOption: paymentOptionInput,
           },
           token: token as string,
           url: `/user/rider/me/ride/${selectedAvailableRide?._id}/book-unlike`,
         });
-  
+
         console.log({ returnedData });
         setFetchState((prev) => ({
           ...prev,
@@ -294,7 +328,7 @@ export default function AppLayout() {
           code: null,
           msg: "",
         }));
-  
+
         const code = returnedData?.code;
         const msg = returnedData?.msg;
         const ticketPaid = returnedData?.ticketPaid;
@@ -305,15 +339,33 @@ export default function AppLayout() {
         const driver = returnedData?.driver;
         const riderRide = returnedData?.riderRide;
         const currentRide = returnedData?.currentRide;
-  
 
-        dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+        let tickets = ticketPaid || ticketBooked || bookedTicket;
+
+        if (tickets) console.log("No tickets");
+        console.log({ tickets });
+
+        tickets = tickets?.map((ticket: ITicket) => {
+          const riderRideDetailsId = String(ticket?.ride?.riderRideDetailsId);
+
+          return ticketsDetails?.map((ticketDetail) =>
+            String(ticketDetail?.rideId) === riderRideDetailsId
+              ? {
+                  ...ticketDetail,
+                  ticketOtp: ticket.ticketOtp,
+                  ticketStatus: ticket.ticketStatus,
+                }
+              : ticketDetail
+          );
+        });
+
+        dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+        // dispatch(setState({ key: "differentTickets", value: ticketPaid }));
         if (code && (code == 200 || code == 201)) {
           if (ticketPaid) {
-            
             // if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
-            // if(Number(ticketPaid?.quantity) == 1) 
-              dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+            // if(Number(ticketPaid?.quantity) == 1)
+            dispatch(setState({ key: "differentTickets", value: ticketPaid }));
             if (riderRide)
               dispatch(
                 setState({
@@ -340,13 +392,13 @@ export default function AppLayout() {
               <RideBookedSheet rideId={selectedAvailableRideId as string} />,
               true
             );
-            router.replace('/rideMap' as Href)
+            router.replace("/rideMap" as Href);
             return;
           }
-  
+
           if ((ticketBooked && paymentLink) || (bookedTicket && paymentLink)) {
             const sameTickets = ticketBooked || bookedTicket;
-  
+
             dispatch(setState({ key: "sameTickets", value: sameTickets }));
             openURL(paymentLink).catch((err: any) =>
               console.error("Failed to open tfare payment link:", err?.message)
@@ -354,10 +406,10 @@ export default function AppLayout() {
             return;
           }
         }
-  
+
         if (code && code == 400) {
           alert(msg);
-  
+
           dispatch(
             setState({
               key: "riderRideDetails",
@@ -374,10 +426,10 @@ export default function AppLayout() {
             setState({ key: "driverDetails", value: returnedData?.driver })
           );
           router.setParams({ requestId: returnedData?.riderRide?._id });
-  
+
           if (status === "started") {
             // router.setParams({ ...searchParams, query: "RideStarted" });
-            setQuery(RideConstants.query.RideStarted)
+            setQuery(RideConstants.query.RideStarted);
             router.push(
               `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );
@@ -385,7 +437,7 @@ export default function AppLayout() {
           }
           if (status === "ended") {
             // router.setParams({ query: "RideEnded" });
-            setQuery(RideConstants.query.RideEnded)
+            setQuery(RideConstants.query.RideEnded);
             showBottomSheet([500], <TripCompletedSheet />, true);
           }
           if (status === "booked") {
@@ -397,8 +449,12 @@ export default function AppLayout() {
             //     value: [returnedData?.ticketPaid],
             //   })
             // );
-            if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
-            if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+            if (Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity)
+              dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+            if (Number(ticketPaid?.quantity) == 1)
+              dispatch(
+                setState({ key: "differentTickets", value: ticketPaid })
+              );
             // router.push(
             //   `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             // );
@@ -411,7 +467,7 @@ export default function AppLayout() {
               true
             );
           }
-  
+
           // const rides = [returnedData?.ticketUnderBooking];
           // if (rides) {
           //   setFetchState((prev) => ({ ...prev, rides: rides as any }));
@@ -419,9 +475,8 @@ export default function AppLayout() {
         }
 
         // if(code != 500) dispatch(setStateInputField({key: 'ticketsDetails', value: []}))
-  
         else {
-          notify({msg});
+          notify({ msg });
         }
 
         return;
@@ -429,7 +484,7 @@ export default function AppLayout() {
 
       const returnedData = await FetchService.postWithBearerToken({
         data: {
-          paymentOption: paymentOptionInput
+          paymentOption: paymentOptionInput,
         },
         token: token as string,
         url: `/user/rider/me/ride/${selectedAvailableRide?._id}/book-unlike`,
@@ -454,14 +509,34 @@ export default function AppLayout() {
       const riderRide = returnedData?.riderRide;
       const currentRide = returnedData?.currentRide;
 
+      let tickets = ticketPaid || ticketBooked || bookedTicket;
+      console.log({ tickets });
 
-      dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+      if (tickets) console.log("No tickets");
+      console.log({ tickets });
+
+      tickets = tickets?.map((ticket: ITicket) => {
+        const riderRideDetailsId = String(ticket?.ride?.riderRideDetailsId);
+
+        return ticketsDetails?.map((ticketDetail) =>
+          String(ticketDetail?.rideId) === riderRideDetailsId
+            ? {
+                ...ticketDetail,
+                ticketOtp: ticket.ticketOtp,
+                ticketStatus: ticket.ticketStatus,
+              }
+            : ticketDetail
+        );
+      });
+      console.log({ tickets });
+
+      dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+      // dispatch(setState({ key: "differentTickets", value: ticketPaid }));
       if (code && (code == 200 || code == 201)) {
         if (ticketPaid) {
-          
           // if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
-          // if(Number(ticketPaid?.quantity) == 1) 
-            dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+          // if(Number(ticketPaid?.quantity) == 1)
+          dispatch(setState({ key: "differentTickets", value: ticketPaid }));
           if (riderRide)
             dispatch(
               setState({
@@ -488,7 +563,7 @@ export default function AppLayout() {
             <RideBookedSheet rideId={selectedAvailableRideId as string} />,
             true
           );
-          router.replace('/rideMap' as Href)
+          router.replace("/rideMap" as Href);
           return;
         }
 
@@ -525,7 +600,7 @@ export default function AppLayout() {
 
         if (status === "started") {
           // router.setParams({ ...searchParams, query: "RideStarted" });
-          setQuery(RideConstants.query.RideStarted)
+          setQuery(RideConstants.query.RideStarted);
           router.push(
             `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
           );
@@ -533,7 +608,7 @@ export default function AppLayout() {
         }
         if (status === "ended") {
           // router.setParams({ query: "RideEnded" });
-          setQuery(RideConstants.query.RideEnded)
+          setQuery(RideConstants.query.RideEnded);
           showBottomSheet([500], <TripCompletedSheet />, true);
         }
         if (status === "booked") {
@@ -545,8 +620,10 @@ export default function AppLayout() {
           //     value: [returnedData?.ticketPaid],
           //   })
           // );
-          if(Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity) dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
-          if(Number(ticketPaid?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: ticketPaid }));
+          if (Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity)
+            dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
+          if (Number(ticketPaid?.quantity) == 1)
+            dispatch(setState({ key: "differentTickets", value: ticketPaid }));
           // router.push(
           //   `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
           // );
@@ -567,9 +644,8 @@ export default function AppLayout() {
       }
 
       // if(code != 500) dispatch(setStateInputField({key: 'ticketsDetails', value: []}))
-
       else {
-        notify({msg});
+        notify({ msg });
       }
     }
   };
@@ -592,31 +668,37 @@ export default function AppLayout() {
       {/* Shows when all the tickets have been filled (counter fare are optional) */}
       {/* Buy Ticket Btn */}
 
-      {((booking || allTicketsFilled) && !someTicketsUnderNegotiation) && path === "/bookRide" && (
-        <View
-          style={[
-            tw`w-full absolute bottom-[30px] left-[0] p-2`,
-            { zIndex: 100000000, opacity: allTicketsFilled ? 1 : 0.5 },
-          ]}
-        >
-          <Snackbar msg={msg} onDismiss={() => closeSnackbar()} snackbarVisible={snackbarVisible} />
-          <CtaBtn
-            img={{
-              src: images.whiteBgTicketImage,
-              w: 22,
-              h: 14,
-            }}
-            onPress={buyTickets}
-            text={{
-              name: "Buy Ticket",
-              color: colors.white,
-            }}
-            bg={{
-              color: Colors.light.background,
-            }}
-          />
-        </View>
-      )}
+      {(booking || allTicketsFilled) &&
+        !someTicketsUnderNegotiation &&
+        path === "/bookRide" && (
+          <View
+            style={[
+              tw`w-full absolute bottom-[30px] left-[0] p-2`,
+              { zIndex: 100000000, opacity: allTicketsFilled ? 1 : 0.5 },
+            ]}
+          >
+            <Snackbar
+              msg={msg}
+              onDismiss={() => closeSnackbar()}
+              snackbarVisible={snackbarVisible}
+            />
+            <CtaBtn
+              img={{
+                src: images.whiteBgTicketImage,
+                w: 22,
+                h: 14,
+              }}
+              onPress={buyTickets}
+              text={{
+                name: "Buy Ticket",
+                color: colors.white,
+              }}
+              bg={{
+                color: Colors.light.background,
+              }}
+            />
+          </View>
+        )}
       {/* Buy Ticket Btn */}
 
       {/* Loading Spinner */}
@@ -643,7 +725,7 @@ export default function AppLayout() {
         <Stack.Screen name={"tripDetails"} />
         <Stack.Screen name={"bookRide"} />
         <Stack.Screen name={"rideMap"} />
-        <Stack.Screen name={`${pages.paymentOptions}`} />
+        {/* <Stack.Screen name={"paymentOptions"} /> */}
       </Stack>
     </View>
   );

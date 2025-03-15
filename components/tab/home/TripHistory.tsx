@@ -56,9 +56,10 @@ import { useStorageState } from "@/hooks/useStorageState";
 import { RideConstants } from "@/constants/ride";
 import { TripStartedSheet } from "@/components/page/tripStartedBottomSheetComponents";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
-import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
+import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
 import { setState, setStateInputField } from "@/state/slices/ride";
 import { IUser } from "@/state/types/user";
+import { RootState } from "@/state/store";
 
 export default function TripHistory({
   refreshCondition = [],
@@ -68,6 +69,7 @@ export default function TripHistory({
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
   const { showBottomSheet } = useBottomSheet();
   const dispatch = useAppDispatch();
+  const {stateInput:{ticketsDetails}} = useAppSelector((state: RootState) => state.ride);
 
   const [fetchState, setFetchState] = useState<{
     loading: boolean;
@@ -86,10 +88,6 @@ export default function TripHistory({
   });
   const { loading, history, code, msg } = fetchState;
 
-  console.log("====================================");
-  console.log(history);
-  console.log("====================================");
-
   const getHistory = async () => {
     setFetchState((prev) => ({ ...prev, loading: true }));
     const returnedData = await FetchService.getWithBearerToken({
@@ -99,18 +97,60 @@ export default function TripHistory({
 
     const rideHistory = returnedData?.rideHistory;
     const lastRides = returnedData?.lastRides;
-    const paidTicket = returnedData?.paidTicket as (ITicket[] | ITicket);
+    const paidTicket = returnedData?.paidTicket as ITicket[] | ITicket;
 
-    dispatch(setState({ key: "lastRides", value: lastRides }));
-    
-    if(Number((paidTicket as ITicket)?.quantity) > 1 || !(paidTicket as ITicket)?.quantity) dispatch(setState({ key: "sameTickets", value: paidTicket }));
-    if(Number((paidTicket as ITicket)?.quantity) == 1) dispatch(setState({ key: "differentTickets", value: paidTicket }));
+    setFetchState((prev) => ({...prev, loading: false, history: rideHistory}))
+
+    const createTicket = (rideHist: IRiderRideDetails, ticketOtp?: number, index?: number) => ({
+      number: index !== undefined ? index + 1 : 1,
+      pickupBusstop: rideHist?.pickupBusstop,
+      dropoffBusstop: rideHist?.dropoffBusstop,
+      id: String(index ?? 0),
+      sameAsFirstTicket: false,
+      userCounterFare: rideHist?.riderCounterOffer,
+      rideFee: Number(rideHist?.ridePlan?.ride?.rideFee),
+      serviceFee: Number(rideHist?.ridePlan?.serviceFee),
+      ticketStatus: "accepted",
+      rideId: rideHist?._id,
+      ticketOtp: ticketOtp ?? (paidTicket as ITicket)?.ticketOtp
+    });
 
     setFetchState((prev) => ({
       ...prev,
       loading: false,
-      history: rideHistory,
+      history: rideHistory
     }));
+
+    dispatch(setState({ key: "lastRides", value: lastRides }));
+
+    const sameTickets = !(Array.isArray(paidTicket));
+
+    if (sameTickets) {
+      const tickets = rideHistory
+        ?.filter((rideHist: IRiderRideDetails) => rideHist?.rideStatus === "booked")
+        ?.map((rideHist: IRiderRideDetails, index: number) => createTicket(rideHist, paidTicket?.ticketOtp, index));
+    
+      dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+    } else {
+      const historyWithOtps = rideHistory?.flatMap((rideHist: IRiderRideDetails) => {
+        if (rideHist.rideStatus === "booked") {
+          const matchingTickets = (Array.isArray(paidTicket) ? paidTicket : [paidTicket])?.filter(
+            (paidTick) => String(paidTick?.ride?.riderRideDetailsId) === String(rideHist._id)
+          );
+    
+          return matchingTickets.length > 0
+            ? matchingTickets.map((paidTick) => ({ ...rideHist, ticketOtp: paidTick.ticketOtp }))
+            : rideHist;
+        }
+        return rideHist;
+      });
+    
+      const tickets = historyWithOtps?.map((rideItem: IRiderRideDetails & {ticketOtp:number}, index: number) => 
+        createTicket(rideItem as IRiderRideDetails & { ticketOtp: number }, rideItem.ticketOtp, index)
+      );
+    
+      dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+    }
   };
 
   useEffect(() => {
@@ -166,26 +206,28 @@ export default function TripHistory({
                       const route = item?.route;
                       const riderId = item?.riderId;
 
-                      const riderRides = currentRide?.ridersRides.filter((ride) => String(ride?.riderId) == String(riderId));
+                      // const riderRides = currentRide?.ridersRides.filter((ride) => String(ride?.riderId) == String(riderId));
 
-                      const tickets = riderRides.map((ride, index) => {
-                        const newTicket = {
-                          number: Number(index +1),
-                          pickupBusstop: ride?.pickupBusstop,
-                          dropoffBusstop: ride?.dropoffBusstop,
-                          id: String(index),
-                          sameAsFirstTicket: false,
-                          userCounterFare: ride?.riderCounterOffer,
-                          rideFee: Number(ride?.ridePlan?.ride?.rideFee),
-                          serviceFee: Number(ride?.ridePlan?.serviceFee),
-                          ticketStatus: ride?.rideStatus == 'accepted' ? 'accepted': 'idle'
-                        } 
+                      // const tickets = riderRides.map((ride, index) => {
+                      //   const newTicket = {
+                      //     number: Number(index +1),
+                      //     pickupBusstop: ride?.pickupBusstop,
+                      //     dropoffBusstop: ride?.dropoffBusstop,
+                      //     id: String(index),
+                      //     sameAsFirstTicket: false,
+                      //     userCounterFare: ride?.riderCounterOffer,
+                      //     rideFee: Number(ride?.ridePlan?.ride?.rideFee),
+                      //     serviceFee: Number(ride?.ridePlan?.serviceFee),
+                      //     ticketStatus: ride?.rideStatus == 'accepted' ? 'accepted': 'idle',
+                      //     rideId: ride?._id,
 
-                        return newTicket;
-                      });
+                      //   }
 
-                      dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}));
-                      
+                      //   return newTicket;
+                      // });
+
+                      // dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}));
+
                       dispatch(
                         setState({ key: "riderRideDetails", value: item })
                       );
@@ -270,7 +312,7 @@ export default function TripHistory({
                               item?.rideStatus == ("ended" as TRideStatus)
                                 ? "#27AE65"
                                 : item?.rideStatus == "accepted" ||
-                                item?.rideStatus == "booked" ||
+                                  item?.rideStatus == "booked" ||
                                   item?.rideStatus == "started"
                                 ? "orange"
                                 : "red",
