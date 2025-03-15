@@ -11,7 +11,11 @@ import { useStorageState } from "@/hooks/useStorageState";
 import FetchService from "@/services/api/fetch.service";
 import { useAppDispatch } from "@/state/hooks/useReduxToolkit";
 import RideSelectors from "@/state/selectors/ride";
-import { setActiveTab, setState, setStateInputField } from "@/state/slices/ride";
+import {
+  setActiveTab,
+  setState,
+  setStateInputField,
+} from "@/state/slices/ride";
 import {
   ICurrentRide,
   IRiderRideDetails,
@@ -171,94 +175,100 @@ function TripHistory() {
                     item?.rideStatus === "booked" ||
                     item?.rideStatus === "requesting" ? (
                       <TouchableOpacity
-                         onPress={() => {
-                                              const currentRide = item?.currentRide;
-                                              const driver = item?.driver;
-                                              const route = item?.route;
-                                              const riderId = item?.riderId;
-                        
-                                              const riderRides = currentRide?.ridersRides.filter((ride) => String(ride?.riderId) == String(riderId));
-                        
-                                              const tickets = riderRides.map((ride, index) => {
-                                                const newTicket = {
-                                                  number: Number(index +1),
-                                                  pickupBusstop: ride?.pickupBusstop,
-                                                  dropoffBusstop: ride?.dropoffBusstop,
-                                                  id: String(index),
-                                                  sameAsFirstTicket: false,
-                                                  userCounterFare: ride?.riderCounterOffer,
-                                                  rideFee: Number(ride?.ridePlan?.ride?.rideFee),
-                                                  serviceFee: Number(ride?.ridePlan?.serviceFee),
-                                                  ticketStatus: ride?.rideStatus == 'accepted' ? 'accepted': 'idle'
-                                                } 
-                        
-                                                return newTicket;
-                                              });
-                        
-                                              dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}));
-                                              
-                                              dispatch(
-                                                setState({ key: "riderRideDetails", value: item })
-                                              );
-                                              dispatch(
-                                                setState({
-                                                  key: "selectedAvailableRide",
-                                                  value: currentRide,
-                                                })
-                                              );
-                                              dispatch(
-                                                setState({
-                                                  key: "currentRoute",
-                                                  value: route,
-                                                })
-                                              );
-                                              dispatch(
-                                                setState({ key: "driverDetails", value: driver })
-                                              );
-                        
-                                              if (
-                                                item?.rideStatus === "started" ||
-                                                item?.rideStatus === "paused"
-                                              ) {
-                                                router.push("/(rideScreens)/rideMap");
-                                                dispatch(
-                                                  setState({ key: "riderRideDetails", value: item })
-                                                );
-                                                setQuery(RideConstants.query.RideStarted);
-                                                showBottomSheet([100, 500], <TripStartedSheet />, true);
-                                              }
-                                              if (item?.rideStatus === "booked") {
-                                                router.push("/(rideScreens)/rideMap");
-                        
-                                                setQuery(RideConstants.query.RideBooked);
-                                                showBottomSheet(
-                                                  [100, 800],
-                                                  <RideBookedSheet
-                                                    rideId={item?.currentRideId as string}
-                                                  />,
-                                                  true
-                                                );
-                                              }
-                                              if (item?.rideStatus === "accepted") {
-                                                router.push("/(rideScreens)/bookRide");
-                                              }
-                                              if (item?.rideStatus === "requesting") {
-                                                router.push("/(rideScreens)/availableRides");
-                                              }
-                                            }}
-                                            style={[
-                                              flex,
-                                              wFull,
-                                              itemsStart,
-                                              justifyBetween,
-                                              {
-                                                paddingRight: 16,
-                                                paddingBottom: 16,
-                                                height: 59,
-                                                borderBottomWidth: 0.7,
-                                                borderBottomColor: Colors.light.border,
-                                              },
-                                            ]}
+                        onPress={() => {
+                          const currentRide = item?.currentRide;
+                          const driver = item?.driver;
+                          const route = item?.route;
+                          const riderId = item?.riderId;
+
+                          // const riderRides = currentRide?.ridersRides.filter((ride) => String(ride?.riderId) == String(riderId));
+
+                          // const tickets = riderRides.map((ride, index) => {
+                          //   const newTicket = {
+                          //     number: Number(index +1),
+                          //     pickupBusstop: ride?.pickupBusstop,
+                          //     dropoffBusstop: ride?.dropoffBusstop,
+                          //     id: String(index),
+                          //     sameAsFirstTicket: false,
+                          //     userCounterFare: ride?.riderCounterOffer,
+                          //     rideFee: Number(ride?.ridePlan?.ride?.rideFee),
+                          //     serviceFee: Number(ride?.ridePlan?.serviceFee),
+                          //     ticketStatus: ride?.rideStatus == 'accepted' ? 'accepted': 'idle',
+                          //     rideId: ride?._id,
+
+                          //   }
+
+                          //   return newTicket;
+                          // });
+
+                          // dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}));
+
+                          dispatch(
+                            setState({ key: "riderRideDetails", value: item })
+                          );
+                          dispatch(
+                            setState({
+                              key: "selectedAvailableRide",
+                              value: currentRide,
+                            })
+                          );
+                          dispatch(
+                            setState({
+                              key: "currentRoute",
+                              value: route,
+                            })
+                          );
+                          dispatch(
+                            setState({ key: "driverDetails", value: driver })
+                          );
+
+                          if (
+                            item?.rideStatus === "started" ||
+                            item?.rideStatus === "paused"
+                          ) {
+                            router.push("/(rideScreens)/rideMap");
+                            dispatch(
+                              setState({ key: "riderRideDetails", value: item })
+                            );
+                            setQuery(RideConstants.query.RideStarted);
+                            showBottomSheet(
+                              [100, 500],
+                              <TripStartedSheet />,
+                              true
+                            );
+                          }
+                          if (item?.rideStatus === "booked") {
+                            router.push("/(rideScreens)/rideMap");
+
+                            setQuery(RideConstants.query.RideBooked);
+                            showBottomSheet(
+                              [100, 800],
+                              <RideBookedSheet
+                                rideId={item?.currentRideId as string}
+                              />,
+                              true
+                            );
+                          }
+                          if (item?.rideStatus === "accepted") {
+                            router.push("/(rideScreens)/bookRide");
+                          }
+                          if (item?.rideStatus === "requesting") {
+                            router.push("/(rideScreens)/availableRides");
+                          }
+                        }}
+                        style={[
+                          flex,
+                          wFull,
+                          itemsStart,
+                          justifyBetween,
+                          {
+                            paddingRight: 16,
+                            paddingBottom: 16,
+                            height: 59,
+                            borderBottomWidth: 0.7,
+                            borderBottomColor: Colors.light.border,
+                          },
+                        ]}
                       >
                         <View
                           style={[flexCol, itemsStart, justifyBetween, hFull]}
@@ -285,7 +295,7 @@ function TripHistory() {
                                   item?.rideStatus == ("ended" as TRideStatus)
                                     ? "#27AE65"
                                     : item?.rideStatus == "booked" ||
-                                    item?.rideStatus == "accepted" ||
+                                      item?.rideStatus == "accepted" ||
                                       item?.rideStatus == "started"
                                     ? "orange"
                                     : "red",
