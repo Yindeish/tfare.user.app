@@ -116,7 +116,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
   const { code, loading, msg } = fetchState;
 
   const channel = supabase.channel(
-    `${RideConstants.channel.ride_accepting}${riderRideDetails?._id}`
+    `${RideConstants.channel.ride_accepting}${ticket?.rideId}`
   );
 
   channel
@@ -128,7 +128,6 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
         const ride = payload?.payload?.ride as IRiderRideDetails;
         console.log("====================================");
         console.log("accepting......", ride, {
-          requestId: riderRideDetails?._id,
           ride,
         });
         console.log("====================================");
@@ -142,6 +141,36 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
             return {
               ...ticket,
               ticketStatus: "accepted",
+              rideFee: ticket?.userCounterFare,
+            };
+          } else return ticketItem;
+        });
+
+        dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+       }
+      }
+    )
+    .on(
+      "broadcast",
+      { event: RideConstants.event.ride_declined },
+      (payload) => {
+       if(path == '/bookRide') {
+        const ride = payload?.payload?.ride as IRiderRideDetails;
+        console.log("====================================");
+        console.log("declining......", ride, {
+          ride,
+        });
+        console.log("====================================");
+        // dispatch(setState({key:'counterFareStatus', value: 'accepted' as TRideStatus}))
+
+        const tickets = ticketsDetails.map((ticketItem) => {
+          if (
+            Number(ticketItem?.number) == Number(ticket?.number) &&
+            ticket?.ticketStatus == ("pending" as any)
+          ) {
+            return {
+              ...ticket,
+              ticketStatus: "declined",
               rideFee: ticket?.userCounterFare,
             };
           } else return ticketItem;
@@ -587,7 +616,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
 
                           const tickets = ticketsDetails?.map((ticketItem) => {
                             if (
-                              Number(ticket?.number) == Number(ticket?.number)
+                              Number(ticket?.number) == Number(ticketItem?.number)
                             ) {
                               return {
                                 ...ticketItem,
