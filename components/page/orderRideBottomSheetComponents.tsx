@@ -2,7 +2,7 @@ import {
   View,
   Image,
   TextInput,
-  TouchableOpacity,
+  // TouchableOpacity,
   ScrollView,
   FlatList,
   Pressable,
@@ -11,7 +11,9 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  Keyboard,
 } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler"; //This is better than react native Touchable Opacity as it best updates text inputs right before the keyboard leaves
 import PaddedScreen from "../shared/paddedScreen";
 import {
   absolute,
@@ -131,20 +133,20 @@ import { supabase } from "@/supabase/supabase.config";
 import { RideConstants } from "@/constants/ride";
 
 const RecentLocationsSnippet = () => {
-  const dispatch = useAppDispatch();
-  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
-  const { token: session } = useAppSelector((state: RootState) => state.user);
-  const { savedAddresses } = AccountSelectors();
+  const dispatch = useAppDispatch()
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query)
+  const { token: session } = useAppSelector((state: RootState) => state.user)
+  const { savedAddresses } = AccountSelectors()
 
-  const { showBottomSheet } = useBottomSheet();
+  const { showBottomSheet } = useBottomSheet()
   const {
     stateInput: { dropoffBusstopInput, pickupBusstopInput },
-  } = RideSelectors();
+  } = RideSelectors()
 
   const [fetchState, setFetchState] = useState({
     loading: false,
-  });
-  const { loading } = fetchState;
+  })
+  const { loading } = fetchState
 
   const [searchState, setSearchState] = useState({
     loading: false,
@@ -153,42 +155,28 @@ const RecentLocationsSnippet = () => {
     inputtingDropoff: false,
     pickupSearchText: "",
     dropoffSearchText: "",
-  });
-  const {
-    busstops,
-    inputtingPickup,
-    inputtingDropoff,
-    dropoffSearchText,
-    pickupSearchText,
-  } = searchState;
+  })
+  const { busstops, inputtingPickup, inputtingDropoff, dropoffSearchText, pickupSearchText } = searchState
 
   const searchBusstops = async (query: string) => {
-    setSearchState((prev) => ({ ...prev, loading: true }));
+    setSearchState((prev) => ({ ...prev, loading: true }))
 
     const returnedData = await FetchService.getWithBearerToken({
       url: `/user/rider/me/busstop/search?searchValue=${query}`,
       token: session as string,
-    });
+    })
 
-    setSearchState((prev) => ({ ...prev, loading: false }));
+    setSearchState((prev) => ({ ...prev, loading: false }))
 
-    const busstops = returnedData?.matchSearchBusStops as IAddress[];
-    console.log({ busstops });
+    const busstops = returnedData?.matchSearchBusStops as IAddress[]
+    console.log({ busstops })
     if (busstops) {
-      setSearchState((prev) => ({ ...prev, busstops: busstops as never[] }));
+      setSearchState((prev) => ({ ...prev, busstops: busstops as never[] }))
       // dispatch(setSavedAddresses(busstops));
     }
-  };
+  }
 
-  const {
-    values,
-    errors,
-    handleBlur,
-    handleChange,
-    handleSubmit,
-    touched,
-    setFieldValue,
-  } = useFormik({
+  const { values, errors, handleBlur, handleChange, handleSubmit, touched, setFieldValue } = useFormik({
     initialValues: {
       pickupBusstop: pickupBusstopInput?.name,
       dropoffBusstop: dropoffBusstopInput?.name,
@@ -198,67 +186,63 @@ const RecentLocationsSnippet = () => {
       dropoffBusstop: string().required(),
     }),
     onSubmit: ({ dropoffBusstop, pickupBusstop }) => {
-      setQuery(RideConstants.query.FilledForm);
-      showBottomSheet([436], <FilledForm />, true);
+      setQuery(RideConstants.query.FilledForm)
+      showBottomSheet([436], <FilledForm />, true)
       // router.setParams({ query: "FilledForm" });
     },
-  });
+  })
 
   const getSavedBusstops = async () => {
-    setFetchState({ loading: true });
+    setFetchState({ loading: true })
     const returnedData = await FetchService.getWithBearerToken({
       url: "/user/rider/me/busstop/saved-busstops",
       token: session as string,
-    });
-    const allBusStops = returnedData?.allBusStops as IAddress[];
-    console.log({ allBusStops });
+    })
+    const allBusStops = returnedData?.allBusStops as IAddress[]
+    console.log({ allBusStops })
 
-    setFetchState({ loading: false });
+    setFetchState({ loading: false })
     if (allBusStops) {
-      dispatch(setSavedAddresses(allBusStops));
+      dispatch(setSavedAddresses(allBusStops))
     }
-  };
+  }
 
   const openRecentPickupLocations = () => {
     // router.setParams({ query: "RecentPickupLocations" });
-    setQuery(RideConstants.query.RecentPickupLocations);
-    showBottomSheet([508], <RecentPickupLocations />, true);
-  };
+    setQuery(RideConstants.query.RecentPickupLocations)
+    showBottomSheet([508], <RecentPickupLocations />, true)
+  }
 
   const openRecentDropoffLocations = () => {
-    showBottomSheet([508], <RecentDropoffLocations />, true);
+    showBottomSheet([508], <RecentDropoffLocations />, true)
     // router.setParams({ query: "RecentDropoffLocations" });
-    setQuery(RideConstants.query.RecentDropoffLocations);
-  };
+    setQuery(RideConstants.query.RecentDropoffLocations)
+  }
 
   // Updating pickup search
   useEffect(() => {
-    inputtingPickup && searchBusstops(values.pickupBusstop as string);
-  }, [values.pickupBusstop, inputtingPickup]);
+    inputtingPickup && searchBusstops(values.pickupBusstop as string)
+  }, [values.pickupBusstop, inputtingPickup])
   // Updating pickup search
 
   // Updating pickup search
   useEffect(() => {
-    inputtingDropoff && searchBusstops(values.dropoffBusstop as string);
-  }, [values.dropoffBusstop, inputtingDropoff]);
+    inputtingDropoff && searchBusstops(values.dropoffBusstop as string)
+  }, [values.dropoffBusstop, inputtingDropoff])
   // Updating pickup search
 
   useEffect(() => {
-    session && savedAddresses.length <= 0 && getSavedBusstops();
-  }, [session]);
+    session && savedAddresses.length <= 0 && getSavedBusstops()
+  }, [session])
 
   return (
     <PaddedScreen>
       <View style={[flexCol, gap(56), mt(20)]}>
         <View style={[flexCol, gap(20)]}>
           <View style={[wFull, flex, itemsCenter, justifyBetween]}>
-            <Text style={[neurialGrotesk, fw700, fs16, colorBlack]}>
-              Pick up bus stop
-            </Text>
+            <Text style={[neurialGrotesk, fw700, fs16, colorBlack]}>Pick up bus stop</Text>
             <TouchableOpacity onPress={openRecentPickupLocations}>
-              <Text style={[neurialGrotesk, fw400, fs14, colorBlueBg]}>
-                recent locations
-              </Text>
+              <Text style={[neurialGrotesk, fw400, fs14, colorBlueBg]}>recent locations</Text>
             </TouchableOpacity>
           </View>
 
@@ -277,10 +261,7 @@ const RecentLocationsSnippet = () => {
             ]}
           >
             <TouchableOpacity>
-              <Image
-                style={[image.w(15), image.h(20)]}
-                source={images.locationImage}
-              />
+              <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
             </TouchableOpacity>
 
             <BottomSheetTextInput
@@ -311,15 +292,12 @@ const RecentLocationsSnippet = () => {
                   ...prev,
                   inputtingPickup: true,
                   inputtingDropoff: false,
-                }));
+                }))
               }}
             />
 
             <TouchableOpacity>
-              <Image
-                style={[image.w(22), image.h(22)]}
-                source={images.pickUpImage}
-              />
+              <Image style={[image.w(22), image.h(22)]} source={images.pickUpImage} />
             </TouchableOpacity>
           </View>
 
@@ -347,25 +325,28 @@ const RecentLocationsSnippet = () => {
                   {(busstops as IBusStop[])?.map((busstop, index) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setFieldValue("pickupBusstop", busstop?.name);
+                        Keyboard.dismiss(); 
+                        // First update the field value and state
+                        setFieldValue("pickupBusstop", busstop?.name)
                         dispatch(
                           setStateInputField({
                             key: "pickupBusstopInput",
                             value: busstop,
-                          })
-                        );
+                          }),
+                        )
                         setSearchState((prev) => ({
                           ...prev,
                           inputtingPickup: false,
                           pickupSearchText: busstop.name,
-                        }));
+                        }))
+
+                        // Then explicitly dismiss the keyboard
+                        
                       }}
                       key={index}
                       style={tw``}
                     >
-                      <Text style={[h(30) as TextStyle, tw``]}>
-                        {busstop?.name}
-                      </Text>
+                      <Text style={[h(30) as TextStyle, tw``]}>{busstop?.name}</Text>
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
@@ -385,19 +366,22 @@ const RecentLocationsSnippet = () => {
               renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={() => {
-                    console.log({ item });
-                    setFieldValue("pickupBusstop", item?.busStop?.name);
+                    console.log({ item })
+                    setFieldValue("pickupBusstop", item?.busStop?.name)
                     dispatch(
                       setStateInputField({
                         key: "pickupBusstopInput",
                         value: item?.busStop,
-                      })
-                    );
+                      }),
+                    )
                     setSearchState((prev) => ({
                       ...prev,
                       inputtingPickup: false,
                       pickupSearchText: item?.busStop?.name,
-                    }));
+                    }))
+
+                    // Dismiss keyboard after updating
+                    Keyboard.dismiss()
                   }}
                 >
                   <View
@@ -413,15 +397,11 @@ const RecentLocationsSnippet = () => {
                       { borderWidth: 1, borderColor: Colors.light.border },
                     ]}
                   >
-                    <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>
-                      {item?.busstopTitle}
-                    </Text>
+                    <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item?.busstopTitle}</Text>
                   </View>
                 </TouchableOpacity>
               )}
-              ItemSeparatorComponent={() => (
-                <View style={[w(16), hFull, bg(colors.transparent)]} />
-              )}
+              ItemSeparatorComponent={() => <View style={[w(16), hFull, bg(colors.transparent)]} />}
               keyExtractor={({}) => Math.random().toString()}
             />
           ) : (
@@ -434,13 +414,9 @@ const RecentLocationsSnippet = () => {
 
         <View style={[flexCol, gap(20)]}>
           <View style={[wFull, flex, itemsCenter, justifyBetween]}>
-            <Text style={[neurialGrotesk, fw700, fs16, colorBlack]}>
-              Drop off bus stop
-            </Text>
+            <Text style={[neurialGrotesk, fw700, fs16, colorBlack]}>Drop off bus stop</Text>
             <TouchableOpacity onPress={openRecentDropoffLocations}>
-              <Text style={[neurialGrotesk, fw400, fs14, colorBlueBg]}>
-                recent locations
-              </Text>
+              <Text style={[neurialGrotesk, fw400, fs14, colorBlueBg]}>recent locations</Text>
             </TouchableOpacity>
           </View>
 
@@ -458,10 +434,7 @@ const RecentLocationsSnippet = () => {
               justifyCenter,
             ]}
           >
-            <Image
-              style={[image.w(15), image.h(20)]}
-              source={images.locationImage}
-            />
+            <Image style={[image.w(15), image.h(20)]} source={images.locationImage} />
 
             <BottomSheetTextInput
               style={[
@@ -490,14 +463,11 @@ const RecentLocationsSnippet = () => {
                   ...prev,
                   inputtingDropoff: true,
                   inputtingPickup: false,
-                }));
+                }))
               }}
             />
 
-            <Image
-              style={[image.w(22), image.h(24)]}
-              source={images.dropOffImage}
-            />
+            <Image style={[image.w(22), image.h(24)]} source={images.dropOffImage} />
           </View>
 
           {/* Dropoff Suggestion Dropodwon */}
@@ -524,18 +494,21 @@ const RecentLocationsSnippet = () => {
                   {(busstops as IBusStop[])?.map((busstop, index) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setFieldValue("dropoffBusstop", busstop?.name);
+                        setFieldValue("dropoffBusstop", busstop?.name)
                         dispatch(
                           setStateInputField({
                             key: "dropoffBusstopInput",
                             value: busstop,
-                          })
-                        );
+                          }),
+                        )
                         setSearchState((prev) => ({
                           ...prev,
                           inputtingDropoff: false,
                           dropoffSearchText: busstop.name,
-                        }));
+                        }))
+
+                        // Then explicitly dismiss the keyboard
+                        Keyboard.dismiss()
                       }}
                       key={index}
                     >
@@ -562,13 +535,16 @@ const RecentLocationsSnippet = () => {
                       setStateInputField({
                         key: "dropoffBusstopInput",
                         value: item?.busStop,
-                      })
-                    );
-                    setFieldValue("dropoffBusstop", item?.busStop?.name);
+                      }),
+                    )
+                    setFieldValue("dropoffBusstop", item?.busStop?.name)
                     setSearchState((prev) => ({
                       ...prev,
                       dropoffSearchText: item?.busStop?.name,
-                    }));
+                    }))
+
+                    // Dismiss keyboard after updating
+                    Keyboard.dismiss()
                   }}
                 >
                   <View
@@ -584,15 +560,11 @@ const RecentLocationsSnippet = () => {
                       { borderWidth: 1, borderColor: Colors.light.border },
                     ]}
                   >
-                    <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>
-                      {item.busstopTitle}
-                    </Text>
+                    <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item.busstopTitle}</Text>
                   </View>
                 </TouchableOpacity>
               )}
-              ItemSeparatorComponent={() => (
-                <View style={[w(16), hFull, bg(colors.transparent)]} />
-              )}
+              ItemSeparatorComponent={() => <View style={[w(16), hFull, bg(colors.transparent)]} />}
               keyExtractor={({}) => Math.random().toString()}
             />
           ) : (
@@ -604,31 +576,17 @@ const RecentLocationsSnippet = () => {
 
         <TouchableOpacity onPress={() => handleSubmit()}>
           <View
-            style={[
-              wFull,
-              h(50),
-              rounded(10),
-              flex,
-              itemsCenter,
-              justifyCenter,
-              gap(10),
-              bg(Colors.light.background),
-            ]}
+            style={[wFull, h(50), rounded(10), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.background)]}
           >
-            <Text style={[neurialGrotesk, fw700, fs18, colorWhite]}>
-              Proceed
-            </Text>
+            <Text style={[neurialGrotesk, fw700, fs18, colorWhite]}>Proceed</Text>
 
-            <Image
-              style={[image.w(20), image.h(20)]}
-              source={images.proceedCheckImage}
-            />
+            <Image style={[image.w(20), image.h(20)]} source={images.proceedCheckImage} />
           </View>
         </TouchableOpacity>
       </View>
     </PaddedScreen>
-  );
-};
+  )
+}
 
 const RecentPickupLocations = () => {
   const dispatch = useAppDispatch();
