@@ -124,13 +124,15 @@ function TripDetails() {
   const path = usePathname();
   const { showBottomSheet, hideBottomSheet } = useBottomSheet();
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
-  const { differentTickets, stateInput:{ticketsDetails} } = useAppSelector((state: RootState) => state.ride);
+  const {
+    stateInput: { ticketsDetails },
+  } = useAppSelector((state: RootState) => state.ride);
 
-  // const tripCost = lastRides?.map((ride) => ride?.ridePlan?.ride?.rideFee || ride?.ridePlan?.plan?.ride?.rideFee)?.reduce((prev, current) => prev+current, 0);
-  // const serviceFee = (lastRides?.[0]?.ridePlan as any)?.serviceFee;
-
-  const tripCost = ticketsDetails?.reduce((prev, current) => prev + Number(current?.rideFee), 0)
-const serviceFee = Number(ticketsDetails[0]?.serviceFee);
+  const tripCost = ticketsDetails?.reduce(
+    (prev, current) => prev + Number(current?.rideFee),
+    0
+  );
+  const serviceFee = Number(ticketsDetails[0]?.serviceFee);
 
   return (
     <SafeScreen>
@@ -150,8 +152,11 @@ const serviceFee = Number(ticketsDetails[0]?.serviceFee);
           <FlatList
             horizontal={false}
             data={lastRides}
-            renderItem={({ index, item }) => <Ticket ride={{...item, ticketNumber: index+1}} key={index} />}
-            style={tw ``}
+            renderItem={({ index, item }) => (
+              <Ticket ride={{ ...item, ticketNumber: index + 1 }} key={index} />
+            )}
+            ItemSeparatorComponent={() => <View style={tw `w-full h-[20px]`} />}
+            style={tw `mb-[20px]`}
           />
 
           <View style={[wFull, flexCol, gap(16)]}>
@@ -165,7 +170,7 @@ const serviceFee = Number(ticketsDetails[0]?.serviceFee);
                   borderBottomColor: Colors.light.border,
                   borderBottomWidth: 0.7,
                 },
-                tw ``
+                tw``,
               ]}
             >
               <View
@@ -178,7 +183,7 @@ const serviceFee = Number(ticketsDetails[0]?.serviceFee);
                     borderBottomColor: Colors.light.border,
                     borderBottomWidth: 0.7,
                   },
-                  tw ``
+                  tw``,
                 ]}
               >
                 <BuyTicketListTile
@@ -213,9 +218,7 @@ const serviceFee = Number(ticketsDetails[0]?.serviceFee);
               <BuyTicketListTile
                 leadingText="Total"
                 trailing={{
-                  text: `₦ ${
-                    Number(tripCost) + Number(serviceFee) || ""
-                  }`,
+                  text: `₦ ${Number(tripCost) + Number(serviceFee) || ""}`,
                 }}
               />
             </View>
@@ -365,7 +368,11 @@ function RideBlock() {
   );
 }
 
-function Ticket({ ride }: { ride: IRiderRideDetails & {ticketNumber: number} }) {
+function Ticket({
+  ride,
+}: {
+  ride: IRiderRideDetails & { ticketNumber: number };
+}) {
   return (
     <View style={tw`w-full h-auto flex flex-col gap-[16px]`}>
       <Text

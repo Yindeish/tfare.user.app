@@ -91,17 +91,13 @@ export default function AppLayout() {
   }>();
   const { Snackbar, snackbarVisible, closeSnackbar, notify } = useSnackbar();
 
-  console.log("====================================");
-  console.log({ query });
-  console.log("====================================");
-
   const [fetchState, setFetchState] = useState({
     loading: false,
     msg: "",
     code: null,
   });
   const { loading, msg } = fetchState;
-  const someTicketsUnderNegotiation = ticketsDetails.find(
+  const someTicketsUnderNegotiation = ticketsDetails?.find(
     (ticket) => ticket?.ticketStatus == ("pending" as any)
   );
 
@@ -279,7 +275,7 @@ export default function AppLayout() {
       if (unnegotiatedTickets.length > 0) {
         const returnedData = await FetchService.postWithBearerToken({
           data: {
-            unitFareId: unnegotiatedTickets?.map((ticket) =>
+            unitFaresIds: unnegotiatedTickets?.map((ticket) =>
               String(ticket?.unitFare?._id)
             ),
             paymentOption: paymentOptionInput,

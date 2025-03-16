@@ -87,15 +87,17 @@ import { useSnackbar } from "@/contexts/snackbar.context";
 import { supabase } from "@/supabase/supabase.config";
 import { useStorageState } from "@/hooks/useStorageState";
 import { RideConstants } from "@/constants/ride";
+import { RealtimeChannel } from "@supabase/supabase-js";
+import { ITicketInput } from "@/state/types/ride";
 
 function TripStartedSheet() {
   const { showBottomSheet } = useBottomSheet();
-  const { riderRideDetails, driverDetails, selectedAvailableRide } =
+  const { riderRideDetails, driverDetails, selectedAvailableRide, stateInput:{ticketsDetails} } =
     useAppSelector((state: RootState) => state.ride);
   const { token } = useAppSelector((state: RootState) => state.user);
   const { notify, Snackbar, snackbarVisible, closeSnackbar } = useSnackbar();
   const searchParams = useGlobalSearchParams();
-  const {requestId} = useGlobalSearchParams();
+  const { requestId } = useGlobalSearchParams();
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   const [fetchState, setFetchState] = useState<{
@@ -132,51 +134,42 @@ function TripStartedSheet() {
       });
   };
 
-  const checkRideStatus = async () => {
-    setFetchState({ ...fetchState, loading: true });
-    await FetchService.getWithBearerToken({
-      url: `/ride/${riderRideDetails?._id}/status`,
-      token: token,
-    })
-      .then(async (res) => {
-        setFetchState({ ...fetchState, loading: false });
-        console.log({ res });
+  let activeChannels: RealtimeChannel[] = [];
 
-        const data = res?.body ? await res.json() : res;
-        const code = data?.code;
-        const msg = data?.msg;
-        const status = data?.status;
+  function listenToAllRides(riderRides: ITicketInput[]) {
+    activeChannels.forEach((channel) => {
+      channel
+        .unsubscribe()
+        .then(() => console.log(`Unsubscribed from: ${channel.topic}`));
+    });
+    activeChannels = [];
 
-        setFetchState({ ...fetchState, code, msg });
+    // Subscribe to each ride
+    riderRides.forEach((ride) => {
+      const channelName = `${RideConstants.channel.ride_ending}${ride.rideId}`;
+      console.log(`Listening to ride: ${channelName}`);
 
-        if (status === "started") {
-          showBottomSheet([500], <TripStartedSheet />);
-          return;
-        }
-        if (status === "ended") {
-          showBottomSheet([500], <TripCompletedSheet />);
-          return;
-        }
-      })
-      .catch((err: any) => {
-        setFetchState({ ...fetchState, loading: false });
-        console.log({ err });
-        notify({ msg: err?.message });
-      });
-  };
+      const channel = supabase.channel(channelName);
 
-  const channel = supabase.channel(
-    `${RideConstants.channel.ride_ending}${riderRideDetails?._id}`
-  );
-  channel
-    .on("broadcast", { event: RideConstants.event.ride_ended}, (payload) => {
-      if(query == RideConstants.query.RideStarted) {
-        // router.setParams({ ...searchParams, query: "RideEnded" });
-      setQuery(RideConstants.query.RideEnded);
-      showBottomSheet([100, 650], <TripCompletedSheet />, true);
-      }
-    })
-    .subscribe();
+      channel
+        .on(
+          "broadcast",
+          { event: RideConstants.event.ride_ended },
+          (payload) => {
+            console.log(`Ride ended for ${ride.rideId}`, payload);
+            if (query == RideConstants.query.RideStarted) {
+              setQuery(RideConstants.query.RideEnded);
+              showBottomSheet([100, 650], <TripCompletedSheet />, true);
+            }
+          }
+        )
+        .subscribe();
+
+      activeChannels.push(channel); // Store the active channels
+    });
+  }
+
+  listenToAllRides(ticketsDetails);
 
   return (
     <PaddedScreen>
@@ -296,23 +289,22 @@ function TripCompletedSheet() {
   const {
     stateInput: { driverRatingInput, driverRatingCommentInput },
   } = RideSelectors();
-  const {requestId} = useGlobalSearchParams();
+  const { requestId } = useGlobalSearchParams();
   const { riderRideDetails, driverDetails, selectedAvailableRide } =
     useAppSelector((state: RootState) => state.ride);
-  const { token } =
-    useAppSelector((state: RootState) => state.user);
-    const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
+  const { token } = useAppSelector((state: RootState) => state.user);
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
-    const [fetchState, setFetchState] = useState<{
-      loading: boolean;
-      code: number | null;
-      msg: string;
-    }>({
-      loading: false,
-      code: null,
-      msg: "",
-    });
-    const { loading, code, msg } = fetchState;
+  const [fetchState, setFetchState] = useState<{
+    loading: boolean;
+    code: number | null;
+    msg: string;
+  }>({
+    loading: false,
+    code: null,
+    msg: "",
+  });
+  const { loading, code, msg } = fetchState;
 
   const rateDriver = (rating: number) => {
     dispatch(setStateInputField({ key: "driverRatingInput", value: rating }));
@@ -321,7 +313,7 @@ function TripCompletedSheet() {
   };
 
   const sendRating = async () => {
-    setFetchState({ ...fetchState, loading: true, msg: '' });
+    setFetchState({ ...fetchState, loading: true, msg: "" });
     await FetchService.patchWithBearerToken({
       url: `/user/rider/me/ride/${selectedAvailableRide?._id}/rate-driver`,
       data: {
@@ -334,7 +326,9 @@ function TripCompletedSheet() {
       .then(async (res) => {
         setFetchState({ ...fetchState, loading: false });
         dispatch(setStateInputField({ key: "driverRatingInput", value: null }));
-        dispatch(setStateInputField({ key: "driverRatingCommentInput", value: "" }));
+        dispatch(
+          setStateInputField({ key: "driverRatingCommentInput", value: "" })
+        );
 
         const data = res?.body ? await res.json() : res;
         const code = data?.code;
@@ -342,17 +336,17 @@ function TripCompletedSheet() {
 
         setFetchState({ ...fetchState, code, msg });
 
-        if(code == 200 || code == 201) {
+        if (code == 200 || code == 201) {
           setQuery(null);
           hideBottomSheet();
-          router.replace('/(tab)')
+          router.replace("/(tab)");
         }
       })
       .catch((err: any) => {
         setFetchState({ ...fetchState, loading: false, msg: err?.message });
         console.log({ err });
       });
-  }
+  };
 
   return (
     <PaddedScreen styles={[tw`relative`]}>
@@ -397,12 +391,14 @@ function TripCompletedSheet() {
           ]}
         >
           <Image
-            source={{uri: driverDetails?.picture ||driverDetails?.avatar}}
+            source={{ uri: driverDetails?.picture || driverDetails?.avatar }}
             style={[image.w(70), image.h(70), image.rounded(70)]}
           />
 
           <View style={[flexCol, itemsStart, gap(20)]}>
-            <Text style={[fw700, fs16, colorBlack]}>{driverDetails?.fullName}</Text>
+            <Text style={[fw700, fs16, colorBlack]}>
+              {driverDetails?.fullName}
+            </Text>
 
             <View style={[flex, gap(32), itemsCenter, mXAuto]}>
               <View style={[flex, itemsCenter, gap(12)]}>
@@ -495,9 +491,13 @@ function TripCompletedSheet() {
         {/* Rating */}
 
         {/* Loading Spinner */}
-        {loading && <View style={tw `w-full h-auto absolute top-1/2 flex items-center justify-center z-5`}>
-        <ActivityIndicator size={"small"} />
-        </View>}
+        {loading && (
+          <View
+            style={tw`w-full h-auto absolute top-1/2 flex items-center justify-center z-5`}
+          >
+            <ActivityIndicator size={"small"} />
+          </View>
+        )}
         {/* Loading Spinner */}
 
         <CtaBtn
@@ -511,7 +511,7 @@ function TripCompletedSheet() {
         />
       </View>
 
-      <Text style={tw `text-[10px] font-medium text-black mt-3`}>{msg}</Text>
+      <Text style={tw`text-[10px] font-medium text-black mt-3`}>{msg}</Text>
     </PaddedScreen>
   );
 }

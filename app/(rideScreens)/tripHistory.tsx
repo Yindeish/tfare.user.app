@@ -250,6 +250,26 @@ function TripHistory() {
                             );
                           }
                           if (item?.rideStatus === "accepted") {
+                            const newTicket = {
+                              number: index + 1,
+                              pickupBusstop: item?.pickupBusstop,
+                              dropoffBusstop: item?.dropoffBusstop,
+                              id: String(index ?? 0),
+                              sameAsFirstTicket: false,
+                              userCounterFare: item?.riderCounterOffer,
+                              rideFee: Number(item?.ridePlan?.ride?.rideFee),
+                              serviceFee: Number(item?.ridePlan?.serviceFee),
+                              ticketStatus: "accepted",
+                              rideId: item?._id,
+                            };
+
+                            dispatch(
+                              setStateInputField({
+                                key: "ticketsDetails",
+                                value: [newTicket],
+                              })
+                            );
+
                             router.push("/(rideScreens)/bookRide");
                           }
                           if (item?.rideStatus === "requesting") {

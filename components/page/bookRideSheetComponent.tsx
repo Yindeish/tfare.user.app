@@ -98,6 +98,7 @@ import { setSavedAddresses } from "@/state/slices/account";
 import { IAddress } from "@/state/types/account";
 import { ActivityIndicator } from "react-native";
 import URLS from "@/constants/urls";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 function TicketDetailsSheet() {
   const dispatch = useAppDispatch();
@@ -621,19 +622,52 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
     }
   };
 
-  const channel = supabase.channel(
-    `${RideConstants.channel.ride_starting}${riderRideDetails?._id}`
-  );
-  channel
-    .on("broadcast", { event: RideConstants.event.ride_started }, (payload) => {
-      if (query == RideConstants.query.RideBooked) {
-        setQuery(RideConstants.query.RideStarted);
-        showBottomSheet([100, 500], <TripStartedSheet />, true);
-        router.replace("/(rideScreens)/rideMap");
-      }
-    })
-    .subscribe();
+  // const channel = supabase.channel(
+  //   `${RideConstants.channel.ride_starting}${riderRideDetails?._id}`
+  // );
+  // channel
+  //   .on("broadcast", { event: RideConstants.event.ride_started }, (payload) => {
+  //     if (query == RideConstants.query.RideBooked) {
+  //       setQuery(RideConstants.query.RideStarted);
+  //       showBottomSheet([100, 500], <TripStartedSheet />, true);
+  //       router.replace("/(rideScreens)/rideMap");
+  //     }
+  //   })
+  //   .subscribe();
+  let activeChannels: RealtimeChannel[] = [];
 
+  function listenToAllRides(riderRides: ITicketInput[]) {
+    
+    activeChannels.forEach((channel) => {
+      channel.unsubscribe().then(() => console.log(`Unsubscribed from: ${channel.topic}`));
+    });
+    activeChannels = [];
+  
+    // Subscribe to each ride
+    riderRides.forEach((ride) => {
+      const channelName = `${RideConstants.channel.ride_starting}${ride.rideId}`;
+      console.log(`Listening to ride: ${channelName}`);
+  
+      const channel = supabase.channel(channelName);
+  
+      channel
+        .on("broadcast", { event: RideConstants.event.ride_started }, (payload) => {
+          console.log(`Ride started for ${ride.rideId}`, payload);
+          if (query === RideConstants.query.RideBooked) {
+            setQuery(RideConstants.query.RideStarted);
+            showBottomSheet([100, 500], <TripStartedSheet />, true);
+            router.replace("/(rideScreens)/rideMap");
+          }
+        })
+        .subscribe();
+  
+      activeChannels.push(channel); // Store the active channels
+    });
+  }
+  
+  listenToAllRides(ticketsDetails);
+
+  
   return (
     <PaddedScreen>
       <View style={[flexCol, gap(32), mt(20)]}>
@@ -757,7 +791,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
               leadingText={`Ticket ${ticket?.number} code`}
               trailing={{
                 // text: '#765XYZ',
-                text: String(ticket?.ticketOtp),
+                text: ticket?.ticketOtp ? String(ticket?.ticketOtp) : String(ticket?.rideId?.slice(-4)),
                 icon: true,
               }}
               key={index}
