@@ -283,7 +283,7 @@ const RecentLocationsSnippet = () => {
               />
             </TouchableOpacity>
 
-            <TextInput
+            <BottomSheetTextInput
               style={[
                 fs14,
                 fw500,

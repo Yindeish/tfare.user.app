@@ -116,7 +116,7 @@ function TicketDetailsSheet() {
     currentNumberOfTickets,
     stateInput: { ticketsDetails },
   } = useAppSelector((state: RootState) => state.ride);
-  console.log({ currentTicket });
+  console.log({ currentTicket, currentRoute });
 
   const [fetchState, setFetchState] = useState({
     loading: false,
@@ -579,7 +579,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   console.log("====================================");
-  console.log({ticketsDetails});
+  console.log({ticketsDetails}, {oya: 'naw'});
   console.log("====================================");
 
   const [fetchState, setFetchState] = useState({

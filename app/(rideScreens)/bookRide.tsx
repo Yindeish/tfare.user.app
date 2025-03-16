@@ -191,7 +191,8 @@ const serviceFee = Number(ticketsDetails[0]?.serviceFee);
           number: val,
           ticketStatus: "idle",
           sameAsFirstTicket: false,
-        };
+          userCounterFare: Number('')
+        } as ITicketInput;
 
         tickets = [...(tickets as ITicketInput[]), newTicket as ITicketInput];
       }

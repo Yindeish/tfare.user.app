@@ -150,6 +150,13 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
        }
       }
     )
+    .subscribe();
+
+  const decline_channel = supabase.channel(
+    `${RideConstants.channel.ride_declining}${ticket?.rideId}`
+  );
+
+  decline_channel
     .on(
       "broadcast",
       { event: RideConstants.event.ride_declined },
@@ -170,8 +177,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
           ) {
             return {
               ...ticket,
-              ticketStatus: "declined",
-              rideFee: ticket?.userCounterFare,
+              ticketStatus: "declined"
             };
           } else return ticketItem;
         });
@@ -181,6 +187,78 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
       }
     )
     .subscribe();
+
+    useEffect(() => {
+      // Subscribe to channels when component mounts
+    
+      return () => {
+        // Unsubscribe when component unmounts
+        channel.unsubscribe();
+        decline_channel.unsubscribe();
+      };
+    }, []);
+    
+    // .on(
+    //   "broadcast",
+    //   { event: RideConstants.event.ride_accepted },
+    //   (payload) => {
+    //    if(path == '/bookRide') {
+    //     const ride = payload?.payload?.ride as IRiderRideDetails;
+    //     console.log("====================================");
+    //     console.log("accepting......", ride, {
+    //       ride,
+    //     });
+    //     console.log("====================================");
+    //     // dispatch(setState({key:'counterFareStatus', value: 'accepted' as TRideStatus}))
+
+    //     const tickets = ticketsDetails.map((ticketItem) => {
+    //       if (
+    //         Number(ticketItem?.number) == Number(ticket?.number) &&
+    //         ticket?.ticketStatus == ("pending" as any)
+    //       ) {
+    //         return {
+    //           ...ticket,
+    //           ticketStatus: "accepted",
+    //           rideFee: ticket?.userCounterFare,
+    //         };
+    //       } else return ticketItem;
+    //     });
+
+    //     dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+    //    }
+    //   }
+    // )
+    // .on(
+    //   "broadcast",
+    //   { event: RideConstants.event.ride_declined },
+    //   (payload) => {
+    //    if(path == '/bookRide') {
+    //     const ride = payload?.payload?.ride as IRiderRideDetails;
+    //     console.log("====================================");
+    //     console.log("declining......", ride, {
+    //       ride,
+    //     });
+    //     console.log("====================================");
+    //     // dispatch(setState({key:'counterFareStatus', value: 'accepted' as TRideStatus}))
+
+    //     const tickets = ticketsDetails.map((ticketItem) => {
+    //       if (
+    //         Number(ticketItem?.number) == Number(ticket?.number) &&
+    //         ticket?.ticketStatus == ("pending" as any)
+    //       ) {
+    //         return {
+    //           ...ticket,
+    //           ticketStatus: "declined",
+    //           rideFee: ticket?.userCounterFare,
+    //         };
+    //       } else return ticketItem;
+    //     });
+
+    //     dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+    //    }
+    //   }
+    // )
+    // .subscribe();
 
   const negotiateTicketFare = async () => {
     setFetchState((prev) => ({ ...prev, loading: true }));
@@ -644,7 +722,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                           // );
                         }}
                         // value={userCounterFareInput?.toString()}
-                        value={String(ticket?.userCounterFare)}
+                        value={ticket?.userCounterFare ? String(ticket?.userCounterFare) : ''}
                         placeholder={"Negotiate fare"}
                         style={[
                           py(16) as TextStyle,
