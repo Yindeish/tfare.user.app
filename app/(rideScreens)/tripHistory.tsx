@@ -89,9 +89,7 @@ function TripHistory() {
   const getHistory = async () => {
     setFetchState((prev) => ({ ...prev, loading: true }));
     const returnedData = await FetchService.getWithBearerToken({
-      url: `/user/rider/me/ride/ride-history?status=${
-        activeTab == "pending" ? "scheduled" : activeTab
-      }`,
+      url: `/user/rider/me/ride/ride-history`,
       token: (await getItemAsync("token")) as string,
     });
 
@@ -99,20 +97,71 @@ function TripHistory() {
     const lastRides = returnedData?.lastRides;
     const paidTicket = returnedData?.paidTicket as ITicket[] | ITicket;
 
-    dispatch(setState({ key: "lastRides", value: lastRides }));
-    if (
-      Number((paidTicket as ITicket)?.quantity) > 1 ||
-      !(paidTicket as ITicket)?.quantity
-    )
-      dispatch(setState({ key: "sameTickets", value: paidTicket }));
-    if (Number((paidTicket as ITicket)?.quantity) == 1)
-      dispatch(setState({ key: "differentTickets", value: paidTicket }));
+    setFetchState((prev) => ({...prev, loading: false, history: rideHistory}))
+
+    const createTicket = (rideHist: IRiderRideDetails, ticketOtp?: number, index?: number) => ({
+      number: index !== undefined ? index + 1 : 1,
+      pickupBusstop: rideHist?.pickupBusstop,
+      dropoffBusstop: rideHist?.dropoffBusstop,
+      id: String(index ?? 0),
+      sameAsFirstTicket: false,
+      userCounterFare: rideHist?.riderCounterOffer,
+      rideFee: Number(rideHist?.ridePlan?.ride?.rideFee),
+      serviceFee: Number(rideHist?.ridePlan?.serviceFee),
+      ticketStatus: "accepted",
+      rideId: rideHist?._id,
+      ticketOtp: ticketOtp ?? (paidTicket as ITicket)?.ticketOtp
+    });
 
     setFetchState((prev) => ({
       ...prev,
       loading: false,
-      history: rideHistory,
+      history: rideHistory
     }));
+
+    dispatch(setState({ key: "lastRides", value: lastRides }));
+
+    const sameTickets = !(Array.isArray(paidTicket));
+
+    if (sameTickets) {
+      const tickets = rideHistory
+        ?.filter((rideHist: IRiderRideDetails) => rideHist?.rideStatus === "booked")
+        ?.map((rideHist: IRiderRideDetails, index: number) => createTicket(rideHist, paidTicket?.ticketOtp, index));
+    
+      dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+    } else {
+      // const historyWithOtps = rideHistory?.flatMap((rideHist: IRiderRideDetails) => {
+      //   if (rideHist.rideStatus === "booked") {
+      //     const matchingTickets = (Array.isArray(paidTicket) ? paidTicket : [paidTicket])?.filter(
+      //       (paidTick) => String(paidTick?.ride?.riderRideDetailsId) === String(rideHist._id)
+      //     );
+    
+      //     return matchingTickets.length > 0
+      //       ? matchingTickets.map((paidTick) => ({ ...rideHist, ticketOtp: paidTick.ticketOtp }))
+      //       : rideHist;
+      //   }
+      //   return rideHist;
+      // });
+    
+      // const tickets = historyWithOtps?.map((rideItem: IRiderRideDetails & {ticketOtp:number}, index: number) => 
+      //   createTicket(rideItem as IRiderRideDetails & { ticketOtp: number }, rideItem.ticketOtp, index)
+      // );
+    
+      const tickets = paidTicket
+      ?.filter((ticketItem) => {
+        const riderRide = (rideHistory as IRiderRideDetails[])?.find((ride) => String(ride?._id) == String(ticketItem?.ride?.riderRideDetailsId) && ride?.rideStatus == 'booked');
+        return riderRide;
+      })
+      ?.map((ticketItem, index) => {
+        const riderRide = (rideHistory as IRiderRideDetails[])?.find((ride) => String(ride?._id) == String(ticketItem?.ride?.riderRideDetailsId) && ride?.rideStatus == 'booked') as IRiderRideDetails;
+
+        const newTicket = createTicket(riderRide, ticketItem?.ticketOtp, index);
+
+        return newTicket;
+      })
+
+      dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
+    }
   };
 
   useEffect(() => {
@@ -179,29 +228,6 @@ function TripHistory() {
                           const currentRide = item?.currentRide;
                           const driver = item?.driver;
                           const route = item?.route;
-                          const riderId = item?.riderId;
-
-                          // const riderRides = currentRide?.ridersRides.filter((ride) => String(ride?.riderId) == String(riderId));
-
-                          // const tickets = riderRides.map((ride, index) => {
-                          //   const newTicket = {
-                          //     number: Number(index +1),
-                          //     pickupBusstop: ride?.pickupBusstop,
-                          //     dropoffBusstop: ride?.dropoffBusstop,
-                          //     id: String(index),
-                          //     sameAsFirstTicket: false,
-                          //     userCounterFare: ride?.riderCounterOffer,
-                          //     rideFee: Number(ride?.ridePlan?.ride?.rideFee),
-                          //     serviceFee: Number(ride?.ridePlan?.serviceFee),
-                          //     ticketStatus: ride?.rideStatus == 'accepted' ? 'accepted': 'idle',
-                          //     rideId: ride?._id,
-
-                          //   }
-
-                          //   return newTicket;
-                          // });
-
-                          // dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}));
 
                           dispatch(
                             setState({ key: "riderRideDetails", value: item })
@@ -375,42 +401,6 @@ function TripHistory() {
                       </View>
                     )}
                   </View>
-                  // <View
-                  //   style={[
-                  //     flex,
-                  //     wFull,
-                  //     itemsStart,
-                  //     justifyBetween,
-                  //     {
-                  //       paddingRight: 16,
-                  //       paddingBottom: 16,
-                  //       height: 59,
-                  //       borderBottomWidth: 0.7,
-                  //       borderBottomColor: Colors.light.border,
-                  //     },
-                  //   ]}
-                  //   key={index}
-                  // >
-                  //   <View style={[flexCol, itemsStart, justifyBetween, hFull]}>
-                  //     <Text style={[fw700, fs14, colorBlack]}>
-                  //       {item?.dropoffBusstop?.name}
-                  //     </Text>
-                  //     <Text
-                  //       style={[colorTextGrey, fs12, fw400]}
-                  //     >{`${Utils.formatTime(
-                  //       item?.createdAt
-                  //     )} - ${Utils.formatDate(item?.updatedAt)}`}</Text>
-                  //   </View>
-
-                  //   <View style={[flexCol, itemsEnd, justifyBetween, hFull]}>
-                  //     <Text
-                  //       style={[fw400, fs14, { color: "#27AE65" }]}
-                  //     >{`₦ ${Number((item?.ridePlan as any)?.serviceFee) + Number(item?.riderCounterOffer)}`}</Text>
-                  //     <Text
-                  //       style={[colorTextGrey, fw400, fs12]}
-                  //     >{`# ${item?._id}`}</Text>
-                  //   </View>
-                  // </View>
                 ))}
               </View>
             ) : (

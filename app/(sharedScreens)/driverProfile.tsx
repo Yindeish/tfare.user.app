@@ -139,8 +139,8 @@ export default function DriverProfile() {
           <PageTitle
             title="Driver Profile"
             onPress={() => {
-              showBottomSheet([100, 500], <TripStartedSheet />, true);
-              router.setParams({ query: query || "RideStarted" });
+              // showBottomSheet([100, 500], <TripStartedSheet />, true);
+              // router.setParams({ query: query || "RideStarted" });
               router.push(`/(rideScreens)/tripDetails` as Href);
             }}
             style={[]}
