@@ -1,5 +1,5 @@
 import { IFlutterwaveWallet, } from "./flutterwaveWallet";
-import { IBusStop, ILoading } from "./ride";
+import { IBusStop, ILoading, ISavedBusStop } from "./ride";
 
 type TProfileCta = 'edit' | 'save';
 
@@ -100,7 +100,7 @@ interface IAccountState {
     stateInput: IStateInput,
     userAccount: IUserAccount | null,
     emergencyContacts: IEmergencyContact[] | [],
-    savedAddresses: IAddress[] | [],
+    savedAddresses: ISavedBusStop[],
     profileCta: TProfileCta,
 }
 

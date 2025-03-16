@@ -366,8 +366,7 @@ const RecentLocationsSnippet = () => {
               renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={() => {
-                    console.log({ item })
-                    setFieldValue("pickupBusstop", item?.busStop?.name)
+                    setFieldValue("pickupBusstop", item?.busstopTitle)
                     dispatch(
                       setStateInputField({
                         key: "pickupBusstopInput",

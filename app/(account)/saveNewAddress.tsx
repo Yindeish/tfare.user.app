@@ -79,7 +79,15 @@ export default function SaveNewAddress() {
 
   const { tokenSession } = useSession();
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<{
+    msg: string,
+    code: null | number,
+    loading: boolean,
+    busstops: IBusStop[],
+    inputtingLocation: boolean,
+    saving: boolean,
+    busstopInput: null | IBusStop
+  }>({
     msg: "",
     code: null,
     loading: false,
@@ -115,7 +123,7 @@ export default function SaveNewAddress() {
       const returnedData = await FetchService.postWithBearerToken({
         token: tokenSession as string,
         url: "/user/rider/me/busstop/save",
-        data: { name: busstopName, city: (busstopInput as any)?.city, busstopTitle },
+        data: { busstopId: busstopInput?._id, busstopTitle },
       });
 
       setState((prev) =>({...prev, saving: false}))
