@@ -109,10 +109,6 @@ export default function AvailableRide() {
     })
     .subscribe();
 
-  // useEffect(() => {
-  //   if (!requestId) router.back();
-  // }, []);
-
   useEffect(() => {
     hideBottomSheet();
   }, [query]);

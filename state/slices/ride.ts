@@ -113,9 +113,7 @@ const RideSlice = createSlice({
       state.currentNumberOfTickets = action.payload;
     },
     setCurrentTicket: (state, action: PayloadAction<ITicketInput>) => {
-      console.log({before: state.currentTicket})
       state.currentTicket = action.payload;
-      console.log({after: state.currentTicket})
     },
     createTicket: (
       state,

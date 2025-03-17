@@ -263,19 +263,18 @@ function TicketDetailsSheet() {
   };
 
   const selectPickup = (busstop: IBusStop) => {
-    setFieldValue('pickupBusstop', busstop?.name)
-    
+    setFieldValue("pickupBusstop", busstop?.name);
+
     const tickets = ticketsDetails?.map((ticketDetails) => {
-      if(Number(ticketDetails?.number) === Number(currentTicket?.number)) {
+      if (Number(ticketDetails?.number) === Number(currentTicket?.number)) {
         return {
           ...ticketDetails,
-          pickupBusstop: busstop
-        }
-      }
-      else return ticketDetails;
-    })
+          pickupBusstop: busstop,
+        };
+      } else return ticketDetails;
+    });
 
-    dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}))
+    dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
 
     dispatch(
       setStateInputField({
@@ -283,22 +282,21 @@ function TicketDetailsSheet() {
         value: busstop,
       })
     );
-  }
+  };
 
   const selectDropoff = (busstop: IBusStop) => {
-    setFieldValue('dropoffBusstop', busstop?.name);
+    setFieldValue("dropoffBusstop", busstop?.name);
 
     const tickets = ticketsDetails?.map((ticketDetails) => {
-      if(Number(ticketDetails?.number) === Number(currentTicket?.number)) {
+      if (Number(ticketDetails?.number) === Number(currentTicket?.number)) {
         return {
           ...ticketDetails,
-          dropoffBusstop: busstop
-        }
-      }
-      else return ticketDetails;
-    })
+          dropoffBusstop: busstop,
+        };
+      } else return ticketDetails;
+    });
 
-    dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}))
+    dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
 
     dispatch(
       setStateInputField({
@@ -580,7 +578,7 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   console.log("====================================");
-  console.log({ticketsDetails}, {oya: 'naw'});
+  console.log({ ticketsDetails }, { oya: "naw" });
   console.log("====================================");
 
   const [fetchState, setFetchState] = useState({
@@ -637,37 +635,41 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
   let activeChannels: RealtimeChannel[] = [];
 
   function listenToAllRides(riderRides: ITicketInput[]) {
-    
     activeChannels.forEach((channel) => {
-      channel.unsubscribe().then(() => console.log(`Unsubscribed from: ${channel.topic}`));
+      channel
+        .unsubscribe()
+        .then(() => console.log(`Unsubscribed from: ${channel.topic}`));
     });
     activeChannels = [];
-  
+
     // Subscribe to each ride
     riderRides.forEach((ride) => {
       const channelName = `${RideConstants.channel.ride_starting}${ride.rideId}`;
       console.log(`Listening to ride: ${channelName}`);
-  
+
       const channel = supabase.channel(channelName);
-  
+
       channel
-        .on("broadcast", { event: RideConstants.event.ride_started }, (payload) => {
-          console.log(`Ride started for ${ride.rideId}`, payload);
-          if (query === RideConstants.query.RideBooked) {
-            setQuery(RideConstants.query.RideStarted);
-            showBottomSheet([100, 500], <TripStartedSheet />, true);
-            router.replace("/(rideScreens)/rideMap");
+        .on(
+          "broadcast",
+          { event: RideConstants.event.ride_started },
+          (payload) => {
+            console.log(`Ride started for ${ride.rideId}`, payload);
+            if (query === RideConstants.query.RideBooked) {
+              setQuery(RideConstants.query.RideStarted);
+              showBottomSheet([100, 500], <TripStartedSheet />, true);
+              router.replace("/(rideScreens)/rideMap");
+            }
           }
-        })
+        )
         .subscribe();
-  
+
       activeChannels.push(channel); // Store the active channels
     });
   }
-  
+
   listenToAllRides(ticketsDetails);
 
-  
   return (
     <PaddedScreen>
       <View style={[flexCol, gap(32), mt(20)]}>
@@ -791,7 +793,9 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
               leadingText={`Ticket ${ticket?.number} code`}
               trailing={{
                 // text: '#765XYZ',
-                text: ticket?.ticketOtp ? String(ticket?.ticketOtp) : String(ticket?.rideId?.slice(-4)),
+                text: ticket?.ticketOtp
+                  ? String(ticket?.ticketOtp)
+                  : String(ticket?.rideId?.slice(-4)),
                 icon: true,
               }}
               key={index}
@@ -852,24 +856,27 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
 
         {/* CTAs */}
 
-        <CtaBtn
-          img={{
-            src: images.redBgCautionImage,
-          }}
-          onPress={() => router.replace("/(rideScreens)/tripDetails")}
-          text={{ name: "View Trip Details" }}
-          bg={{ color: Colors.light.background }}
-        />
+        <View style={tw `w-full h-auto flex flex-col gap-[16px]`}>
+          <CtaBtn
+            img={{
+              src: images.redBgCautionImage,
+            }}
+            onPress={() => {
+              router.replace("/(rideScreens)/tripDetails");
+            }}
+            text={{ name: "View Trip Details" }}
+            bg={{ color: Colors.light.background }}
+          />
 
-        <CtaBtn
-          img={{
-            src: images.cancelImage,
-          }}
-          onPress={() => {}}
-          text={{ name: "Cancel Order", color: Colors.light.textGrey }}
-          bg={{ color: "#F9F7F8", borderColor: Colors.light.border }}
-        />
-
+          <CtaBtn
+            img={{
+              src: images.cancelImage,
+            }}
+            onPress={() => {}}
+            text={{ name: "Cancel Order", color: Colors.light.textGrey }}
+            bg={{ color: "#F9F7F8", borderColor: Colors.light.border }}
+          />
+        </View>
         {/* CTAs */}
       </View>
     </PaddedScreen>

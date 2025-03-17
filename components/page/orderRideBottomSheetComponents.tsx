@@ -2,7 +2,7 @@ import {
   View,
   Image,
   TextInput,
-  // TouchableOpacity,
+  TouchableOpacity,
   ScrollView,
   FlatList,
   Pressable,
@@ -13,7 +13,7 @@ import {
   TextStyle,
   Keyboard,
 } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler"; //This is better than react native Touchable Opacity as it best updates text inputs right before the keyboard leaves
+import { TouchableOpacity as GestureTouchableOpacity } from "react-native-gesture-handler"; //This is better than react native Touchable Opacity as it best updates text inputs right before the keyboard leaves
 import PaddedScreen from "../shared/paddedScreen";
 import {
   absolute,
@@ -186,6 +186,7 @@ const RecentLocationsSnippet = () => {
       dropoffBusstop: string().required(),
     }),
     onSubmit: ({ dropoffBusstop, pickupBusstop }) => {
+      console.log({dropoffBusstop, pickupBusstop})
       setQuery(RideConstants.query.FilledForm)
       showBottomSheet([436], <FilledForm />, true)
       // router.setParams({ query: "FilledForm" });
@@ -364,19 +365,19 @@ const RecentLocationsSnippet = () => {
               horizontal
               data={savedAddresses}
               renderItem={({ item }) => (
-                <TouchableOpacity
+                <GestureTouchableOpacity
                   onPress={() => {
-                    setFieldValue("pickupBusstop", item?.busstopTitle)
+                    setFieldValue("pickupBusstop", item?.busstop?.name)
                     dispatch(
                       setStateInputField({
                         key: "pickupBusstopInput",
-                        value: item?.busStop,
+                        value: item?.busstop,
                       }),
                     )
                     setSearchState((prev) => ({
                       ...prev,
                       inputtingPickup: false,
-                      pickupSearchText: item?.busStop?.name,
+                      pickupSearchText: item?.busstop?.name,
                     }))
 
                     // Dismiss keyboard after updating
@@ -398,7 +399,7 @@ const RecentLocationsSnippet = () => {
                   >
                     <Text style={[neurialGrotesk, fw500, fs12, colorBlack]}>{item?.busstopTitle}</Text>
                   </View>
-                </TouchableOpacity>
+                </GestureTouchableOpacity>
               )}
               ItemSeparatorComponent={() => <View style={[w(16), hFull, bg(colors.transparent)]} />}
               keyExtractor={({}) => Math.random().toString()}
@@ -491,7 +492,7 @@ const RecentLocationsSnippet = () => {
                   ]}
                 >
                   {(busstops as IBusStop[])?.map((busstop, index) => (
-                    <TouchableOpacity
+                    <GestureTouchableOpacity
                       onPress={() => {
                         setFieldValue("dropoffBusstop", busstop?.name)
                         dispatch(
@@ -512,7 +513,7 @@ const RecentLocationsSnippet = () => {
                       key={index}
                     >
                       <Text style={[h(30) as TextStyle]}>{busstop?.name}</Text>
-                    </TouchableOpacity>
+                    </GestureTouchableOpacity>
                   ))}
                 </ScrollView>
               ) : (
@@ -533,13 +534,13 @@ const RecentLocationsSnippet = () => {
                     dispatch(
                       setStateInputField({
                         key: "dropoffBusstopInput",
-                        value: item?.busStop,
+                        value: item?.busstop,
                       }),
                     )
-                    setFieldValue("dropoffBusstop", item?.busStop?.name)
+                    setFieldValue("dropoffBusstop", item?.busstop?.name)
                     setSearchState((prev) => ({
                       ...prev,
-                      dropoffSearchText: item?.busStop?.name,
+                      dropoffSearchText: item?.busstop?.name,
                     }))
 
                     // Dismiss keyboard after updating

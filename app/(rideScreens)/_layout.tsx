@@ -185,7 +185,7 @@ export default function AppLayout() {
               );
             setQuery(RideConstants.query.RideBooked);
             showBottomSheet(
-              [100, 800],
+              [100, 400, 800],
               <RideBookedSheet rideId={selectedAvailableRideId as string} />,
               true
             );
@@ -247,7 +247,7 @@ export default function AppLayout() {
               `/rideMap?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );
             showBottomSheet(
-              [100, 800],
+              [100, 400, 800],
               <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
               true
             );
@@ -365,7 +365,7 @@ export default function AppLayout() {
               );
             setQuery(RideConstants.query.RideBooked);
             showBottomSheet(
-              [100, 800],
+              [100, 400, 800],
               <RideBookedSheet rideId={selectedAvailableRideId as string} />,
               true
             );
@@ -439,7 +439,7 @@ export default function AppLayout() {
               `/rideMap?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );
             showBottomSheet(
-              [100, 800],
+              [100, 400, 800],
               <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
               true
             );

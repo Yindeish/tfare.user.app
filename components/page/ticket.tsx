@@ -83,6 +83,7 @@ import tw from "@/constants/tw";
 import { RideConstants } from "@/constants/ride";
 import { supabase } from "@/supabase/supabase.config";
 import { usePathname } from "expo-router";
+import { useStorageState } from "@/hooks/useStorageState";
 
 function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
   const dispatch = useAppDispatch();
@@ -105,6 +106,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
     riderRideDetails,
     stateInput: { ticketsDetails },
   } = useAppSelector((state: RootState) => state.ride);
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
   const path = usePathname();
 
@@ -114,6 +116,8 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
     code: null,
   });
   const { code, loading, msg } = fetchState;
+
+  useEffect(() => console.log({ticketsDetails}), [ticketsDetails])
 
   const channel = supabase.channel(
     `${RideConstants.channel.ride_accepting}${ticket?.rideId}`
@@ -131,17 +135,15 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
           ride,
         });
         console.log("====================================");
-        // dispatch(setState({key:'counterFareStatus', value: 'accepted' as TRideStatus}))
-
         const tickets = ticketsDetails.map((ticketItem) => {
           if (
             Number(ticketItem?.number) == Number(ticket?.number) &&
-            ticket?.ticketStatus == ("pending" as any)
+            ticket?.ticketStatus === "pending"
           ) {
             return {
-              ...ticket,
+              ...ticketItem,
               ticketStatus: "accepted",
-              rideFee: ticket?.userCounterFare,
+              rideFee: ticket?.userCounterFare ? Number(ticket?.userCounterFare) : ticket?.rideFee,
             };
           } else return ticketItem;
         });
@@ -168,15 +170,14 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
           ride,
         });
         console.log("====================================");
-        // dispatch(setState({key:'counterFareStatus', value: 'accepted' as TRideStatus}))
 
         const tickets = ticketsDetails.map((ticketItem) => {
           if (
             Number(ticketItem?.number) == Number(ticket?.number) &&
-            ticket?.ticketStatus == ("pending" as any)
+            ticket?.ticketStatus == "pending"
           ) {
             return {
-              ...ticket,
+              ...ticketItem,
               ticketStatus: "declined"
             };
           } else return ticketItem;
@@ -263,22 +264,10 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
   const negotiateTicketFare = async () => {
     setFetchState((prev) => ({ ...prev, loading: true }));
 
-    // const dropoffPlan = currentRoute?.inTripDropoffs?.find((dropoff) => String(dropoff?._id) === String(dropoffBusstopInput?._id))?.plan;
     const dropoffPlan = currentRoute?.inTripDropoffs?.find(
       (dropoff) => String(dropoff?._id) === String(ticket?.dropoffBusstop?._id)
     )?.plan;
 
-    // const returnedData = await FetchService.postWithBearerToken({
-    //   url: `/user/rider/me/ride/${selectedAvailableRide?._id}/negotiate-fare`,
-    //   data: {
-    //     pickupBusstopId: pickupBusstopInput?._id,
-    //     dropoffBusstopId: dropoffBusstopInput?._id,
-    //     userCounterOffer: userCounterFareInput,
-    //     ridePlan: dropoffPlan?.ride?.rideFee || dropoffPlan?.plan?.ride?.rideFee,
-    //     routeId: dropoffPlan?.routeId,
-    //   },
-    //   token: token as string,
-    // });
     const returnedData = await FetchService.postWithBearerToken({
       url: `/user/rider/me/ride/${selectedAvailableRide?._id}/negotiate-fare`,
       data: {
@@ -307,7 +296,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
 
     if (code == 201 || code == 200) {
       const tickets = ticketsDetails.map((ticketItem) => {
-        if (ticketItem?.number == ticket?.number) {
+        if (Number(ticketItem?.number) == Number(ticket?.number)) {
           return {
             ...ticketItem,
             ticketStatus: "pending",
@@ -319,11 +308,12 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
       dispatch(setStateInputField({ key: "ticketsDetails", value: tickets }));
       dispatch(setCurrentTicket(ticket));
       dispatch(setState({ key: "riderRideDetails", value: userRideSaved }));
-      // dispatch(setState({key:'counterFareStatus', value: 'pending'}))
     }
   };
 
   const toggleTicketAsFirstTicket = (ticketNumber: number) => {
+    if(ticket?.ticketStatus === 'accepted' || ticket?.ticketStatus === 'pending') return;
+
     const firstTicket = ticketsDetails.find(
       (ticket) => Number(ticket?.number) == 1
     );
@@ -465,7 +455,8 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
 
         <TouchableOpacity
           onPress={() => toggleTicketAsFirstTicket(ticket?.number)}
-          style={[flex, gap(12), itemsCenter]}
+          style={[flex, gap(12), itemsCenter, {opacity: (ticket?.ticketStatus === 'accepted' || ticket?.ticketStatus === 'pending') ? 0.5 : 1}]}
+          disabled={(ticket?.ticketStatus === 'accepted' || ticket?.ticketStatus === 'pending')}
         >
           <Checkbox
             value={ticket.sameAsFirstTicket}
@@ -495,7 +486,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
           <TouchableOpacity
             onPress={() => {
               dispatch(setCurrentTicket(ticket));
-
+              setQuery(RideConstants.query.TripDetails);
               showBottomSheet([516, 601], <TicketDetailsSheet />);
             }}
           >
@@ -688,9 +679,35 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                         ₦
                       </Text>
                       <TextInput
-                        onFocus={() => dispatch(setCurrentTicket(ticket))}
-                        onChangeText={(ticket?.ticketStatus == 'pending' as any) ? () => {} : (text) => {
-                          if(ticket?.ticketStatus == 'pending' as any) return;
+                        onFocus={() => {
+                          dispatch(setCurrentTicket(ticket));
+                          if(ticket?.ticketStatus === 'declined') {
+                            const tickets = ticketsDetails?.map((ticketDetails) => {
+                              if(Number(ticketDetails?.number) == Number(ticket?.number) && ticketDetails?.ticketStatus == 'declined') {
+                                return {
+                                  ...ticketDetails,
+                                  ticketStatus: 'idle'
+                                }
+                              } else return ticketDetails;
+                            })
+
+                            dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}));
+                          }
+                        }}
+                        onChangeText={(ticket?.ticketStatus === 'accepted' || ticket?.ticketStatus === 'pending') ? () => {} : (text) => {
+                          if (ticket?.ticketStatus === 'accepted' || ticket?.ticketStatus === 'pending') return;
+                          if(ticket?.ticketStatus === 'declined') {
+                            const tickets = ticketsDetails?.map((ticketDetails) => {
+                              if(Number(ticketDetails?.number) == Number(ticket?.number) && ticketDetails?.ticketStatus == 'declined') {
+                                return {
+                                  ...ticketDetails,
+                                  ticketStatus: 'idle'
+                                }
+                              } else return ticketDetails;
+                            })
+
+                            dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}));
+                          }
 
                           const tickets = ticketsDetails?.map((ticketItem) => {
                             if (
@@ -704,25 +721,8 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                           });
 
                           dispatch(setStateInputField({key: 'ticketsDetails', value: tickets}));
-
-                          console.log({currentTicket})
-
-                          // dispatch(
-                          //   setStateInputField({
-                          //     key: "userCounterFareInput",
-                          //     value: text,
-                          //   })
-                          // );
-                          // dispatch(
-                          //   editTicketCounterFare({
-                          //     currentNumberOfTickets: Number(
-                          //       currentTicket?.number
-                          //     ),
-                          //   })
-                          // );
                         }}
-                        // value={userCounterFareInput?.toString()}
-                        value={ticket?.userCounterFare ? String(ticket?.userCounterFare) : ''}
+                        value={ticket?.userCounterFare ? String(ticket.userCounterFare) : ''}
                         placeholder={"Negotiate fare"}
                         style={[
                           py(16) as TextStyle,
@@ -809,11 +809,11 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
                           pl(16),
                           rounded(10),
                           bg(colors.white),
-                          { borderWidth: 0.7, borderColor: "#27AE65" },
+                          { borderWidth: 0.7, borderColor: colors.red600 },
                         ]}
                       >
                         <Text
-                          style={[neurialGrotesk, fw700, fs16, c("#27AE65")]}
+                          style={[neurialGrotesk, fw700, fs16, c(colors.red600)]}
                         >
                           Declined
                         </Text>

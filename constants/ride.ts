@@ -9,7 +9,8 @@ const bottomSheetqueries = {
     RideBooked: 'RideBooked',
     RideStarted: 'RideStarted',
     RideEnded: 'RideEnded',
-    RideDeclined: 'RideDeclined'
+    RideDeclined: 'RideDeclined',
+    TripDetails: 'TripDetails',
 }
 
 const channels = {

@@ -89,7 +89,7 @@ function TripHistory() {
   const getHistory = async () => {
     setFetchState((prev) => ({ ...prev, loading: true }));
     const returnedData = await FetchService.getWithBearerToken({
-      url: `/user/rider/me/ride/ride-history`,
+      url: `/user/rider/me/ride/ride-history?status=${activeTab === 'pending'? 'scheduled': activeTab}`,
       token: (await getItemAsync("token")) as string,
     });
 
@@ -268,7 +268,7 @@ function TripHistory() {
 
                             setQuery(RideConstants.query.RideBooked);
                             showBottomSheet(
-                              [100, 800],
+                              [100,400, 800],
                               <RideBookedSheet
                                 rideId={item?.currentRideId as string}
                               />,

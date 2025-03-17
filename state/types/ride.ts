@@ -22,6 +22,7 @@ export type TRideStatus =
   | "booked"
   | "ended";
   export type TTicketSatus = 'idle' | 'cancelled' | 'paid' | 'booked' | 'declined';
+  export type TTicketInputSatus = 'idle' | 'pending' | 'accepted' | 'paid' | 'booked' | 'declined';
 
 export interface IRoute {
   routeName: string;
@@ -45,7 +46,7 @@ export interface IBusStop {
 export interface ISavedBusStop {
   userId: string;
   busstopTitle: string;
-  busStop: IBusStop;
+  busstop: IBusStop;
 }
 
 export interface IUnitFare {
@@ -95,7 +96,7 @@ export interface ITicketInput {
   userCounterFare?: number | null;
   rideFee?: number;
   serviceFee?: number;
-  ticketStatus?: TTicketSatus;
+  ticketStatus?: TTicketInputSatus;
   unitFare?: IUnitFare;
   rideId?: string;
   quantity?: number;
@@ -158,6 +159,8 @@ export interface ICurrentRide {
   vehicleName: string;
   inRideDropoffs: IBusStop[];
   ridersRides: IRiderRideDetails[];
+  routeId?: string;
+  route?: IRoute; 
 }
 
 export interface IRiderRideDetails {

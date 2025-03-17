@@ -99,6 +99,7 @@ import { useStorageState } from "@/hooks/useStorageState";
 import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
 import * as Device from "expo-device";
 import * as Location from "expo-location";
+import usePreventGoBack from "@/hooks/usePreventGoBack";
 
 const {
   sharedStyle,
@@ -150,6 +151,8 @@ export default function BookRide() {
   const { showBottomSheet, hideBottomSheet } = useBottomSheet();
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
+  usePreventGoBack(Number(ticketsDetails?.length) > 1);
+
   const [fetchState, setFetchState] = useState({
     loading: false,
     msg: "",
@@ -163,18 +166,16 @@ export default function BookRide() {
   );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // const tripCost = userRideInput?.tickets?.[1]?.sameAsFirstTicket
-  //   ? Number(ridePlans[0]?.ride?.rideFee) * (currentNumberOfTickets || 1) ||
-  //     Number(ridePlans[0]?.plan?.ride?.rideFee) * (currentNumberOfTickets || 1)
-  //   : userRideInput?.tickets?.reduce(
-  //       (prev, current) => prev + Number(current?.rideFee),
-  //       0
-  //     );
-  const tripCost = ticketsDetails?.reduce((prev, current) => prev + Number(current?.rideFee), 0)
-const serviceFee = Number(ticketsDetails[0]?.serviceFee);
-  // const serviceFee = Number(ridePlans?.[0]?.plan?.serviceFee);
+  const tripCost = ticketsDetails?.reduce(
+    (prev, current) => prev + Number(current?.rideFee),
+    0
+  );
+  const serviceFee = Number(ticketsDetails[0]?.serviceFee);
   const totalCost = Number(tripCost) + serviceFee;
-  console.log({ticketsDetails})
+
+  useEffect(() => {
+    selectedAvailableRide?.route && dispatch(setState({key:'currentRoute', value: selectedAvailableRide?.route}));
+  }, [currentRoute, selectedAvailableRide]);
 
   const selectNumberOfTickets = (ticketNumber: number) => {
     dispatch(setCurrentNumberOfTickets(ticketNumber));
@@ -191,7 +192,7 @@ const serviceFee = Number(ticketsDetails[0]?.serviceFee);
           number: val,
           ticketStatus: "idle",
           sameAsFirstTicket: false,
-          userCounterFare: Number('')
+          userCounterFare: Number(""),
         } as ITicketInput;
 
         tickets = [...(tickets as ITicketInput[]), newTicket as ITicketInput];
@@ -247,74 +248,13 @@ const serviceFee = Number(ticketsDetails[0]?.serviceFee);
   // Updating buy Ticket btn with allTicketsFilled
 
   useEffect(() => {
-    if (!selectedAvailableRide) router.back();
+    if (!selectedAvailableRide) router.push("/(rideScreens)/availableRides");
   }, [selectedAvailableRide]);
 
-  //   const getRideDetails = async () => {
-  //     const url = `user/rider/me/ride/${currentRideId}/ride-details`;
-
-  //     setFetchState((prev) => ({ ...prev, loading: true }));
-  //     const returnedData = await FetchService.getWithBearerToken({
-  //       url: "/user/rider/me/available-rides",
-  //       token: token as string,
-  //     });
-
-  //     const code = returnedData?.code;
-  //     const msg = returnedData?.msg;
-  //     const rideDetails = returnedData?.rides;
-
-  //     if (code && code == 200 && rideDetails) {
-  //       setFetchState((prev) => ({
-  //         ...prev,
-  //         loading: false,
-  //         msg: "",
-  //         code: null,
-  //         ride: rideDetails
-  //       }));
-  //     } else if (code && code == 400) {
-  //       setFetchState((prev) => ({
-  //         ...prev,
-  //         loading: false,
-  //         msg: "",
-  //         code: null,
-  //       }));
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  //     getRideDetails();
-  //   }, []);
-
-  // create a single ticket based on the default number of tickets
-  useEffect(() => {
-    // if (currentNumberOfTickets === 1) {
-    //   dispatch(createTicket({ currentNumberOfTickets: 1 }));
-    // }
-  }, [currentNumberOfTickets]);
-  // create a single ticket based on the default number of tickets
-
-  // check if all tickets have been filled
-  // useEffect(() => {
-  //   if (Number(userRideInput?.tickets?.length) > 0) {
-  //     const allTciketsFilled = userRideInput?.tickets?.every(
-  //       (ticket) => ticket.dropoffBusstop && ticket.dropoffBusstop
-  //       // &&  ticket.dropoffBusstop.routeName !== '' && ticket.dropoffBusstop.routeName !== '')
-  //     );
-  //     if (allTciketsFilled) {
-  //       dispatch(setAllTicketsFilled(true));
-  //       dispatch(setState({key:'booking', value: true}));
-  //     }
-  //     else {
-  //       dispatch(setAllTicketsFilled(false));
-  //       dispatch(setState({key:'booking', value: false}));
-  //     }
-  //   }
-  // }, [userRideInput?.tickets]);
   useEffect(() => {
     if (Number(ticketsDetails?.length) > 0) {
       const allTciketsFilled = ticketsDetails?.every(
         (ticket) => ticket.dropoffBusstop && ticket.dropoffBusstop
-        // &&  ticket.dropoffBusstop.routeName !== '' && ticket.dropoffBusstop.routeName !== '')
       );
       if (allTciketsFilled) {
         dispatch(setAllTicketsFilled(true));
@@ -357,7 +297,11 @@ const serviceFee = Number(ticketsDetails[0]?.serviceFee);
         <PageFloatingTitle
           title="Book Ride"
           color={{ icon: Colors.light.textGrey, text: colors.black }}
-          onPress={() => router.push(`/${pages.availableRides}` as Href)}
+          onPress={() => {
+            if(ticketsDetails?.length > 1) return;
+            
+            router.push(`/${pages.availableRides}` as Href)}
+          }
           view={false}
         />
         {/* Page Title */}
@@ -469,7 +413,6 @@ const serviceFee = Number(ticketsDetails[0]?.serviceFee);
 
             <FlatList
               horizontal={false}
-              // data={userRideInput?.tickets}
               data={ticketsDetails}
               renderItem={({ index, item: ticketId }) => (
                 <Ticket ticket={ticketId} index={index} key={index} />
@@ -483,17 +426,9 @@ const serviceFee = Number(ticketsDetails[0]?.serviceFee);
             {currentNumberOfTickets <
               Number(selectedAvailableRide?.availableSeats) && (
               <TouchableOpacity
-              onPress={() => selectNumberOfTickets(currentNumberOfTickets+1)}
-                // onPress={() => {
-                //   dispatch(
-                //     setCurrentNumberOfTickets(currentNumberOfTickets + 1)
-                //   );
-                //   dispatch(
-                //     createTicket({
-                //       currentNumberOfTickets: currentNumberOfTickets + 1,
-                //     })
-                //   );
-                // }}
+                onPress={() =>
+                  selectNumberOfTickets(currentNumberOfTickets + 1)
+                }
               >
                 <View
                   style={[
@@ -525,41 +460,12 @@ const serviceFee = Number(ticketsDetails[0]?.serviceFee);
             {/* Shows when all the tickets have been filled (counter fare are optional) */}
             {/* Buy Ticket Btn */}
 
-            {/* {allTicketsFilled && (
-              <View
-                style={[
-                  absolute,
-                  zIndex(indices.xHigh),
-                  b("30%"),
-                  l(20),
-                  wFull,
-                ]}
-              >
-                <CtaBtn
-                  img={{
-                    src: images.whiteBgTicketImage,
-                    w: 22,
-                    h: 14,
-                  }}
-                  onPress={buyTickets}
-                  text={{
-                    name: "Buy Ticket",
-                    color: colors.white,
-                  }}
-                  bg={{
-                    color: Colors.light.background,
-                  }}
-                />
-              </View>
-            )} */}
-
             {/* Buy Ticket Btn */}
 
             {/* Shows when buy ticket cta btn is clicked */}
 
             {/* Payment options */}
 
-            {/* {paymentOptionsVisible && ( */}
             {allTicketsFilled && (
               <View style={[wFull, flexCol, gap(16), mt(32), mb(100)]}>
                 <View

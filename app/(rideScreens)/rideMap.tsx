@@ -30,10 +30,12 @@ import { RideBookedSheet } from '@/components/page/bookRideSheetComponent';
 import { supabase } from '@/supabase/supabase.config';
 import { useStorageState } from '@/hooks/useStorageState';
 import { RideConstants } from '@/constants/ride';
+import usePreventGoBack from '@/hooks/usePreventGoBack';
 
 
 
 function RideMap() {
+    usePreventGoBack(true);
     
 
     return (

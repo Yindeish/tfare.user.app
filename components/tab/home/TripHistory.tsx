@@ -278,7 +278,7 @@ export default function TripHistory({
 
                       setQuery(RideConstants.query.RideBooked);
                       showBottomSheet(
-                        [100, 800],
+                        [100, 400, 800],
                         <RideBookedSheet
                           rideId={item?.currentRideId as string}
                         />,
