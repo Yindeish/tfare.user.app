@@ -118,6 +118,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
   const { code, loading, msg } = fetchState;
 
   useEffect(() => console.log({ticketsDetails}), [ticketsDetails])
+  useEffect(() => console.log({ticket}), [ticket])
 
   const channel = supabase.channel(
     `${RideConstants.channel.ride_accepting}${ticket?.rideId}`
@@ -312,7 +313,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
   };
 
   const toggleTicketAsFirstTicket = (ticketNumber: number) => {
-    if(ticket?.ticketStatus === 'accepted' || ticket?.ticketStatus === 'pending') return;
+    if(((ticket?.ticketStatus === 'accepted' && ticket?.sameAsFirstTicket == false) || ticket?.ticketStatus === 'pending')) return;
 
     const firstTicket = ticketsDetails.find(
       (ticket) => Number(ticket?.number) == 1
@@ -455,18 +456,11 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
 
         <TouchableOpacity
           onPress={() => toggleTicketAsFirstTicket(ticket?.number)}
-          style={[flex, gap(12), itemsCenter, {opacity: (ticket?.ticketStatus === 'accepted' || ticket?.ticketStatus === 'pending') ? 0.5 : 1}]}
-          disabled={(ticket?.ticketStatus === 'accepted' || ticket?.ticketStatus === 'pending')}
+          style={[flex, gap(12), itemsCenter, {opacity: ((ticket?.ticketStatus === 'accepted' && ticket?.sameAsFirstTicket == false) || ticket?.ticketStatus === 'pending') ? 0.5 : 1}]}
+          disabled={((ticket?.ticketStatus === 'accepted' && ticket?.sameAsFirstTicket == false) || ticket?.ticketStatus === 'pending')}
         >
           <Checkbox
             value={ticket.sameAsFirstTicket}
-            // onValueChange={() => {
-            //   dispatch(
-            //     toggleTicketAsFirstTicket({
-            //       currentNumberOfTickets: ticket.number,
-            //     })
-            //   );
-            // }}
             onValueChange={() => toggleTicketAsFirstTicket(ticket?.number)}
             color={ticket.sameAsFirstTicket ? "#27AE65" : colors.grey500}
           />

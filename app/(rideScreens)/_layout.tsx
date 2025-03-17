@@ -98,7 +98,7 @@ export default function AppLayout() {
   });
   const { loading, msg } = fetchState;
   const someTicketsUnderNegotiation = ticketsDetails?.find(
-    (ticket) => ticket?.ticketStatus == ("pending" as any)
+    (ticket) => ticket?.ticketStatus == "pending"
   );
 
   const buyTickets = async () => {
@@ -237,12 +237,6 @@ export default function AppLayout() {
           if (status === "booked") {
             setQuery(RideConstants.query.RideBooked);
           
-            if (Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity)
-              dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
-            if (Number(ticketPaid?.quantity) == 1)
-              dispatch(
-                setState({ key: "differentTickets", value: [ticketPaid] })
-              );
             router.push(
               `/rideMap?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );
@@ -269,7 +263,7 @@ export default function AppLayout() {
       return;
     } else {
       const unnegotiatedTickets = ticketsDetails?.filter(
-        (ticket) => ticket?.ticketStatus == "idle"
+        (ticket) => ticket?.ticketStatus == "idle" || ticket?.ticketStatus == "declined"
       );
 
       if (unnegotiatedTickets.length > 0) {
@@ -418,23 +412,7 @@ export default function AppLayout() {
             showBottomSheet([500], <TripCompletedSheet />, true);
           }
           if (status === "booked") {
-            // router.setParams({ ...searchParams, query: "RideBooked" });
             setQuery(RideConstants.query.RideBooked);
-            // dispatch(
-            //   setState({
-            //     key: "sameTickets",
-            //     value: [returnedData?.ticketPaid],
-            //   })
-            // );
-            if (Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity)
-              dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
-            if (Number(ticketPaid?.quantity) == 1)
-              dispatch(
-                setState({ key: "differentTickets", value: ticketPaid })
-              );
-            // router.push(
-            //   `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
-            // );
             router.push(
               `/rideMap?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
             );
@@ -540,11 +518,9 @@ export default function AppLayout() {
             dispatch(
               setState({ key: "driverDetails", value: returnedData?.driver })
             );
-          // dispatch(setPaymentOptionsVisible(true));
-          // router.setParams({ ...searchParams, query: "RideBooked" });
           setQuery(RideConstants.query.RideBooked);
           showBottomSheet(
-            [100, 800],
+            [100, 400, 800],
             <RideBookedSheet rideId={selectedAvailableRideId as string} />,
             true
           );
@@ -594,35 +570,17 @@ export default function AppLayout() {
           showBottomSheet([500], <TripCompletedSheet />, true);
         }
         if (status === "booked") {
-          // router.setParams({ ...searchParams, query: "RideBooked" });
           setQuery(RideConstants.query.RideBooked);
-          // dispatch(
-          //   setState({
-          //     key: "sameTickets",
-          //     value: [returnedData?.ticketPaid],
-          //   })
-          // );
-          if (Number(ticketPaid?.quantity) > 1 || !ticketPaid?.quantity)
-            dispatch(setState({ key: "sameTickets", value: [ticketPaid] }));
-          if (Number(ticketPaid?.quantity) == 1)
-            dispatch(setState({ key: "differentTickets", value: ticketPaid }));
-          // router.push(
-          //   `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
-          // );
+         
           router.push(
             `/rideMap?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
           );
           showBottomSheet(
-            [100, 800],
+            [100,400, 800],
             <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
             true
           );
         }
-
-        // const rides = [returnedData?.ticketUnderBooking];
-        // if (rides) {
-        //   setFetchState((prev) => ({ ...prev, rides: rides as any }));
-        // }
       }
       else {
         notify({ msg });
