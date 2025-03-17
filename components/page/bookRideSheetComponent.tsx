@@ -123,7 +123,6 @@ function TicketDetailsSheet() {
     loading: false,
     gettingTicketdetails: false,
   });
-  const { loading, gettingTicketdetails } = fetchState;
 
   const [searchState, setSearchState] = useState<{
     loading: boolean;
@@ -571,15 +570,9 @@ function RideBookedSheet({ rideId }: { rideId: string }) {
     driverDetails,
     stateInput: { ticketsDetails },
   } = useAppSelector((state: RootState) => state.ride);
-  const { token, user } = useAppSelector((state: RootState) => state.user);
   const { hideBottomSheet, showBottomSheet } = useBottomSheet();
   const dispatch = useAppDispatch();
-  const { requestId } = useGlobalSearchParams();
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
-
-  console.log("====================================");
-  console.log({ ticketsDetails }, { oya: "naw" });
-  console.log("====================================");
 
   const [fetchState, setFetchState] = useState({
     loading: false,
