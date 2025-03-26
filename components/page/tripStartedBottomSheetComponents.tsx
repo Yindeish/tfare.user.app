@@ -91,7 +91,7 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 import { ITicketInput } from "@/state/types/ride";
 
 function TripStartedSheet() {
-  const { showBottomSheet } = useBottomSheet();
+  const { showBottomSheet, hideBottomSheet } = useBottomSheet();
   const { riderRideDetails, driverDetails, selectedAvailableRide, stateInput:{ticketsDetails} } =
     useAppSelector((state: RootState) => state.ride);
   const { token } = useAppSelector((state: RootState) => state.user);
@@ -201,11 +201,14 @@ function TripStartedSheet() {
         {/* Driver block */}
 
         <TouchableOpacity
-          onPress={() =>
+          onPress={() => {
+            hideBottomSheet();
+
             router.push(
               `/(sharedScreens)/driverProfile?currentRideId=${riderRideDetails?.currentRideId})` as Href
             )
-          }
+            setTimeout(() => showBottomSheet([100, 500], <TripStartedSheet />, true), 500);
+          }}
           style={[
             wFull,
             h(144),
@@ -375,9 +378,11 @@ function TripCompletedSheet() {
         {/* Driver block */}
 
         <TouchableOpacity
-          onPress={() =>
+          onPress={() => {
+            hideBottomSheet();
             router.push(`/(sharedScreens)/driverProfile?)` as Href)
-          }
+            setTimeout(() => showBottomSheet([100, 650], <TripCompletedSheet />), 500);
+          }}
           style={[
             wFull,
             h(144),

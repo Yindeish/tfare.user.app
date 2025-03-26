@@ -226,15 +226,18 @@ export default function AppLayout() {
           if (status === "started") {
             // router.setParams({ ...searchParams, query: "RideStarted" });
             setQuery(RideConstants.query.RideStarted);
-            router.push(
-              `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
-            );
+            // router.push(
+            //   `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+            // );
+            router.replace("/rideMap" as Href);
             showBottomSheet([100, 500], <TripStartedSheet />, true);
+            return;
           }
           if (status === "ended") {
             // router.setParams({ query: "RideEnded" });
             setQuery(RideConstants.query.RideEnded);
             showBottomSheet([500], <TripCompletedSheet />, true);
+            return
           }
           if (status === "booked") {
             setQuery(RideConstants.query.RideBooked);
@@ -263,7 +266,8 @@ export default function AppLayout() {
       return;
     } else {
       const unnegotiatedTickets = ticketsDetails?.filter(
-        (ticket) => ticket?.ticketStatus == "idle" || ticket?.ticketStatus == "declined"
+        (ticket) => ticket?.ticketStatus == "idle"
+        //  || ticket?.ticketStatus == "declined" // We don't want to include declined tickets
       );
 
       if (unnegotiatedTickets.length > 0) {
@@ -416,15 +420,18 @@ export default function AppLayout() {
           if (status === "started") {
             // router.setParams({ ...searchParams, query: "RideStarted" });
             setQuery(RideConstants.query.RideStarted);
-            router.push(
-              `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
-            );
+            // router.push(
+            //   `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+            // );
+            router.replace("/rideMap" as Href);
             showBottomSheet([100, 500], <TripStartedSheet />, true);
+            return;
           }
           if (status === "ended") {
             // router.setParams({ query: "RideEnded" });
             setQuery(RideConstants.query.RideEnded);
             showBottomSheet([500], <TripCompletedSheet />, true);
+            return;
           }
           if (status === "booked") {
             setQuery(RideConstants.query.RideBooked);
@@ -575,15 +582,18 @@ export default function AppLayout() {
         if (status === "started") {
           // router.setParams({ ...searchParams, query: "RideStarted" });
           setQuery(RideConstants.query.RideStarted);
-          router.push(
-            `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
-          );
+          // router.push(
+          //   `/(rideScreens)/bookRide?selectedAvailableRideId=${returnedData?.riderRide?.currentRideId}&requestId=${returnedData?.riderRide?._id}`
+          // );
+          router.replace("/rideMap" as Href);
           showBottomSheet([100, 500], <TripStartedSheet />, true);
+          return;
         }
         if (status === "ended") {
           // router.setParams({ query: "RideEnded" });
           setQuery(RideConstants.query.RideEnded);
           showBottomSheet([500], <TripCompletedSheet />, true);
+          return;
         }
         if (status === "booked") {
           setQuery(RideConstants.query.RideBooked);
@@ -596,6 +606,7 @@ export default function AppLayout() {
             <RideBookedSheet rideId={returnedData?.riderRide?._id} />,
             true
           );
+          return;
         }
       }
       else {

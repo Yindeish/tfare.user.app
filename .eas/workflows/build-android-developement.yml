@@ -1,0 +1,13 @@
+name: apk developement build
+
+on:
+  push:
+    branches: ['rt_events_streamlined']
+
+jobs:
+  build_apk:
+    name: Build apk
+    type: build
+    params:
+      platform: android
+      profile: development

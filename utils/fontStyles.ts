@@ -4,7 +4,7 @@ import { TextStyle } from "react-native";
 
 export const fontStyles: Record<string, TextStyle> = {
     neurialGrotesk: {
-        fontFamily: fonts.neurialGrotesk
+        // fontFamily: fonts.neurialGrotesk
     },
     fw400: {
         fontWeight: '400'

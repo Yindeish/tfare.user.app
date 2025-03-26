@@ -58,3 +58,10 @@ Join our community of developers creating universal apps.
 2. eas update --channel preview --platform android --message 'preview updates for android'
 
 <!-- Updates -->
+
+<!-- Workflows -->
+## APK Preview Build
+# eas workflow:run build-android-preview.yml
+## APK Developement Build
+# eas workflow:run build-android-development.yml
+<!-- Workflows -->

@@ -269,9 +269,10 @@ const RecentLocationsSnippet = () => {
               style={[
                 fs14,
                 fw500,
+                colorBlack,
                 h(20) as TextStyle,
                 {
-                  color: Colors.light.textGrey,
+                  // color: Colors.light.textGrey,
                   borderColor: colors.transparent,
                   borderWidth: 0,
                   flex: 0.8,
@@ -440,9 +441,10 @@ const RecentLocationsSnippet = () => {
               style={[
                 fs14,
                 fw500,
+                colorBlack,
                 h(20) as TextStyle,
                 {
-                  color: Colors.light.textGrey,
+                  // color: Colors.light.textGrey,
                   borderColor: colors.transparent,
                   borderWidth: 0,
                   flex: 0.8,

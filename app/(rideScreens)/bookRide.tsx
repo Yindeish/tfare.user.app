@@ -8,7 +8,7 @@ import {
   Platform,
 } from "react-native";
 import { Text } from "react-native-paper";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import SafeScreen from "@/components/shared/safeScreen";
 import {
   absolute,
@@ -166,15 +166,37 @@ export default function BookRide() {
   );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const tripCost = ticketsDetails?.reduce(
-    (prev, current) => prev + Number(current?.rideFee),
-    0
-  );
+  // const tripCost = ticketsDetails
+  // ?.filter((ticket) => ticket?.ticketStatus !== 'declined' || ticket?.ticketStatus !== 'pending' as any)
+  // ?.reduce(
+  //   (prev, current) => prev + Number(current?.rideFee),
+  //   0
+  // );
+  const [tripCost, setTripCost] = useState(ticketsDetails[0]?.rideFee || 0);
   const serviceFee = Number(ticketsDetails[0]?.serviceFee);
-  const totalCost = Number(tripCost) + serviceFee;
+  const [totalCost, setTotalCost] = useState(Number(tripCost) + serviceFee);
 
   useEffect(() => {
-    selectedAvailableRide?.route && dispatch(setState({key:'currentRoute', value: selectedAvailableRide?.route}));
+    const validTickets = ticketsDetails?.filter(
+      (ticket) =>
+        ticket?.ticketStatus !== "declined" &&
+        ticket?.ticketStatus !== "pending"
+    );
+
+    const newTripCost = validTickets?.reduce(
+      (prev, current) => prev + Number(current?.rideFee),
+      0
+    );
+
+    setTripCost(newTripCost);
+    setTotalCost(newTripCost + serviceFee);
+  }, [ticketsDetails]); 
+
+  useEffect(() => {
+    selectedAvailableRide?.route &&
+      dispatch(
+        setState({ key: "currentRoute", value: selectedAvailableRide?.route })
+      );
   }, [currentRoute, selectedAvailableRide]);
 
   const selectNumberOfTickets = (ticketNumber: number) => {
@@ -298,10 +320,10 @@ export default function BookRide() {
           title="Book Ride"
           color={{ icon: Colors.light.textGrey, text: colors.black }}
           onPress={() => {
-            if(ticketsDetails?.length > 1) return;
-            
-            router.push(`/${pages.availableRides}` as Href)}
-          }
+            if (ticketsDetails?.length > 1) return;
+
+            router.push(`/${pages.availableRides}` as Href);
+          }}
           view={false}
         />
         {/* Page Title */}
