@@ -29,7 +29,7 @@ export default function PaymentOptions() {
     const { rideId } = useLocalSearchParams();
     const { showBottomSheet } = useBottomSheet();
     const {wallet} = useAppSelector((state: RootState) => state.user)
-    const {stateInput:{paymentOptionInput}} = useAppSelector((state: RootState) => state.ride)
+    const {currentRoute: route,stateInput:{paymentOptionInput}} = useAppSelector((state: RootState) => state.ride)
 
 
     return (
@@ -40,7 +40,32 @@ export default function PaymentOptions() {
 
                     <View style={[wFull, flexCol, gap(24)]}>
 
-                        <PaymentOptionsListTile
+                        {
+                        route?.allowedPaymentOptions
+                        ?.map((option) => {
+                            if(option === 'wallet') return {name: option, label: option}
+                            if(option === 'cash') return {name: option, label: option}
+                            if(option === 'online') return {name: 'bank-transfer', label: option }
+                            if(option === 'point') return {name: option, label: option }
+                            else return {name: option, label: option}
+                        })
+                        ?.map(({label, name}, key) => (
+                            <PaymentOptionsListTile
+                            input={{
+                                onChange: (val: string) => {
+                                    dispatch(setStateInputField({key:'paymentOptionInput', value: name}))
+                                },
+                                value: label,
+                                condition: paymentOptionInput == name
+                            }}
+                            // title='Wallet'
+                            title={label}
+                            subTitle={`Balance: ₦${wallet?.balance || '0000.00'}`}
+                            key={key}
+                        />
+                        ))}
+
+                        {/* <PaymentOptionsListTile
                             input={{
                                 onChange: (val: string) => {
                                     dispatch(setStateInputField({key:'paymentOptionInput', value: 'wallet'}))
@@ -74,7 +99,7 @@ export default function PaymentOptions() {
                             }}
                             title='Pay online'
                             subTitle={`Pay with third party`}
-                        />
+                        /> */}
                     </View>
 
                     <View style={[wFull, mt('97%'), {opacity: paymentOptionInput != ''?1:0.5}]}>

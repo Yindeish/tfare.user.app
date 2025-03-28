@@ -6,6 +6,7 @@ type TLoadingType = string;
 type TCurrentrideView = "orderRide" | "availableRides";
 type TActiveTab = "pending" | "completed" | "cancelled";
 type TCounterFareStatus = "idle" | "pending" | "accepted" | "rejected";
+type TAllowedPaymentOptions = "cash" | "online" | "wallet" | "point";
 
 type TBusStop = "pickupBusstop" | "dropoffBusstop";
 export type TPlanName = "standard" | "premium";
@@ -25,9 +26,19 @@ export type TRideStatus =
   export type TTicketInputSatus = 'idle' | 'pending' | 'accepted' | 'paid' | 'booked' | 'declined';
 
 export interface IRoute {
-  routeName: string;
-  routeDesc: string;
-  routeDistance: string;
+  // routeName: string;
+  // routeDesc: string;
+  // routeDistance: string;
+  _id: string;
+  pickupBusstop: IBusStop;
+  dropoffBusstop: IBusStop;
+  inTripDirection: "forward" | "backward";
+  city: ICity;
+  inTripDropoffs: IBusStop[],
+  unitFares: IUnitFare[];
+  editable: boolean;
+  active: boolean;
+  allowedPaymentOptions: TAllowedPaymentOptions[];
 }
 
 export interface ICity {
@@ -56,23 +67,24 @@ export interface IUnitFare {
   _id: string;
 }
 
-export interface IRoute {
-  _id: string;
-  // pickupBusstopId: string;
-  // dropoffBusstopId: string;
-  pickupBusstop: IBusStop;
-  dropoffBusstop: IBusStop;
-  rideDirection: "forward" | "backward";
-  inTripDropoffsIds?: string[];
-  inTripDropoffs?: {
-    name: string;
-    city: ICity;
-    order: number;
-    plan: IPlan;
-    _id: string;
-  }[];
-  unitFares?: IUnitFare[]
-}
+// export interface IRoute {
+//   // _id: string;
+//   // pickupBusstopId: string;
+//   // dropoffBusstopId: string;
+//   ///^^^^^^^************
+//   // pickupBusstop: IBusStop;
+//   // dropoffBusstop: IBusStop;
+//   // rideDirection: "forward" | "backward";
+//   // inTripDropoffsIds?: string[];
+//   // inTripDropoffs?: {
+//   //   name: string;
+//   //   city: ICity;
+//   //   order: number;
+//   //   plan: IPlan;
+//   //   _id: string;
+//   // }[];
+//   // unitFares?: IUnitFare[]
+// }
 
 export interface IRecentBusStop {
   userId: string;
