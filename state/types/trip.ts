@@ -1,4 +1,5 @@
 import { IDriverDetails } from "./driver";
+import { IBusStop, IPlan, IRide, IRiderRideDetails, IRoute, IUnitFare, TTicketInputSatus } from "./ride";
 import { IUser } from "./user";
 
 type TLoadingStatus = "idle" | "succeeded" | "failed";
@@ -22,43 +23,9 @@ export type TRideStatus =
   | "booked"
   | "ended";
 
-// export interface IRoute {
-//   routeName: string;
-//   routeDesc: string;
-//   routeDistance: string;
-// }
-
-export interface IBusStop {
-  _id?: string;
-  name: string;
-  order?: {
-    forward: { number: number };
-    backward: { number: number };
-  };
-  category?: {
-    origin: TCategoryOrigin;
-    destination: TCategoryDestination;
-  };
-}
-
 export interface ISavedBusStop {
   userId: string;
   busstopTitle: string;
-  busStop: IBusStop;
-}
-
-export interface IRoute {
-  _id: string;
-  // pickupBusstopId: string;
-  // dropoffBusstopId: string;
-  pickupBusstop: IBusStop;
-  dropoffBusstop: IBusStop;
-  rideDirection: "forward" | "backward";
-  inTripDropoffsIds: string[];
-}
-
-export interface IRecentBusStop {
-  userId: string;
   busStop: IBusStop;
 }
 
@@ -69,15 +36,19 @@ export interface ILoading {
 
 export interface ITicketInput {
   id?: string;
-  owner?: {};
-  ticketOtp: string;
-  pickupBusstop?: IBusStop | null;
-  dropoffBusstop?: IBusStop | null;
-  time?: string;
-  sameAsFirstTicket?: boolean;
-  number: number;
-  userCounterFare?: number | null;
-  rideFee?: number;
+    ticketOtp: string;
+    pickupBusstop?: IBusStop | null;
+    dropoffBusstop?: IBusStop | null;
+    time?: string;
+    sameAsFirstTicket?: boolean;
+    number: number;
+    userCounterFare?: number | null;
+    rideFee?: number;
+    serviceFee?: number;
+    ticketStatus?: TTicketInputSatus;
+    unitFare?: IUnitFare;
+    rideId?: string;
+    quantity?: number;
 }
 
 export interface ITicket {
@@ -107,18 +78,6 @@ export interface IStateInput {
 }
 // ? Ride
 
-export interface IPlan {
-  routeId: string;
-  planName: TPlanName;
-  vehicleSeats: number;
-  ride?: {
-    rideFee: number;
-  };
-  trip?: {
-    tripFee: number;
-  };
-}
-
 export interface ICurrentTrip {
   _id: string;
   driverId: string;
@@ -133,50 +92,6 @@ export interface ICurrentTrip {
   route?: IRoute;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface IRiderRideDetails {
-  _id: string;
-  pickupBusstop: IBusStop;
-  dropoffBusstop: IBusStop;
-  riderId: string;
-  ticketsIds: string[];
-  duration: string;
-  ridePlan: IPlan;
-  rideStatus: TRideStatus;
-  riderCounterOffer: number;
-  currentTripId: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface IRide {
-  _id?: string;
-  pickupBusstop: IBusStop;
-  dropoffBusstop: IBusStop;
-  saved: boolean;
-  tickets?: ITicketInput[] | [];
-  status: "idle" | "cancelled" | "accepted" | "started";
-  duration?: string;
-  availableSeats?: number;
-  seats?: number;
-  driverDetails?: IDriverDetails;
-  busStops?: IBusStop[] | [];
-}
-
-export interface IPlan {
-  routeId: string;
-  plan: {
-    ride: {
-      rideFee: number;
-    };
-    planName: "standard";
-    serviceFee: number;
-    riderTolerance: number;
-    driverTolerance: number;
-    vehicleSeats: number;
-    _id: string;
-  };
 }
 
 export interface ITripState {
@@ -202,12 +117,18 @@ export interface ITripState {
   currentTicket: ITicketInput | null;
   counterFareStatus: TCounterFareStatus;
   allTicketsFilled: boolean;
+  ticketsInputs: ITicketInput[];
+  paymentOptionInput: string;
+  pickupBusstopInput: IBusStop | null;
+  dropoffBusstopInput: IBusStop | null;
   ticketDetailsShown: boolean;
   duration: { text: string; value: string } | null;
   price: string;
   seats: number[];
   ridePlans: IPlan[];
   paymentOptionsVisible: boolean;
+  currentTrip: null | ICurrentTrip;
+  route: IRoute | null;
 }
 // ? Ride
 

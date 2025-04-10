@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ESlicesNames } from "../enums/slicesNames";
-import { IBusStop, ICurrentTrip, ILoading, IRide, IRiderRideDetails, ITripState, IStateInput, ITicketInput, TActiveTab, TCounterFareStatus, TCurrentrideView, } from "../types/trip";
+import { ICurrentTrip, ILoading, ITripState, IStateInput, ITicketInput, TActiveTab, TCounterFareStatus, TCurrentrideView, } from "../types/trip";
+import { IBusStop, IRide, IRiderRideDetails } from "../types/ride";
 
 
 const initialState: ITripState = {
@@ -44,19 +45,24 @@ const initialState: ITripState = {
     },
     counterFareStatus: 'idle',
     allTicketsFilled: false,
+    ticketsInputs: [],
     duration: null,
     price: '',
     seats: [],
     ridePlans: [],
     paymentOptionsVisible: false,
-
+    paymentOptionInput: '',
+    dropoffBusstopInput: null,
+    pickupBusstopInput: null,
+    currentTrip: null,
+    route: null,
 }
 
 const RideSlice = createSlice({
     name: ESlicesNames.ride,
     initialState,
     reducers: {
-        setState: (state, action: PayloadAction<{ key: keyof ITripState, value: any }>) => {
+        setTripState: (state, action: PayloadAction<{ key: keyof ITripState, value: any }>) => {
             const { key, value } = action.payload;
             state[key] = value as never;
         },
@@ -121,7 +127,6 @@ const RideSlice = createSlice({
                     const newTicket: ITicketInput = {
                         dropoffBusstop: (val + 1) === 1 ? state.stateInput.dropoffBusstopInput : null, // setting the first ticket to use the underlying credentials
                         pickupBusstop: (val + 1) === 1 ? state.stateInput.pickupBusstopInput : null, // setting the first ticket to use the underlying credentials
-                        owner: {},
                         ticketOtp: '',
                         sameAsFirstTicket: (val + 1) === 1 ? true : false, // setting the first ticket to use the underlying credentials
                         number: val + 1,
@@ -235,7 +240,7 @@ const RideSlice = createSlice({
 })
 
 export const {
-    setState, setPaymentOptionsVisible,
+    setTripState, setPaymentOptionsVisible,
     setLoading, setCurrentRideView,
     setAvailableRides, setUserRideInput,
     setUserRide, setSearchMatchBusstops,

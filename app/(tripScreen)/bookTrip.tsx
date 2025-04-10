@@ -1,218 +1,341 @@
-import { Image, View, TouchableOpacity, ScrollView, FlatList, StyleSheet } from 'react-native'
-import { Text, } from 'react-native-paper'
-import React, { useEffect } from 'react'
-import SafeScreen from '@/components/shared/safeScreen'
-import { image, imgAbsolute, mYAuto, wHFull } from '@/utils/imageStyles'
-import { absolute, b, bg, borderGrey, borderL, borderR, flex, flexCenter, flexCol, gap, h, itemsCenter, justifyBetween, justifyCenter, l, maxh, mb, ml, mr, mt, my, p, pb, pl, px, py, relative, rounded, w, wFull, zIndex } from '@/utils/styles'
-import Colors, { colors } from '@/constants/Colors'
-import PaddedScreen from '@/components/shared/paddedScreen'
-import { images } from '@/constants/images'
-import { c, colorBlack, colorWhite, fs12, fs14, fw400, fw500, fw700, neurialGrotesk } from '@/utils/fontStyles'
-import { Href, router } from 'expo-router'
-import PageTitle from '@/components/shared/pageTitle'
-import TripBlock from '@/components/shared/tripBlock';
-import CtaBtn from '@/components/shared/ctaBtn';
-import { useBottomSheet } from '@/contexts/useBottomSheetContext';
-import { useLocalSearchParams } from 'expo-router'
-import { pages } from '@/constants/pages'
-import RideSelectors from '@/state/selectors/ride'
-import { useAppDispatch } from '@/state/hooks/useReduxToolkit'
-import { createTicket, setAllTicketsFilled, setCurrentNumberOfTickets, } from '@/state/slices/ride'
-import Ticket from '@/components/page/ticket'
-import { indices } from '@/constants/zIndices'
-import { Ionicons } from '@expo/vector-icons'
-import BuyTicketListTile from '@/components/page/buyTicketListTile'
-import { TripBookedSheet } from '@/components/page/bookTripSheetComponent'
+import {
+  Image,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+  StyleSheet,
+  Platform,
+  ViewStyle,
+} from "react-native";
+import { Text } from "react-native-paper";
+import React, { useEffect, useState } from "react";
+import SafeScreen from "@/components/shared/safeScreen";
+import { image, imgAbsolute, mYAuto, wHFull } from "@/utils/imageStyles";
+import {
+  absolute,
+  b,
+  bg,
+  borderGrey,
+  borderL,
+  borderR,
+  flex,
+  flexCenter,
+  flexCol,
+  gap,
+  h,
+  itemsCenter,
+  justifyBetween,
+  justifyCenter,
+  l,
+  maxh,
+  mb,
+  ml,
+  mr,
+  mt,
+  my,
+  p,
+  pb,
+  pl,
+  px,
+  py,
+  relative,
+  rounded,
+  w,
+  wFull,
+  zIndex,
+} from "@/utils/styles";
+import Colors, { colors } from "@/constants/Colors";
+import PaddedScreen from "@/components/shared/paddedScreen";
+import { images } from "@/constants/images";
+import {
+  c,
+  colorBlack,
+  colorWhite,
+  fs12,
+  fs14,
+  fw400,
+  fw500,
+  fw700,
+  neurialGrotesk,
+} from "@/utils/fontStyles";
+import { Href, router, useGlobalSearchParams, usePathname } from "expo-router";
+import PageTitle from "@/components/shared/pageTitle";
+import TripBlock from "@/components/shared/tripBlock";
+import CtaBtn from "@/components/shared/ctaBtn";
+import { useBottomSheet } from "@/contexts/useBottomSheetContext";
+import { useLocalSearchParams } from "expo-router";
+import { pages } from "@/constants/pages";
+import RideSelectors from "@/state/selectors/ride";
+import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
+import {
+  createTicket,
+  setAllTicketsFilled,
+  setCurrentNumberOfTickets,
+} from "@/state/slices/ride";
+import { indices } from "@/constants/zIndices";
+import { Ionicons } from "@expo/vector-icons";
+import BuyTicketListTile from "@/components/page/buyTicketListTile";
+import { TripBookedSheet } from "@/components/page/bookTripSheetComponent";
+import { RootState } from "@/state/store";
+import { useStorageState } from "@/hooks/useStorageState";
+import { RideConstants } from "@/constants/ride";
+import usePreventGoBack from "@/hooks/usePreventGoBack";
+import * as Location from "expo-location";
+import { ITicketInput } from "@/state/types/trip";
+import { setTripState } from "@/state/slices/trip";
+import * as Device from "expo-device";
+import { openURL } from "expo-linking";
+import { RideBookedSheet } from "@/components/page/bookRideSheetComponent";
+import {
+  TripCompletedSheet,
+  TripStartedSheet,
+} from "@/components/page/tripStartedBottomSheetComponents";
+import Spinner from "@/components/shared/spinner";
+import tw from "@/constants/tw";
+import Ticket from "@/components/tab/trip/ticket";
+import BookSeatSheet from "@/components/page/bookSeatSheet";
+import PaymentOptions from "@/components/tab/trip/paymentOptions";
 
-
-const { sharedStyle, availableSeatStyle, selectedSeatStyle, unavailableSeatStyle } = StyleSheet.create({
-    sharedStyle: {
-        ...w(45), ...h(45), ...rounded(100), ...flex, ...itemsCenter, ...justifyCenter,
-        borderWidth: 0.7, borderColor: Colors.light.border
-    },
-    availableSeatStyle: {
-        ...bg('#F9F7F8'),
-    },
-    unavailableSeatStyle: {
-        ...bg(Colors.light.border)
-    },
-    selectedSeatStyle: {
-        ...bg(Colors.light.background)
-    }
+const {
+  sharedStyle,
+  availableSeatStyle,
+  selectedSeatStyle,
+  unavailableSeatStyle,
+} = StyleSheet.create({
+  sharedStyle: {
+    ...w(45),
+    ...h(45),
+    ...rounded(100),
+    ...flex,
+    ...itemsCenter,
+    ...justifyCenter,
+    borderWidth: 0.7,
+    borderColor: Colors.light.border,
+  },
+  availableSeatStyle: {
+    ...bg("#F9F7F8"),
+  },
+  unavailableSeatStyle: {
+    ...bg(Colors.light.border),
+  },
+  selectedSeatStyle: {
+    ...bg(Colors.light.background),
+  },
 });
 
 function BookTrip() {
-    const { rideId } = useLocalSearchParams();
+  const { rideId, currentTripId, requestId } = useGlobalSearchParams();
+  const dispatch = useAppDispatch();
+  const {
+    riderRideDetails: riderRide,
+    ridePlans,
+    route,
+    ticketsInputs,
+    currentTrip,
+    allTicketsFilled,
+    currentNumberOfTickets,
+    paymentOptionInput,
+  } = useAppSelector((state: RootState) => state.trip);
+  const path = usePathname();
+  const { showBottomSheet, hideBottomSheet } = useBottomSheet();
+  const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
-    const { showBottomSheet } = useBottomSheet()
-    const dispatch = useAppDispatch();
-    const { userRide, allTicketsFilled, stateInput: { pickupBusstopInput, dropoffBusstopInput }, currentNumberOfTickets } = RideSelectors()
+  usePreventGoBack(Number(ticketsInputs?.length) > 1);
 
-    // create a single ticket based on the default number of tickets
-    useEffect(() => {
-        if (currentNumberOfTickets === 1) {
-            dispatch(createTicket({ currentNumberOfTickets: 1 }))
-        }
-    }, [currentNumberOfTickets])
-    // create a single ticket based on the default number of tickets
+  const [fetchState, setFetchState] = useState({
+    loading: false,
+    msg: "",
+    code: null,
+    rides: [],
+  });
+  const { code, msg, loading, rides } = fetchState;
 
-    const selectNumberOfTickets = (ticketNumber: number) => {
-        dispatch(setCurrentNumberOfTickets(ticketNumber))
+  const [tripCost, setTripCost] = useState(ticketsInputs[0]?.rideFee || 0);
+  const serviceFee = Number(ticketsInputs[0]?.serviceFee);
+  const [totalCost, setTotalCost] = useState(Number(tripCost) + serviceFee);
 
-        dispatch(createTicket({ currentNumberOfTickets: ticketNumber }))
+  const ticketAddable = () => {
+    const totalQuantitiesSelected = ticketsInputs
+      // .filter((ticket) => ticket?.ticketStatus !== "accepted")
+      .reduce(
+        (accumulator, ticket) => accumulator + Number(ticket?.quantity),
+        0
+      );
+    const availableSeats = Number(currentTrip?.availableSeats);
+
+    return totalQuantitiesSelected < availableSeats;
+  };
+
+  //   Automatic book sheet popup
+  useEffect(() => {
+    if (ticketsInputs.length == 0) {
+        showBottomSheet([300, 700], <BookSeatSheet />)
     }
+  }, []);
+  //   Automatic book sheet popup
 
-    // check if all tickets have been filled
-    // useEffect(() => {
-    //     if (userRide && userRide?.ticket) {
-    //         const allTciketsFilled = userRide?.tickets.every(ticket =>
-    //             ticket.dropoffBusstop && ticket.dropoffBusstop &&
-    //             ticket.dropoffBusstop.routeName !== '' && ticket.dropoffBusstop.routeName !== '');
+  //   Updating Trip cost, Total cost, and ServiceFee
+  useEffect(() => {
+    const validTickets = ticketsInputs?.filter(
+      (ticket) =>
+        ticket?.ticketStatus !== "declined" &&
+        ticket?.ticketStatus !== "pending"
+    );
 
-    //         if (allTciketsFilled) dispatch(setAllTicketsFilled(true))
-    //         else dispatch(setAllTicketsFilled(false))
-    //     }
-    // }, [userRide?.tickets])
-    // check if all tickets have been filled
+    const newTripCost = validTickets?.reduce(
+      (prev, current) => prev + Number(current?.rideFee),
+      0
+    );
 
+    setTripCost(newTripCost);
+    setTotalCost(newTripCost + serviceFee);
+  }, [ticketsInputs]);
+  //   Updating Trip cost, Total cost, and ServiceFee
 
-    return (
-        <SafeScreen>
-            <ScrollView style={[]}>
-                {/* //!Page Header */}
-                <PaddedScreen>
+  //   Updating route with respect to the Current trip
+  useEffect(() => {
+    currentTrip?.route &&
+      dispatch(setTripState({ key: "route", value: currentTrip?.route }));
+  }, [route, currentTrip]);
+  //   Updating route with respect to the Current trip
 
-                    <PageTitle
-                        title='Book Trip'
-                        onPress={() => router.back()}
+  // Updating buy Ticket btn with allTicketsFilled
+  useEffect(() => {
+    dispatch(
+      setTripState({
+        key: "booking",
+        value:
+          allTicketsFilled && path === ("/(tripScreens)/bookTrip" as Href)
+            ? true
+            : false,
+      })
+    );
+  }, [allTicketsFilled, path]);
+  // Updating buy Ticket btn with allTicketsFilled
+
+  useEffect(() => {
+    if (Number(ticketsInputs?.length) > 0) {
+      const allTciketsFilled = ticketsInputs?.every(
+        (ticket) => ticket.dropoffBusstop && ticket.dropoffBusstop
+      );
+      if (allTciketsFilled) {
+        dispatch(setAllTicketsFilled(true));
+        dispatch(setTripState({ key: "booking", value: true }));
+      } else {
+        dispatch(setAllTicketsFilled(false));
+        dispatch(setTripState({ key: "booking", value: false }));
+      }
+    }
+  }, [ticketsInputs]);
+  // check if all tickets have been filled
+
+  // !BottomSheets
+  useEffect(() => {
+    if (query === RideConstants.query.RideBooked)
+      showBottomSheet(
+        [100, 800],
+        <RideBookedSheet rideId={riderRide?._id as string} />,
+        true
+      );
+    if (query === RideConstants.query.RideStarted)
+      showBottomSheet([100, 500], <TripStartedSheet />, true);
+    if (query === RideConstants.query.RideEnded)
+      showBottomSheet([100, 650], <TripCompletedSheet />, true);
+    if (query === RideConstants.query.RideDeclined)
+      showBottomSheet(
+        [300],
+        <View>
+          <Text>Trip Declined</Text>
+        </View>,
+        true
+      );
+  }, [query]);
+  // !BottomSheets
+
+  useEffect(() => {console.log({ticketsInputs})}, [ticketsInputs])
+
+  return (
+    <SafeScreen>
+      <ScrollView
+        style={[wHFull, relative, { overflow: "scroll" }] as ViewStyle[]}
+      >
+        {/* //!Trip Block */}
+        <TripBlock />
+        {/* //!Trip Block */}
+
+        <View
+          style={[wHFull, flexCol, gap(32), mb(150)] as ViewStyle[]}
+        >
+          <PaddedScreen>
+            {/* Ticket */}
+            <FlatList
+              horizontal={false}
+              data={ticketsInputs}
+              renderItem={({ index, item: ticketId }) => (
+                <Ticket ticket={ticketId} index={index} key={index} />
+              )}
+            />
+            {/* Ticket */}
+
+            {/* Add another ticket btn */}
+
+            {/* 5 is the seats (total) and 3 is the available seats */}
+            {
+              // currentNumberOfTickets <
+              //   Number(currentTrip?.availableSeats)
+              ticketAddable() && (
+                <TouchableOpacity
+                  onPress={() =>
+                    showBottomSheet([300, 700], <BookSeatSheet />)
+                  }
+                >
+                  <View
+                    style={[
+                      w("50%"),
+                      h(50),
+                      mt(32),
+                      rounded(100),
+                      flex,
+                      itemsCenter,
+                      justifyCenter,
+                      gap(10),
+                      bg(Colors.light.background),
+                    ]}
+                  >
+                    <Image
+                      style={[image.w(20), image.h(20)]}
+                      source={images.waitChairImage}
                     />
 
-                </PaddedScreen>
-                {/* //!Page Header */}
+                    <Text style={[neurialGrotesk, fw500, fs12, colorWhite]}>
+                      {ticketsInputs.length == 0 ? 'Add a ticket': 'Add another ticket'}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )
+            }
 
-                {/* //!Trip Block */}
-                <TripBlock />
-                {/* //!Trip Block */}
+            {/* Add another ticket btn */}
 
-                {/* //! */}
-                <PaddedScreen>
+            {/* Shows when all the tickets have been filled (counter fare are optional) */}
 
-                    <FlatList
-                        horizontal={false}
-                        // data={userRide?.tickets}
-                        data={[]}
-                        renderItem={({ index, item: ticket }) => (
-                            <Ticket ticket={ticket} index={index} key={index} />
-                        )}
-                    />
+            {/* Shows when buy ticket cta btn is clicked */}
 
-                    {/* Add another ticket btn */}
+            {/* Payment options */}
 
-                    {/* 5 is the seats (total) and 3 is the available seats */}
-                    {currentNumberOfTickets < 3 && <TouchableOpacity onPress={() => {
-                        dispatch(setCurrentNumberOfTickets(currentNumberOfTickets + 1))
-                        dispatch(createTicket({ currentNumberOfTickets: currentNumberOfTickets + 1 }))
-                    }}>
-                        <View style={[w('50%'), h(50), mt(32), rounded(100), flex, itemsCenter, justifyCenter, gap(10), bg(Colors.light.background)]}>
-                            <Image style={[image.w(20), image.h(20)]} source={images.waitChairImage} />
+            {allTicketsFilled && <PaymentOptions />}
 
-                            <Text style={[neurialGrotesk, fw500, fs12, colorWhite]}>Add another ticket</Text>
-                        </View>
-                    </TouchableOpacity>}
+            {/* Payment options */}
 
-                    {/* Add another ticket btn */}
-
-                    {/* Shows when all the tickets have been filled (counter fare are optional) */}
-                    {/* Buy Ticket Btn */}
-
-                    {allTicketsFilled && <View style={[absolute, zIndex(indices.xHigh), b('30%'), l(20), wFull]}>
-                        <CtaBtn
-                            img={{
-                                src: images.whiteBgTicketImage,
-                                w: 22, h: 14
-                            }}
-                            onPress={() => showBottomSheet([700], <TripBookedSheet rideId='1' />)}
-                            text={{
-                                name: 'Buy Ticket',
-                                color: colors.white
-                            }}
-                            bg={{
-                                color: Colors.light.background
-                            }}
-                        />
-                    </View>}
-
-                    {/* Buy Ticket Btn */}
-
-                    {/* Shows when buy ticket cta btn is clicked */}
-
-                    {/* Payment options */}
-
-                    <View style={[wFull, flexCol, gap(16), mt(32), mb(30)]}>
-                        <View style={[wFull, flexCol, gap(16), pb(16), { borderBottomColor: Colors.light.border, borderBottomWidth: 0.7 }]}>
-
-                            <TouchableOpacity
-                                onPress={() => {
-                                    router.push(`/(tripScreen)/paymentOptions/1` as Href)
-                                }}
-                                style={[wFull, flex, justifyBetween, itemsCenter]}>
-                                <Text style={[neurialGrotesk, fs14, fw700, colorBlack]}>Pay with</Text>
-
-                                <View style={[flex, gap(16), itemsCenter]}>
-                                    <Text style={[neurialGrotesk, fw400, fs14, colorBlack]}>Wallet</Text>
-
-                                    <Ionicons name="chevron-forward" size={20} color={Colors.light.textGrey} />
-                                </View>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity style={[wFull, flex, justifyBetween, itemsCenter]}>
-                                <Text style={[neurialGrotesk, fs14, fw700, c(Colors.light.border)]}>Offers</Text>
-
-                                <View style={[flex, gap(16), itemsCenter]}>
-                                    <Text style={[neurialGrotesk, fw400, fs14, c(Colors.light.border)]}>Unavailable</Text>
-
-                                    <Ionicons name="chevron-forward" size={20} color={Colors.light.border} />
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={[wFull, flexCol, gap(16), pb(16), { borderBottomColor: Colors.light.border, borderBottomWidth: 0.7 }]}>
-                            <BuyTicketListTile
-                                leadingText='Trip ID'
-                                trailing={{
-                                    text: '#1234567ABC',
-                                }}
-                            />
-                            <BuyTicketListTile
-                                leadingText='Trip Cost'
-                                trailing={{
-                                    text: ' ₦ 500.00',
-                                }}
-                            />
-                            <BuyTicketListTile
-                                leadingText='Discount'
-                                trailing={{
-                                    text: ' ₦ 0000.00',
-                                }}
-                            />
-                        </View>
-
-                        <BuyTicketListTile
-                            leadingText='Total'
-                            trailing={{
-                                text: ' ₦ 500.00',
-                            }}
-                        />
-                    </View>
-
-                    {/* Payment options */}
-                </PaddedScreen>
-                {/* //! */}
-
-            </ScrollView>
-
-        </SafeScreen>
-    )
+            {/* Loading Spinner */}
+            <Spinner visible={loading} />
+            {/* Loading Spinner */}
+          </PaddedScreen>
+        </View>
+      </ScrollView>
+    </SafeScreen>
+  );
 }
 
 export default BookTrip;

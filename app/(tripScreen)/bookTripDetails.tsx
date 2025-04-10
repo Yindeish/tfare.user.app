@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { ActivityIndicator, Button, Snackbar, Text } from "react-native-paper";
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import SafeScreen from "@/components/shared/safeScreen";
 import { image, imgAbsolute, mYAuto, wHFull } from "@/utils/imageStyles";
 import {
@@ -58,7 +58,7 @@ import {
   fw700,
   neurialGrotesk,
 } from "@/utils/fontStyles";
-import { Href, router } from "expo-router";
+import { Href, router, useNavigation } from "expo-router";
 import PageTitle from "@/components/shared/pageTitle";
 import TripBlock from "@/components/shared/tripBlock";
 import InTripDropoffTile from "@/components/page/inTripDropoffsTile";
@@ -67,75 +67,40 @@ import { useBottomSheet } from "@/contexts/useBottomSheetContext";
 import BookSeatSheet from "@/components/page/bookSeatSheet";
 import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
 import { RootState } from "@/state/store";
+import tw from "@/constants/tw";
 
 const { height } = Dimensions.get("window");
 
 function TripDetails() {
   const { showBottomSheet } = useBottomSheet();
   const dispatch = useAppDispatch();
-  const { selectedAvailableTrip } = useAppSelector(
+  const { currentTrip, route, driverDetails } = useAppSelector(
     (state: RootState) => state.trip
   );
+
 
   return (
     <SafeScreen>
       <ScrollView style={[]}>
-        {/* //!Page Header */}
-        <PaddedScreen>
-          <View style={[flex, justifyBetween, itemsCenter, w("100%")]}>
-            <View style={[w("auto"), mYAuto] as ViewStyle[]}>
-              <PageTitle
-                title="Trip Details"
-                // onPress={() => router.back()}
-                onPress={() => router.push("/(tab)/trip")}
-              />
-            </View>
-
-            <TouchableOpacity
-              onPress={() =>
-                router.push(`/(sharedScreens)/driverProfile` as Href)
-              }
-              style={[
-                bg("#F9F7F8"),
-                borderGrey(0.7),
-                rounded(10),
-                py(0),
-                px(10),
-                flex,
-                gap(10),
-                itemsCenter,
-                w("auto"),
-                h(45),
-                mt(20),
-              ]}
-            >
-              <Image
-                style={[image.w(30), image.h(30), image.rounded(30)]}
-                source={{ uri: selectedAvailableTrip?.driver?.picture || selectedAvailableTrip?.driver?.avatar }}
-              />
-
-              <Text style={[neurialGrotesk, fs12, fw500, c(colors.black)]}>
-                View Driver
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </PaddedScreen>
-        {/* //!Page Header */}
-
         {/* //!Trip Block */}
         <TripBlock />
         {/* //!Trip Block */}
 
         <PaddedScreen>
           {/* //!In Trip Dropoffs */}
-          <View style={[flexCol, gap(16), mt(32)]}>
+          <View style={[flexCol, gap(16), mt(32), tw `pb-[150px]`]}>
             <Text style={[fw700, fs14, c(colors.black)]}>In-Trip Dropoffs</Text>
 
             {/* <View style={[flexCol, gap(16), bg('red'), h(height * 0.51), { overflow: 'scroll' }]}> */}
             <View style={[flexCol, gap(16), { overflow: "scroll" }]}>
-              {selectedAvailableTrip?.inRideDropoffs.map((_, index) => (
-                <InTripDropoffTile key={index} />
-              ))}
+              {route?.inTripDropoffs
+                ?.map((dropoff, index) => ({
+                  ...dropoff,
+                  number: index + 1,
+                }))
+                ?.map((dropoff, index) => (
+                  <InTripDropoffTile dropoff={dropoff} key={index} />
+                ))}
             </View>
           </View>
           {/* //!In Trip Dropoffs */}

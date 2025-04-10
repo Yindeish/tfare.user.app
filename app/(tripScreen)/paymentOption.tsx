@@ -21,7 +21,7 @@ import LayoutSelectors from '@/state/selectors/layout'
 import { useBottomSheet } from '@/contexts/useBottomSheetContext'
 import { RideBookedSheet } from '@/components/page/bookRideSheetComponent'
 import { RootState } from '@/state/store'
-import { setStateInputField } from '@/state/slices/ride'
+import { setTripState } from '@/state/slices/trip'
 
 
 export default function PaymentOptions() {
@@ -29,7 +29,7 @@ export default function PaymentOptions() {
     const { rideId } = useLocalSearchParams();
     const { showBottomSheet } = useBottomSheet();
     const {wallet} = useAppSelector((state: RootState) => state.user)
-    const {stateInput:{paymentOptionInput}} = useAppSelector((state: RootState) => state.ride)
+    const {paymentOptionInput} = useAppSelector((state: RootState) => state.trip)
 
 
     return (
@@ -43,7 +43,7 @@ export default function PaymentOptions() {
                         <PaymentOptionsListTile
                             input={{
                                 onChange: (val: string) => {
-                                    dispatch(setStateInputField({key:'paymentOptionInput', value: 'wallet'}))
+                                    dispatch(setTripState({key:'paymentOptionInput', value: 'wallet'}))
                                 },
                                 value: 'wallet',
                                 condition: paymentOptionInput == 'wallet'
@@ -55,7 +55,7 @@ export default function PaymentOptions() {
                         <PaymentOptionsListTile
                             input={{
                                 onChange: (val: string) => {
-                                    dispatch(setStateInputField({key:'paymentOptionInput', value: 'cash'}))
+                                    dispatch(setTripState({key:'paymentOptionInput', value: 'cash'}))
                                 },
                                 value: 'cash',
                                 condition: paymentOptionInput == 'cash'
@@ -67,7 +67,7 @@ export default function PaymentOptions() {
                         <PaymentOptionsListTile
                             input={{
                                 onChange: (val: string) => {
-                                    dispatch(setStateInputField({key:'paymentOptionInput', value: 'bank-transfer'}))
+                                    dispatch(setTripState({key:'paymentOptionInput', value: 'bank-transfer'}))
                                 },
                                 value: 'bank-transfer',
                                 condition: paymentOptionInput == 'bank-transfer'
@@ -81,7 +81,7 @@ export default function PaymentOptions() {
                         <CtaBtn
                             img={{ src: images.proceedCheckImage, w: 20, h: 20 }}
                             onPress={() => {
-                                paymentOptionInput != '' && router.push(`/(rideScreens)/bookRide` as Href);
+                                paymentOptionInput != '' && router.push(`/(tripScreen)/bookTrip` as Href);
                                 // showBottomSheet([800], <RideBookedSheet rideId={rideId as string} />)
                             }}
                             text={{ name: 'Proceed', color: colors.white }}

@@ -1,6 +1,6 @@
 import { image, mXAuto, wHFull } from "@/utils/imageStyles";
 import { bg, flex, flexCol, gap, h, hFull, itemsCenter, itemsStart, justifyBetween, justifyCenter, mt, pb, px, py, rounded, w, wFull } from "@/utils/styles";
-import { FlatList, Image, TextInput, Touchable, View } from "react-native";
+import { FlatList, Image, TextInput, TextStyle, Touchable, View, ViewStyle } from "react-native";
 import PaddedScreen from "../shared/paddedScreen";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Text } from "react-native-paper";
@@ -27,14 +27,6 @@ function TripBookedSheet({ rideId }: { rideId: string }) {
     const { userRide } = RideSelectors()
     const { hideBottomSheet } = useBottomSheet()
 
-    useEffect(() => {
-        // if a signal is recieved from the driver to start the trip
-        // for now dummy redirection
-        setTimeout(() => {
-            // router.push(`/${rideId}/${pages.tripStarted}` as Href)
-        }, 3000)
-    })
-
     return (
         <PaddedScreen>
             <View style={[flexCol, gap(32), mt(20),]}>
@@ -46,7 +38,7 @@ function TripBookedSheet({ rideId }: { rideId: string }) {
                             <Text style={[neurialGrotesk, fw700, colorBlack, { fontSize: 22 }]}>Trip Booked</Text>
                         </View>
 
-                        <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey), mXAuto]}>Your Trip has been successfully booked</Text>
+                        <Text style={[neurialGrotesk, fw400, fs12, c(Colors.light.textGrey), mXAuto] as TextStyle[]}>Your Trip has been successfully booked</Text>
                     </View>
                 </PaddedScreen>
 
@@ -67,7 +59,7 @@ function TripBookedSheet({ rideId }: { rideId: string }) {
                     <View style={[flexCol, itemsStart, gap(20)]}>
                         <Text style={[fw700, fs16, colorBlack]}>Tom Hawkins</Text>
 
-                        <View style={[flex, gap(32), itemsCenter, mXAuto]}>
+                        <View style={[flex, gap(32), itemsCenter, mXAuto] as ViewStyle[]}>
                             <View style={[flex, itemsCenter, gap(12)]}>
                                 <Image
                                     source={images.startRatingImage}

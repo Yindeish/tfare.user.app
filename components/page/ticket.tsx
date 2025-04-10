@@ -63,6 +63,8 @@ import {
   setBottomSheetType,
 } from "@/state/slices/layout";
 import {
+  IBusStop,
+  IPlan,
   IRiderRideDetails,
   ITicketInput,
   TRideStatus,
@@ -265,7 +267,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
   const negotiateTicketFare = async () => {
     setFetchState((prev) => ({ ...prev, loading: true }));
 
-    const dropoffPlan = currentRoute?.inTripDropoffs?.find(
+    const dropoffPlan = (currentRoute?.inTripDropoffs as (IBusStop & {plan: IPlan})[])?.find(
       (dropoff) => String(dropoff?._id) === String(ticket?.dropoffBusstop?._id)
     )?.plan;
 

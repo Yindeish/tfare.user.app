@@ -176,6 +176,7 @@ export default function BookRide() {
   const serviceFee = Number(ticketsDetails[0]?.serviceFee);
   const [totalCost, setTotalCost] = useState(Number(tripCost) + serviceFee);
 
+  // Updating Trip cost, total cost and service fee
   useEffect(() => {
     const validTickets = ticketsDetails?.filter(
       (ticket) =>
@@ -191,6 +192,7 @@ export default function BookRide() {
     setTripCost(newTripCost);
     setTotalCost(newTripCost + serviceFee);
   }, [ticketsDetails]); 
+  // Updating Trip cost, total cost and service fee
 
   useEffect(() => {
     selectedAvailableRide?.route &&
