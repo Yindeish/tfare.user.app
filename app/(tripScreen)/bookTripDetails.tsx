@@ -88,7 +88,7 @@ function TripDetails() {
 
         <PaddedScreen>
           {/* //!In Trip Dropoffs */}
-          <View style={[flexCol, gap(16), mt(32), tw `pb-[150px]`]}>
+          <View style={[flexCol, gap(16), mt(32), tw `pb-[200px]`]}>
             <Text style={[fw700, fs14, c(colors.black)]}>In-Trip Dropoffs</Text>
 
             {/* <View style={[flexCol, gap(16), bg('red'), h(height * 0.51), { overflow: 'scroll' }]}> */}

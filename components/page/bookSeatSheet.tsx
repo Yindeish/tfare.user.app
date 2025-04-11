@@ -107,7 +107,7 @@ function BookSeatSheet() {
   } = useAppSelector((state: RootState) => state.trip);
 
   const ticketQuantitySelectable = (ticketQuantity: number) => {
-    const totalQuantitiesSelected = ticketsInputs.reduce(
+    const totalQuantitiesSelected = ticketsInputs?.reduce(
       (accumulator, ticket) => accumulator + Number(ticket?.quantity),
       0
     );

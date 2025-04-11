@@ -41,8 +41,8 @@ const PaymentOptions = () => {
     paymentOptionInput,
   } = useAppSelector((state: RootState) => state.trip);
 
-  const [tripCost, setTripCost] = useState(ticketsInputs[0]?.rideFee || 0);
-  const serviceFee = Number(ticketsInputs[0]?.serviceFee);
+  const [tripCost, setTripCost] = useState(ticketsInputs?.[0]?.rideFee || 0);
+  const serviceFee = Number(ticketsInputs?.[0]?.serviceFee);
   const [totalCost, setTotalCost] = useState(Number(tripCost) + serviceFee);
 
   // Updating Trip cost, total cost and service fee

@@ -97,9 +97,6 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
   });
   const { code, loading, msg } = fetchState;
 
-  useEffect(() => console.log({ ticketsInputs }), [ticketsInputs]);
-  useEffect(() => console.log({ ticket }), [ticket]);
-
   const channel = supabase.channel(
     `${RideConstants.channel.ride_accepting}${ticket?.rideId}`
   );
@@ -113,7 +110,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
         console.log("accepting......");
         console.log("====================================");
         if (path == "/bookTrip") {
-          const ride = payload?.payload?.ride as IRiderRideDetails;
+          const ride = payload?.payload?.trip as IRiderRideDetails;
           console.log("====================================");
           console.log("accepting......", ride, {
             ride,
@@ -121,8 +118,9 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
           console.log("====================================");
           const tickets = ticketsInputs.map((ticketItem) => {
             if (
-              Number(ticketItem?.number) == Number(ticket?.number) &&
-              ticket?.ticketStatus === "pending"
+              String(ride?._id) == String(ticketItem?.rideId)
+              // Number(ticketItem?.number) == Number(ticket?.number) &&
+              // ticket?.ticketStatus === "pending"
             ) {
               return {
                 ...ticketItem,
@@ -149,9 +147,8 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
       "broadcast",
       { event: RideConstants.event.ride_declined },
       (payload) => {
-        console.log("declining......",)
-        if (path == "/bookRide") {
-          const ride = payload?.payload?.ride as IRiderRideDetails;
+        if (path == "/bookTrip") {
+          const ride = payload?.payload?.trip as IRiderRideDetails;
           console.log("====================================");
           console.log("declining......", ride, {
             ride,
@@ -160,8 +157,9 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
 
           const tickets = ticketsInputs.map((ticketItem) => {
             if (
-              Number(ticketItem?.number) == Number(ticket?.number) &&
-              ticket?.ticketStatus == "pending"
+              // Number(ticketItem?.number) == Number(ticket?.number) &&
+              // ticket?.ticketStatus == "pending"
+              String(ride?._id) == String(ticketItem?.rideId)
             ) {
               return {
                 ...ticketItem,

@@ -13,7 +13,7 @@ const DriverCTATile = () => {
 
     return (
         <TouchableOpacity
-        onPress={() => router.push(`/(sharedScreens)/driverProfile` as Href)}
+        onPress={() => router.push(`/(tripScreen)/driverProfile` as Href)}
         style={[
           bg("#F9F7F8"),
           borderGrey(0.7),

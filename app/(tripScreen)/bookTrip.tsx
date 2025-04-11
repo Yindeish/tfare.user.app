@@ -151,14 +151,14 @@ function BookTrip() {
   });
   const { code, msg, loading, rides } = fetchState;
 
-  const [tripCost, setTripCost] = useState(ticketsInputs[0]?.rideFee || 0);
-  const serviceFee = Number(ticketsInputs[0]?.serviceFee);
+  const [tripCost, setTripCost] = useState(ticketsInputs?.[0]?.rideFee || 0);
+  const serviceFee = Number(ticketsInputs?.[0]?.serviceFee);
   const [totalCost, setTotalCost] = useState(Number(tripCost) + serviceFee);
 
   const ticketAddable = () => {
     const totalQuantitiesSelected = ticketsInputs
       // .filter((ticket) => ticket?.ticketStatus !== "accepted")
-      .reduce(
+      ?.reduce(
         (accumulator, ticket) => accumulator + Number(ticket?.quantity),
         0
       );
@@ -231,26 +231,26 @@ function BookTrip() {
   // check if all tickets have been filled
 
   // !BottomSheets
-  useEffect(() => {
-    if (query === RideConstants.query.RideBooked)
-      showBottomSheet(
-        [100, 800],
-        <RideBookedSheet rideId={riderRide?._id as string} />,
-        true
-      );
-    if (query === RideConstants.query.RideStarted)
-      showBottomSheet([100, 500], <TripStartedSheet />, true);
-    if (query === RideConstants.query.RideEnded)
-      showBottomSheet([100, 650], <TripCompletedSheet />, true);
-    if (query === RideConstants.query.RideDeclined)
-      showBottomSheet(
-        [300],
-        <View>
-          <Text>Trip Declined</Text>
-        </View>,
-        true
-      );
-  }, [query]);
+//   useEffect(() => {
+//     if (query === RideConstants.query.RideBooked)
+//       showBottomSheet(
+//         [100, 800],
+//         <RideBookedSheet rideId={riderRide?._id as string} />,
+//         true
+//       );
+//     if (query === RideConstants.query.RideStarted)
+//       showBottomSheet([100, 500], <TripStartedSheet />, true);
+//     if (query === RideConstants.query.RideEnded)
+//       showBottomSheet([100, 650], <TripCompletedSheet />, true);
+//     if (query === RideConstants.query.RideDeclined)
+//       showBottomSheet(
+//         [300],
+//         <View>
+//           <Text>Trip Declined</Text>
+//         </View>,
+//         true
+//       );
+//   }, [query]);
   // !BottomSheets
 
   useEffect(() => {console.log({ticketsInputs})}, [ticketsInputs])

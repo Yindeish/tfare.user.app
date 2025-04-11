@@ -15,6 +15,7 @@ function TripBlock() {
       const { currentTrip } = useAppSelector(
         (state: RootState) => state.trip
       );
+      console.log({currentTrip})
 
 
     return (

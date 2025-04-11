@@ -57,10 +57,6 @@ import {
   import { useBottomSheet } from "@/contexts/useBottomSheetContext";
   import { useSnackbar } from "@/contexts/snackbar.context";
   import { openURL } from "expo-linking";
-  import {
-      CancelRide,
-    TripCompletedSheet,
-  } from "@/components/page/tripStartedBottomSheetComponents";
   import { useStorageState } from "@/hooks/useStorageState";
   import { RideConstants } from "@/constants/ride";
   import {
@@ -85,12 +81,14 @@ import { ICurrentRide } from "@/state/types/ride";
 import { image, mXAuto } from "@/utils/imageStyles";
 import BuyTicketListTile from "@/components/page/buyTicketListTile";
 import { supabase } from "@/supabase/supabase.config";
+import TripCompletedSheet from "./TripCompleted";
+import CancelRide from "./cancelTrip";
 
 
   const TripStartedSheet = () => {
     const { showBottomSheet, hideBottomSheet } = useBottomSheet();
-    const { riderRideDetails, driverDetails, selectedAvailableRide, stateInput:{ticketsDetails} } =
-      useAppSelector((state: RootState) => state.ride);
+    const { riderRideDetails, driverDetails, currentTrip,ticketsInputs } =
+      useAppSelector((state: RootState) => state.trip);
     const { token } = useAppSelector((state: RootState) => state.user);
     const { notify, Snackbar, snackbarVisible, closeSnackbar } = useSnackbar();
     const searchParams = useGlobalSearchParams();
@@ -111,7 +109,7 @@ import { supabase } from "@/supabase/supabase.config";
     const commitSafetyAlert = async () => {
       setFetchState({ ...fetchState, loading: true });
       await FetchService.postWithBearerToken({
-        url: `/user/rider/me/ride/${selectedAvailableRide?._id}/commit-safety-alert`,
+        url: `/user/rider/me/trip/${currentTrip?._id}/commit-safety-alert`,
         token: token,
       })
         .then(async (res) => {
@@ -166,7 +164,7 @@ import { supabase } from "@/supabase/supabase.config";
       });
     }
   
-    listenToAllRides(ticketsDetails);
+    listenToAllRides(ticketsInputs);
   
     return (
       <PaddedScreen>
@@ -272,7 +270,7 @@ import { supabase } from "@/supabase/supabase.config";
               src: images.cancelImage,
             }}
             onPress={() => {
-              showBottomSheet([660], <CancelRide />);
+              // showBottomSheet([660], <CancelRide />);
             }}
             text={{ name: "Cancel Order", color: Colors.light.textGrey }}
             bg={{ color: "#F9F7F8", borderColor: Colors.light.border }}

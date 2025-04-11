@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   TextStyle,
   Text,
+  Pressable,
 } from "react-native";
 import { useSession } from "../../contexts/userSignedInContext";
 import { useEffect, useState } from "react";
@@ -732,7 +733,11 @@ export default function AppLayout() {
             headerShown: true,
             headerTitle: '',
             headerLeft: () => (
-              <View
+              <TouchableOpacity
+              onPress={() => {
+                // router.back();
+                router.push('/(tab)/trip')
+              }}
                 style={[
                   h(20),
                   bg(colors.transparent),
@@ -742,23 +747,19 @@ export default function AppLayout() {
                   gap(10),
                 ]}
               >
-                <TouchableOpacity
-                  onPress={() => {
-                    // router.back();
-                    router.push('/(tab)/trip')
-                  }}
+                <View
                 >
                   <Ionicons
                     name="chevron-back"
                     size={20}
                     color={Colors.light.textGrey}
                   />
-                </TouchableOpacity>
+                </View>
 
                 <Text style={[colorBlack, fs16, fw700, neurialGrotesk]}>
                   Trip Details
                 </Text>
-              </View>
+              </TouchableOpacity>
             ),
             headerRight: () => <DriverCTATile />,
           }}

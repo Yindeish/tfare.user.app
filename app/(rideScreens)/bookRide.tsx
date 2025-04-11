@@ -172,8 +172,8 @@ export default function BookRide() {
   //   (prev, current) => prev + Number(current?.rideFee),
   //   0
   // );
-  const [tripCost, setTripCost] = useState(ticketsDetails[0]?.rideFee || 0);
-  const serviceFee = Number(ticketsDetails[0]?.serviceFee);
+  const [tripCost, setTripCost] = useState(ticketsDetails?.[0]?.rideFee || 0);
+  const serviceFee = Number(ticketsDetails?.[0]?.serviceFee);
   const [totalCost, setTotalCost] = useState(Number(tripCost) + serviceFee);
 
   // Updating Trip cost, total cost and service fee

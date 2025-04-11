@@ -58,7 +58,7 @@ import {
 import { image } from "@/utils/imageStyles";
 import { images } from "@/constants/images";
 import { pages } from "@/constants/pages";
-// import RideBlock from "@/components/page/rideBlock";
+// import TripBlock from "@/components/page/rideBlock";
 import PaddedScreen from "@/components/shared/paddedScreen";
 import { FlatList } from "react-native-gesture-handler";
 import RideSelectors from "@/state/selectors/ride";
@@ -100,6 +100,7 @@ import Ticket from "@/components/page/ticket";
 import * as Device from "expo-device";
 import * as Location from "expo-location";
 import ScaleUpDown from "@/components/shared/scale_animator";
+import { Utils } from "@/utils";
 
 function TripDetails() {
   const { rideId, currentRideId, selectedAvailableRideId, requestId } =
@@ -114,16 +115,16 @@ function TripDetails() {
     paymentOptionsVisible,
   } = RideSelectors();
   const {
-    selectedAvailableRide,
+    currentTrip,
     riderRideDetails: riderRide,
     ridePlans,
-    stateInput: { paymentOptionInput, ticketsDetails },
-  } = useAppSelector((state: RootState) => state.ride);
+    ticketsInputs
+  } = useAppSelector((state: RootState) => state.trip);
   const path = usePathname();
   const { showBottomSheet, hideBottomSheet } = useBottomSheet();
   const [[_, query], setQuery] = useStorageState(RideConstants.localDB.query);
 
-  console.log({ticketsDetails})
+  console.log({ticketsInputs})
 
   return (
     <SafeScreen>
@@ -138,11 +139,11 @@ function TripDetails() {
         {/* Page Title */}
 
         <View style={[wHFull, mt(120), flexCol, gap(32), px(20)]}>
-          <RideBlock />
+          <TripBlock />
 
           <FlatList
               horizontal={false}
-              data={ticketsDetails}
+              data={ticketsInputs}
               renderItem={({ index, item: ticketId }) => (
                 <Ticket ticket={ticketId} index={index} key={index} />
               )}
@@ -176,7 +177,7 @@ function TripDetails() {
                   <BuyTicketListTile
                     leadingText="Trip ID"
                     trailing={{
-                      text: selectedAvailableRide?._id || selectedAvailableRideId as string,
+                      text: currentTrip?._id || selectedAvailableRideId as string,
                     }}
                   />
                   <BuyTicketListTile
@@ -209,11 +210,10 @@ function TripDetails() {
 
 export default TripDetails;
 
-function RideBlock() {
-  const { selectedAvailableRide } = useAppSelector(
-    (state: RootState) => state.ride
+function TripBlock() {
+  const { currentTrip } = useAppSelector(
+    (state: RootState) => state.trip
   );
-  const { user } = useAppSelector((state: RootState) => state.user);
 
    const [location, setLocation] = useState<Location.LocationObject | null>(
       null
@@ -247,22 +247,6 @@ function RideBlock() {
       }
     };
 
-  // const openMap = () => {
-  //   const riderRide = selectedAvailableRide?.ridersRides.find(
-  //     (ride) => String(ride?.riderId) == String(user?._id)
-  //   );
-  //   const location =
-  //     riderRide?.dropoffBusstop?.name ||
-  //     selectedAvailableRide?.inRideDropoffs[
-  //       selectedAvailableRide?.inRideDropoffs.length - 1
-  //     ]?.name;
-  //   const mapLink = `https://www.google.com/maps?q=${location}`;
-
-  //   Linking.openURL(mapLink).catch((err) =>
-  //     console.error("Failed to open map:", err)
-  //   );
-  // };
-
   return (
     <View
       style={[
@@ -279,10 +263,10 @@ function RideBlock() {
       <View style={[wFull, h(45), flex, itemsCenter, justifyBetween, gap(14)]}>
         <View style={[flexCol, gap(12), itemsStart]}>
           <Text style={[colorBlack, fw700, fs14]}>
-            Rider #{(selectedAvailableRide as any)?._id.slice(0, 15)}
+            Ride #{currentTrip?._id.slice(0, 10)}
           </Text>
           <Text style={[fw400, fs12, c(Colors.light.textGrey)]}>
-            {selectedAvailableRide?.vehicleName}
+            {currentTrip?.vehicleName}
           </Text>
         </View>
 
@@ -303,8 +287,8 @@ function RideBlock() {
             style={[image.w(18), image.h(14.73)]}
             source={images.passengersImage}
           />
-          <Text style={[fs12, fw500, colorBlack]}>
-            {selectedAvailableRide?.availableSeats} seats Available
+          <Text style={[fs12, fw500, colorBlack, tw `h-[20px]`]}>
+            {currentTrip?.availableSeats} seats Available
           </Text>
         </View>
       </View>
@@ -326,6 +310,7 @@ function RideBlock() {
           <View style={[hFull, flex, itemsCenter, gap(12)]}>
             <View style={[w(5), h(5), rounded(5), bg(colors.black)]} />
             {/* <Text style={[colorBlack, fw500, fs14]}>{ride?.duration}</Text> */}
+            <Text style={[colorBlack, fw500, fs14]}>{Utils.formatTime(currentTrip?.departureTime as string)}</Text>
           </View>
         </View>
 
