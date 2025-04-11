@@ -119,7 +119,7 @@ export default function AppLayout() {
             paymentOption: paymentOptionInput,
           },
           token: token as string,
-          url: `/user/rider/me/ride/${currentTrip?._id}/book`,
+          url: `/user/rider/me/trip/${currentTrip?._id}/book`,
         });
 
         setFetchState((prev) => ({
@@ -283,7 +283,7 @@ export default function AppLayout() {
             paymentOption: paymentOptionInput,
           },
           token: token as string,
-          url: `/user/rider/me/ride/${currentTrip?._id}/book-unlike`,
+          url: `/user/rider/me/trip/${currentTrip?._id}/book-unlike`,
         });
 
         setFetchState((prev) => ({
@@ -448,7 +448,7 @@ export default function AppLayout() {
           paymentOption: paymentOptionInput,
         },
         token: token as string,
-        url: `/user/rider/me/ride/${currentTrip?._id}/book-unlike`,
+        url: `/user/rider/me/trip/${currentTrip?._id}/book-unlike`,
       });
 
       setFetchState((prev) => ({
@@ -643,7 +643,7 @@ export default function AppLayout() {
       {/* Buy Ticket Btn */}
 
       {/* Book Seat Btn */}
-      {ticketsInputs.length == 0 && path === "/bookTripDetails" && (
+      {path === "/bookTripDetails" && (
         <View
           style={[
             tw`w-full absolute bottom-[30px] left-[0] px-[20px]`,

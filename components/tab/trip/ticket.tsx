@@ -195,6 +195,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
         pickupBusstopId: ticket?.pickupBusstop?._id,
         dropoffBusstopId: ticket?.dropoffBusstop?._id,
         userCounterOffer: ticket?.userCounterFare,
+        requestId: ticket?.rideId
       },
       token: token as string,
     });
@@ -217,7 +218,7 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
           return {
             ...ticketItem,
             ticketStatus: "pending",
-            rideId: userTripSaved?._id,
+            rideId: !ticket?.rideId && userTripSaved?._id,
           };
         } else return ticketItem;
       });
@@ -235,16 +236,16 @@ function Ticket({ index, ticket }: { index: number; ticket: ITicketInput }) {
   return (
     <View style={[wFull, flexCol, gap(32), itemsStart, mt(40)]}>
       {/* Ticket Ticket */}
-      <View style={[flex, itemsCenter, gap(4)]}>
+      <View style={[flex, flexCol, gap(2)]}>
         <Text style={[colorBlack, fw700, fs14]}>
           {`Ticket ${ticket?.number} (${ticket?.quantity} ${
             Number(ticket?.quantity) > 1 ? "quantities" : "quantity"
           })`}{" "}
         </Text>
 
-        <Text style={[fw400, fs12, c(Colors.light.textGrey)]}>
+       {ticket?.number > 1 && <Text style={[fw400, fs12, c(Colors.light.textGrey)]}>
           (You have selected more than 1 seat)
-        </Text>
+        </Text>}
       </View>
       {/* Ticket Ticket */}
 
