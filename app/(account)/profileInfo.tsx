@@ -1,18 +1,19 @@
+"use client"
+
 import {
   View,
-  ImageSourcePropType,
   Image,
-  ViewStyle,
+  type ViewStyle,
   TextInput,
-  TextStyle,
+  type TextStyle,
   ActivityIndicator,
   TouchableOpacity,
-} from "react-native";
-import { Text } from "react-native-paper";
-import React, { useEffect, useState } from "react";
-import SafeScreen from "@/components/shared/safeScreen";
-import PaddedScreen from "@/components/shared/paddedScreen";
-import { image, wHFull } from "@/utils/imageStyles";
+} from "react-native"
+import { Text } from "react-native-paper"
+import { useEffect, useState } from "react"
+import SafeScreen from "@/components/shared/safeScreen"
+import PaddedScreen from "@/components/shared/paddedScreen"
+import { image, wHFull } from "@/utils/imageStyles"
 import {
   bg,
   border,
@@ -21,82 +22,57 @@ import {
   gap,
   h,
   itemsCenter,
-  justifyBetween,
   justifyCenter,
   mt,
   px,
   py,
-  relative,
   rounded,
   wFull,
-} from "@/utils/styles";
-import Colors, { colors } from "@/constants/Colors";
-import { images } from "@/constants/images";
-import {
-  c,
-  colorBlack,
-  colorWhite,
-  fs12,
-  fs14,
-  fw500,
-  neurialGrotesk,
-} from "@/utils/fontStyles";
-import AccountPageTitle from "@/components/shared/pageTitle";
-import { Href, router } from "expo-router";
-import { tabs } from "@/constants/tabs";
-import AccountTextField from "@/components/page/accountTextFeild";
-import AccountSelectors from "@/state/selectors/account";
-import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit";
-import {
-  setProfileCta,
-  setUserProfileInfo,
-  setUserProfileInfoFeild,
-} from "@/state/slices/account";
-import { IStateInputProfile, IUserAccount } from "@/state/types/account";
-import { useSession } from "@/contexts/userSignedInContext";
-import * as ImagePicker from "expo-image-picker";
-import { useFormik } from "formik";
-import { number, ObjectSchema, string } from "yup";
-// import { UploadApiOptions, upload } from 'cloudinary-react-native'
-// import CloudinaryServices from '../../cloudinary/cloudinary.services'
-import { useSession as useTokenSession } from "@/contexts/userTokenContext";
-import FetchService from "@/services/api/fetch.service";
-import ErrorMsg from "@/components/shared/error_msg";
-import CloudinaryServices from "@/cloudinary/cloudinary.services";
-import { useStorageState } from "@/hooks/useStorageState";
-import { RootState } from "@/state/store";
-import { setState as  setUserState } from "@/state/slices/user";
+} from "@/utils/styles"
+import Colors from "@/constants/Colors"
+import { images } from "@/constants/images"
+import { c, colorBlack, colorWhite, fs12, fs14, fw500, neurialGrotesk } from "@/utils/fontStyles"
+import AccountPageTitle from "@/components/shared/pageTitle"
+import { type Href, router } from "expo-router"
+import { tabs } from "@/constants/tabs"
+import { useAppDispatch, useAppSelector } from "@/state/hooks/useReduxToolkit"
+import { setProfileCta } from "@/state/slices/account"
+import type { IUserAccount } from "@/state/types/account"
+import * as ImagePicker from "expo-image-picker"
+import { useFormik } from "formik"
+import { number, ObjectSchema, string } from "yup"
+import { useSession as useTokenSession } from "@/contexts/userTokenContext"
+import FetchService from "@/services/api/fetch.service"
+import ErrorMsg from "@/components/shared/error_msg"
+import CloudinaryServices from "@/cloudinary/cloudinary.services"
+import { useStorageState } from "@/hooks/useStorageState"
+import type { RootState } from "@/state/store"
+import AccountSelectors from "@/state/selectors/account"
 
-export default function profileInfo() {
-  const dispatch = useAppDispatch();
-  const { profileCta, stateInput } = AccountSelectors();
-  // const [[_, userSession],] = useSession();
-  const [[_, userSession], updateUserSession] = useStorageState("user");
-  const parsedUser = JSON.parse(userSession as string) as IUserAccount;
-
-  const { user } = useAppSelector((state: RootState) => state.user);
-
-  const { tokenSession } = useTokenSession();
+export default function ProfileInfo() {
+  const dispatch = useAppDispatch()
+  const { profileCta } = AccountSelectors()
+  const [[_, userSession], updateUserSession] = useStorageState("user")
+  const parsedUser = JSON.parse(userSession as string) as IUserAccount
+  const { user } = useAppSelector((state: RootState) => state.user)
+  const { tokenSession } = useTokenSession()
 
   const [state, setState] = useState({
     msg: "",
     code: null,
     loading: false,
-    // updatedUserProfile: null
-  });
-  const { code, msg, loading, 
-    // updatedUserProfile 
-  } = state;
+  })
 
-  const {
-    values,
-    errors,
-    touched,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    setValues,
-  } = useFormik({
+  const { code, msg, loading } = state
+
+  // Simplified image upload state
+  const [imageState, setImageState] = useState({
+    loading: false,
+    picture: user?.picture || null,
+    avatar: user?.avatar || null,
+  })
+
+  const { values, errors, touched, handleChange, handleBlur, handleSubmit, setValues } = useFormik({
     initialValues: {
       fullName: parsedUser?.fullName || "",
       userName: parsedUser?.fullName || "",
@@ -110,8 +86,7 @@ export default function profileInfo() {
       phoneNumber: number(),
     }),
     onSubmit: async ({ email, fullName, phoneNumber, userName }) => {
-      onChange({ key: "loading", value: true });
-      onChange({ key: "msg", value: "" });
+      setState((prev) => ({ ...prev, loading: true, msg: "" }))
 
       const returnedData = await FetchService.patchWithBearerToken({
         token: tokenSession as string,
@@ -121,133 +96,140 @@ export default function profileInfo() {
           fullName,
           phoneNumber,
           profileName: userName,
-          picture: imgUploadState.img || user?.picture,
-          avatar: imgUploadState.avatar || user?.avatar,
+          picture: imageState.picture || user?.picture,
+          avatar: imageState.avatar || user?.avatar,
         },
-      });
+      })
 
-      onChange({ key: "loading", value: false });
-      onChange({ key: "code", value: returnedData?.code });
-      onChange({ key: "msg", value: returnedData?.msg });
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        code: returnedData?.code,
+        msg: returnedData?.msg,
+      }))
 
-      if (returnedData?.code == 200 || returnedData?.code == 201) {
-        updateUserSession(JSON.stringify(returnedData?.userProfileUpdated));
+      if (returnedData?.code === 200 || returnedData?.code === 201) {
+        updateUserSession(JSON.stringify(returnedData?.userProfileUpdated))
         setValues({
           fullName: returnedData?.userProfileUpdated?.fullName || "",
           userName: returnedData?.userProfileUpdated?.fullName || "",
           email: returnedData?.userProfileUpdated?.email || "",
           phoneNumber: String(returnedData?.userProfileUpdated?.phoneNumber) || "",
-        });
-        dispatch(setProfileCta("edit"));
+        })
+        dispatch(setProfileCta("edit"))
       }
     },
-  });
+  })
 
-  const [imgUploadState, setImgUploadState] = useState({
-    msg: "",
-    loading: false,
-    img: null,
-    avatar: null,
-    // img: user?.picture,
-    // avatar: user?.avatar,
-  });
-
-  const onChange = ({
-    key,
-    value,
-  }: {
-    key: "code" | "msg" | "loading";
-    value: string | number | boolean;
-  }) => setState((prev) => ({ ...prev, [key]: value }));
-
-  // const refreshUpdates = () => {
-  //   updatedUserProfile && updateUserSession(JSON.stringify(updatedUserProfile))
-
-  //   dispatch(setUserState({key: 'user', value: updatedUserProfile}));
-  // }
-
-  const editProfile = () => {
-    dispatch(setProfileCta("save"));
-  };
-
-  const uploadImgToCloudinary = async ({
-    folderName,
-    imagePath,
-  }: {
-    imagePath: string;
-    folderName: string;
-  }) => {
-    setImgUploadState((prev) => ({ ...prev, loading: true }));
-
-    CloudinaryServices.uploadImage({
-      imagePath,
-      folderName,
-      fnToRn: (value) => {
-        setImgUploadState((prev) => ({
-          ...prev,
-          loading: false,
-          img: value as any,
-        }));
-      },
-    });
-  };
-
+  // Simplified image picker function
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: "images",
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      })
 
-    if (!result.canceled) {
-      const uri = result.assets[0].uri as string;
-      uploadImgToCloudinary({ folderName: "ridersImages", imagePath: uri });
+      if (!result.canceled && result.assets[0].uri) {
+        setImageState((prev) => ({ ...prev, loading: true }))
+
+        CloudinaryServices.uploadImage({
+          imagePath: result.assets[0].uri,
+          folderName: "ridersImages",
+          fnToRn: (imageUrl) => {
+            setImageState((prev) => ({
+              ...prev,
+              loading: false,
+              picture: imageUrl as string,
+            }))
+          },
+        })
+      }
+    } catch (error) {
+      console.error("Error picking image:", error)
+      setImageState((prev) => ({ ...prev, loading: false }))
     }
-  };
+  }
 
+  // Generate avatar function
   const generateAvatar = () => {
-    const AVATAR_API_URL = "https://api.multiavatar.com";
+    const AVATAR_API_URL = "https://api.multiavatar.com"
+    const userProfileName = values.fullName || user?.fullName;
+    const userAvatar = `${AVATAR_API_URL}/${userProfileName}`
 
-    const userProfileName = user?.fullName;
-    const userAvatar = `${AVATAR_API_URL}/${userProfileName}`;
-    console.log({ userAvatar });
-
-    setImgUploadState((prev) => ({ ...prev, avatar: userAvatar as any }));
-  };
+    setImageState((prev) => ({ ...prev, avatar: userAvatar }))
+  }
 
   useEffect(() => {
     setValues({
       fullName: (user?.fullName as string) || parsedUser?.fullName,
-      userName:
-        (user as any)?.profileName ||
-        (user?.fullName as string) ||
-        parsedUser?.fullName,
+      userName: (user as any)?.profileName || (user?.fullName as string) || parsedUser?.fullName,
       email: (user?.email as string) || parsedUser?.email,
-      phoneNumber:
-        String(user?.phoneNumber as number) || String(parsedUser?.phoneNumber),
-    });
-  }, []);
+      phoneNumber: String(user?.phoneNumber as number) || String(parsedUser?.phoneNumber),
+    })
+
+    // Initialize image state with user data
+    setImageState({
+      loading: false,
+      picture: user?.picture || null,
+      avatar: user?.avatar || null,
+    })
+  }, [user])
+
+  // Profile image component
+  const ProfileImage = () => {
+    const imageSource = imageState.picture || imageState.avatar || user?.picture || user?.avatar;
+    console.log({imageSource})
+
+    return (
+      <View style={[mt(28), flexCol, gap(16), itemsCenter, wFull, h(134)]}>
+        <Image
+          source={{uri: imageSource}}
+          style={[image.w(100), image.h(100), image.rounded(100)]}
+        />
+
+        {profileCta === "save" && (
+          <View style={[flex, itemsCenter, justifyCenter, gap(20)]}>
+            <TouchableOpacity
+              onPress={pickImage}
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 5,
+                alignItems: "center",
+              }}
+            >
+              <Text style={[neurialGrotesk, fw500, fs14, c(Colors.light.background)]}>Upload picture</Text>
+              {imageState.loading && <ActivityIndicator size={10} />}
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={generateAvatar}>
+              <Text style={[neurialGrotesk, fw500, fs14, c(Colors.light.error)]}>Generate Avatar</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    )
+  }
 
   return (
     <SafeScreen>
       <View style={[wHFull as ViewStyle]}>
         <PaddedScreen>
           {/* Page Header */}
-
           <AccountPageTitle
             title="Profile Information"
             onPress={() => {
-              dispatch(setProfileCta("edit"));
-              router.push(`/(tab)/${tabs.account}` as Href);
+              dispatch(setProfileCta("edit"))
+              router.push(`/(tab)/${tabs.account}` as Href)
             }}
             style={[]}
           >
             {/* Edit / Save profile Btn */}
-
             {profileCta === "edit" ? (
               <TouchableOpacity
-                onPress={editProfile}
+                onPress={() => dispatch(setProfileCta("save"))}
                 style={[
                   flex,
                   rounded(100),
@@ -259,14 +241,8 @@ export default function profileInfo() {
                   { borderColor: Colors.light.border, borderWidth: 0.7 },
                 ]}
               >
-                <Image
-                  source={images.editBtnImage}
-                  style={[image.w(18), image.h(18)]}
-                />
-
-                <Text style={[neurialGrotesk, fs12, fw500, colorBlack]}>
-                  Edit
-                </Text>
+                <Image source={images.editBtnImage} style={[image.w(18), image.h(18)]} />
+                <Text style={[neurialGrotesk, fs12, fw500, colorBlack]}>Edit</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
@@ -282,84 +258,20 @@ export default function profileInfo() {
                   { borderColor: Colors.light.border, borderWidth: 0.7 },
                 ]}
               >
-                <Image
-                  source={images.whiteBgEditBtnImage}
-                  style={[image.w(18), image.h(18)]}
-                />
-
-                <Text style={[neurialGrotesk, fs12, fw500, colorWhite]}>
-                  Save
-                </Text>
+                <Image source={images.whiteBgEditBtnImage} style={[image.w(18), image.h(18)]} />
+                <Text style={[neurialGrotesk, fs12, fw500, colorWhite]}>Save</Text>
               </TouchableOpacity>
             )}
-
-            {/* Edit / Save profile Btn */}
           </AccountPageTitle>
-
-          {/* Page Header */}
 
           {loading && <ActivityIndicator />}
 
           {/* User avatar */}
-
-          <View style={[mt(28), flexCol, gap(16), itemsCenter, wFull, h(134)]}>
-            {/* {(user?.picture || user?.avatar) ? */}
-            {user?.picture || user?.avatar ? (
-              <Image
-                source={{ uri: (user?.picture as any) || user?.avatar }}
-                style={[image.w(100), image.h(100), image.rounded(100)]}
-              />
-            ) : (
-              <Image
-                source={
-                  imgUploadState.img || imgUploadState.avatar
-                    ? { uri: imgUploadState.img || imgUploadState.avatar }
-                    : images.fallbackAvatar
-                }
-                style={[image.w(100), image.h(100), image.rounded(100)]}
-              />
-            )}
-
-            {/* {profileCta === 'save' && (!user?.picture || !user?.avatar) && <View style={[flex, itemsCenter, justifyCenter, gap(20)]}> */}
-            {profileCta === "save" && !user?.picture && (
-              <View style={[flex, itemsCenter, justifyCenter, gap(20)]}>
-                <TouchableOpacity
-                  onPress={pickImage}
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    gap: 5,
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={[
-                      neurialGrotesk,
-                      fw500,
-                      fs14,
-                      c(Colors.light.background),
-                    ]}
-                  >
-                    Upload picture
-                  </Text>
-                  {imgUploadState.loading && <ActivityIndicator size={10} />}
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => generateAvatar()}>
-                  <Text
-                    style={[neurialGrotesk, fw500, fs14, c(Colors.light.error)]}
-                  >
-                    Generate Avatar
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-
-          {/* User avatar */}
+          <ProfileImage />
 
           {/* Form */}
           <View style={[wFull, flexCol, gap(16), mt(60)]}>
+            {/* Form fields */}
             <TextInput
               style={[
                 border(0.7, "#D7D7D7") as TextStyle,
@@ -368,19 +280,16 @@ export default function profileInfo() {
                 h(50) as TextStyle,
                 px(24) as TextStyle,
                 bg("#F9F7F8") as TextStyle,
-                errors.email && touched.email
-                  ? { borderColor: Colors.light.error }
-                  : undefined,
+                errors.fullName && touched.fullName ? { borderColor: Colors.light.error } : undefined,
               ]}
               placeholderTextColor={Colors.light.textGrey}
               placeholder="Full Name"
               keyboardType="default"
               value={values.fullName}
               autoCorrect={false}
-              onChangeText={
-                profileCta === "save" ? handleChange("fullName") : () => {}
-              }
+              onChangeText={profileCta === "save" ? handleChange("fullName") : () => {}}
               onBlur={handleBlur("fullName")}
+              editable={profileCta === "save"}
             />
 
             <TextInput
@@ -391,19 +300,16 @@ export default function profileInfo() {
                 h(50) as TextStyle,
                 px(24) as TextStyle,
                 bg("#F9F7F8") as TextStyle,
-                errors.email && touched.email
-                  ? { borderColor: Colors.light.error }
-                  : undefined,
+                errors.userName && touched.userName ? { borderColor: Colors.light.error } : undefined,
               ]}
               placeholderTextColor={Colors.light.textGrey}
               placeholder="User Name"
               keyboardType="default"
               value={values.userName}
               autoCorrect={false}
-              onChangeText={
-                profileCta === "save" ? handleChange("userName") : () => {}
-              }
+              onChangeText={profileCta === "save" ? handleChange("userName") : () => {}}
               onBlur={handleBlur("userName")}
+              editable={profileCta === "save"}
             />
 
             <TextInput
@@ -414,19 +320,16 @@ export default function profileInfo() {
                 h(50) as TextStyle,
                 px(24) as TextStyle,
                 bg("#F9F7F8") as TextStyle,
-                errors.email && touched.email
-                  ? { borderColor: Colors.light.error }
-                  : undefined,
+                errors.email && touched.email ? { borderColor: Colors.light.error } : undefined,
               ]}
               placeholderTextColor={Colors.light.textGrey}
               placeholder="Email Address"
               keyboardType="email-address"
               value={values.email}
               autoCorrect={false}
-              onChangeText={
-                profileCta === "save" ? handleChange("email") : () => {}
-              }
+              onChangeText={profileCta === "save" ? handleChange("email") : () => {}}
               onBlur={handleBlur("email")}
+              editable={profileCta === "save"}
             />
 
             <TextInput
@@ -437,28 +340,24 @@ export default function profileInfo() {
                 h(50) as TextStyle,
                 px(24) as TextStyle,
                 bg("#F9F7F8") as TextStyle,
-                errors.phoneNumber && touched.phoneNumber
-                  ? { borderColor: Colors.light.error }
-                  : undefined,
+                errors.phoneNumber && touched.phoneNumber ? { borderColor: Colors.light.error } : undefined,
               ]}
               placeholderTextColor={Colors.light.textGrey}
               placeholder="Phone Number"
               keyboardType="numeric"
               value={values.phoneNumber}
               autoCorrect={false}
-              onChangeText={
-                profileCta === "save" ? handleChange("phoneNumber") : () => {}
-              }
+              onChangeText={profileCta === "save" ? handleChange("phoneNumber") : () => {}}
               onBlur={handleBlur("phoneNumber")}
+              editable={profileCta === "save"}
             />
           </View>
 
           <View style={{ marginTop: 20 }}>
             <ErrorMsg msg={msg} code={code} />
           </View>
-          {/* Form */}
         </PaddedScreen>
       </View>
     </SafeScreen>
-  );
+  )
 }
