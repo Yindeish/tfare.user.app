@@ -1,5 +1,5 @@
 // import { UploadApiOptions, upload } from "cloudinary-react-native";
-import cloudinary from "./cloudinary.config";
+// import cloudinary from "./cloudinary.config";
 import { uploadImage } from "./cloudinary-cdn";
 import { CLOUDINARY_UNSIGNED_PRESET } from "./cloudinary.constants";
 // import { upload } from 'cloudinary/react-native';
